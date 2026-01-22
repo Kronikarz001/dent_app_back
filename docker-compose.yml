@@ -1,0 +1,46 @@
+services:
+  dent_app_back_app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: dent_app_back_app
+    container_name: dent_app_back_app
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./:/var/www
+    ports:
+      - "8000:8000"
+    depends_on:
+      - dent_app_back_db
+    environment:
+      - DB_HOST=dent_app_back_db
+      - DB_PORT=5432
+      - DB_DATABASE=dent_db_back
+      - DB_USERNAME=pskudlik
+      - DB_PASSWORD=Troll001#
+    networks:
+      - dent_app_back_network
+
+  dent_app_back_db:
+    image: postgres:15
+    container_name: dent_app_back_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: dent_db_back
+      POSTGRES_USER: pskudlik
+      POSTGRES_PASSWORD: Troll001#
+    volumes:
+      - dbdata:/var/lib/postgresql
+    ports:
+      - "5432:5432"
+    networks:
+      - dent_app_back_network
+
+volumes:
+  dbdata:
+    driver: local
+
+networks:
+  dent_app_back_network:
+    driver: bridge
