@@ -31,3 +31,7 @@ optimize:
 	docker-compose exec dent_app_back_app php artisan config:clear
 	docker-compose exec dent_app_back_app php artisan cache:clear
 
+artisan:
+	docker-compose exec dent_app_back_app php artisan $@
+
+
