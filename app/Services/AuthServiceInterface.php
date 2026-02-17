@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
-use App\Requests\LoginRequest;
-use App\Requests\ResetPasswordRequest;
+use App\Http\Requests\LoginRequest;
+use App\Http\Requests\ResetPasswordRequest;
 use Illuminate\Http\JsonResponse;
 
 /**
