@@ -14,6 +14,8 @@ class JobPositionFactory extends Factory
     {
         return [
             'name' => $this->faker->name(),
+            'f_name' => $this->faker->name(),
+            'm_name' => $this->faker->name(),
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
         ];

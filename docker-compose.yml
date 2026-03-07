@@ -9,6 +9,10 @@ services:
     working_dir: /var/www
     volumes:
       - ./:/var/www
+      - storage_logs:/var/www/storage/logs
+      - storage_framework:/var/www/storage/framework
+      - storage_app:/var/www/storage/app
+      - bootstrap_cache:/var/www/bootstrap/cache
     ports:
       - "8000:8000"
     depends_on:
@@ -31,7 +35,7 @@ services:
       POSTGRES_USER: pskudlik
       POSTGRES_PASSWORD: Troll001#
     volumes:
-      - dbdata:/var/lib/postgresql
+      - dbdata:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     networks:
@@ -39,6 +43,14 @@ services:
 
 volumes:
   dbdata:
+    driver: local
+  storage_logs:
+    driver: local
+  storage_framework:
+    driver: local
+  storage_app:
+    driver: local
+  bootstrap_cache:
     driver: local
 
 networks:
