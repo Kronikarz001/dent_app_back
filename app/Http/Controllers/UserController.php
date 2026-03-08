@@ -8,7 +8,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Pagination\LengthAwarePaginator;
 use App\Http\Requests\UserStoreRequest;
 use App\Http\Requests\UserUpdateRequest;
-use App\Http\Requests\UserRequest;
 use App\Services\UserServiceInterface;
 
 /**
@@ -60,7 +59,7 @@ class UserController extends Controller
 
     /**
      * @param User $user
-     * @param UserRequest $request
+     * @param UserUpdateRequest $request
      * @return JsonResponse
      */
     public function update(User $user, UserUpdateRequest $request): JsonResponse

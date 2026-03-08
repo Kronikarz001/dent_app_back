@@ -49,13 +49,15 @@ class UserControllerTest extends TestCase
     {
         $response = $this->callApiWithLoggedUser()
             ->postJson(route('user.store'), [
-                'name' => 'Test User',
+                'first_name' => 'Test',
+                'last_name' => 'User',
                 'email' => 'example@mail',
+                'pesel' => '12345678901',
                 'password' => 'password',
                 'password_confirmation' => 'password',
             ]);
 
-        $response->assertOk();
+        $response->assertCreated();
 
         $this->assertDatabaseHas('users', [
             'email' => 'example@mail',
