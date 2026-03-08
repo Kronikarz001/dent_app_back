@@ -65,4 +65,24 @@ class UserControllerTest extends TestCase
             'email' => 'example@mail',
         ]);
     }
+
+    /**
+     * @return void
+     */
+    public function testUpdateUserReturnSuccessResponse(): void
+    {
+        $user = User::factory()->create();
+        $response = $this->callApiWithLoggedUser()
+            ->putJson(route('user.update', ['user' => $user->uuid]), [
+                'first_name' => 'Updated',
+                'last_name' => 'User',
+                'email' => 'example_updated@mail',
+                'pesel' => '12345678901',
+            ]);
+        $response->assertCreated();
+
+        $this->assertDatabaseHas('users', [
+            'email' => 'example_updated@mail',
+        ]);
+    }
 }
