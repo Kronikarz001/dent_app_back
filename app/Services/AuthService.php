@@ -9,11 +9,16 @@ use Illuminate\Http\JsonResponse;
 /**
  * Summary of AuthService
  */
-class AuthService implements AuthServiceInterface
+readonly class AuthService implements AuthServiceInterface
 {
+    /**
+     * @param UserServiceInterface $userService
+     */
     public function __construct(
-        private UserSe
+        private UserServiceInterface $userService
     )
+    {}
+
     /**
      * @param LoginRequest $request
      * @return JsonResponse
@@ -26,23 +31,35 @@ class AuthService implements AuthServiceInterface
     /**
      * @return JsonResponse
      */
-    public function logout(): JsonResponse;
+    public function logout(): JsonResponse
+    {
+
+    }
 
     /**
      * @param array $data
      * @return JsonResponse
      */
-    public function forgotPassword(array $data): JsonResponse;
+    public function forgotPassword(array $data): JsonResponse
+    {
+
+    }
 
     /**
      * @param ResetPasswordRequest $request
      * @return JsonResponse
      */
-    public function resetPassword(ResetPasswordRequest $request): JsonResponse;
+    public function resetPassword(ResetPasswordRequest $request): JsonResponse
+    {
+
+    }
 
     /**
      * @param string|null $token
      * @return void
      */
-    public function authenticate(?string $token): void;
+    public function authenticate(?string $token): void
+    {
+
+    }
 }

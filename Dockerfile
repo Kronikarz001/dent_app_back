@@ -1,4 +1,4 @@
-FROM php:8.3-fpm
+FROM php:8.4-fpm
 LABEL authors="Zalewska&Skudlik"
 ARG DOCKER_ENV
 
@@ -36,7 +36,12 @@ RUN groupadd -g 1000 www
 RUN useradd -u 1000 -ms /bin/bash -g www www
 
 COPY ./ /var/www
-RUN chown -R www:www /var/www
+
+RUN mkdir -p /var/www/storage/logs /var/www/storage/framework/cache \
+    /var/www/storage/framework/sessions /var/www/storage/framework/views \
+    /var/www/bootstrap/cache \
+    && chmod -R 777 /var/www/storage /var/www/bootstrap/cache \
+    && chown -R www:www /var/www
 
 USER www
 

@@ -2,20 +2,80 @@
 
 namespace App\Http\Controllers;
 
-class UserController
+use App\Models\User;
+use App\Resources\UserResource;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Pagination\LengthAwarePaginator;
+use App\Http\Requests\UserStoreRequest;
+use App\Http\Requests\UserUpdateRequest;
+use App\Http\Requests\UserRequest;
+use App\Services\UserServiceInterface;
+
+/**
+ * Summary of UserController
+ */
+class UserController extends Controller
 {
-    public function index()
-    {
-
+    /**
+     * @param UserServiceInterface $userService
+     */
+    public function __construct(
+        private readonly UserServiceInterface $userService
+    ) {
     }
 
-    public function create()
+    /**
+     * @return LengthAwarePaginator
+     */
+    public function index(): LengthAwarePaginator
     {
-
+        return $this->userService->getUsers();
     }
 
-    public function update()
+    /**
+     * @return LengthAwarePaginator
+     */
+    public function selectList(): LengthAwarePaginator
     {
+        return $this->userService->getUsersList();
+    }
 
+    /**
+     * @param User $user
+     * @return UserResource
+     */
+    public function show(User $user): UserResource
+    {
+        return new UserResource($user);
+    }
+
+    /**
+     * @param UserStoreRequest $request
+     * @return UserResource
+     */
+    public function store(UserStoreRequest $request): UserResource
+    {
+        return new UserResource($this->userService->createUser($request->all()));
+    }
+
+    /**
+     * @param User $user
+     * @param UserRequest $request
+     * @return JsonResponse
+     */
+    public function update(User $user, UserUpdateRequest $request): JsonResponse
+    {
+        $this->userService->updateUser($user, $request->all());
+        return response(204)->json();
+    }
+
+    /**
+     * @param User $user
+     * @return JsonResponse
+     */
+    public function destroy(User $user): JsonResponse
+    {
+        $this->userService->deactivateUser($user);
+        return response(204)->json();
     }
 }

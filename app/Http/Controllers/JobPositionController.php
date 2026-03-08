@@ -2,51 +2,67 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\JobPositionRequest;
-use App\Http\Resources\JobPositionResource;
 use App\Models\JobPosition;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use App\Resources\JobPositionResource;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Pagination\LengthAwarePaginator;
 
+/**
+ * Summary of JobPositionController
+ */
 class JobPositionController extends Controller
 {
-    use AuthorizesRequests;
-
-    public function index()
-    {
-        $this->authorize('viewAny', JobPosition::class);
-
-        return JobPositionResource::collection(JobPosition::all());
+    /**
+     * @param JobPositionServiceInterface $jobPositionService
+     */
+    public function __construct(
+        private readonly JobPositionServiceInterface $jobPositionService
+    ) {
     }
 
-    public function store(JobPositionRequest $request)
+    /**
+     * @return LengthAwarePaginator
+     */
+    public function index(): LengthAwarePaginator
     {
-        $this->authorize('create', JobPosition::class);
-
-        return new JobPositionResource(JobPosition::create($request->validated()));
+        return $this->$jobPositionService->getAllJobPositions();
     }
 
-    public function show(JobPosition $jobPosition)
+    /**
+     * @return LengthAwarePaginator
+     */
+    public function indexList(): LengthAwarePaginator
     {
-        $this->authorize('view', $jobPosition);
-
-        return new JobPositionResource($jobPosition);
+        return $this->$jobPositionService->getAllJobPositionsList();
     }
 
-    public function update(JobPositionRequest $request, JobPosition $jobPosition)
+    /**
+     * @param JobPositionStoreRequest $request
+     * @return JobPosition
+     */
+    public function create(JobPositionStoreRequest $request): JobPositionResource
     {
-        $this->authorize('update', $jobPosition);
-
-        $jobPosition->update($request->validated());
-
-        return new JobPositionResource($jobPosition);
+        return new JobPositionResource($this->$jobPositionService->createJobPosition($request->all()));
     }
 
-    public function destroy(JobPosition $jobPosition)
+    /**
+     * @param JobPosition $jobPosition
+     * @param JobPositionRequest $request
+     * @return JsonResponse
+     */
+    public function update(JobPosition $jobPosition, JobPositionUpdateRequest $request): JsonResponse
     {
-        $this->authorize('delete', $jobPosition);
+        $this->$jobPositionService->updateJobPosition($jobPosition, $request->all());
+        return response(204)->json();
+    }
 
-        $jobPosition->delete();
-
-        return response()->json();
+    /**
+     * @param JobPosition $jobPosition
+     * @return JsonResponse
+     */
+    public function delete(JobPosition $jobPosition): JsonResponse
+    {
+        $this->$jobPositionService->delete($jobPosition);
+        return response(204)->json();
     }
 }

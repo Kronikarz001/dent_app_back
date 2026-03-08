@@ -6,12 +6,15 @@ use App\Models\User;
 use App\Resources\UserResource;
 use Illuminate\Pagination\LengthAwarePaginator;
 
+/**
+ * Summary of UserServiceInterface
+ */
 interface UserServiceInterface
 {
     /**
-     * @return string
+     * @return LengthAwarePaginator
      */
-    public function getLoggedUserFullName(): string;
+    public function getUsers(): LengthAwarePaginator;
 
     /**
      * @return LengthAwarePaginator
@@ -19,10 +22,10 @@ interface UserServiceInterface
     public function getUsersList(): LengthAwarePaginator;
 
     /**
-     * @param string|null $token
-     * @return User|null
+     * @param array $data
+     * @return User
      */
-    public function getUserByToken(?string $token): ?User;
+    public function createUser(array $data): User;
 
     /**
      * @param User $user
@@ -32,13 +35,29 @@ interface UserServiceInterface
     public function updateUser(User $user, array $data): User;
 
     /**
-     * @return UserResource
+     * @param User $user
+     * @return void
      */
-    public function getUserInformation(): UserResource;
+    public function deactivateUser(User $user): void;
 
     /**
      * @param array $data
      * @return User
      */
     public function editPassword(array $data):User;
+
+    /**
+     * @return User
+     */
+    public function getUserInformation(): User;
+
+    /**
+     * @param string|null $token
+     * @return User|null
+     */
+    public function getUserByToken(?string $token): ?User;
+    /**
+     * @return string
+     */
+    public function getLoggedUserFullName(): string;
 }

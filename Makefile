@@ -31,6 +31,16 @@ optimize:
 	docker-compose exec dent_app_back_app php artisan config:clear
 	docker-compose exec dent_app_back_app php artisan cache:clear
 
+test:
+	docker-compose exec dent_app_back_app php artisan optimize
+	docker-compose exec dent_app_back_app php artisan cache:clear
+	docker-compose exec dent_app_back_app php artisan config:clear
+	docker-compose exec dent_app_back_app php artisan cache:clear
+	docker-compose exec dent_app_back_app php artisan test --env=testing
+
+logs:
+	docker-compose exec dent_app_back_app tail -f storage/logs/laravel.log
+
 artisan:
 	docker-compose exec dent_app_back_app php artisan $@
 
