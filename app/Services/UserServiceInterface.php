@@ -41,23 +41,26 @@ interface UserServiceInterface
     public function deactivateUser(User $user): void;
 
     /**
+     * @param User $user
      * @param array $data
      * @return User
      */
-    public function editPassword(array $data):User;
+    public function editPassword(User $user, array $data): User;
+
+    /**
+     * @param User $user
+     * @return User
+     */
+    public function getUserInformation(User $user): User;
+
+    /**
+     * @param array $data
+     * @return User|null
+     */
+    public function getUserByToken(array $data): ?User;
 
     /**
      * @return User
      */
-    public function getUserInformation(): User;
-
-    /**
-     * @param string|null $token
-     * @return User|null
-     */
-    public function getUserByToken(?string $token): ?User;
-    /**
-     * @return string
-     */
-    public function getLoggedUserFullName(): string;
+    public function getLoggedUser(): User;
 }

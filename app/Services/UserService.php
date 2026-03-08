@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\User;
 use App\Repositories\UserRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
+use InvalidArgumentException;
 
 /**
  * Summary of UserService
@@ -52,7 +53,7 @@ readonly class UserService implements UserServiceInterface
      */
     public function updateUser(User $user, array $data): User
     {
-        return $this->userRepository->updateUser($user, $data);
+        return $this->userRepository->update($user, $data);
     }
 
     /**
@@ -61,39 +62,52 @@ readonly class UserService implements UserServiceInterface
      */
     public function deactivateUser(User $user): void
     {
-        $this->userRepository->deactivateUser($user);
+        $this->userRepository->update($user, ['active' => false]);
     }
 
     /**
+     * @param User $user
+     * @return void
+     */
+    public function deleteUser(User $user): void
+    {
+        $this->userRepository->delete($user);
+    }
+
+    /**
+     * @param User $user
      * @param array $data
      * @return User
      */
-    public function editPassword(array $data): User
+    public function editPassword(User $user, array $data): User
     {
-        return $this->userRepository->editPassword($data);
+        $data['password'] = bcrypt($data['password']);
+        return $this->userRepository->update($user, $data);
     }
 
     /**
+     * @param User $user
      * @return User
      */
-    public function getUserInformation(): User
+    public function getUserInformation(User $user): User
     {
         return $this->userRepository->getUserInformation();
     }
 
     /**
-     * @param string|null $token
+     * @param array $data
      * @return User|null
      */
-    public function getUserByToken(?string $token): ?User
+    public function getUserByToken(array $data): ?User
     {
+        $token = $data['token'];
         return $this->userRepository->getUserByToken($token);
     }
 
     /**
-     * @return string
+     * @return User
      */
-    public function getLoggedUserFullName(): string
+    public function getLoggedUser(): User
     {
         return $this->userRepository->getLoggedUserFullName();
     }
