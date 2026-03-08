@@ -3,12 +3,13 @@
 namespace App\Services;
 
 use App\Models\User;
+use App\Repositories\UserRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 /**
  * Summary of UserService
  */
-class UserService implements UserServiceInterface
+readonly class UserService implements UserServiceInterface
 {
     /**
      * @param UserRepositoryInterface $userRepository
@@ -60,7 +61,7 @@ class UserService implements UserServiceInterface
      */
     public function deactivateUser(User $user): void
     {
-        return $this->userRepository->deactivateUser($user);
+        $this->userRepository->deactivateUser($user);
     }
 
     /**
