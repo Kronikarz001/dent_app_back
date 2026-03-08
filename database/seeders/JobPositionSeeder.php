@@ -15,13 +15,13 @@ class JobPositionSeeder extends Seeder
      */
     public function run(): void
     {
-//        collect($this->positions)->each(function ($position) {
-//            JobPosition::create([
-//                'name' => $position['name'],
-//                'f_name' => $position['f_name'],
-//                'm_name' => $position['m_name'],
-//            ]);
-//        });
+        collect($this->positions)->each(function ($position) {
+            JobPosition::create([
+                'name' => $position['name'],
+                'f_name' => $position['f_name'],
+                'm_name' => $position['m_name'],
+            ]);
+        });
     }
 
     /**

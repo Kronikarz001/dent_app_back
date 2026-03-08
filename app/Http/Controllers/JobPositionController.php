@@ -25,7 +25,7 @@ class JobPositionController extends Controller
      */
     public function index(): LengthAwarePaginator
     {
-        return $this->$jobPositionService->getAllJobPositions();
+        return $this->jobPositionService->getAllJobPositions();
     }
 
     /**
@@ -33,7 +33,7 @@ class JobPositionController extends Controller
      */
     public function indexList(): LengthAwarePaginator
     {
-        return $this->$jobPositionService->getAllJobPositionsList();
+        return $this->jobPositionService->getAllJobPositionsList();
     }
 
     /**
@@ -42,7 +42,7 @@ class JobPositionController extends Controller
      */
     public function create(JobPositionStoreRequest $request): JobPositionResource
     {
-        return new JobPositionResource($this->$jobPositionService->createJobPosition($request->all()));
+        return new JobPositionResource($this->jobPositionService->createJobPosition($request->all()));
     }
 
     /**
@@ -52,7 +52,7 @@ class JobPositionController extends Controller
      */
     public function update(JobPosition $jobPosition, JobPositionUpdateRequest $request): JsonResponse
     {
-        $this->$jobPositionService->updateJobPosition($jobPosition, $request->all());
+        $this->jobPositionService->updateJobPosition($jobPosition, $request->all());
         return response(204)->json();
     }
 
@@ -62,7 +62,7 @@ class JobPositionController extends Controller
      */
     public function delete(JobPosition $jobPosition): JsonResponse
     {
-        $this->$jobPositionService->delete($jobPosition);
+        $this->jobPositionService->delete($jobPosition);
         return response(204)->json();
     }
 }

@@ -34,7 +34,7 @@ readonly class UserService implements UserServiceInterface
      */
     public function getUsersList(): LengthAwarePaginator
     {
-        return $this->userRepository->findAllWithPagination(['id', 'name']);
+        return $this->userRepository->findAllWithPagination(['uuid', 'name']);
     }
 
     /**

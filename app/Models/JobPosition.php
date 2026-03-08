@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 
 /**
+ * Summary of JobPosition
  * @property string $uuid
  * @property string $name
  * @property string $f_name
@@ -16,12 +17,17 @@ use Illuminate\Support\Carbon;
  */
 class JobPosition extends UuidModel
 {
+    /**
+     * @use SoftDeletes
+     */
     use SoftDeletes;
 
-    protected array $fillable = [
+    /**
+     * @var string[]
+     */
+    protected $fillable = [
         'name',
         'f_name',
         'm_name',
     ];
-
 }

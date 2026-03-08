@@ -1,20 +1,20 @@
 <?php
 namespace App\Search;
 
-use App\Models\User;
+use App\Models\JobPosition;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
- * Summary of UserSearch
+ * Summary of JobPositionSearch
  */
-class UserSearch extends Search
+class JobPositionSearch extends Search
 {
     /**
      * @return string
      */
     protected function modelClass(): string
     {
-        return User::class;
+        return JobPosition::class;
     }
 
     /**
@@ -22,7 +22,7 @@ class UserSearch extends Search
      */
     protected function prefix(): string
     {
-        return 'user';
+        return 'jobPosition';
     }
 
     /**
@@ -31,11 +31,9 @@ class UserSearch extends Search
     protected function fillableSearchFields(): array
     {
         return [
-            'uuid',
-            'email',
-            'first_name',
-            'last_name',
-            'pesel'
+            'name',
+            'f_name',
+            'm_name',
         ];
     }
 
@@ -44,7 +42,11 @@ class UserSearch extends Search
      */
     protected function fillableSortFields(): array
     {
-        return ['first_name', 'last_name', 'email', 'created_at'];
+        return [
+            'name',
+            'f_name',
+            'm_name',
+        ];
     }
 
     /**
@@ -52,7 +54,11 @@ class UserSearch extends Search
      */
     protected function searchStringFields(): array
     {
-        return ['first_name', 'last_name', 'email'];
+        return [
+            'name',
+            'f_name',
+            'm_name',
+        ];
     }
 
     /**
