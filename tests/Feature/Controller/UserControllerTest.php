@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Controller;
 
+use App\Models\User;
 use Tests\TestCase;
 
 /**
@@ -36,8 +37,9 @@ class UserControllerTest extends TestCase
      */
     public function testShowUserReturnSuccessResponse(): void
     {
+        $user = User::factory()->create();
         $response = $this->callApiWithLoggedUser()
-            ->getJson(route('user.show', ['user' => 1]));
+            ->getJson(route('user.show', ['user' => $user->uuid]));
 
         $response->assertOk();
     }
