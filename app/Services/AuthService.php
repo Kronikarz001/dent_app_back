@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\ResetPasswordRequest;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 
 /**
@@ -21,17 +22,26 @@ readonly class AuthService implements AuthServiceInterface
 
     /**
      * @param LoginRequest $request
-     * @return JsonResponse
+     * @return User
      */
-    public function login(LoginRequest $request): JsonResponse
+    public function login(LoginRequest $request): User
     {
+        $user = $this->userService->findByEmail($request->email);
 
+        if (!$user || !password_verify($request->password, $user->password)) {
+            throw new \Exception('Invalid credentials');
+        }
+
+        // Generate token logic here (e.g., JWT)
+        // $token = $this->generateToken($user);
+
+        return $user;
     }
 
     /**
-     * @return JsonResponse
+     * @return void
      */
-    public function logout(): JsonResponse
+    public function logout(): void
     {
 
     }

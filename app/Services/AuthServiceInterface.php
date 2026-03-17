@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\ResetPasswordRequest;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 
 /**
@@ -13,14 +14,14 @@ interface AuthServiceInterface
 {
     /**
      * @param LoginRequest $request
-     * @return JsonResponse
+     * @return User
      */
-    public function login(LoginRequest $request): JsonResponse;
+    public function login(LoginRequest $request): User;
 
     /**
-     * @return JsonResponse
+     * @return void
      */
-    public function logout(): JsonResponse;
+    public function logout(): void;
 
     /**
      * @param array $data
