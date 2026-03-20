@@ -10,6 +10,10 @@ Route::middleware('auth:sanctum')->group(function () {
     /**
      * All api routes for users
      */
+    Route::post('/user/{user}/forgot-password', [AuthController::class, 'forgotPassword'])
+        ->name('user.forgot_password');
+    Route::patch('/user/{user}/resetPassword', [AuthController::class, 'resetPassword'])
+        ->name('user.resetPassword');
     Route::get('/user/selectlist', [UserController::class, 'selectList'])
         ->name('user.selectList');
     Route::apiResource('/user', UserController::class)

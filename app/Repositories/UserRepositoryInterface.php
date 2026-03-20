@@ -44,4 +44,10 @@ interface UserRepositoryInterface extends BasicRepositoryInterface
      * @return User
      */
     public function getLoggedUserFullName(): User;
+
+    /**
+     * @param User $user
+     * @return User
+     */
+    public function getUserInformation(User $user): User;
 }

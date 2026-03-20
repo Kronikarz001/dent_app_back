@@ -30,10 +30,10 @@ interface AuthServiceInterface
     public function forgotPassword(array $data): JsonResponse;
 
     /**
-     * @param ResetPasswordRequest $request
+     * @param array $data
      * @return JsonResponse
      */
-    public function resetPassword(ResetPasswordRequest $request): JsonResponse;
+    public function resetPassword(array $data): JsonResponse;
 
     /**
      * @param string|null $token

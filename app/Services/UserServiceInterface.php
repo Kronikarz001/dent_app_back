@@ -54,10 +54,10 @@ interface UserServiceInterface
     public function getUserInformation(User $user): User;
 
     /**
-     * @param array $data
+     * @param string $token
      * @return User|null
      */
-    public function getUserByToken(array $data): ?User;
+    public function getUserByToken(string $token): ?User;
 
     /**
      * @return User

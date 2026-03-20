@@ -27,7 +27,8 @@ class AuthController extends Controller
      */
     public function login(LoginRequest $request): JsonResponse
     {
-        return $this->authService->login($request);
+        $this->authService->login($request);
+        return response(200)->json();
     }
 
     /**
@@ -35,7 +36,8 @@ class AuthController extends Controller
      */
     public function logout(): JsonResponse
     {
-        return $this->authService->logout();
+        $this->authService->logout();
+        return response(200)->json();
     }
 
     /**
@@ -44,7 +46,8 @@ class AuthController extends Controller
      */
     public function forgotPassword(ForgotPasswordRequest $request): JsonResponse
     {
-        return $this->authService->forgotPassword($request->all());
+        $this->authService->forgotPassword($request->all());
+        return response(200)->json();
     }
 
     /**
@@ -53,7 +56,8 @@ class AuthController extends Controller
      */
     public function resetPassword(ResetPasswordRequest $request): JsonResponse
     {
-        return $this->authService->resetPassword($request);
+        $this->authService->resetPassword($request->all());
+        return response(204)->json();
     }
 
 }

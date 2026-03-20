@@ -91,16 +91,15 @@ readonly class UserService implements UserServiceInterface
      */
     public function getUserInformation(User $user): User
     {
-        return $this->userRepository->getUserInformation();
+        return $this->userRepository->getUserInformation($user->uuid);
     }
 
     /**
-     * @param array $data
+     * @param string $token
      * @return User|null
      */
-    public function getUserByToken(array $data): ?User
+    public function getUserByToken(string $token): ?User
     {
-        $token = $data['token'];
         return $this->userRepository->getUserByToken($token);
     }
 
@@ -111,6 +110,4 @@ readonly class UserService implements UserServiceInterface
     {
         return $this->userRepository->getLoggedUserFullName();
     }
-
-
 }

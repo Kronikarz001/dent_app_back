@@ -93,4 +93,13 @@ readonly class UserRepository implements UserRepositoryInterface
     {
         return Auth::user();
     }
+
+    /**
+     * @param User $user
+     * @return User
+     */
+    public function getUserInformation(User $user): User
+    {
+        return User::find($user->id);
+    }
 }
