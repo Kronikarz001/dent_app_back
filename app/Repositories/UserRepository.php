@@ -95,11 +95,11 @@ readonly class UserRepository implements UserRepositoryInterface
     }
 
     /**
-     * @param User $user
+     * @param string $userUuid
      * @return User
      */
-    public function getUserInformation(User $user): User
+    public function getUserInformation(string $userUuid): User
     {
-        return User::find($user->id);
+        return User::find($userUuid);
     }
 }

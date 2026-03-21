@@ -47,7 +47,7 @@ class UserControllerTest extends TestCase
     /**
      * @return void
      */
-    public function testStoreUserReturnSuccessResponse(): void
+    public function testStoreUserReturnCreatedResponse(): void
     {
         $response = $this->callApiWithLoggedUser()
             ->postJson(route('user.store'), [
@@ -69,7 +69,7 @@ class UserControllerTest extends TestCase
     /**
      * @return void
      */
-    public function testUpdateUserReturnSuccessResponse(): void
+    public function testUpdateUserReturnNoContentResponse(): void
     {
         $user = User::factory()->create();
         $response = $this->callApiWithLoggedUser()
@@ -89,7 +89,7 @@ class UserControllerTest extends TestCase
     /**
      * @return void
      */
-    public function testDeleteUserReturnSuccessResponse(): void
+    public function testDeleteUserReturnNoContentResponse(): void
     {
         $user = User::factory()->create();
         $response = $this->callApiWithLoggedUser()
