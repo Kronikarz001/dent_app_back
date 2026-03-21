@@ -79,10 +79,25 @@ class UserControllerTest extends TestCase
                 'email' => 'example_updated@mail',
                 'pesel' => '12345678901',
             ]);
-        $response->assertCreated();
+        $response->assertNoContent();
 
         $this->assertDatabaseHas('users', [
             'email' => 'example_updated@mail',
+        ]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testDeleteUserReturnSuccessResponse(): void
+    {
+        $user = User::factory()->create();
+        $response = $this->callApiWithLoggedUser()
+            ->deleteJson(route('user.destroy', ['user' => $user->uuid]));
+        $response->assertNoContent();
+
+        $this->assertDatabaseMissing('users', [
+            'email' => 'example@mail',
         ]);
     }
 }
