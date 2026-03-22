@@ -83,7 +83,7 @@ readonly class UserRepository implements UserRepositoryInterface
      */
     public function getUserByToken(string $token): ?User
     {
-        return User::where('api_token', $token)->first();
+        return User::whereToken($token);
     }
 
     /**
