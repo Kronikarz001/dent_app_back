@@ -44,9 +44,30 @@ readonly class AuthService implements AuthServiceInterface
      */
     public function logout(): void
     {
-        $user =  Auth::user();
-        $this->userRouteCacheService->delete($user);
+        /** @var User $user */
+        $user = Auth::user();
+
+        if (is_null($user)) {
+            return;
+        }
+
         $user->currentAccessToken()->delete();
+        $this->userRouteCacheService->delete($user);
+    }
+
+    /**
+     * @param array $data
+     * @return JsonResponse
+     */
+    public function forgotPassword(array $data): JsonResponse
+    {
+        $status = Password::sendResetLink(['email' => $data['email']]);
+
+        if ($status === Password::RESET_LINK_SENT) {
+            return new JsonResponse(['message' => __($status)]);
+        }
+
+        return new JsonResponse(['message' => __($status)], 422);
     }
 
     /**
@@ -65,21 +86,6 @@ readonly class AuthService implements AuthServiceInterface
         );
 
         if ($status === Password::PASSWORD_RESET) {
-            return new JsonResponse(['message' => __($status)]);
-        }
-
-        return new JsonResponse(['message' => __($status)], 422);
-    }
-
-    /**
-     * @param array $data
-     * @return JsonResponse
-     */
-    public function forgotPassword(array $data): JsonResponse
-    {
-        $status = Password::sendResetLink($data);
-
-        if ($status === Password::RESET_LINK_SENT) {
             return new JsonResponse(['message' => __($status)]);
         }
 

@@ -9,7 +9,7 @@ Route::middleware('auth:sanctum')->group(function () {
     /**
      * All api routes for users
      */
-    Route::post('/user/{user}/forgot-password', [AuthController::class, 'forgotPassword'])
+    Route::post('/user/forgot-password', [AuthController::class, 'forgotPassword'])
         ->name('user.forgot_password');
     Route::patch('/user/{user}/resetPassword', [AuthController::class, 'resetPassword'])
         ->name('user.resetPassword');

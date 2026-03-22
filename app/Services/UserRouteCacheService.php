@@ -5,7 +5,6 @@ namespace App\Services;
 use App\DTO\UserRouteDto;
 use App\Models\User;
 
-
 /**
  * @extends CacheServiceInterface<User, UserRouteDto>
  */
@@ -18,7 +17,7 @@ class UserRouteCacheService extends CacheService
      */
     public function set(mixed $key, mixed $data): void
     {
-        parent::set($key->id, $data);
+        parent::set($key->uuid, $data);
     }
 
     /**
@@ -27,7 +26,7 @@ class UserRouteCacheService extends CacheService
      */
     public function get(mixed $key): UserRouteDto
     {
-        return parent::get($key->id);
+        return parent::get($key->uuid);
     }
 
     /**
@@ -36,7 +35,7 @@ class UserRouteCacheService extends CacheService
      */
     public function delete(mixed $key): void
     {
-        parent::delete($key->id);
+        parent::delete($key->uuid);
     }
 
     /**
@@ -45,7 +44,7 @@ class UserRouteCacheService extends CacheService
      */
     public function has(mixed $key): bool
     {
-        return parent::has($key->id);
+        return parent::has($key->uuid);
     }
 
     /**
