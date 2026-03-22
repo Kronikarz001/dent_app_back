@@ -38,4 +38,10 @@ interface JobPositionServiceInterface
      * @return void
      */
     public function deleteJobPosition(JobPosition $jobPosition): void;
+
+    /**
+     * @param JobPosition $jobPosition
+     * @return void
+     */
+    public function deleteJobPosition(JobPosition $jobPosition): void;
 }

@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\JobPositionRequest;
 use App\Models\JobPosition;
 use App\Resources\JobPositionResource;
+use App\Services\JobPositionServiceInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Pagination\LengthAwarePaginator;
 
@@ -25,7 +27,7 @@ class JobPositionController extends Controller
      */
     public function index(): LengthAwarePaginator
     {
-        return $this->jobPositionService->getAllJobPositions();
+        return $this->jobPositionService->getJobPositions();
     }
 
     /**
@@ -33,14 +35,14 @@ class JobPositionController extends Controller
      */
     public function indexList(): LengthAwarePaginator
     {
-        return $this->jobPositionService->getAllJobPositionsList();
+        return $this->jobPositionService->getJobPositionsList();
     }
 
     /**
-     * @param JobPositionStoreRequest $request
-     * @return JobPosition
+     * @param JobPositionRequest $request
+     * @return JobPositionResource
      */
-    public function create(JobPositionStoreRequest $request): JobPositionResource
+    public function create(JobPositionRequest $request): JobPositionResource
     {
         return new JobPositionResource($this->jobPositionService->createJobPosition($request->all()));
     }
@@ -50,10 +52,10 @@ class JobPositionController extends Controller
      * @param JobPositionRequest $request
      * @return JsonResponse
      */
-    public function update(JobPosition $jobPosition, JobPositionUpdateRequest $request): JsonResponse
+    public function update(JobPosition $jobPosition, JobPositionRequest $request): JsonResponse
     {
         $this->jobPositionService->updateJobPosition($jobPosition, $request->all());
-        return response(204)->json();
+        return response()->json([], 204);
     }
 
     /**
@@ -62,7 +64,7 @@ class JobPositionController extends Controller
      */
     public function delete(JobPosition $jobPosition): JsonResponse
     {
-        $this->jobPositionService->delete($jobPosition);
-        return response(204)->json();
+        $this->jobPositionService->deleteJobPosition($jobPosition);
+        return response()->json([], 204);
     }
 }

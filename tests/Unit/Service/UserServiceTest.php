@@ -166,9 +166,7 @@ class UserServiceTest extends TestCase
 
         $this->userRepository->shouldReceive('update')->once();
 
-        $result = $this->userService->deactivateUser($user);
-
-        $this->assertNull($result);
+        $this->assertNull($this->userService->deactivateUser($user));
     }
 
     /**

@@ -6,12 +6,14 @@ use App\Exceptions\AuthenticationException;
 use App\Http\Requests\LoginRequest;
 use App\Models\User;
 use App\Services\Cache\UserRouteCacheService;
-use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 
+/**
+ * Summary of AuthService
+ */
 readonly class AuthService implements AuthServiceInterface
 {
     /**
@@ -27,21 +29,15 @@ readonly class AuthService implements AuthServiceInterface
 
     /**
      * @param LoginRequest $request
-     * @return JsonResponse
+     * @return User
      */
-    public function login(LoginRequest $request): JsonResponse
+    public function login(LoginRequest $request): User
     {
-
-        if (!Auth::attempt($request->all())) {
-            return $this->unauthorized();
+        if (!Auth::attempt($request->only(['email', 'password']))) {
+            throw new AuthenticationException();
         }
 
-        /** @var User $user */
-        $user = Auth::user();
-
-        return new JsonResponse(
-            $this->makeTokenResponse($user)
-        );
+        return Auth::user();
     }
 
     /**
@@ -127,15 +123,5 @@ readonly class AuthService implements AuthServiceInterface
             'token' => $plainText,
             'type' => 'BEARER',
         ];
-    }
-
-    /**
-     * @return JsonResponse
-     */
-    private function unauthorized(): JsonResponse
-    {
-        return new JsonResponse([
-            'message' => __('bad.credentials'),
-        ], 401);
     }
 }
