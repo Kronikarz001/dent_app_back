@@ -33,7 +33,7 @@ class JobPositionController extends Controller
     /**
      * @return LengthAwarePaginator
      */
-    public function indexList(): LengthAwarePaginator
+    public function selectList(): LengthAwarePaginator
     {
         return $this->jobPositionService->getJobPositionsList();
     }

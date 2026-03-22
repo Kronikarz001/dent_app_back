@@ -37,7 +37,7 @@ class AuthController extends Controller
     public function logout(): JsonResponse
     {
         $this->authService->logout();
-        return response()->json([], 200);
+        return response()->json();
     }
 
     /**
@@ -47,7 +47,7 @@ class AuthController extends Controller
     public function forgotPassword(ForgotPasswordRequest $request): JsonResponse
     {
         $this->authService->forgotPassword($request->all());
-        return response()->json([], 200);
+        return response()->json();
     }
 
     /**

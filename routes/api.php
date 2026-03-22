@@ -6,7 +6,6 @@ use App\Http\Controllers\UserController;
 
 
 Route::middleware('auth:sanctum')->group(function () {
-
     /**
      * All api routes for users
      */
@@ -24,6 +23,8 @@ Route::middleware('auth:sanctum')->group(function () {
     /**
      * All api routes for job positions
      */
+    Route::get('/job-position/selectlist', [JobPositionController::class, 'selectList'])
+        ->name('jobPosition.selectList');
     Route::apiResource('/job-position', JobPositionController::class)
         ->names('jobPosition');
 });
