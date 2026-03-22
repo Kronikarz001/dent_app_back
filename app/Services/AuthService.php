@@ -96,11 +96,17 @@ readonly class AuthService implements AuthServiceInterface
      * @param string|null $token
      * @return void
      */
+    /**
+     * @param string|null $token
+     * @return void
+     */
     public function authenticate(?string $token): void
     {
-        $user = $this->userService->getUserByToken(
-            $token,
-        );
+        if (is_null($token)) {
+            throw new AuthenticationException();
+        }
+
+        $user = $this->userService->getUserByToken($token);
 
         if (is_null($user)) {
             throw new AuthenticationException();
