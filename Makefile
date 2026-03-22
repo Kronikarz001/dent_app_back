@@ -45,3 +45,6 @@ artisan:
 	docker-compose exec dent_app_back_app php artisan $@
 
 
+
+seed-users:
+	docker-compose exec dent_app_back_app php artisan tinker --execute="App\Models\User::factory()->count(50)->create();"

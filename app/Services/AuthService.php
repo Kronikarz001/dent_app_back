@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Exceptions\AuthenticationException;
 use App\Http\Requests\LoginRequest;
 use App\Models\User;
-use App\Services\Cache\UserRouteCacheService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;

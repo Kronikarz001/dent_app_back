@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
-use App\Resources\UserResource;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Pagination\LengthAwarePaginator;
 use App\Http\Requests\UserStoreRequest;
 use App\Http\Requests\UserUpdateRequest;
+use App\Models\User;
+use App\Resources\UserResource;
 use App\Services\UserServiceInterface;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 /**
  * Summary of UserController

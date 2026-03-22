@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ForgotPasswordRequest;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\ResetPasswordRequest;
+use App\Resources\UserResource;
 use App\Services\AuthServiceInterface;
 use Illuminate\Http\JsonResponse;
 
@@ -23,12 +24,11 @@ class AuthController extends Controller
 
     /**
      * @param LoginRequest $request
-     * @return JsonResponse
+     * @return UserResource
      */
-    public function login(LoginRequest $request): JsonResponse
+    public function login(LoginRequest $request): UserResource
     {
-        $this->authService->login($request);
-        return response(200)->json();
+        return new UserResource($this->authService->login($request));
     }
 
     /**
@@ -37,7 +37,7 @@ class AuthController extends Controller
     public function logout(): JsonResponse
     {
         $this->authService->logout();
-        return response(200)->json();
+        return response()->json([], 200);
     }
 
     /**
@@ -47,7 +47,7 @@ class AuthController extends Controller
     public function forgotPassword(ForgotPasswordRequest $request): JsonResponse
     {
         $this->authService->forgotPassword($request->all());
-        return response(200)->json();
+        return response()->json([], 200);
     }
 
     /**
@@ -57,7 +57,6 @@ class AuthController extends Controller
     public function resetPassword(ResetPasswordRequest $request): JsonResponse
     {
         $this->authService->resetPassword($request->all());
-        return response(204)->json();
+        return response()->json([], 204);
     }
-
 }
