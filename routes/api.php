@@ -23,6 +23,8 @@ Route::middleware('auth:sanctum')->group(function () {
     /**
      * All api routes for job positions
      */
+    Route::patch('/user/{user}/jobposition', [JobPositionController::class, 'assignJobPosition'])
+        ->name('user.jobPosition.assignJobPosition');
     Route::get('/job-position/selectlist', [JobPositionController::class, 'selectList'])
         ->name('jobPosition.selectList');
     Route::apiResource('/job-position', JobPositionController::class)

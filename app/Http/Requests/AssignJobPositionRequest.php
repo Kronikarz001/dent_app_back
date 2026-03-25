@@ -5,9 +5,9 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
- * Summary of JobPositionRequest
+ * Summary of AssignJobPositionRequest
  */
-class JobPositionRequest extends FormRequest
+class AssignJobPositionRequest extends FormRequest
 {
     /**
      * @return array
@@ -15,9 +15,8 @@ class JobPositionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string'],
-            'f_name' => ['required', 'string'],
-            'm_name' => ['required', 'string'],
+            'job_positions' => ['required', 'array'],
+            'job_positions.*' => ['required','exists:job_positions,uuid'],
         ];
     }
 

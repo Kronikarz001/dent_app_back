@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\JobPosition;
+use App\Models\User;
 use App\Repositories\JobPositionRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
 use InvalidArgumentException;
@@ -63,5 +64,17 @@ readonly class JobPositionService implements JobPositionServiceInterface
     public function deleteJobPosition(JobPosition $jobPosition): void
     {
         $this->jobPositionRepository->delete($jobPosition);
+    }
+
+    /**
+     * @param User $user
+     * @param array $data
+     * @return void
+     */
+    public function assignJobPosition(User $user, array $data): void
+    {
+        collect($data)->each(function (array $jobPosition) use ($user) {
+           $user->jobPositions()->syncWithoutDetaching($jobPosition['uuid']);
+        });
     }
 }

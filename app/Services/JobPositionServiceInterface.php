@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\JobPosition;
+use App\Models\User;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 /**
@@ -40,8 +41,9 @@ interface JobPositionServiceInterface
     public function deleteJobPosition(JobPosition $jobPosition): void;
 
     /**
-     * @param JobPosition $jobPosition
+     * @param User $user
+     * @param array $data
      * @return void
      */
-    public function deleteJobPosition(JobPosition $jobPosition): void;
+    public function assignJobPosition(User $user, array $data): void;
 }

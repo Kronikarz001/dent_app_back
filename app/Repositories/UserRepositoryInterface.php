@@ -29,10 +29,10 @@ interface UserRepositoryInterface extends BasicRepositoryInterface
     public function update(User|Model $user, array $data): User;
 
     /**
-     * @param User|Model $user
-     * @return void
+     * @param Model|User $model
+     * @return bool
      */
-    public function delete(User|Model $user): void;
+    public function delete(Model|User $model): bool;
 
     /**
      * @param string $token
