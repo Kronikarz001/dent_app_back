@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 
@@ -22,6 +24,8 @@ class JobPosition extends UuidModel
      */
     use SoftDeletes;
 
+    protected $table = 'job_positions';
+
     /**
      * @var string[]
      */
@@ -30,4 +34,12 @@ class JobPosition extends UuidModel
         'f_name',
         'm_name',
     ];
+
+    /**
+     * @return BelongsToMany
+     */
+    public function user(): BelongsToMany
+    {
+        return $this->BelongsToMany(User::class, 'users_job_positions', 'job_position_uuid', 'user_uuid');
+    }
 }

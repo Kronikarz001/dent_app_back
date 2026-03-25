@@ -43,8 +43,8 @@ interface BasicRepositoryInterface
 
     /**
      * @param Model $model
-     * @return void
+     * @return bool
      */
-    public function delete(Model $model): void;
+    public function delete(Model $model): bool;
 
 }

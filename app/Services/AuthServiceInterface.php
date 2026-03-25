@@ -14,9 +14,9 @@ interface AuthServiceInterface
 {
     /**
      * @param LoginRequest $request
-     * @return User
+     * @return JsonResponse
      */
-    public function login(LoginRequest $request): User;
+    public function login(LoginRequest $request): JsonResponse;
 
     /**
      * @return void

@@ -22,15 +22,15 @@ interface JobPositionRepositoryInterface extends BasicRepositoryInterface
     public function create(array $data): JobPosition;
 
     /**
-     * @param JobPosition|Model $jobPosition
+     * @param JobPosition|Model $model
      * @param array $data
      * @return JobPosition
      */
-    public function update(JobPosition|Model $jobPosition, array $data): JobPosition;
+    public function update(JobPosition|Model $model, array $data): JobPosition;
 
     /**
      * @param JobPosition|Model $jobPosition
-     * @return void
+     * @return bool
      */
-    public function delete(JobPosition|Model $jobPosition): void;
+    public function delete(JobPosition|Model $model): bool;
 }

@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AssignJobPositionRequest;
 use App\Http\Requests\JobPositionRequest;
 use App\Models\JobPosition;
+use App\Models\User;
 use App\Resources\JobPositionResource;
 use App\Services\JobPositionServiceInterface;
 use Illuminate\Http\JsonResponse;
@@ -39,10 +41,19 @@ class JobPositionController extends Controller
     }
 
     /**
+     * @param JobPosition $jobPosition
+     * @return JobPositionResource
+     */
+    public function show(JobPosition $jobPosition): JobPositionResource
+    {
+        return new JobPositionResource($jobPosition);
+    }
+
+    /**
      * @param JobPositionRequest $request
      * @return JobPositionResource
      */
-    public function create(JobPositionRequest $request): JobPositionResource
+    public function store(JobPositionRequest $request): JobPositionResource
     {
         return new JobPositionResource($this->jobPositionService->createJobPosition($request->all()));
     }
@@ -62,9 +73,20 @@ class JobPositionController extends Controller
      * @param JobPosition $jobPosition
      * @return JsonResponse
      */
-    public function delete(JobPosition $jobPosition): JsonResponse
+    public function destroy(JobPosition $jobPosition): JsonResponse
     {
         $this->jobPositionService->deleteJobPosition($jobPosition);
+        return response()->json([], 204);
+    }
+
+    /**
+     * @param User $user
+     * @param AssignJobPositionRequest $request
+     * @return JsonResponse
+     */
+    public function assignJobPosition(User $user, AssignJobPositionRequest $request): JsonResponse
+    {
+        $this->jobPositionService->assignJobPosition($user, $request->all());
         return response()->json([], 204);
     }
 }

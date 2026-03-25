@@ -28,15 +28,19 @@ readonly class AuthService implements AuthServiceInterface
 
     /**
      * @param LoginRequest $request
-     * @return User
+     * @return JsonResponse
      */
-    public function login(LoginRequest $request): User
+    public function login(LoginRequest $request): JsonResponse
     {
         if (!Auth::attempt($request->only(['email', 'password']))) {
             throw new AuthenticationException();
         }
 
-        return Auth::user();
+        $user = Auth::user();
+
+        return new JsonResponse(
+            $this->makeTokenResponse($user)
+        );
     }
 
     /**

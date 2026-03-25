@@ -71,10 +71,10 @@ readonly class JobPositionRepository implements JobPositionRepositoryInterface
 
     /**
      * @param JobPosition|Model $jobPosition
-     * @return void
+     * @return bool
      */
-    public function delete(JobPosition|Model $jobPosition): void
+    public function delete(Model|JobPosition $jobPosition): bool
     {
-        $jobPosition->delete();
+        return $jobPosition->delete();
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Service;
+namespace Tests\Unit\Service;
 
 use App\Exceptions\AuthenticationException;
 use App\Http\Requests\LoginRequest;
@@ -8,6 +8,8 @@ use App\Models\User;
 use App\Services\AuthService;
 use Exception;
 use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Foundation\Application;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Password;
@@ -18,6 +20,9 @@ use Tests\TestCase;
  */
 class AuthServiceTest extends TestCase
 {
+    /**
+     * @var AuthService|Application|mixed|object
+     */
     private AuthService $authService;
 
     /**
@@ -42,8 +47,8 @@ class AuthServiceTest extends TestCase
 
         $result = $this->authService->login($request);
 
-        $this->assertInstanceOf(User::class, $result);
-        $this->assertEquals($user->uuid, $result->uuid);
+        $this->assertInstanceOf(JsonResponse::class, $result);
+        $this->assertEquals(200, $result->status());
     }
 
     /**

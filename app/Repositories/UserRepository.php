@@ -70,13 +70,14 @@ readonly class UserRepository implements UserRepositoryInterface
     }
 
     /**
-     * @param User|Model $user
-     * @return void
+     * @param User|Model $model
+     * @return bool
      */
-    public function delete(User|Model $user): void
+    public function delete(User|Model $model): bool
     {
-        $user->delete();
+        return $model->delete();
     }
+
     /**
      * @param string $token
      * @return User|null

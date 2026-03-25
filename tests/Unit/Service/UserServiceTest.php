@@ -174,22 +174,16 @@ class UserServiceTest extends TestCase
      */
     public function testDeleteUserCallsRepositoryDeleteNotUpdate(): void
     {
-        $user         = User::factory()->make(['id' => 8]);
-        $deleteCalled = false;
+        $user = User::factory()->make(['uuid' => 8]);
 
         $this->userRepository
             ->shouldReceive('delete')
             ->once()
-            ->with($user)
-            ->andReturnUsing(function () use (&$deleteCalled) {
-                $deleteCalled = true;
-            });
+            ->with($user);
 
         $this->userRepository->shouldNotReceive('update');
 
-        $this->userService->deleteUser($user);
-
-        $this->assertTrue($deleteCalled);
+        $this->assertNull($this->userService->deleteUser($user));
     }
 
     /**
