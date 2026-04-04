@@ -11,6 +11,8 @@ use App\Resources\JobPositionResource;
 use App\Services\JobPositionServiceInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Pagination\LengthAwarePaginator;
+use PhpOffice\PhpSpreadsheet\Exception;
+use PhpOffice\PhpSpreadsheet\Writer\Exception as WriterException;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 /**
@@ -95,6 +97,8 @@ class JobPositionController extends Controller
     /**
      * @param ExportRequest $request
      * @return BinaryFileResponse
+     * @throws Exception
+     * @throws WriterException
      */
     public function export(ExportRequest $request): BinaryFileResponse
     {

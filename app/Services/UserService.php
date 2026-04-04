@@ -2,9 +2,14 @@
 
 namespace App\Services;
 
+use App\Exports\UserExport;
+use App\Http\Requests\ExportRequest;
 use App\Models\User;
 use App\Repositories\UserRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
+use PhpOffice\PhpSpreadsheet\Exception;
+use PhpOffice\PhpSpreadsheet\Writer\Exception as WriterException;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 /**
  * Summary of UserService
@@ -13,9 +18,11 @@ readonly class UserService implements UserServiceInterface
 {
     /**
      * @param UserRepositoryInterface $userRepository
+     * @param ExportServiceInterface $exportService
      */
     public function __construct(
-        private UserRepositoryInterface $userRepository
+        private UserRepositoryInterface $userRepository,
+        private ExportServiceInterface $exportService,
     )
     {
     }
@@ -108,5 +115,16 @@ readonly class UserService implements UserServiceInterface
     public function getLoggedUser(): User
     {
         return $this->userRepository->getLoggedUserFullName();
+    }
+
+    /**
+     * @param ExportRequest $request
+     * @return BinaryFileResponse
+     * @throws Exception
+     * @throws WriterException
+     */
+    public function export(ExportRequest $request): BinaryFileResponse
+    {
+        return $this->exportService->export($request, new UserExport($this->getUsers()->getCollection()), User::getModel());
     }
 }

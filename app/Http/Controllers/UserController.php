@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ExportRequest;
 use App\Http\Requests\UserStoreRequest;
 use App\Http\Requests\UserUpdateRequest;
 use App\Models\User;
@@ -9,6 +10,9 @@ use App\Resources\UserResource;
 use App\Services\UserServiceInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Pagination\LengthAwarePaginator;
+use PhpOffice\PhpSpreadsheet\Exception;
+use PhpOffice\PhpSpreadsheet\Writer\Exception as WriterException;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 /**
  * Summary of UserController
@@ -76,5 +80,16 @@ class UserController extends Controller
     {
         $this->userService->deactivateUser($user);
         return response()->json([], 204);
+    }
+
+    /**
+     * @param ExportRequest $request
+     * @return BinaryFileResponse
+     * @throws Exception
+     * @throws WriterException
+     */
+    public function export(ExportRequest $request): BinaryFileResponse
+    {
+        return $this->userService->export($request);
     }
 }
