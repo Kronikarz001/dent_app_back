@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\AssignJobPositionRequest;
+use App\Http\Requests\ExportRequest;
 use App\Http\Requests\JobPositionRequest;
 use App\Models\JobPosition;
 use App\Models\User;
@@ -10,6 +11,7 @@ use App\Resources\JobPositionResource;
 use App\Services\JobPositionServiceInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 /**
  * Summary of JobPositionController
@@ -88,5 +90,14 @@ class JobPositionController extends Controller
     {
         $this->jobPositionService->assignJobPosition($user, $request->all());
         return response()->json([], 204);
+    }
+
+    /**
+     * @param ExportRequest $request
+     * @return BinaryFileResponse
+     */
+    public function export(ExportRequest $request): BinaryFileResponse
+    {
+        return $this->jobPositionService->export($request);
     }
 }

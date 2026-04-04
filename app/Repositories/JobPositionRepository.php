@@ -59,22 +59,22 @@ readonly class JobPositionRepository implements JobPositionRepositoryInterface
     }
 
     /**
-     * @param JobPosition|Model $jobPosition
+     * @param JobPosition|Model $model
      * @param array $data
      * @return JobPosition
      */
-    public function update(JobPosition|Model $jobPosition, array $data): JobPosition
+    public function update(JobPosition|Model $model, array $data): JobPosition
     {
-        $jobPosition->update($data);
-        return $jobPosition->fresh();
+        $model->update($data);
+        return $model->fresh();
     }
 
     /**
-     * @param JobPosition|Model $jobPosition
+     * @param JobPosition|Model $model
      * @return bool
      */
-    public function delete(Model|JobPosition $jobPosition): bool
+    public function delete(JobPosition|Model $model): bool
     {
-        return $jobPosition->delete();
+        return $model->delete();
     }
 }
