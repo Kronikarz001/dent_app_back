@@ -8,6 +8,8 @@ use App\Repositories\UserRepository;
 use App\Repositories\UserRepositoryInterface;
 use App\Services\AuthService;
 use App\Services\AuthServiceInterface;
+use App\Services\ExportService;
+use App\Services\ExportServiceInterface;
 use App\Services\JobPositionService;
 use App\Services\JobPositionServiceInterface;
 use App\Services\UserService;
@@ -26,6 +28,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind(AuthServiceInterface::class, AuthService::class);
+        $this->app->bind(ExportServiceInterface::class, ExportService::class);
         $this->app->bind(JobPositionRepositoryInterface::class, JobPositionRepository::class);
         $this->app->bind(JobPositionServiceInterface::class, JobPositionService::class);
         $this->app->bind(UserRepositoryInterface::class, UserRepository::class);

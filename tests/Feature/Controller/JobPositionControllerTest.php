@@ -93,11 +93,10 @@ class JobPositionControllerTest extends TestCase
     public function testDeleteJobPositionReturnNoContentResponse(): void
     {
         $jobPosition = JobPosition::factory()->create();
-        $user = User::factory()->create();
-        $this->callApiWithLoggedUser($user)
+        $this->callApiWithLoggedUser()
             ->deleteJson(route('jobPosition.destroy', ['job_position' => $jobPosition->uuid]))
             ->assertNoContent();
 
-        $this->assertDatabaseMissing('job_positions', ['uuid' => $jobPosition->uuid]);
+        $this->assertSoftDeleted('job_positions', ['uuid' => $jobPosition->uuid]);
     }
 }

@@ -2,11 +2,14 @@
 
 namespace App\Services;
 
+use App\Http\Requests\ExportRequest;
 use App\Models\JobPosition;
 use App\Models\User;
 use App\Repositories\JobPositionRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
-use InvalidArgumentException;
+use PhpOffice\PhpSpreadsheet\Exception;
+use PhpOffice\PhpSpreadsheet\Writer\Exception as WriterException;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 /**
  * Summary of JobPositionService
@@ -15,9 +18,11 @@ readonly class JobPositionService implements JobPositionServiceInterface
 {
     /**
      * @param JobPositionRepositoryInterface $jobPositionRepository
+     * @param ExportServiceInterface $exportService
      */
     public function __construct(
-        private JobPositionRepositoryInterface $jobPositionRepository
+        private JobPositionRepositoryInterface $jobPositionRepository,
+        private ExportServiceInterface $exportService,
     )
     {
     }
@@ -76,5 +81,16 @@ readonly class JobPositionService implements JobPositionServiceInterface
         collect($data)->each(function (array $jobPosition) use ($user) {
            $user->jobPositions()->syncWithoutDetaching($jobPosition['uuid']);
         });
+    }
+
+    /**
+     * @param ExportRequest $request
+     * @return BinaryFileResponse
+     * @throws Exception
+     * @throws WriterException
+     */
+    public function export(ExportRequest $request): BinaryFileResponse
+    {
+        return $this->exportService->export($request, new JobPositionExport($this->getJobPositions()->getCollection()), JobPosition::getModel());
     }
 }
