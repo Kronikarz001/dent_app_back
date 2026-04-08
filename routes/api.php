@@ -9,7 +9,7 @@ Route::middleware('auth:sanctum')->group(function () {
     /**
      * All api routes for users
      */
-    Route::get('/user/{user}/export', [UserController::class, 'export'])
+    Route::get('/user/export', [UserController::class, 'export'])
         ->name('user.export');
     Route::post('/user/forgot-password', [AuthController::class, 'forgotPassword'])
         ->name('user.forgot_password');
@@ -25,7 +25,7 @@ Route::middleware('auth:sanctum')->group(function () {
     /**
      * All api routes for job positions
      */
-    Route::get('/job-position/{job_position}/export', [JobPositionController::class, 'export'])
+    Route::get('/job-position/export', [JobPositionController::class, 'export'])
         ->name('jobPosition.export');
     Route::patch('/user/{user}/jobposition', [JobPositionController::class, 'assignJobPosition'])
         ->name('user.jobPosition.assignJobPosition');
