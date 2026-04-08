@@ -14,7 +14,7 @@ use PhpOffice\PhpSpreadsheet\Style\Border;
 /**
  * Summary of UserExport
  */
-final class UserExport implements FromCollection, WithHeadings, WithMapping, WithEvents
+final class UserExport implements FromCollection, WithHeadings, WithMapping, WithEvents, \App\Exports\ExportInterface
 {
     /**
      * @param Collection $users
