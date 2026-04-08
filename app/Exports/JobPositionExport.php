@@ -13,7 +13,7 @@ use PhpOffice\PhpSpreadsheet\Style\Border;
 /**
  * Summary of JobPositionExport
  */
-final class JobPositionExport implements FromCollection, WithHeadings, WithMapping, WithEvents
+final class JobPositionExport implements FromCollection, WithHeadings, WithMapping, WithEvents, \App\Exports\ExportInterface
 {
     /**
      * @param Collection $jobPositions

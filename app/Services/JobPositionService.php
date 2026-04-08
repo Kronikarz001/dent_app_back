@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Exports\JobPositionExport;
 use App\Http\Requests\ExportRequest;
 use App\Models\JobPosition;
 use App\Models\User;
