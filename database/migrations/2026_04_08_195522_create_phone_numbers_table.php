@@ -11,13 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('patients', function (Blueprint $table) {
+        Schema::create('phone_numbers', function (Blueprint $table) {
             $table->uuid()->primary();
-            $table->string('first_name');
-            $table->string('last_name');
-            $table->string('email')->unique()->nullable();
-            $table->string('pesel')->unique();
-            $table->boolean('is_active')->default(false);
+            $table->uuidMorphs('phoneable');
+            $table->string('number');
             $table->timestamps();
         });
     }
@@ -27,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('patients');
+        Schema::dropIfExists('phone_numbers');
     }
 };

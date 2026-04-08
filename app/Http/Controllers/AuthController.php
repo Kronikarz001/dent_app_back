@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ForgotPasswordRequest;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\ResetPasswordRequest;
-use App\Resources\UserResource;
 use App\Services\AuthServiceInterface;
 use Illuminate\Http\JsonResponse;
 

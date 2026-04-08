@@ -2,13 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ExportRequest;
 use App\Http\Requests\PatientStoreRequest;
 use App\Http\Requests\PatientUpdateRequest;
+use App\Http\Resources\PatientResource;
 use App\Models\Patient;
-use App\Resources\PatientResource;
 use App\Services\PatientServiceInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Pagination\LengthAwarePaginator;
+use PhpOffice\PhpSpreadsheet\Exception;
+use PhpOffice\PhpSpreadsheet\Writer\Exception as WriterException;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 /**
  * Summary of PatientController
@@ -74,7 +78,18 @@ class PatientController extends Controller
      */
     public function destroy(Patient $patient): JsonResponse
     {
-        $this->patientService->deactivatePatient($patient);
+        $this->patientService->deletePatient($patient);
         return response()->json([], 204);
+    }
+
+    /**
+     * @param ExportRequest $request
+     * @return BinaryFileResponse
+     * @throws Exception
+     * @throws WriterException
+     */
+    public function export(ExportRequest $request): BinaryFileResponse
+    {
+        return $this->patientService->export($request);
     }
 }

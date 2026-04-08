@@ -33,5 +33,4 @@ interface JobPositionRepositoryInterface extends BasicRepositoryInterface
      * @return bool
      */
     public function delete(Model|JobPosition $model): bool;
-
 }

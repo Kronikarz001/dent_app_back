@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Http\Requests\ExportRequest;
 use App\Models\User;
-use App\Resources\UserResource;
 use Illuminate\Pagination\LengthAwarePaginator;
 use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\Writer\Exception as WriterException;

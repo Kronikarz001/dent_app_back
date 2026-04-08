@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Observers\PatientObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -19,6 +21,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
+#[ObservedBy(PatientObserver::class)]
 class Patient extends UuidModel
 {
     /**
@@ -42,6 +45,9 @@ class Patient extends UuidModel
         return "$firstName $lastName";
     }
 
+    /**
+     * @return HasMany
+     */
     public function phoneNumbers(): HasMany
     {
         return $this->hasMany(PhoneNumber::class, 'patient_uuid', 'uuid');

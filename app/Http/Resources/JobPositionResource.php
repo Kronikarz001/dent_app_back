@@ -2,20 +2,10 @@
 
 namespace App\Http\Resources;
 
-use App\Models\JobPosition;
-use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
-
-/** @mixin JobPosition */
-class JobPositionResource extends JsonResource
+/**
+ * Summary of JobPositionResource
+ */
+class JobPositionResource extends BasicResource
 {
-    public function toArray(Request $request): array
-    {
-        return [
-            'uuid' => $this->uuid,
-            'name' => $this->name,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
-        ];
-    }
+
 }

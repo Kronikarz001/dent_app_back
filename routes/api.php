@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\JobPositionController;
+use App\Http\Controllers\PatientController;
 use App\Http\Controllers\UserController;
 
 
@@ -33,6 +34,16 @@ Route::middleware('auth:sanctum')->group(function () {
         ->name('jobPosition.selectList');
     Route::apiResource('/job-position', JobPositionController::class)
         ->names('jobPosition');
+
+    /**
+     * All api routes for patients
+     */
+    Route::get('/patient/export', [PatientController::class, 'export'])
+        ->name('patient.export');
+    Route::get('/patient/selectlist', [PatientController::class, 'selectList'])
+        ->name('patient.selectList');
+    Route::apiResource('/patient', PatientController::class)
+        ->names('patient');
 });
 
 Route::post('/login', [AuthController::class, 'login'])

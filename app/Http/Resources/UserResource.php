@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Resources;
+namespace App\Http\Resources;
 
 /**
  * Summary of UserResource

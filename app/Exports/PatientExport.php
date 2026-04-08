@@ -2,19 +2,18 @@
 
 namespace App\Exports;
 
-use App\Models\User;
 use Illuminate\Support\Collection;
 
 /**
- * Summary of UserExport
+ * Summary of JobPositionExport
  */
-final class UserExport extends Export
+final class PatientExport extends Export
 {
     /**
-     * @param Collection $users
+     * @param Collection $patients
      */
     public function __construct(
-        private Collection $users
+        private Collection $patients
     ) {}
 
     /**
@@ -22,7 +21,7 @@ final class UserExport extends Export
      */
     public function collection(): Collection
     {
-        return $this->users;
+        return $this->patients;
     }
 
     /**
@@ -34,13 +33,11 @@ final class UserExport extends Export
             'Imię',
             'Nazwisko',
             'Email',
-            'Email prywatny',
-            'PESEL',
         ];
     }
 
     /**
-     * @param User $row
+     * @param mixed $row
      * @return array
      */
     public function map(mixed $row): array
@@ -49,8 +46,6 @@ final class UserExport extends Export
             'first_name'    => $row->first_name,
             'last_name'     => $row->last_name,
             'email'         => $row->email,
-            'private_email' => $row->private_email,
-            'pesel'         => $row->pesel,
         ];
     }
 }
