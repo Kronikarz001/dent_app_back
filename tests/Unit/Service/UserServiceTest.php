@@ -4,6 +4,7 @@ namespace Tests\Unit\Service;
 
 use App\Models\User;
 use App\Repositories\UserRepositoryInterface;
+use App\Services\ExportServiceInterface;
 use App\Services\UserService;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Mockery;
@@ -26,7 +27,8 @@ class UserServiceTest extends TestCase
         parent::setUp();
 
         $this->userRepository = Mockery::mock(UserRepositoryInterface::class);
-        $this->userService    = new UserService($this->userRepository);
+        $exportService        = Mockery::mock(ExportServiceInterface::class);
+        $this->userService    = new UserService($this->userRepository, $exportService);
     }
 
     /**
