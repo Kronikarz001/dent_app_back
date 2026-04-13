@@ -100,4 +100,16 @@ class UserControllerTest extends TestCase
             'email' => 'example@mail',
         ]);
     }
+
+    /**
+     * @return void
+     */
+    public function testShowLoggedUserReturnSuccessResponse(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->callApiWithLoggedUser()
+            ->getJson(route('user.show', ['user' => $user->uuid]));
+        $response->assertOk();
+    }
 }
