@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\PhoneNumberType;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
@@ -14,8 +15,7 @@ use Ramsey\Uuid\UuidFactory;
 class PhoneNumberFactory extends Factory
 {
     /**
-     * Define the model's default state
-     * @return array<string, mixed>
+     * @return array
      */
     public function definition(): array
     {
@@ -23,6 +23,7 @@ class PhoneNumberFactory extends Factory
             'phoneable_type' => User::class,
             'phoneable_id' => User::factory()->create()->uuid,
             'number' => fake()->unique()->numerify('##########'),
+            'type' => fake()->randomElement(PhoneNumberType::cases())->value,
         ];
     }
 }
