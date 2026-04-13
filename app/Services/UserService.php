@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Exports\UserExport;
 use App\Http\Requests\ExportRequest;
-use App\Models\PhoneNumber;
 use App\Models\User;
 use App\Repositories\UserRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -20,10 +19,12 @@ readonly class UserService implements UserServiceInterface
     /**
      * @param UserRepositoryInterface $userRepository
      * @param ExportServiceInterface $exportService
+     * @param PhoneNumberServiceInterface $phoneNumberService
      */
     public function __construct(
         private UserRepositoryInterface $userRepository,
         private ExportServiceInterface $exportService,
+        private PhoneNumberServiceInterface $phoneNumberService
     )
     {
     }
@@ -62,26 +63,9 @@ readonly class UserService implements UserServiceInterface
     {
         if(array_key_exists("phone_numbers", $data))
         {
-            $this->assignPhones($user, $data['phone_numbers']);
+            $this->phoneNumberService->assignPhones($user, $data['phone_numbers']);
         }
         return $this->userRepository->update($user, $data);
-    }
-
-    /**
-     * @param User $user
-     * @param array $phones
-     * @return void
-     */
-    private function assignPhones(User $user, array $phones): void
-    {
-        $records = array_map(fn(array $phone) => [
-            'number'         => $phone['number'],
-            'type'           => $phone['type'],
-            'phoneable_type' => User::class,
-            'phoneable_id'   => $user->uuid,
-        ], $phones);
-
-        PhoneNumber::upsert($records, ['number'], ['type']);
     }
 
     /**

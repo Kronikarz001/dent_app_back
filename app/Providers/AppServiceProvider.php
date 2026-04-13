@@ -16,6 +16,8 @@ use App\Services\JobPositionService;
 use App\Services\JobPositionServiceInterface;
 use App\Services\PatientService;
 use App\Services\PatientServiceInterface;
+use App\Services\PhoneNumberService;
+use App\Services\PhoneNumberServiceInterface;
 use App\Services\UserService;
 use App\Services\UserServiceInterface;
 use Illuminate\Support\ServiceProvider;
@@ -37,6 +39,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(JobPositionServiceInterface::class, JobPositionService::class);
         $this->app->bind(PatientRepositoryInterface::class, PatientRepository::class);
         $this->app->bind(PatientServiceInterface::class, PatientService::class);
+        $this->app->bind(PhoneNumberServiceInterface::class, PhoneNumberService::class);
         $this->app->bind(UserRepositoryInterface::class, UserRepository::class);
         $this->app->bind(UserServiceInterface::class, UserService::class);
     }
