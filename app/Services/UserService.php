@@ -60,7 +60,7 @@ readonly class UserService implements UserServiceInterface
      */
     public function updateUser(User $user, array $data): User
     {
-        if($data['phone_numbers'])
+        if(array_key_exists("phone_numbers", $data))
         {
             $this->assignPhones($user, $data['phone_numbers']);
         }
@@ -136,7 +136,7 @@ readonly class UserService implements UserServiceInterface
      */
     public function getLoggedUser(): User
     {
-        return $this->userRepository->getLoggedUserFullName();
+        return $this->userRepository->getLoggedUser();
     }
 
     /**

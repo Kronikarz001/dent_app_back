@@ -57,8 +57,7 @@ class UserController extends Controller
      */
     public function showLoggedUser(): UserResource
     {
-        $user = auth()->user();
-        return new UserResource($user);
+        return new UserResource($this->userService->getLoggedUser());
     }
 
     /**

@@ -323,7 +323,7 @@ class UserServiceTest extends TestCase
         $loggedUser = User::factory()->make(['name' => 'Adam Kowalski']);
 
         $this->userRepository
-            ->shouldReceive('getLoggedUserFullName')
+            ->shouldReceive('getLoggedUser')
             ->once()
             ->andReturn($loggedUser);
 
