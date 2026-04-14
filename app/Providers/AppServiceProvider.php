@@ -20,6 +20,7 @@ use App\Services\PhoneNumberService;
 use App\Services\PhoneNumberServiceInterface;
 use App\Services\UserService;
 use App\Services\UserServiceInterface;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\ServiceProvider;
 
 /**
@@ -50,6 +51,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        JsonResource::withoutWrapping();
+        $this->loadJsonTranslationsFrom(__DIR__ . '/../lang');
     }
 }
