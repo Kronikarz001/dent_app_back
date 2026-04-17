@@ -53,6 +53,14 @@ class UserController extends Controller
     }
 
     /**
+     * @return UserResource
+     */
+    public function showLoggedUser(): UserResource
+    {
+        return new UserResource($this->userService->getLoggedUser());
+    }
+
+    /**
      * @param UserStoreRequest $request
      * @return UserResource
      */

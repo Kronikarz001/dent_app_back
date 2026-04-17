@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 
@@ -46,10 +47,10 @@ class Patient extends UuidModel
     }
 
     /**
-     * @return HasMany
+     * @return MorphMany
      */
-    public function phoneNumbers(): HasMany
+    public function phoneNumbers(): MorphMany
     {
-        return $this->hasMany(PhoneNumber::class, 'patient_uuid', 'uuid');
+        return $this->morphMany(PhoneNumber::class, 'phoneable', 'phoneable_type', 'phoneable_id', 'uuid');
     }
 }

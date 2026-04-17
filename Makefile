@@ -1,53 +1,79 @@
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Darwin)
+	SUDO =
+else
+	SUDO = sudo
+endif
+
+include .env
+renew:
+	$(SUDO) docker compose down
+	$(SUDO) docker compose up -d
+	$(SUDO) docker exec dent_app_back_app php artisan config:clear
+	$(SUDO) docker exec dent_app_back_app php artisan migrate
+	$(SUDO) docker exec dent_app_back_app php artisan route:clear
+	$(SUDO) docker exec dent_app_back_app php artisan cache:clear
+	$(SUDO) docker exec dent_app_back_app php artisan config:clear
+	$(SUDO) docker exec dent_app_back_app php artisan cache:clear
+	$(SUDO) docker exec dent_app_back_app php scripts/create_user.php
+
 up:
-	docker-compose up -d
+	$(SUDO) docker-compose up -d
 down:
-	docker-compose down
+	$(SUDO) docker-compose down
 up-build:
-	docker-compose up -d --build
+	$(SUDO) docker-compose up -d --build
 down-remove:
-	docker-compose down -v
+	$(SUDO) docker-compose down -v
+
 
 
 createdb:
-	docker-compose exec dent_app_back_db psql -U pskudlik -d postgres -c "CREATE DATABASE dent_db_back;"
+	$(SUDO) docker-compose exec dent_app_back_db psql -U pskudlik -d postgres -c "CREATE DATABASE dent_db_back;"
 
 createdb-role:
-	docker-compose exec dent_app_back_db psql -U pskudlik -d postgres -c "CREATE ROLE pskudlik WITH LOGIN PASSWORD 'Troll001#';"
+	$(SUDO) docker-compose exec dent_app_back_db psql -U pskudlik -d postgres -c "CREATE ROLE pskudlik WITH LOGIN PASSWORD 'Troll001#';"
 
 createdb-user:
-	docker-compose exec dent_app_back_db psql -U pskudlik -d postgres -c "ALTER USER pskudlik WITH SUPERUSER;"
+	$(SUDO) docker-compose exec dent_app_back_db psql -U pskudlik -d postgres -c "ALTER USER pskudlik WITH SUPERUSER;"
 
 create-local-user:
-	docker-compose exec dent_app_back_db psql -U pskudlik -d postgres -c "CREATE ROLE pskudlik WITH LOGIN PASSWORD 'Troll001#';"
+	$(SUDO) docker-compose exec dent_app_back_db psql -U pskudlik -d postgres -c "CREATE ROLE pskudlik WITH LOGIN PASSWORD 'Troll001#';"
 
+create-user:
+	$(SUDO) docker exec dent_app_back_app php artisan route:clear
+	$(SUDO) docker exec dent_app_back_app php artisan cache:clear
+	$(SUDO) docker exec dent_app_back_app php artisan config:clear
+	$(SUDO) docker exec dent_app_back_app php artisan cache:clear
+	$(SUDO) docker exec dent_app_back_app php scripts/create_user.php
 
 migrate:
-	docker-compose exec dent_app_back_app php artisan migrate
+	$(SUDO) docker-compose exec dent_app_back_app php artisan migrate
+
 migrate-fresh:
-	docker-compose exec dent_app_back_app php artisan migrate:fresh
+	$(SUDO) docker-compose exec dent_app_back_app php artisan migrate:fresh
+
 optimize:
-	docker-compose exec dent_app_back_app php artisan optimize
-	docker-compose exec dent_app_back_app php artisan cache:clear
-	docker-compose exec dent_app_back_app php artisan config:clear
-	docker-compose exec dent_app_back_app php artisan cache:clear
+	$(SUDO) docker-compose exec dent_app_back_app php artisan optimize
+	$(SUDO) docker-compose exec dent_app_back_app php artisan cache:clear
+	$(SUDO) docker-compose exec dent_app_back_app php artisan config:clear
+	$(SUDO) docker-compose exec dent_app_back_app php artisan cache:clear
 
 test:
-	docker-compose exec dent_app_back_app php artisan optimize
-	docker-compose exec dent_app_back_app php artisan cache:clear
-	docker-compose exec dent_app_back_app php artisan config:clear
-	docker-compose exec dent_app_back_app php artisan cache:clear
-	docker-compose exec dent_app_back_app php artisan test --env=testing
+	$(SUDO) docker-compose exec dent_app_back_app php artisan optimize
+	$(SUDO) docker-compose exec dent_app_back_app php artisan cache:clear
+	$(SUDO) docker-compose exec dent_app_back_app php artisan config:clear
+	$(SUDO) docker-compose exec dent_app_back_app php artisan cache:clear
+	$(SUDO) docker-compose exec dent_app_back_app php artisan test --env=testing
 
 logs:
-	docker-compose exec dent_app_back_app tail -f storage/logs/laravel.log
+	$(SUDO) docker-compose exec dent_app_back_app tail -f storage/logs/laravel.log
 
 artisan:
-	docker-compose exec dent_app_back_app php artisan $@
-
-
+	$(SUDO) docker-compose exec dent_app_back_app php artisan $@
 
 seed-users:
-	docker-compose exec dent_app_back_app php artisan tinker --execute="App\Models\User::factory()->count(50)->create();"
+	$(SUDO) docker-compose exec dent_app_back_app php artisan tinker --execute="App\Models\User::factory()->count(50)->create();"
 
 seed-patients:
-	docker-compose exec dent_app_back_app php artisan tinker --execute="App\Models\Patient::factory()->count(250)->create();"
+	$(SUDO) docker-compose exec dent_app_back_app php artisan tinker --execute="App\Models\Patient::factory()->count(250)->create();"

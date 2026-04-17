@@ -10,6 +10,8 @@ Route::middleware('auth:sanctum')->group(function () {
     /**
      * All api routes for users
      */
+    Route::get('/user/user-info', [UserController::class, 'showLoggedUser'])
+        ->name('user.user-info');
     Route::get('/user/export', [UserController::class, 'export'])
         ->name('user.export');
     Route::post('/user/forgot-password', [AuthController::class, 'forgotPassword'])

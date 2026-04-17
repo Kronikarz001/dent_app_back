@@ -90,7 +90,7 @@ readonly class UserRepository implements UserRepositoryInterface
     /**
      * @return User
      */
-    public function getLoggedUserFullName(): User
+    public function getLoggedUser(): User
     {
         return Auth::user();
     }

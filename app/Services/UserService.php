@@ -19,10 +19,12 @@ readonly class UserService implements UserServiceInterface
     /**
      * @param UserRepositoryInterface $userRepository
      * @param ExportServiceInterface $exportService
+     * @param PhoneNumberServiceInterface $phoneNumberService
      */
     public function __construct(
         private UserRepositoryInterface $userRepository,
         private ExportServiceInterface $exportService,
+        private PhoneNumberServiceInterface $phoneNumberService
     )
     {
     }
@@ -59,6 +61,10 @@ readonly class UserService implements UserServiceInterface
      */
     public function updateUser(User $user, array $data): User
     {
+        if(array_key_exists("phone_numbers", $data))
+        {
+            $this->phoneNumberService->assignPhones($user, $data['phone_numbers']);
+        }
         return $this->userRepository->update($user, $data);
     }
 
@@ -114,7 +120,7 @@ readonly class UserService implements UserServiceInterface
      */
     public function getLoggedUser(): User
     {
-        return $this->userRepository->getLoggedUserFullName();
+        return $this->userRepository->getLoggedUser();
     }
 
     /**

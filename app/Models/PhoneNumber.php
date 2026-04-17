@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property string $phoneable_type
  * @property string $phoneable_uuid
  * @property string $number
+ * @property string $type
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
@@ -23,7 +24,10 @@ class PhoneNumber extends UuidModel
         'phoneable_type',
         'phoneable_uuid',
         'number',
+        'type',
     ];
+
+
 
     /**
      * @return MorphTo

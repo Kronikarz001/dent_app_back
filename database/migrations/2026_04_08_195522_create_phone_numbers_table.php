@@ -15,6 +15,7 @@ return new class extends Migration
             $table->uuid()->primary();
             $table->uuidMorphs('phoneable');
             $table->string('number');
+            $table->string('type');
             $table->timestamps();
         });
     }
