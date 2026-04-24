@@ -81,6 +81,8 @@ class PatientSearch extends Search
      */
     protected function relationsShipLoad(): array
     {
-        return [];
+        return [
+            'phoneNumbers'
+        ];
     }
 }

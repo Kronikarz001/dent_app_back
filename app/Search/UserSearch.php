@@ -69,6 +69,8 @@ class UserSearch extends Search
      */
     protected function relationsShipLoad(): array
     {
-        return [];
+        return [
+            'phoneNumbers'
+        ];
     }
 }
