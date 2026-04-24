@@ -14,7 +14,7 @@ class PatientResource extends BasicResource
     public function toArray($request): array
     {
         return array_merge(parent::toArray($request), [
-            'phone_number' => $this->phone_numbers,
+            'phone_number' => PhoneNumberResource::collection($this->phoneNumbers)
         ]);
     }
 }
