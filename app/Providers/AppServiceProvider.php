@@ -5,6 +5,9 @@ namespace App\Providers;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\ServiceProvider;
 
+/**
+ * Summary of AppServiceProvider
+ */
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -16,6 +19,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->register(UserServiceProvider::class);
         $this->app->register(PatientServiceProvider::class);
         $this->app->register(JobPositionServiceProvider::class);
+        //$this->app->register(CalendarServiceProvider::class);
     }
 
     /**
