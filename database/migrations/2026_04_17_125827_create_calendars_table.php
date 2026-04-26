@@ -13,11 +13,9 @@ return new class extends Migration
     {
         Schema::create('calendars', function (Blueprint $table) {
             $table->uuid()->primary();
-            $table->string('type');
             $table->string('name')->nullable();
             $table->string('description')->nullable();
-            $table->uuidMorphs('ownerable');
-            $table->uuid('connected_calendar_uuid')->nullable();
+            $table->string('type');
             $table->timestamp('start_date')->nullable();
             $table->timestamp('end_date')->nullable();
             $table->boolean('is_active')->default(false);
