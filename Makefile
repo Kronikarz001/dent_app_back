@@ -37,7 +37,7 @@ createdb-role:
 createdb-user:
 	$(SUDO) docker-compose exec dent_app_back_db psql -U pskudlik -d postgres -c "ALTER USER pskudlik WITH SUPERUSER;"
 
-create-local-user:
+createdb-local-user:
 	$(SUDO) docker-compose exec dent_app_back_db psql -U pskudlik -d postgres -c "CREATE ROLE pskudlik WITH LOGIN PASSWORD 'Troll001#';"
 
 create-user:
@@ -77,3 +77,9 @@ seed-users:
 
 seed-patients:
 	$(SUDO) docker-compose exec dent_app_back_app php artisan tinker --execute="App\Models\Patient::factory()->count(250)->create();"
+
+route-clear:
+	$(SUDO) docker-compose exec dent_app_back_app php artisan route:clear
+
+route-list:
+	$(SUDO) docker-compose exec dent_app_back_app php artisan route:list
