@@ -35,7 +35,8 @@ class UserSearch extends Search
             'email',
             'first_name',
             'last_name',
-            'pesel'
+            'pesel',
+            'is_active'
         ];
     }
 
@@ -44,7 +45,13 @@ class UserSearch extends Search
      */
     protected function fillableSortFields(): array
     {
-        return ['first_name', 'last_name', 'email', 'created_at'];
+        return [
+            'first_name',
+            'last_name',
+            'email',
+            'created_at',
+            'is_active'
+        ];
     }
 
     /**
@@ -52,7 +59,12 @@ class UserSearch extends Search
      */
     protected function searchStringFields(): array
     {
-        return ['first_name', 'last_name', 'email'];
+        return [
+            'first_name',
+            'last_name',
+            'email',
+            'is_active'
+        ];
     }
 
     /**

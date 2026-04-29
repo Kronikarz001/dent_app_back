@@ -47,6 +47,13 @@ create-user:
 	$(SUDO) docker exec dent_app_back_app php artisan cache:clear
 	$(SUDO) docker exec dent_app_back_app php scripts/create_user.php
 
+createdb-user:
+	$(SUDO) docker exec dent_app_back_app php artisan route:clear
+	$(SUDO) docker exec dent_app_back_app php artisan cache:clear
+	$(SUDO) docker exec dent_app_back_app php artisan config:clear
+	$(SUDO) docker exec dent_app_back_app php artisan cache:clear
+	$(SUDO) docker exec dent_app_back_app php scripts/create_user.php
+
 migrate:
 	$(SUDO) docker-compose exec dent_app_back_app php artisan migrate
 
