@@ -19,7 +19,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->register(UserServiceProvider::class);
         $this->app->register(PatientServiceProvider::class);
         $this->app->register(JobPositionServiceProvider::class);
-        //$this->app->register(CalendarServiceProvider::class);
+        $this->app->register(CalendarServiceProvider::class);
     }
 
     /**
