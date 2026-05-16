@@ -15,19 +15,31 @@ use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Pagination\LengthAwarePaginator;
 
+/**
+ * Summary of PatientFileController
+ */
 class PatientFileController extends Controller
 {
+    /**
+     * @param FileServiceInterface $fileService
+     */
     public function __construct(
         private readonly FileServiceInterface $fileService
     ) {}
 
+    /**
+     * @param Patient $patient
+     * @return LengthAwarePaginator
+     */
     public function index(Patient $patient): LengthAwarePaginator
     {
         return $this->fileService->getAllFiles($patient);
     }
 
     /**
-     * @throws FileUploadException
+     * @param Patient $patient
+     * @param FileStoreRequest $request
+     * @return JsonResponse
      */
     public function store(Patient $patient, FileStoreRequest $request): JsonResponse
     {
@@ -47,6 +59,12 @@ class PatientFileController extends Controller
         return response()->json($this->fileService->getFile($file));
     }
 
+    /**
+     * @param Patient $patient
+     * @param File $file
+     * @param FileUpdateRequest $request
+     * @return FileResource
+     */
     public function update(Patient $patient, File $file, FileUpdateRequest $request): FileResource
     {
         return new FileResource(
@@ -55,7 +73,9 @@ class PatientFileController extends Controller
     }
 
     /**
-     * @throws FileNotFoundException
+     * @param Patient $patient
+     * @param File $file
+     * @return JsonResponse
      */
     public function destroy(Patient $patient, File $file): JsonResponse
     {
@@ -72,7 +92,10 @@ class PatientFileController extends Controller
     }
 
     /**
-     * @throws FileUploadException
+     * @param Patient $patient
+     * @param File $file
+     * @param FileStoreRequest $request
+     * @return JsonResponse
      */
     public function storeNewVersion(Patient $patient, File $file, FileStoreRequest $request): JsonResponse
     {

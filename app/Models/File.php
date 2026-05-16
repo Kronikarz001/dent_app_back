@@ -53,7 +53,7 @@ class File extends UuidModel
      */
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_uuid', 'uuid');
     }
 
     /**
@@ -61,6 +61,6 @@ class File extends UuidModel
      */
     public function files(): HasMany
     {
-        return $this->hasMany(File::class);
+        return $this->hasMany(File::class, 'file_uuid', 'uuid');
     }
 }

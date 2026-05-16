@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Dto\FileDto;
 use App\Enums\FileableType;
-use App\Exceptions\FileUploadException;
 use App\Http\Requests\FileStoreRequest;
 use App\Http\Requests\FileUpdateRequest;
 use App\Http\Resources\FileResource;
@@ -15,8 +14,14 @@ use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Pagination\LengthAwarePaginator;
 
+/**
+ * Summary of UserFileController
+ */
 class UserFileController extends Controller
 {
+    /**
+     * @param FileServiceInterface $fileService
+     */
     public function __construct(
         private readonly FileServiceInterface $fileService
     ) {}
@@ -34,7 +39,6 @@ class UserFileController extends Controller
      * @param User $user
      * @param FileStoreRequest $request
      * @return JsonResponse
-     * @throws FileUploadException
      */
     public function store(User $user, FileStoreRequest $request): JsonResponse
     {
@@ -74,7 +78,6 @@ class UserFileController extends Controller
      * @param User $user
      * @param File $file
      * @return JsonResponse
-     * @throws FileNotFoundException
      */
     public function destroy(User $user, File $file): JsonResponse
     {
@@ -98,7 +101,6 @@ class UserFileController extends Controller
      * @param File $file
      * @param FileStoreRequest $request
      * @return JsonResponse
-     * @throws FileUploadException
      */
     public function storeNewVersion(User $user, File $file, FileStoreRequest $request): JsonResponse
     {

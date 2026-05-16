@@ -15,19 +15,31 @@ use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Pagination\LengthAwarePaginator;
 
+/**
+ * Summary of JobPositionFileController
+ */
 class JobPositionFileController extends Controller
 {
+    /**
+     * @param FileServiceInterface $fileService
+     */
     public function __construct(
         private readonly FileServiceInterface $fileService
     ) {}
 
+    /**
+     * @param JobPosition $jobPosition
+     * @return LengthAwarePaginator
+     */
     public function index(JobPosition $jobPosition): LengthAwarePaginator
     {
         return $this->fileService->getAllFiles($jobPosition);
     }
 
     /**
-     * @throws FileUploadException
+     * @param JobPosition $jobPosition
+     * @param FileStoreRequest $request
+     * @return JsonResponse
      */
     public function store(JobPosition $jobPosition, FileStoreRequest $request): JsonResponse
     {
@@ -47,6 +59,12 @@ class JobPositionFileController extends Controller
         return response()->json($this->fileService->getFile($file));
     }
 
+    /**
+     * @param JobPosition $jobPosition
+     * @param File $file
+     * @param FileUpdateRequest $request
+     * @return FileResource
+     */
     public function update(JobPosition $jobPosition, File $file, FileUpdateRequest $request): FileResource
     {
         return new FileResource(
@@ -55,7 +73,9 @@ class JobPositionFileController extends Controller
     }
 
     /**
-     * @throws FileNotFoundException
+     * @param JobPosition $jobPosition
+     * @param File $file
+     * @return JsonResponse
      */
     public function destroy(JobPosition $jobPosition, File $file): JsonResponse
     {
@@ -72,7 +92,10 @@ class JobPositionFileController extends Controller
     }
 
     /**
-     * @throws FileUploadException
+     * @param JobPosition $jobPosition
+     * @param File $file
+     * @param FileStoreRequest $request
+     * @return JsonResponse
      */
     public function storeNewVersion(JobPosition $jobPosition, File $file, FileStoreRequest $request): JsonResponse
     {

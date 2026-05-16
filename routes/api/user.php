@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\UserAvatarFileController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserFileController;
 
@@ -19,4 +20,11 @@ Route::middleware('auth:sanctum')->group(function () {
         ->name('userfile.download');
     Route::post('/user/{user}/file-new-version/{file}', [UserFileController::class, 'storeNewVersion'])
         ->name('userfile.newversion');
+
+    Route::post('/user/{user}/avatar', [UserAvatarFileController::class, 'store'])
+        ->name('useravatar.store');
+    Route::get('/user/{user}/avatar', [UserAvatarFileController::class, 'show'])
+        ->name('useravatar.show');
+    Route::delete('/user/{user}/avatar', [UserAvatarFileController::class, 'destroy'])
+        ->name('useravatar.destroy');
 });
