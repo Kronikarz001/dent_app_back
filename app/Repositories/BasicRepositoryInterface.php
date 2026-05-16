@@ -2,6 +2,7 @@
 namespace App\Repositories;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -29,10 +30,24 @@ interface BasicRepositoryInterface
     public function findByUuid(string $uuid): ?Model;
 
     /**
+     * @param array $uuids
+     * @return Collection
+     */
+    public function findAllByUuids(array $uuids): Collection;
+
+    /**
     * @param array $data
     * @return Model
     */
     public function create(array $data): Model;
+
+    /**
+     * @param string $modelClass
+     * @param array $uniqueAttributes
+     * @param array $values
+     * @return Model
+     */
+    public function createOrUpdate(string $modelClass, array $uniqueAttributes, array $values): Model;
 
     /**
      * @param Model $model

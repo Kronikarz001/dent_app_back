@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Factory;
+namespace Tests\Unit\Factories;
 
 use App\Models\User;
 use Illuminate\Contracts\Container\BindingResolutionException;

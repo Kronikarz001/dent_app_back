@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Export;
+namespace Tests\Unit\Exports;
 
 use App\Exports\UserExport;
 use App\Models\User;
