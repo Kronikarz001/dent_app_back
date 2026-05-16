@@ -6,8 +6,8 @@ use App\DTO\FileDto;
 use App\Enums\FileableType;
 use App\Exceptions\FileUploadException;
 use App\Models\File;
-use App\Models\UuidModel;
 use App\Repositories\FileRepositoryInterface;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Http\UploadedFile;
@@ -37,7 +37,7 @@ readonly class FileService implements FileServiceInterface
      * @param array $excludeUuids
      * @return LengthAwarePaginator
      */
-    public function getAllFiles(UuidModel $model, array $excludeUuids = []): LengthAwarePaginator
+    public function getAllFiles(Model $model, array $excludeUuids = []): LengthAwarePaginator
     {
         $excludeUuids = array_values(array_filter($excludeUuids, static fn($uuid) => !is_null($uuid)));
 
@@ -55,7 +55,7 @@ readonly class FileService implements FileServiceInterface
      * @return array
      * @throws FileUploadException
      */
-    public function saveFile(FileDto $fileDto, UuidModel $model): array
+    public function saveFile(FileDto $fileDto, Model $model): array
     {
         return $this->processFiles($fileDto, $model);
     }
@@ -67,7 +67,7 @@ readonly class FileService implements FileServiceInterface
      * @return array
      * @throws FileUploadException
      */
-    public function createNewVersionFile(File $existingFile, FileDto $fileDto, UuidModel $model): array
+    public function createNewVersionFile(File $existingFile, FileDto $fileDto, Model $model): array
     {
         return $this->processFiles($fileDto, $model, $existingFile);
     }
@@ -124,7 +124,7 @@ readonly class FileService implements FileServiceInterface
      * @return array
      * @throws FileUploadException
      */
-    private function processFiles(FileDto $fileDto, UuidModel $model, ?File $parentFile = null): array
+    private function processFiles(FileDto $fileDto, Model $model, ?File $parentFile = null): array
     {
         $results = [];
 
@@ -148,7 +148,7 @@ readonly class FileService implements FileServiceInterface
      * @return File
      * @throws FileUploadException
      */
-    private function processSingleFile(UploadedFile $upload, FileableType $type, UuidModel $model, ?File $parentFile = null): File
+    private function processSingleFile(UploadedFile $upload, FileableType $type, Model $model, ?File $parentFile = null): File
     {
         $newUuid = Str::uuid()->toString();
         $rootUuid = $parentFile
@@ -266,7 +266,7 @@ readonly class FileService implements FileServiceInterface
      * @param UuidModel $model
      * @return Collection
      */
-    public function getAllFilesWithoutPagination(UuidModel $model): Collection
+    public function getAllFilesWithoutPagination(Model $model): Collection
     {
         return $this->fileRepository->findAllWithParams(
             [

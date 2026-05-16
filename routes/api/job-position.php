@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\JobPositionController;
+use App\Http\Controllers\JobPositionFileController;
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/job-position/export', [JobPositionController::class, 'export'])
@@ -11,4 +12,11 @@ Route::middleware('auth:sanctum')->group(function () {
         ->name('jobPosition.selectList');
     Route::apiResource('/job-position', JobPositionController::class)
         ->names('jobPosition');
+
+    Route::apiResource('/job-position/{jobPosition}/file', JobPositionFileController::class)
+        ->names('jobpositionfile');
+    Route::get('/job-position/{jobPosition}/file-download/{file}', [JobPositionFileController::class, 'download'])
+        ->name('jobpositionfile.download');
+    Route::post('/job-position/{jobPosition}/file-new-version/{file}', [JobPositionFileController::class, 'storeNewVersion'])
+        ->name('jobpositionfile.newversion');
 });

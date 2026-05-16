@@ -3,9 +3,11 @@
 namespace App\Observers;
 
 use App\Models\File;
-use App\Services\UserService;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ * Summary of FileObserver
+ */
 class FileObserver
 {
     /**
@@ -15,7 +17,7 @@ class FileObserver
     public function creating(File $file): void
     {
         if (Auth::check()) {
-            $file->user_id = UserService::getLoggedUser()->id;
+            $file->user_uuid = Auth::user()->uuid;
         }
     }
 }

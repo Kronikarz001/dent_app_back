@@ -4,8 +4,8 @@ namespace App\Services;
 
 use App\DTO\FileDto;
 use App\Models\File;
-use App\Models\UuidModel;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
@@ -19,20 +19,20 @@ interface FileServiceInterface
      * @param UuidModel $model
      * @return array
      */
-    public function saveFile(FileDto $fileDto, UuidModel $model): array;
+    public function saveFile(FileDto $fileDto, Model $model): array;
 
     /**
      * @param UuidModel $model
      * @param array $excludeUuids
      * @return LengthAwarePaginator
      */
-    public function getAllFiles(UuidModel $model, array $excludeUuids = []): LengthAwarePaginator;
+    public function getAllFiles(Model $model, array $excludeUuids = []): LengthAwarePaginator;
 
     /**
      * @param UuidModel $model
      * @return Collection
      */
-    public function getAllFilesWithoutPagination(UuidModel $model): Collection;
+    public function getAllFilesWithoutPagination(Model $model): Collection;
 
     /**
      * @param File $file
@@ -53,7 +53,7 @@ interface FileServiceInterface
      * @param UuidModel $model
      * @return array
      */
-    public function createNewVersionFile(File $existingFile, FileDto $fileDto, UuidModel $model): array;
+    public function createNewVersionFile(File $existingFile, FileDto $fileDto, Model $model): array;
 
     /**
      * @param File $existingFile
