@@ -6,6 +6,9 @@ use App\Models\User;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Http\UploadedFile;
 
+/**
+ * Summary of UserAvatarServiceInterface
+ */
 interface UserAvatarServiceInterface
 {
     /**

@@ -9,8 +9,14 @@ use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 
+/**
+ * Summary of UserAvatarFileController
+ */
 class UserAvatarFileController extends Controller
 {
+    /**
+     * @param UserAvatarServiceInterface $avatarService
+     */
     public function __construct(
         private readonly UserAvatarServiceInterface $avatarService,
     ) {}
