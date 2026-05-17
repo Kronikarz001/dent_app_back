@@ -6,6 +6,8 @@ use App\Repositories\FileRepository;
 use App\Repositories\FileRepositoryInterface;
 use App\Services\FileService;
 use App\Services\FileServiceInterface;
+use App\Services\UserAvatarService;
+use App\Services\UserAvatarServiceInterface;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\ServiceProvider;
 
@@ -26,6 +28,10 @@ class FileServiceProvider extends ServiceProvider
                 $app->make(FileRepositoryInterface::class),
                 Storage::disk('local'),
             );
+        });
+
+        $this->app->bind(UserAvatarServiceInterface::class, function () {
+            return new UserAvatarService(Storage::disk('local'));
         });
     }
 }

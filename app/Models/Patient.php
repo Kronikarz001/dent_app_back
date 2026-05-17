@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use App\Models\Concerns\HasFile;
-use App\Models\Concerns\HasPhoneNumber;
+use App\Traits\HasFile;
+use App\Traits\HasPhoneNumber;
 use App\Observers\PatientObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Support\Carbon;
