@@ -9,11 +9,11 @@ use App\Models\File;
 use App\Repositories\FileRepositoryInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
-use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 /**
@@ -21,16 +21,9 @@ use Illuminate\Support\Str;
  */
 readonly class FileService implements FileServiceInterface
 {
-    /**
-     * @param FileRepositoryInterface $fileRepository
-     * @param Filesystem $disk
-     */
     public function __construct(
         private FileRepositoryInterface $fileRepository,
-        private Filesystem              $disk,
-    )
-    {
-    }
+    ) {}
 
     /**
      * @param UuidModel $model
@@ -103,18 +96,28 @@ readonly class FileService implements FileServiceInterface
      */
     public function getFile(File $file): array
     {
-        if (!$this->disk->exists($file->path)) {
+        $decrypted = $this->getFileContent($file);
+
+        return [
+            'filename'  => $file->filename,
+            'extension' => $file->extension,
+            'mime'      => $file->mimetype,
+            'content'   => base64_encode($decrypted),
+        ];
+    }
+
+    /**
+     * @param File $file
+     * @return string
+     * @throws FileNotFoundException
+     */
+    public function getFileContent(File $file): string
+    {
+        if (!Storage::disk('files')->exists($file->path)) {
             throw new FileNotFoundException($file->path);
         }
 
-        $decrypted = Crypt::decrypt($this->disk->get($file->path));
-
-        return [
-            'filename' => $file->filename,
-            'extension' => $file->extension,
-            'mime' => $file->mimetype,
-            'content' => base64_encode($decrypted),
-        ];
+        return Crypt::decrypt(Storage::disk('files')->get($file->path));
     }
 
     /**
@@ -189,7 +192,7 @@ readonly class FileService implements FileServiceInterface
     {
         $encrypted = Crypt::encrypt($file->getContent());
 
-        if (!$this->disk->put($path, $encrypted)) {
+        if (!Storage::disk('files')->put($path, $encrypted)) {
             throw new FileUploadException("Error uploading file to {$path}");
         }
     }
@@ -225,11 +228,11 @@ readonly class FileService implements FileServiceInterface
      */
     private function deletePhysicalFile(File $file): void
     {
-        if (!$this->disk->exists($file->path)) {
+        if (!Storage::disk('files')->exists($file->path)) {
             throw new FileNotFoundException($file->path);
         }
 
-        $this->disk->delete($file->path);
+        Storage::disk('files')->delete($file->path);
     }
 
     /**

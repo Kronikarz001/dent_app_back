@@ -23,7 +23,7 @@ class JobPositionFileControllerTest extends TestCase
 
     public function testStoreReturnsCreatedResponse(): void
     {
-        Storage::fake('local');
+        Storage::fake('files');
 
         $jobPosition = JobPosition::factory()->create();
         $file        = UploadedFile::fake()->create('document.pdf', 100, 'application/pdf');
@@ -37,7 +37,7 @@ class JobPositionFileControllerTest extends TestCase
 
     public function testShowReturnsSuccessResponse(): void
     {
-        Storage::fake('local');
+        Storage::fake('files');
 
         $user        = User::factory()->create();
         $jobPosition = JobPosition::factory()->create();
@@ -75,7 +75,7 @@ class JobPositionFileControllerTest extends TestCase
 
     public function testDestroyReturnsNoContentResponse(): void
     {
-        Storage::fake('local');
+        Storage::fake('files');
 
         $user        = User::factory()->create();
         $jobPosition = JobPosition::factory()->create();
@@ -96,7 +96,7 @@ class JobPositionFileControllerTest extends TestCase
 
     public function testDownloadReturnsSuccessResponse(): void
     {
-        Storage::fake('local');
+        Storage::fake('files');
 
         $user        = User::factory()->create();
         $jobPosition = JobPosition::factory()->create();
@@ -117,7 +117,7 @@ class JobPositionFileControllerTest extends TestCase
 
     public function testStoreNewVersionReturnsCreatedResponse(): void
     {
-        Storage::fake('local');
+        Storage::fake('files');
 
         $user         = User::factory()->create();
         $jobPosition  = JobPosition::factory()->create();

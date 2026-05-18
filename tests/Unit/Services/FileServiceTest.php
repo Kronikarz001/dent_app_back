@@ -23,9 +23,6 @@ use Tests\Unit\UnitTestCase;
 
 class FileServiceTest extends UnitTestCase
 {
-    /**
-     * @var FilesystemAdapter|(FilesystemAdapter&Mockery\MockInterface&object&Mockery\LegacyMockInterface)|(Mockery\MockInterface&object&Mockery\LegacyMockInterface)
-     */
     protected FilesystemAdapter $diskMock;
 
     protected function setUp(): void
@@ -35,7 +32,7 @@ class FileServiceTest extends UnitTestCase
         $this->diskMock = Mockery::mock(FilesystemAdapter::class);
 
         Storage::shouldReceive('disk')
-            ->with('local')
+            ->with('files')
             ->andReturn($this->diskMock);
     }
 
@@ -79,7 +76,7 @@ class FileServiceTest extends UnitTestCase
             ->with($path)
             ->andReturn($mimetype);
 
-        $service = new FileService(new FileMockRepository(), $this->diskMock);
+        $service = new FileService(new FileMockRepository());
 
         $result = $service->getFile($fileModel);
 
@@ -114,7 +111,7 @@ class FileServiceTest extends UnitTestCase
             ->with(Mockery::any())
             ->andReturn($paginator);
 
-        $service = new FileService($repoMock, $this->diskMock);
+        $service = new FileService($repoMock);
         $this->assertSame($paginator, $service->getAllFiles($uuidModel));
     }
 
@@ -133,7 +130,7 @@ class FileServiceTest extends UnitTestCase
             ->with($path)
             ->andReturnFalse();
 
-        $service = new FileService(new FileMockRepository(), $this->diskMock);
+        $service = new FileService(new FileMockRepository());
 
         $this->expectException(FileNotFoundException::class);
 
@@ -176,7 +173,7 @@ class FileServiceTest extends UnitTestCase
             ->once()
             ->andReturn('some/path.pdf');
 
-        $service = new FileService($repoMock, $this->diskMock);
+        $service = new FileService($repoMock);
         $result = $service->saveFile(
             new FileDto([$dtoFile], FileableType::USER),
             $model
@@ -209,7 +206,7 @@ class FileServiceTest extends UnitTestCase
             ->with('some/path.pdf')
             ->andReturn(true);
 
-        $service = new FileService($repoMock, $this->diskMock);
+        $service = new FileService($repoMock);
 
         $response = $service->deleteFile($file);
 
@@ -240,7 +237,7 @@ class FileServiceTest extends UnitTestCase
             ->with('some/path.pdf')
             ->andReturn(true);
 
-        $service = new FileService($repoMock, $this->diskMock);
+        $service = new FileService($repoMock);
 
         $this->expectException(FileNotFoundException::class);
 
@@ -267,7 +264,7 @@ class FileServiceTest extends UnitTestCase
             ->with($existingFileModel, Mockery::any())
             ->andReturn($updatedFileModel);
 
-        $service = new FileService($repoMock, $this->diskMock);
+        $service = new FileService($repoMock);
 
         $file = $service->updateFileName($existingFileModel, "new_filename.txt");
 
@@ -302,7 +299,7 @@ class FileServiceTest extends UnitTestCase
             ->shouldReceive('put')->once()
             ->andReturnFalse();
 
-        $service = new FileService(new FileMockRepository(), $this->diskMock);
+        $service = new FileService(new FileMockRepository());
         $service->saveFile(
             new FileDto([$dtoFile], FileableType::USER),
             $model
@@ -323,7 +320,7 @@ class FileServiceTest extends UnitTestCase
             ->with($existing, ['filename' => 'new'])
             ->andReturn($updated);
 
-        $service = new FileService($repoMock, $this->diskMock);
+        $service = new FileService($repoMock);
         $result = $service->updateFileName($existing, 'new');
 
         $this->assertSame($updated, $result);
@@ -354,7 +351,7 @@ class FileServiceTest extends UnitTestCase
             ->shouldReceive('delete')->once()
             ->with($parent)->andReturnTrue();
 
-        $service = new FileService($repoMock, $this->diskMock);
+        $service = new FileService($repoMock);
         $result = $service->deleteFile($parent);
 
         $this->assertTrue($result);

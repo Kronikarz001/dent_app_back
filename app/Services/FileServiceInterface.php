@@ -43,6 +43,13 @@ interface FileServiceInterface
 
     /**
      * @param File $file
+     * @return string
+     * @throws FileNotFoundException
+     */
+    public function getFileContent(File $file): string;
+
+    /**
+     * @param File $file
      * @return bool
      */
     public function deleteFile(File $file): bool;

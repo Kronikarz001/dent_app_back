@@ -13,6 +13,7 @@ use App\Models\Patient;
 use App\Services\FileServiceInterface;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 /**
@@ -86,9 +87,9 @@ class PatientFileController extends Controller
     /**
      * @throws FileNotFoundException
      */
-    public function download(Patient $patient, File $file): JsonResponse
+    public function download(Patient $patient, File $file): Response
     {
-        return response()->json($this->fileService->getFile($file));
+        return response($this->fileService->getFileContent($file), 200, ['Content-Type' => $file->mimetype]);
     }
 
     /**

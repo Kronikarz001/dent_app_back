@@ -54,7 +54,7 @@ abstract class BasicUser extends Authenticatable
         'password',
         'pesel',
         'is_active',
-        'avatar_path',
+        'avatar_path'
     ];
 
     /**

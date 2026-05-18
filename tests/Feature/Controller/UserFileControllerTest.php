@@ -22,7 +22,7 @@ class UserFileControllerTest extends TestCase
 
     public function testStoreReturnsCreatedResponse(): void
     {
-        Storage::fake('local');
+        Storage::fake('files');
 
         $user = User::factory()->create();
         $file = UploadedFile::fake()->create('document.pdf', 100, 'application/pdf');
@@ -36,7 +36,7 @@ class UserFileControllerTest extends TestCase
 
     public function testShowReturnsSuccessResponse(): void
     {
-        Storage::fake('local');
+        Storage::fake('files');
 
         $user     = User::factory()->create();
         $path     = 'user/ab/cd/ef/abcdef/file';
@@ -72,7 +72,7 @@ class UserFileControllerTest extends TestCase
 
     public function testDestroyReturnsNoContentResponse(): void
     {
-        Storage::fake('local');
+        Storage::fake('files');
 
         $user     = User::factory()->create();
         $path     = 'user/ab/cd/ef/abcdef/file';
@@ -92,7 +92,7 @@ class UserFileControllerTest extends TestCase
 
     public function testDownloadReturnsSuccessResponse(): void
     {
-        Storage::fake('local');
+        Storage::fake('files');
 
         $user     = User::factory()->create();
         $path     = 'user/ab/cd/ef/abcdef/file';
@@ -112,7 +112,7 @@ class UserFileControllerTest extends TestCase
 
     public function testStoreNewVersionReturnsCreatedResponse(): void
     {
-        Storage::fake('local');
+        Storage::fake('files');
 
         $user      = User::factory()->create();
         $path      = 'user/ab/cd/ef/abcdef/old';
