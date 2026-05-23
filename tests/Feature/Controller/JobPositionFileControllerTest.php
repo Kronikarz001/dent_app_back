@@ -49,7 +49,7 @@ class JobPositionFileControllerTest extends TestCase
             'user_uuid'     => $user->uuid,
         ]);
 
-        Storage::disk('local')->put($path, Crypt::encrypt('test content'));
+        Storage::disk('files')->put($path, Crypt::encrypt('test content'));
 
         $this->callApiWithLoggedUser()
             ->getJson(route('jobpositionfile.show', ['jobPosition' => $jobPosition->uuid, 'file' => $fileModel->uuid]))
@@ -87,7 +87,7 @@ class JobPositionFileControllerTest extends TestCase
             'user_uuid'     => $user->uuid,
         ]);
 
-        Storage::disk('local')->put($path, Crypt::encrypt('test'));
+        Storage::disk('files')->put($path, Crypt::encrypt('test'));
 
         $this->callApiWithLoggedUser()
             ->deleteJson(route('jobpositionfile.destroy', ['jobPosition' => $jobPosition->uuid, 'file' => $fileModel->uuid]))
@@ -108,7 +108,7 @@ class JobPositionFileControllerTest extends TestCase
             'user_uuid'     => $user->uuid,
         ]);
 
-        Storage::disk('local')->put($path, Crypt::encrypt('test content'));
+        Storage::disk('files')->put($path, Crypt::encrypt('test content'));
 
         $this->callApiWithLoggedUser()
             ->getJson(route('jobpositionfile.download', ['jobPosition' => $jobPosition->uuid, 'file' => $fileModel->uuid]))
@@ -130,7 +130,7 @@ class JobPositionFileControllerTest extends TestCase
             'is_latest'     => true,
         ]);
 
-        Storage::disk('local')->put($path, Crypt::encrypt('old content'));
+        Storage::disk('files')->put($path, Crypt::encrypt('old content'));
 
         $newFile = UploadedFile::fake()->create('new.pdf', 100, 'application/pdf');
 
