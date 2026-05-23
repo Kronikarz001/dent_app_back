@@ -36,6 +36,9 @@ class DataSortFilterRequest extends Request
         ];
     }
 
+    /**
+     * @return PageableDto
+     */
     public function getDto(): PageableDto
     {
         return new PageableDto(
