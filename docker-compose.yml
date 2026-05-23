@@ -25,12 +25,6 @@ services:
       - ./:/var/www
     depends_on:
       - dent_app_back_db
-    environment:
-      - DB_HOST=dent_app_back_db
-      - DB_PORT=5432
-      - DB_DATABASE=dent_db_back
-      - DB_USERNAME=pskudlik
-      - DB_PASSWORD=Troll001#
     networks:
       - dent_app_back_network
 

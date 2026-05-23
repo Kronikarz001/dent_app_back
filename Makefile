@@ -29,16 +29,16 @@ down-remove:
 
 
 createdb:
-	$(SUDO) docker-compose exec dent_app_back_db psql -U pskudlik -d postgres -c "CREATE DATABASE dent_db_back;"
+	$(SUDO) docker-compose exec dent_app_back_db psql -U $(DB_USERNAME) -d postgres -c "CREATE DATABASE $(DB_DATABASE);"
 
 createdb-role:
-	$(SUDO) docker-compose exec dent_app_back_db psql -U pskudlik -d postgres -c "CREATE ROLE pskudlik WITH LOGIN PASSWORD 'Troll001#';"
+	$(SUDO) docker-compose exec dent_app_back_db psql -U $(DB_USERNAME) -d postgres -c "CREATE ROLE $(DB_USERNAME) WITH LOGIN PASSWORD '$(DB_PASSWORD)';"
 
 createdb-user:
-	$(SUDO) docker-compose exec dent_app_back_db psql -U pskudlik -d postgres -c "ALTER USER pskudlik WITH SUPERUSER;"
+	$(SUDO) docker-compose exec dent_app_back_db psql -U $(DB_USERNAME) -d postgres -c "ALTER USER $(DB_USERNAME) WITH SUPERUSER;"
 
 createdb-local-user:
-	$(SUDO) docker-compose exec dent_app_back_db psql -U pskudlik -d postgres -c "CREATE ROLE pskudlik WITH LOGIN PASSWORD 'Troll001#';"
+	$(SUDO) docker-compose exec dent_app_back_db psql -U $(DB_USERNAME) -d postgres -c "CREATE ROLE $(DB_USERNAME) WITH LOGIN PASSWORD '$(DB_PASSWORD)';"
 
 create-user:
 	$(SUDO) docker exec dent_app_back_app php artisan route:clear
