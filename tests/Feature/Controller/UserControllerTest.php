@@ -10,21 +10,15 @@ use Tests\TestCase;
  */
 class UserControllerTest extends TestCase
 {
-    /**
-     * @return void
-     */
-    public function testIndexUsersReturnSuccessResponse(): void
+    public function test_index_users_return_success_response(): void
     {
         $response = $this->callApiWithLoggedUser()
-        ->getJson(route('user.index'));
+            ->getJson(route('user.index'));
 
         $response->assertOk();
     }
 
-    /**
-     * @return void
-     */
-     public function testIndexUsersListReturnSuccessResponse(): void
+    public function test_index_users_list_return_success_response(): void
     {
         $response = $this->callApiWithLoggedUser()
             ->getJson(route('user.selectList'));
@@ -32,10 +26,7 @@ class UserControllerTest extends TestCase
         $response->assertOk();
     }
 
-    /**
-     * @return void
-     */
-    public function testShowUserReturnSuccessResponse(): void
+    public function test_show_user_return_success_response(): void
     {
         $user = User::factory()->create();
         $response = $this->callApiWithLoggedUser()
@@ -44,10 +35,7 @@ class UserControllerTest extends TestCase
         $response->assertOk();
     }
 
-    /**
-     * @return void
-     */
-    public function testStoreUserReturnCreatedResponse(): void
+    public function test_store_user_return_created_response(): void
     {
         $response = $this->callApiWithLoggedUser()
             ->postJson(route('user.store'), [
@@ -66,10 +54,7 @@ class UserControllerTest extends TestCase
         ]);
     }
 
-    /**
-     * @return void
-     */
-    public function testUpdateUserReturnNoContentResponse(): void
+    public function test_update_user_return_no_content_response(): void
     {
         $user = User::factory()->create();
         $response = $this->callApiWithLoggedUser()
@@ -86,10 +71,7 @@ class UserControllerTest extends TestCase
         ]);
     }
 
-    /**
-     * @return void
-     */
-    public function testDeleteUserReturnNoContentResponse(): void
+    public function test_delete_user_return_no_content_response(): void
     {
         $user = User::factory()->create();
         $response = $this->callApiWithLoggedUser()
@@ -101,10 +83,7 @@ class UserControllerTest extends TestCase
         ]);
     }
 
-    /**
-     * @return void
-     */
-    public function testShowLoggedUserReturnSuccessResponse(): void
+    public function test_show_logged_user_return_success_response(): void
     {
         $user = User::factory()->create();
 

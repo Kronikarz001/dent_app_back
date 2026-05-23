@@ -9,9 +9,6 @@ use Illuminate\Foundation\Http\FormRequest;
  */
 class PatientStoreRequest extends FormRequest
 {
-    /**
-     * @return array
-     */
     public function rules(): array
     {
         return [
@@ -22,9 +19,6 @@ class PatientStoreRequest extends FormRequest
         ];
     }
 
-    /**
-     * @return bool
-     */
     public function authorize(): bool
     {
         return true;

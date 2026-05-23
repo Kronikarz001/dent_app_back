@@ -5,5 +5,4 @@ namespace App\Mappers;
 /**
  * Summary of MapperInterface
  */
-interface MapperInterface
-{}
+interface MapperInterface {}

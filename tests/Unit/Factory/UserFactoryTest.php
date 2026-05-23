@@ -9,13 +9,12 @@ use Tests\Unit\UnitTestCase;
 /**
  * Summary of UserFactoryTest
  */
-final class UserFactoryTest  extends UnitTestCase
+final class UserFactoryTest extends UnitTestCase
 {
     /**
-     * @return void
      * @throws BindingResolutionException
      */
-    public function testUserCreateByFactory(): void
+    public function test_user_create_by_factory(): void
     {
         $user = User::factory()->create(['first_name' => 'John', 'last_name' => 'Doe']);
 

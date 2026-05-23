@@ -22,18 +22,14 @@ class AccessTokenMiddleware
      */
     private const API_KEY = 'X-API-KEY';
 
-    /**
-     * @param AuthServiceInterface $authService
-     */
     public function __construct(
         private readonly AuthServiceInterface $authService
-    )
-    {
-    }
+    ) {}
 
     /**
      * Handle an incoming request.
-     * @param Closure(Request): (Response) $next
+     *
+     * @param  Closure(Request): (Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
     {

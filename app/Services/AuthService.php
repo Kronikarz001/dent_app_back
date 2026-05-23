@@ -15,25 +15,15 @@ use Illuminate\Support\Facades\Password;
  */
 readonly class AuthService implements AuthServiceInterface
 {
-    /**
-     * @param UserServiceInterface $userService
-     * @param UserRouteCacheService $userRouteCacheService
-     */
     public function __construct(
-        private UserServiceInterface  $userService,
+        private UserServiceInterface $userService,
         private UserRouteCacheService $userRouteCacheService
-    )
-    {
-    }
+    ) {}
 
-    /**
-     * @param LoginRequest $request
-     * @return JsonResponse
-     */
     public function login(LoginRequest $request): JsonResponse
     {
-        if (!Auth::attempt($request->only(['email', 'password']))) {
-            throw new AuthenticationException();
+        if (! Auth::attempt($request->only(['email', 'password']))) {
+            throw new AuthenticationException;
         }
 
         $user = Auth::user();
@@ -43,9 +33,6 @@ readonly class AuthService implements AuthServiceInterface
         );
     }
 
-    /**
-     * @return void
-     */
     public function logout(): void
     {
         /** @var User $user */
@@ -59,10 +46,6 @@ readonly class AuthService implements AuthServiceInterface
         $this->userRouteCacheService->delete($user);
     }
 
-    /**
-     * @param array $data
-     * @return JsonResponse
-     */
     public function forgotPassword(array $data): JsonResponse
     {
         $status = Password::sendResetLink(['email' => $data['email']]);
@@ -74,10 +57,6 @@ readonly class AuthService implements AuthServiceInterface
         return new JsonResponse(['message' => __($status)], 422);
     }
 
-    /**
-     * @param array $data
-     * @return JsonResponse
-     */
     public function resetPassword(array $data): JsonResponse
     {
         $status = Password::reset(
@@ -96,36 +75,24 @@ readonly class AuthService implements AuthServiceInterface
         return new JsonResponse(['message' => __($status)], 422);
     }
 
-    /**
-     * @param string|null $token
-     * @return void
-     */
-    /**
-     * @param string|null $token
-     * @return void
-     */
     public function authenticate(?string $token): void
     {
         if (is_null($token)) {
-            throw new AuthenticationException();
+            throw new AuthenticationException;
         }
 
         $user = $this->userService->getUserByToken($token);
 
         if (is_null($user)) {
-            throw new AuthenticationException();
+            throw new AuthenticationException;
         }
 
         Auth::setUser($user);
     }
 
-    /**
-     * @param User $user
-     * @return array
-     */
     private function makeTokenResponse(User $user): array
     {
-        if (!is_null($user->token)) {
+        if (! is_null($user->token)) {
             return [
                 'token' => $user->token,
                 'type' => 'API_TOKEN',

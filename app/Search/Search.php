@@ -17,55 +17,24 @@ use Illuminate\Support\Str;
  */
 abstract class Search implements SearchInterface
 {
-    /**
-     * @var bool
-     */
     protected bool $includeEmptyRelations = false;
 
-    /**
-     * @param Request $request
-     */
     public function __construct(
         protected Request $request
-    )
-    {
-    }
+    ) {}
 
-    /**
-     * @return string
-     */
     abstract protected function modelClass(): string;
 
-    /**
-     * @return string
-     */
     abstract protected function prefix(): string;
 
-    /**
-     * @return array
-     */
     abstract protected function fillableSearchFields(): array;
 
-    /**
-     * @return array
-     */
     abstract protected function fillableSortFields(): array;
 
-    /**
-     * @return array
-     */
     abstract protected function searchStringFields(): array;
 
-    /**
-     * @param Builder $query
-     * @param array $params
-     * @return void
-     */
     abstract protected function preFilter(Builder $query, array $params): void;
 
-    /**
-     * @return array
-     */
     abstract protected function relationsShipLoad(): array;
 
     /**
@@ -76,9 +45,6 @@ abstract class Search implements SearchInterface
         return [];
     }
 
-    /**
-     * @return array
-     */
     protected function relationsCount(): array
     {
         return [];
@@ -98,16 +64,11 @@ abstract class Search implements SearchInterface
     protected function selectColumns(): array
     {
         return [
-            $this->init()->getModel()->getTable() . '.*',
+            $this->init()->getModel()->getTable().'.*',
         ];
     }
 
-
-    /**
-     * @param array $params
-     * @return LengthAwarePaginator
-     */
-    public final function search(array $params = []): LengthAwarePaginator
+    final public function search(array $params = []): LengthAwarePaginator
     {
         $query = $this->init();
         $this->selectCols($query);
@@ -117,7 +78,7 @@ abstract class Search implements SearchInterface
         $this->applySearchString($query);
         $this->applySort($query);
 
-        $perPage = (int)$this->request->get('perPage', -1);
+        $perPage = (int) $this->request->get('perPage', -1);
 
         return $query->paginate($perPage);
     }
@@ -143,11 +104,6 @@ abstract class Search implements SearchInterface
         $this->preFilter($query, $params);
     }
 
-    /**
-     * @param Builder $query
-     * @param array $params
-     * @return array
-     */
     private function applyNullSentinelsFromParams(Builder $query, array $params): array
     {
         if (empty($params)) {
@@ -162,11 +118,11 @@ abstract class Search implements SearchInterface
                 continue;
             }
 
-            if (!is_string($field) || str_contains($field, '.')) {
+            if (! is_string($field) || str_contains($field, '.')) {
                 continue;
             }
 
-            if (!in_array($field, $this->fillableSearchFields(), true)) {
+            if (! in_array($field, $this->fillableSearchFields(), true)) {
                 continue;
             }
 
@@ -175,6 +131,7 @@ abstract class Search implements SearchInterface
             if ($nullCondition === 'null') {
                 $query->whereNull($qualified);
                 unset($params[$field]);
+
                 continue;
             }
 
@@ -192,14 +149,10 @@ abstract class Search implements SearchInterface
         $query->select($this->selectColumns());
     }
 
-    /**
-     * @param Builder $query
-     * @return void
-     */
     protected function applyFilters(Builder $query): void
     {
         $filterData = $this->request->get($this->prefix(), []);
-        if (!is_array($filterData)) {
+        if (! is_array($filterData)) {
             return;
         }
 
@@ -225,16 +178,18 @@ abstract class Search implements SearchInterface
     {
         if (str_contains($field, '.')) {
             if ($this->isJsonSearchField($field)) {
-                $qualified = $table . '.' . $this->jsonPathFromField($field);
+                $qualified = $table.'.'.$this->jsonPathFromField($field);
                 $nullCondition = $this->resolveNullFilter($value);
 
                 if ($nullCondition === 'null') {
                     $useOr ? $query->orWhereNull($qualified) : $query->whereNull($qualified);
+
                     return;
                 }
 
                 if ($nullCondition === 'not_null') {
                     $useOr ? $query->orWhereNotNull($qualified) : $query->whereNotNull($qualified);
+
                     return;
                 }
 
@@ -243,6 +198,7 @@ abstract class Search implements SearchInterface
                 } else {
                     $useOr ? $query->orWhere($qualified, $value) : $query->where($qualified, $value);
                 }
+
                 return;
             }
 
@@ -252,15 +208,16 @@ abstract class Search implements SearchInterface
                 $pivotField = str_replace('pivot.', '', $relField);
                 $useOr
                     ? $query->orWhereHas($relation, function (Builder $q) use ($pivotField, $value) {
-                    is_array($value)
-                        ? $q->wherePivotIn($pivotField, $value)
-                        : $q->wherePivot($pivotField, $value);
-                })
+                        is_array($value)
+                            ? $q->wherePivotIn($pivotField, $value)
+                            : $q->wherePivot($pivotField, $value);
+                    })
                     : $query->whereHas($relation, function (Builder $q) use ($pivotField, $value) {
-                    is_array($value)
-                        ? $q->wherePivotIn($pivotField, $value)
-                        : $q->wherePivot($pivotField, $value);
-                });
+                        is_array($value)
+                            ? $q->wherePivotIn($pivotField, $value)
+                            : $q->wherePivot($pivotField, $value);
+                    });
+
                 return;
             }
 
@@ -277,11 +234,13 @@ abstract class Search implements SearchInterface
                         $q->whereHas($relation, function (Builder $sub) use ($qualifiedRelationField, $value, $nullCondition) {
                             if ($nullCondition === 'null') {
                                 $sub->whereNull($qualifiedRelationField);
+
                                 return;
                             }
 
                             if ($nullCondition === 'not_null') {
                                 $sub->whereNotNull($qualifiedRelationField);
+
                                 return;
                             }
 
@@ -296,53 +255,58 @@ abstract class Search implements SearchInterface
                     if ($nullCondition === 'null') {
                         $useOr
                             ? $query->orWhereHas($relation, function (Builder $q) use ($qualifiedRelationField) {
-                            $q->whereNull($qualifiedRelationField);
-                        })
+                                $q->whereNull($qualifiedRelationField);
+                            })
                             : $query->whereHas($relation, function (Builder $q) use ($qualifiedRelationField) {
-                            $q->whereNull($qualifiedRelationField);
-                        });
+                                $q->whereNull($qualifiedRelationField);
+                            });
+
                         return;
                     }
 
                     if ($nullCondition === 'not_null') {
                         $useOr
                             ? $query->orWhereHas($relation, function (Builder $q) use ($qualifiedRelationField) {
-                            $q->whereNotNull($qualifiedRelationField);
-                        })
+                                $q->whereNotNull($qualifiedRelationField);
+                            })
                             : $query->whereHas($relation, function (Builder $q) use ($qualifiedRelationField) {
-                            $q->whereNotNull($qualifiedRelationField);
-                        });
+                                $q->whereNotNull($qualifiedRelationField);
+                            });
+
                         return;
                     }
 
                     $useOr
                         ? $query->orWhereHas($relation, function (Builder $q) use ($qualifiedRelationField, $value) {
-                        is_array($value)
-                            ? $q->whereIn($qualifiedRelationField, $value)
-                            : $q->where($qualifiedRelationField, $value);
-                    })
+                            is_array($value)
+                                ? $q->whereIn($qualifiedRelationField, $value)
+                                : $q->where($qualifiedRelationField, $value);
+                        })
                         : $query->whereHas($relation, function (Builder $q) use ($qualifiedRelationField, $value) {
-                        is_array($value)
-                            ? $q->whereIn($qualifiedRelationField, $value)
-                            : $q->where($qualifiedRelationField, $value);
-                    });
+                            is_array($value)
+                                ? $q->whereIn($qualifiedRelationField, $value)
+                                : $q->where($qualifiedRelationField, $value);
+                        });
                 }
             }
+
             return;
         }
 
         if (in_array($field, $this->fillableSearchFields(), true)
-            && !in_array($field, config('search.search_keywords', []), true)) {
-            $qualified = $table . '.' . $field;
+            && ! in_array($field, config('search.search_keywords', []), true)) {
+            $qualified = $table.'.'.$field;
             $nullCondition = $this->resolveNullFilter($value);
 
             if ($nullCondition === 'null') {
                 $useOr ? $query->orWhereNull($qualified) : $query->whereNull($qualified);
+
                 return;
             }
 
             if ($nullCondition === 'not_null') {
                 $useOr ? $query->orWhereNotNull($qualified) : $query->whereNotNull($qualified);
+
                 return;
             }
 
@@ -390,6 +354,7 @@ abstract class Search implements SearchInterface
         }
 
         $root = explode('.', $field, 2)[0];
+
         return in_array($root, $allowed, true);
     }
 
@@ -398,17 +363,12 @@ abstract class Search implements SearchInterface
         return str_replace('.', '->', $field);
     }
 
-
-    /**
-     * @param Builder $query
-     * @return void
-     */
     protected function applySort(Builder $query): void
     {
         $sortKeyword = config('search.sort_keyword');
         $allParams = $this->request->all();
 
-        if (!isset($allParams[$sortKeyword])) {
+        if (! isset($allParams[$sortKeyword])) {
             return;
         }
 
@@ -417,8 +377,9 @@ abstract class Search implements SearchInterface
 
         if (str_contains($sortField, '.')) {
             if ($this->isJsonSearchField($sortField)) {
-                $qualified = $query->getModel()->getTable() . '.' . $this->jsonPathFromField($sortField);
+                $qualified = $query->getModel()->getTable().'.'.$this->jsonPathFromField($sortField);
                 $query->orderBy($qualified, $direction);
+
                 return;
             }
 
@@ -430,9 +391,10 @@ abstract class Search implements SearchInterface
                 $foreignKey = $relationObj->getQualifiedForeignKeyName();
                 $ownerKey = $relationObj->getQualifiedOwnerKeyName();
 
-                $alias = $relation . '_sort';
-                $query->leftJoin("$relatedTable as $alias", $foreignKey, '=', "$alias." . last(explode('.', $ownerKey)));
+                $alias = $relation.'_sort';
+                $query->leftJoin("$relatedTable as $alias", $foreignKey, '=', "$alias.".last(explode('.', $ownerKey)));
                 $query->orderBy("$alias.$relField", $direction);
+
                 return;
             }
 
@@ -441,9 +403,10 @@ abstract class Search implements SearchInterface
                 $localKey = $relationObj->getQualifiedParentKeyName();
                 $foreignKey = $relationObj->getQualifiedForeignKeyName();
 
-                $alias = $relation . '_sort';
-                $query->leftJoin("$relatedTable as $alias", $localKey, '=', "$alias." . last(explode('.', $foreignKey)));
+                $alias = $relation.'_sort';
+                $query->leftJoin("$relatedTable as $alias", $localKey, '=', "$alias.".last(explode('.', $foreignKey)));
                 $query->orderBy("$alias.$relField", $direction);
+
                 return;
             }
 
@@ -454,9 +417,10 @@ abstract class Search implements SearchInterface
                     $parentKey = $relationObj->getQualifiedParentKeyName();
                     $foreignPivotKey = $relationObj->getQualifiedForeignPivotKeyName();
 
-                    $alias = $relation . '_pivot_sort';
+                    $alias = $relation.'_pivot_sort';
                     $query->leftJoin("$pivotTable as $alias", $parentKey, '=', $foreignPivotKey);
                     $query->orderBy("$alias.$pivotField", $direction);
+
                     return;
                 }
 
@@ -464,9 +428,10 @@ abstract class Search implements SearchInterface
                 $foreignKey = $relationObj->getQualifiedForeignKeyName();
                 $ownerKey = $relationObj->getRelated()->getQualifiedKeyName();
 
-                $alias = $relation . '_sort';
-                $query->leftJoin("$relatedTable as $alias", $foreignKey, '=', "$alias." . last(explode('.', $ownerKey)));
+                $alias = $relation.'_sort';
+                $query->leftJoin("$relatedTable as $alias", $foreignKey, '=', "$alias.".last(explode('.', $ownerKey)));
                 $query->orderBy("$alias.$relField", $direction);
+
                 return;
             }
         }
@@ -474,22 +439,19 @@ abstract class Search implements SearchInterface
         if (in_array($sortField, $this->fillableSortFields(), true)) {
             if (str_ends_with($sortField, '_count') && $this->isRelationCountField($sortField)) {
                 $query->orderBy($sortField, $direction);
+
                 return;
             }
 
-            $qualified = $query->getModel()->getTable() . '.' . $sortField;
+            $qualified = $query->getModel()->getTable().'.'.$sortField;
             $query->orderBy($qualified, $direction);
         }
     }
 
-    /**
-     * @param Builder $query
-     * @return void
-     */
     protected function applySearchString(Builder $query): void
     {
         $searchKeyword = config('search.search_string_keyword', 'search');
-        if (!$this->request->filled($searchKeyword)) {
+        if (! $this->request->filled($searchKeyword)) {
             return;
         }
 
@@ -507,6 +469,7 @@ abstract class Search implements SearchInterface
                         $q->orWhereHas($relation, function (Builder $q2) use ($pivotField, $searchString) {
                             $q2->wherePivot($pivotField, 'ILIKE', "%{$searchString}%");
                         });
+
                         continue;
                     }
 
@@ -520,18 +483,13 @@ abstract class Search implements SearchInterface
                         $q2->where($qualifiedRelationField, 'ILIKE', "%{$searchString}%");
                     });
                 } else {
-                    $qualified = $table . '.' . $field;
+                    $qualified = $table.'.'.$field;
                     $q->orWhere($qualified, 'ILIKE', "%{$searchString}%");
                 }
             }
         });
     }
 
-
-    /**
-     * @param string $sortDirection
-     * @return string
-     */
     protected function getSortDirection(string $sortDirection): string
     {
         return config('search.sort_asc_default_character') === $sortDirection ? 'asc' : 'desc';
@@ -540,7 +498,7 @@ abstract class Search implements SearchInterface
     private function canFilterByRelation(string $relation): bool
     {
         foreach ($this->relationsShipLoad() as $loadedRelation) {
-            if ($loadedRelation === $relation || str_starts_with($loadedRelation, $relation . '.')) {
+            if ($loadedRelation === $relation || str_starts_with($loadedRelation, $relation.'.')) {
                 return true;
             }
         }
@@ -548,14 +506,10 @@ abstract class Search implements SearchInterface
         return array_key_exists($relation, $this->recursiveRelations());
     }
 
-    /**
-     * @param string $sortField
-     * @return bool
-     */
     private function isRelationCountField(string $sortField): bool
     {
         foreach ($this->relationsCount() as $relation) {
-            if (Str::snake($relation) . '_count' === $sortField) {
+            if (Str::snake($relation).'_count' === $sortField) {
                 return true;
             }
         }
@@ -567,7 +521,7 @@ abstract class Search implements SearchInterface
     {
         $model = $query->getModel();
 
-        if (!method_exists($model, $relation)) {
+        if (! method_exists($model, $relation)) {
             return null;
         }
 
@@ -584,20 +538,17 @@ abstract class Search implements SearchInterface
 
         if (str_contains($field, '->')) {
             [$column, $jsonPath] = explode('->', $field, 2);
-            return $relation->getRelated()->qualifyColumn($column) . '->' . $jsonPath;
+
+            return $relation->getRelated()->qualifyColumn($column).'->'.$jsonPath;
         }
 
         return $relation->getRelated()->qualifyColumn($field);
     }
 
-    /**
-     * @param Builder $query
-     * @return void
-     */
     private function loadRelations(Builder $query): void
     {
         $relations = $this->relationsShipLoad();
-        if (!empty($relations)) {
+        if (! empty($relations)) {
             $query->with($relations);
         }
 
@@ -606,7 +557,7 @@ abstract class Search implements SearchInterface
             $query->with($path);
         }
 
-        if (!empty($this->relationsCount())) {
+        if (! empty($this->relationsCount())) {
             $query->withCount($this->relationsCount());
         }
     }
@@ -622,19 +573,17 @@ abstract class Search implements SearchInterface
             $current = $relation;
             for ($level = 1; $level <= $depth; $level++) {
                 $paths[] = $current;
-                $current .= '.' . $relation;
+                $current .= '.'.$relation;
             }
         }
 
         return array_values(array_unique($paths));
     }
 
-    /**
-     * @return Builder
-     */
     private function init(): Builder
     {
         $modelClass = $this->modelClass();
+
         return $modelClass::query();
     }
 }

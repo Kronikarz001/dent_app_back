@@ -10,10 +10,7 @@ use ReflectionObject;
  */
 abstract class Dto implements Arrayable
 {
-    /**
-     * @return array
-     */
-    public final function toArray(): array
+    final public function toArray(): array
     {
         $array = [];
         $ref = new ReflectionObject($this);
@@ -27,10 +24,6 @@ abstract class Dto implements Arrayable
         return $array;
     }
 
-    /**
-     * @param mixed $value
-     * @return mixed
-     */
     protected function normalizeValue(mixed $value): mixed
     {
         if ($value instanceof Arrayable) {
@@ -38,17 +31,13 @@ abstract class Dto implements Arrayable
         }
 
         if (is_array($value)) {
-            return array_map(fn($item) => $this->normalizeValue($item), $value);
+            return array_map(fn ($item) => $this->normalizeValue($item), $value);
         }
 
         return $value;
     }
 
-    /**
-     * @param array $data
-     * @return static
-     */
-    public static final function fromArray(array $data): static
+    final public static function fromArray(array $data): static
     {
         return new static(...array_values($data));
     }

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 /**
  * Summary of PhoneNumber
+ *
  * @property string $uuid
  * @property string $phoneable_type
  * @property string $phoneable_uuid
@@ -27,11 +28,6 @@ class PhoneNumber extends UuidModel
         'type',
     ];
 
-
-
-    /**
-     * @return MorphTo
-     */
     public function phoneNumberable(): MorphTo
     {
         return $this->morphTo();

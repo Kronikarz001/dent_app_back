@@ -10,9 +10,6 @@ use Illuminate\Database\Seeder;
  */
 class JobPositionSeeder extends Seeder
 {
-    /**
-     * @return void
-     */
     public function run(): void
     {
         collect($this->positions)->each(function ($position) {

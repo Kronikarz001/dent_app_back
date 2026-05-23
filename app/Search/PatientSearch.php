@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Search;
 
 use App\Models\Patient;
@@ -9,17 +10,11 @@ use Illuminate\Database\Eloquent\Builder;
  */
 class PatientSearch extends Search
 {
-    /**
-     * @return string
-     */
     protected function modelClass(): string
     {
         return Patient::class;
     }
 
-    /**
-     * @return string
-     */
     protected function prefix(): string
     {
         return 'patient';
@@ -67,22 +62,12 @@ class PatientSearch extends Search
         ];
     }
 
-    /**
-     * @param Builder $query
-     * @param array $params
-     * @return void
-     */
-    protected function preFilter(Builder $query, array $params): void
-    {
-    }
+    protected function preFilter(Builder $query, array $params): void {}
 
-    /**
-     * @return array
-     */
     protected function relationsShipLoad(): array
     {
         return [
-            'phoneNumbers'
+            'phoneNumbers',
         ];
     }
 }

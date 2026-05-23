@@ -11,12 +11,9 @@ use Tests\Unit\UnitTestCase;
  */
 final class JobPositionExportTest extends UnitTestCase
 {
-    /**
-     * @return void
-     */
-    public function testHeadingsAreCorrect(): void
+    public function test_headings_are_correct(): void
     {
-        $export   = new JobPositionExport(collect());
+        $export = new JobPositionExport(collect());
         $expected = [
             'Nazwa stanowiska',
             'Nazwa r.żeński',
@@ -25,13 +22,10 @@ final class JobPositionExportTest extends UnitTestCase
         $this->assertEquals($expected, $export->headings());
     }
 
-    /**
-     * @return void
-     */
-    public function testMapWithAllValuesReturnsExpectedArray(): void
+    public function test_map_with_all_values_returns_expected_array(): void
     {
         $jobPosition = new JobPosition([
-            'name'   => 'Lekarz',
+            'name' => 'Lekarz',
             'f_name' => 'Lekarka',
             'm_name' => 'Lekarz',
         ]);
@@ -40,21 +34,18 @@ final class JobPositionExportTest extends UnitTestCase
         $result = $export->map($jobPosition);
 
         $this->assertEquals([
-            'name'   => 'Lekarz',
+            'name' => 'Lekarz',
             'f_name' => 'Lekarka',
             'm_name' => 'Lekarz',
         ], $result);
     }
 
-    /**
-     * @return void
-     */
-    public function testCollectionReturnsJobPositionsCollection(): void
+    public function test_collection_returns_job_positions_collection(): void
     {
         $jobPosition1 = new JobPosition(['name' => 'Lekarz']);
         $jobPosition2 = new JobPosition(['name' => 'Pielęgniarka']);
         $jobPositions = collect([$jobPosition1, $jobPosition2]);
-        $export       = new JobPositionExport($jobPositions);
+        $export = new JobPositionExport($jobPositions);
 
         $collection = $export->collection();
         $this->assertSame($jobPositions, $collection);

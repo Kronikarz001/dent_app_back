@@ -9,9 +9,5 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
  */
 interface SearchInterface
 {
-    /**
-     * @param array $params
-     * @return LengthAwarePaginator
-     */
     public function search(array $params = []): LengthAwarePaginator;
 }

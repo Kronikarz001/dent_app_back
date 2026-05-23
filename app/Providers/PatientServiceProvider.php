@@ -15,9 +15,6 @@ use Illuminate\Support\ServiceProvider;
  */
 class PatientServiceProvider extends ServiceProvider
 {
-    /**
-     * @return void
-     */
     public function register(): void
     {
         $this->app->bind(PatientRepositoryInterface::class, PatientRepository::class);

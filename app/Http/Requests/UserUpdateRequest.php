@@ -4,7 +4,6 @@ namespace App\Http\Requests;
 
 use App\Enums\PhoneNumberType;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
 
 /**
@@ -30,9 +29,6 @@ class UserUpdateRequest extends FormRequest
         ];
     }
 
-    /**
-     * @return bool
-     */
     public function authorize(): bool
     {
         return true;

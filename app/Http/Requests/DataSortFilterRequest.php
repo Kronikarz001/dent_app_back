@@ -23,6 +23,7 @@ class DataSortFilterRequest extends Request
 
     /**
      * Get the validation rules that apply to the request.
+     *
      * @return array<string, ValidationRule|array|string>
      */
     public function rules(): array
@@ -35,9 +36,6 @@ class DataSortFilterRequest extends Request
         ];
     }
 
-    /**
-     * @return PageableDto
-     */
     public function getDto(): PageableDto
     {
         return new PageableDto(
