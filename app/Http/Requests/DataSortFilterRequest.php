@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests;
 
-use App\DTO\PageableDto;
+use App\Dto\PageableDto;
 use Illuminate\Contracts\Validation\ValidationRule;
 
 /**
