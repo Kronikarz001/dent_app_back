@@ -14,14 +14,14 @@ use Illuminate\Http\JsonResponse;
 class AuthController extends Controller
 {
     /**
-     * @param  AuthServiceInterface  $authService
+     * @param AuthServiceInterface $authService
      */
     public function __construct(
         private readonly AuthServiceInterface $authService
     ) {}
 
     /**
-     * @param  LoginRequest  $request
+     * @param LoginRequest $request
      * @return JsonResponse
      */
     public function login(LoginRequest $request): JsonResponse
@@ -40,7 +40,7 @@ class AuthController extends Controller
     }
 
     /**
-     * @param  ForgotPasswordRequest  $request
+     * @param ForgotPasswordRequest $request
      * @return JsonResponse
      */
     public function forgotPassword(ForgotPasswordRequest $request): JsonResponse
@@ -51,7 +51,7 @@ class AuthController extends Controller
     }
 
     /**
-     * @param  ResetPasswordRequest  $request
+     * @param ResetPasswordRequest $request
      * @return JsonResponse
      */
     public function resetPassword(ResetPasswordRequest $request): JsonResponse

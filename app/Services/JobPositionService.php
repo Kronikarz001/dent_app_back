@@ -18,8 +18,8 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 readonly class JobPositionService implements JobPositionServiceInterface
 {
     /**
-     * @param  JobPositionRepositoryInterface  $jobPositionRepository
-     * @param  ExportServiceInterface  $exportService
+     * @param JobPositionRepositoryInterface $jobPositionRepository
+     * @param ExportServiceInterface $exportService
      */
     public function __construct(
         private JobPositionRepositoryInterface $jobPositionRepository,
@@ -43,7 +43,7 @@ readonly class JobPositionService implements JobPositionServiceInterface
     }
 
     /**
-     * @param  array  $data
+     * @param array $data
      * @return JobPosition
      */
     public function createJobPosition(array $data): JobPosition
@@ -52,8 +52,8 @@ readonly class JobPositionService implements JobPositionServiceInterface
     }
 
     /**
-     * @param  JobPosition  $jobPosition
-     * @param  array  $data
+     * @param JobPosition $jobPosition
+     * @param array $data
      * @return JobPosition
      */
     public function updateJobPosition(JobPosition $jobPosition, array $data): JobPosition
@@ -62,7 +62,7 @@ readonly class JobPositionService implements JobPositionServiceInterface
     }
 
     /**
-     * @param  JobPosition  $jobPosition
+     * @param JobPosition $jobPosition
      * @return void
      */
     public function deleteJobPosition(JobPosition $jobPosition): void
@@ -71,8 +71,8 @@ readonly class JobPositionService implements JobPositionServiceInterface
     }
 
     /**
-     * @param  User  $user
-     * @param  array  $data
+     * @param User $user
+     * @param array $data
      * @return void
      */
     public function assignJobPosition(User $user, array $data): void
@@ -83,7 +83,7 @@ readonly class JobPositionService implements JobPositionServiceInterface
     }
 
     /**
-     * @param  ExportRequest  $request
+     * @param ExportRequest $request
      * @return BinaryFileResponse
      *
      * @throws Exception

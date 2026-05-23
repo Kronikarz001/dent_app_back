@@ -17,9 +17,9 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 readonly class UserService implements UserServiceInterface
 {
     /**
-     * @param  UserRepositoryInterface  $userRepository
-     * @param  ExportServiceInterface  $exportService
-     * @param  PhoneNumberServiceInterface  $phoneNumberService
+     * @param UserRepositoryInterface $userRepository
+     * @param ExportServiceInterface $exportService
+     * @param PhoneNumberServiceInterface $phoneNumberService
      */
     public function __construct(
         private UserRepositoryInterface $userRepository,
@@ -44,7 +44,7 @@ readonly class UserService implements UserServiceInterface
     }
 
     /**
-     * @param  array  $data
+     * @param array $data
      * @return User
      */
     public function createUser(array $data): User
@@ -53,8 +53,8 @@ readonly class UserService implements UserServiceInterface
     }
 
     /**
-     * @param  User  $user
-     * @param  array  $data
+     * @param User $user
+     * @param array $data
      * @return User
      */
     public function updateUser(User $user, array $data): User
@@ -67,7 +67,7 @@ readonly class UserService implements UserServiceInterface
     }
 
     /**
-     * @param  User  $user
+     * @param User $user
      * @return void
      */
     public function deactivateUser(User $user): void
@@ -76,7 +76,7 @@ readonly class UserService implements UserServiceInterface
     }
 
     /**
-     * @param  User  $user
+     * @param User $user
      * @return void
      */
     public function deleteUser(User $user): void
@@ -85,8 +85,8 @@ readonly class UserService implements UserServiceInterface
     }
 
     /**
-     * @param  User  $user
-     * @param  array  $data
+     * @param User $user
+     * @param array $data
      * @return User
      */
     public function editPassword(User $user, array $data): User
@@ -97,7 +97,7 @@ readonly class UserService implements UserServiceInterface
     }
 
     /**
-     * @param  User  $user
+     * @param User $user
      * @return User
      */
     public function getUserInformation(User $user): User
@@ -106,7 +106,7 @@ readonly class UserService implements UserServiceInterface
     }
 
     /**
-     * @param  string  $token
+     * @param string $token
      * @return User|null
      */
     public function getUserByToken(string $token): ?User
@@ -123,7 +123,7 @@ readonly class UserService implements UserServiceInterface
     }
 
     /**
-     * @param  ExportRequest  $request
+     * @param ExportRequest $request
      * @return BinaryFileResponse
      *
      * @throws Exception

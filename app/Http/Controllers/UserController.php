@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 class UserController extends Controller
 {
     /**
-     * @param  UserServiceInterface  $userService
+     * @param UserServiceInterface $userService
      */
     public function __construct(
         private readonly UserServiceInterface $userService
@@ -43,7 +43,7 @@ class UserController extends Controller
     }
 
     /**
-     * @param  User  $user
+     * @param User $user
      * @return UserResource
      */
     public function show(User $user): UserResource
@@ -60,7 +60,7 @@ class UserController extends Controller
     }
 
     /**
-     * @param  UserStoreRequest  $request
+     * @param UserStoreRequest $request
      * @return UserResource
      */
     public function store(UserStoreRequest $request): UserResource
@@ -69,8 +69,8 @@ class UserController extends Controller
     }
 
     /**
-     * @param  User  $user
-     * @param  UserUpdateRequest  $request
+     * @param User $user
+     * @param UserUpdateRequest $request
      * @return JsonResponse
      */
     public function update(User $user, UserUpdateRequest $request): JsonResponse
@@ -81,7 +81,7 @@ class UserController extends Controller
     }
 
     /**
-     * @param  User  $user
+     * @param User $user
      * @return JsonResponse
      */
     public function destroy(User $user): JsonResponse
@@ -92,7 +92,7 @@ class UserController extends Controller
     }
 
     /**
-     * @param  ExportRequest  $request
+     * @param ExportRequest $request
      * @return BinaryFileResponse
      *
      * @throws Exception

@@ -63,8 +63,8 @@ class JobPositionSearch extends Search
     }
 
     /**
-     * @param  Builder  $query
-     * @param  array  $params
+     * @param Builder $query
+     * @param array $params
      * @return void
      */
     protected function preFilter(Builder $query, array $params): void {}

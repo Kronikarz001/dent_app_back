@@ -28,7 +28,7 @@ abstract class Dto implements Arrayable
     }
 
     /**
-     * @param  mixed  $value
+     * @param mixed $value
      * @return mixed
      */
     protected function normalizeValue(mixed $value): mixed
@@ -45,7 +45,7 @@ abstract class Dto implements Arrayable
     }
 
     /**
-     * @param  array  $data
+     * @param array $data
      * @return static
      */
     final public static function fromArray(array $data): static

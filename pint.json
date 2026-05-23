@@ -2,6 +2,7 @@
     "preset": "laravel",
     "rules": {
         "no_superfluous_phpdoc_tags": false,
-        "no_empty_phpdoc": false
+        "no_empty_phpdoc": false,
+        "phpdoc_align": false
     }
 }

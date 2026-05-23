@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Cache;
 abstract class CacheService implements CacheServiceInterface
 {
     /**
-     * @param  $key
+     * @param $key
      * @return object
      */
     public function get($key): mixed
@@ -19,8 +19,8 @@ abstract class CacheService implements CacheServiceInterface
     }
 
     /**
-     * @param  string  $key
-     * @param  object  $data
+     * @param string $key
+     * @param object $data
      * @return void
      */
     public function set(mixed $key, mixed $data): void
@@ -29,7 +29,7 @@ abstract class CacheService implements CacheServiceInterface
     }
 
     /**
-     * @param  string  $key
+     * @param string $key
      * @return void
      */
     public function delete(mixed $key): void
@@ -38,7 +38,7 @@ abstract class CacheService implements CacheServiceInterface
     }
 
     /**
-     * @param  mixed  $key
+     * @param mixed $key
      * @return bool
      */
     public function has(mixed $key): bool
@@ -57,7 +57,7 @@ abstract class CacheService implements CacheServiceInterface
     abstract protected function getTtl(): ?int;
 
     /**
-     * @param  string  $key
+     * @param string $key
      * @return string
      */
     public function getPrefix(string $key): string

@@ -10,7 +10,7 @@ use Illuminate\Support\Collection;
 final class PatientExport extends Export
 {
     /**
-     * @param  Collection  $patients
+     * @param Collection $patients
      */
     public function __construct(
         private Collection $patients
@@ -37,7 +37,7 @@ final class PatientExport extends Export
     }
 
     /**
-     * @param  mixed  $row
+     * @param mixed $row
      * @return array
      */
     public function map(mixed $row): array

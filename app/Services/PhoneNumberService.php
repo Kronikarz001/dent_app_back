@@ -11,8 +11,8 @@ use Illuminate\Database\Eloquent\Model;
 class PhoneNumberService implements PhoneNumberServiceInterface
 {
     /**
-     * @param  Model  $model
-     * @param  array  $phones
+     * @param Model $model
+     * @param array $phones
      * @return void
      */
     public function assignPhones(Model $model, array $phones): void

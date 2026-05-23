@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 class JobPositionController extends Controller
 {
     /**
-     * @param  JobPositionServiceInterface  $jobPositionService
+     * @param JobPositionServiceInterface $jobPositionService
      */
     public function __construct(
         private readonly JobPositionServiceInterface $jobPositionService
@@ -44,7 +44,7 @@ class JobPositionController extends Controller
     }
 
     /**
-     * @param  JobPosition  $jobPosition
+     * @param JobPosition $jobPosition
      * @return JobPositionResource
      */
     public function show(JobPosition $jobPosition): JobPositionResource
@@ -53,7 +53,7 @@ class JobPositionController extends Controller
     }
 
     /**
-     * @param  JobPositionRequest  $request
+     * @param JobPositionRequest $request
      * @return JobPositionResource
      */
     public function store(JobPositionRequest $request): JobPositionResource
@@ -62,8 +62,8 @@ class JobPositionController extends Controller
     }
 
     /**
-     * @param  JobPosition  $jobPosition
-     * @param  JobPositionRequest  $request
+     * @param JobPosition $jobPosition
+     * @param JobPositionRequest $request
      * @return JsonResponse
      */
     public function update(JobPosition $jobPosition, JobPositionRequest $request): JsonResponse
@@ -74,7 +74,7 @@ class JobPositionController extends Controller
     }
 
     /**
-     * @param  JobPosition  $jobPosition
+     * @param JobPosition $jobPosition
      * @return JsonResponse
      */
     public function destroy(JobPosition $jobPosition): JsonResponse
@@ -85,8 +85,8 @@ class JobPositionController extends Controller
     }
 
     /**
-     * @param  User  $user
-     * @param  AssignJobPositionRequest  $request
+     * @param User $user
+     * @param AssignJobPositionRequest $request
      * @return JsonResponse
      */
     public function assignJobPosition(User $user, AssignJobPositionRequest $request): JsonResponse
@@ -97,7 +97,7 @@ class JobPositionController extends Controller
     }
 
     /**
-     * @param  ExportRequest  $request
+     * @param ExportRequest $request
      * @return BinaryFileResponse
      *
      * @throws Exception

@@ -13,14 +13,14 @@ use Illuminate\Database\Eloquent\Model;
 readonly class PatientRepository implements PatientRepositoryInterface
 {
     /**
-     * @param  PatientSearch  $search
+     * @param PatientSearch $search
      */
     public function __construct(
         private PatientSearch $search
     ) {}
 
     /**
-     * @param  array  $params
+     * @param array $params
      * @return LengthAwarePaginator
      */
     public function findAllWithPagination(array $params = []): LengthAwarePaginator
@@ -29,8 +29,8 @@ readonly class PatientRepository implements PatientRepositoryInterface
     }
 
     /**
-     * @param  array  $columns
-     * @param  array  $params
+     * @param array $columns
+     * @param array $params
      * @return LengthAwarePaginator
      */
     public function findSelectAllWithPagination(array $columns = ['*'], array $params = []): LengthAwarePaginator
@@ -39,7 +39,7 @@ readonly class PatientRepository implements PatientRepositoryInterface
     }
 
     /**
-     * @param  string  $uuid
+     * @param string $uuid
      * @return Patient|null
      */
     public function findByUuid(string $uuid): ?Patient
@@ -48,7 +48,7 @@ readonly class PatientRepository implements PatientRepositoryInterface
     }
 
     /**
-     * @param  array  $data
+     * @param array $data
      * @return Patient
      */
     public function create(array $data): Patient
@@ -57,8 +57,8 @@ readonly class PatientRepository implements PatientRepositoryInterface
     }
 
     /**
-     * @param  Patient|Model  $model
-     * @param  array  $data
+     * @param Patient|Model $model
+     * @param array $data
      * @return Patient
      */
     public function update(Patient|Model $model, array $data): Patient
@@ -69,7 +69,7 @@ readonly class PatientRepository implements PatientRepositoryInterface
     }
 
     /**
-     * @param  Patient|Model  $model
+     * @param Patient|Model $model
      * @return bool
      */
     public function delete(Patient|Model $model): bool

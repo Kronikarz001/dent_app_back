@@ -14,7 +14,7 @@ abstract class TestCase extends BaseTestCase
     use RefreshDatabase;
 
     /**
-     * @param  User|null  $user
+     * @param User|null $user
      * @return $this
      */
     protected function callApiWithLoggedUser(?User $user = null): static

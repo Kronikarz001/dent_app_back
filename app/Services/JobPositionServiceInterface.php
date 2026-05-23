@@ -26,33 +26,33 @@ interface JobPositionServiceInterface
     public function getJobPositionsList(): LengthAwarePaginator;
 
     /**
-     * @param  array  $data
+     * @param array $data
      * @return JobPosition
      */
     public function createJobPosition(array $data): JobPosition;
 
     /**
-     * @param  JobPosition  $jobPosition
-     * @param  array  $data
+     * @param JobPosition $jobPosition
+     * @param array $data
      * @return JobPosition
      */
     public function updateJobPosition(JobPosition $jobPosition, array $data): JobPosition;
 
     /**
-     * @param  JobPosition  $jobPosition
+     * @param JobPosition $jobPosition
      * @return void
      */
     public function deleteJobPosition(JobPosition $jobPosition): void;
 
     /**
-     * @param  User  $user
-     * @param  array  $data
+     * @param User $user
+     * @param array $data
      * @return void
      */
     public function assignJobPosition(User $user, array $data): void;
 
     /**
-     * @param  ExportRequest  $request
+     * @param ExportRequest $request
      * @return BinaryFileResponse
      *
      * @throws Exception

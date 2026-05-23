@@ -25,39 +25,39 @@ interface UserServiceInterface
     public function getUsersList(): LengthAwarePaginator;
 
     /**
-     * @param  array  $data
+     * @param array $data
      * @return User
      */
     public function createUser(array $data): User;
 
     /**
-     * @param  User  $user
-     * @param  array  $data
+     * @param User $user
+     * @param array $data
      * @return User
      */
     public function updateUser(User $user, array $data): User;
 
     /**
-     * @param  User  $user
+     * @param User $user
      * @return void
      */
     public function deactivateUser(User $user): void;
 
     /**
-     * @param  User  $user
-     * @param  array  $data
+     * @param User $user
+     * @param array $data
      * @return User
      */
     public function editPassword(User $user, array $data): User;
 
     /**
-     * @param  User  $user
+     * @param User $user
      * @return User
      */
     public function getUserInformation(User $user): User;
 
     /**
-     * @param  string  $token
+     * @param string $token
      * @return User|null
      */
     public function getUserByToken(string $token): ?User;
@@ -68,7 +68,7 @@ interface UserServiceInterface
     public function getLoggedUser(): User;
 
     /**
-     * @param  ExportRequest  $request
+     * @param ExportRequest $request
      * @return BinaryFileResponse
      *
      * @throws Exception

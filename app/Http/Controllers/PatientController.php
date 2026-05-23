@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 class PatientController extends Controller
 {
     /**
-     * @param  PatientServiceInterface  $patientService
+     * @param PatientServiceInterface $patientService
      */
     public function __construct(
         private readonly PatientServiceInterface $patientService
@@ -43,7 +43,7 @@ class PatientController extends Controller
     }
 
     /**
-     * @param  Patient  $patient
+     * @param Patient $patient
      * @return PatientResource
      */
     public function show(Patient $patient): PatientResource
@@ -52,7 +52,7 @@ class PatientController extends Controller
     }
 
     /**
-     * @param  PatientStoreRequest  $request
+     * @param PatientStoreRequest $request
      * @return PatientResource
      */
     public function store(PatientStoreRequest $request): PatientResource
@@ -61,8 +61,8 @@ class PatientController extends Controller
     }
 
     /**
-     * @param  Patient  $patient
-     * @param  PatientUpdateRequest  $request
+     * @param Patient $patient
+     * @param PatientUpdateRequest $request
      * @return JsonResponse
      */
     public function update(Patient $patient, PatientUpdateRequest $request): JsonResponse
@@ -73,7 +73,7 @@ class PatientController extends Controller
     }
 
     /**
-     * @param  Patient  $patient
+     * @param Patient $patient
      * @return JsonResponse
      */
     public function destroy(Patient $patient): JsonResponse
@@ -84,7 +84,7 @@ class PatientController extends Controller
     }
 
     /**
-     * @param  ExportRequest  $request
+     * @param ExportRequest $request
      * @return BinaryFileResponse
      *
      * @throws Exception

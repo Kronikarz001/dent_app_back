@@ -10,7 +10,7 @@ use Illuminate\Support\Collection;
 final class JobPositionExport extends Export
 {
     /**
-     * @param  Collection  $jobPositions
+     * @param Collection $jobPositions
      */
     public function __construct(
         private Collection $jobPositions
@@ -37,7 +37,7 @@ final class JobPositionExport extends Export
     }
 
     /**
-     * @param  mixed  $row
+     * @param mixed $row
      * @return array
      */
     public function map(mixed $row): array

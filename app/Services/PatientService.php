@@ -17,8 +17,8 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 readonly class PatientService implements PatientServiceInterface
 {
     /**
-     * @param  PatientRepositoryInterface  $patientRepository
-     * @param  ExportServiceInterface  $exportService
+     * @param PatientRepositoryInterface $patientRepository
+     * @param ExportServiceInterface $exportService
      */
     public function __construct(
         private PatientRepositoryInterface $patientRepository,
@@ -42,7 +42,7 @@ readonly class PatientService implements PatientServiceInterface
     }
 
     /**
-     * @param  array  $data
+     * @param array $data
      * @return Patient
      */
     public function createPatient(array $data): Patient
@@ -51,8 +51,8 @@ readonly class PatientService implements PatientServiceInterface
     }
 
     /**
-     * @param  Patient  $patient
-     * @param  array  $data
+     * @param Patient $patient
+     * @param array $data
      * @return Patient
      */
     public function updatePatient(Patient $patient, array $data): Patient
@@ -61,7 +61,7 @@ readonly class PatientService implements PatientServiceInterface
     }
 
     /**
-     * @param  Patient  $patient
+     * @param Patient $patient
      * @return void
      */
     public function deletePatient(Patient $patient): void
@@ -70,7 +70,7 @@ readonly class PatientService implements PatientServiceInterface
     }
 
     /**
-     * @param  ExportRequest  $request
+     * @param ExportRequest $request
      * @return BinaryFileResponse
      *
      * @throws Exception

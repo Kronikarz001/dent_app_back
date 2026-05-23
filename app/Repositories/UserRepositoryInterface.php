@@ -11,32 +11,32 @@ use Illuminate\Database\Eloquent\Model;
 interface UserRepositoryInterface extends BasicRepositoryInterface
 {
     /**
-     * @param  string  $uuid
+     * @param string $uuid
      * @return User|null
      */
     public function findByUuid(string $uuid): ?User;
 
     /**
-     * @param  array  $data
+     * @param array $data
      * @return User
      */
     public function create(array $data): User;
 
     /**
-     * @param  User|Model  $user
-     * @param  array  $data
+     * @param User|Model $user
+     * @param array $data
      * @return User
      */
     public function update(User|Model $user, array $data): User;
 
     /**
-     * @param  Model|User  $model
+     * @param Model|User $model
      * @return bool
      */
     public function delete(Model|User $model): bool;
 
     /**
-     * @param  string  $token
+     * @param string $token
      * @return User|null
      */
     public function getUserByToken(string $token): ?User;
@@ -47,7 +47,7 @@ interface UserRepositoryInterface extends BasicRepositoryInterface
     public function getLoggedUser(): User;
 
     /**
-     * @param  string  $userUuid
+     * @param string $userUuid
      * @return User
      */
     public function getUserInformation(string $userUuid): User;

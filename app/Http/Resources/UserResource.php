@@ -8,7 +8,7 @@ namespace App\Http\Resources;
 class UserResource extends BasicResource
 {
     /**
-     * @param  $request
+     * @param $request
      * @return array
      */
     public function toArray($request): array

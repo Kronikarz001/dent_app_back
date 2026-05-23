@@ -11,7 +11,7 @@ use Illuminate\Support\Collection;
 final class UserExport extends Export
 {
     /**
-     * @param  Collection  $users
+     * @param Collection $users
      */
     public function __construct(
         private Collection $users
@@ -40,7 +40,7 @@ final class UserExport extends Export
     }
 
     /**
-     * @param  User  $row
+     * @param User $row
      * @return array
      */
     public function map(mixed $row): array

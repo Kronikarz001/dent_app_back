@@ -16,8 +16,8 @@ use Illuminate\Support\Facades\Password;
 readonly class AuthService implements AuthServiceInterface
 {
     /**
-     * @param  UserServiceInterface  $userService
-     * @param  UserRouteCacheService  $userRouteCacheService
+     * @param UserServiceInterface $userService
+     * @param UserRouteCacheService $userRouteCacheService
      */
     public function __construct(
         private UserServiceInterface $userService,
@@ -25,7 +25,7 @@ readonly class AuthService implements AuthServiceInterface
     ) {}
 
     /**
-     * @param  LoginRequest  $request
+     * @param LoginRequest $request
      * @return JsonResponse
      */
     public function login(LoginRequest $request): JsonResponse
@@ -58,7 +58,7 @@ readonly class AuthService implements AuthServiceInterface
     }
 
     /**
-     * @param  array  $data
+     * @param array $data
      * @return JsonResponse
      */
     public function forgotPassword(array $data): JsonResponse
@@ -73,7 +73,7 @@ readonly class AuthService implements AuthServiceInterface
     }
 
     /**
-     * @param  array  $data
+     * @param array $data
      * @return JsonResponse
      */
     public function resetPassword(array $data): JsonResponse
@@ -95,11 +95,11 @@ readonly class AuthService implements AuthServiceInterface
     }
 
     /**
-     * @param  string|null  $token
+     * @param string|null $token
      * @return void
      */
     /**
-     * @param  string|null  $token
+     * @param string|null $token
      * @return void
      */
     public function authenticate(?string $token): void
@@ -118,7 +118,7 @@ readonly class AuthService implements AuthServiceInterface
     }
 
     /**
-     * @param  User  $user
+     * @param User $user
      * @return array
      */
     private function makeTokenResponse(User $user): array

@@ -18,7 +18,7 @@ class AuthenticationException extends Exception
     }
 
     /**
-     * @param  Request  $request
+     * @param Request $request
      * @return JsonResponse
      */
     public function render(Request $request): JsonResponse

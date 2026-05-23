@@ -13,14 +13,14 @@ use Illuminate\Database\Eloquent\Model;
 readonly class JobPositionRepository implements JobPositionRepositoryInterface
 {
     /**
-     * @param  JobPositionSearch  $search
+     * @param JobPositionSearch $search
      */
     public function __construct(
         private JobPositionSearch $search
     ) {}
 
     /**
-     * @param  array  $params
+     * @param array $params
      * @return LengthAwarePaginator
      */
     public function findAllWithPagination(array $params = []): LengthAwarePaginator
@@ -29,8 +29,8 @@ readonly class JobPositionRepository implements JobPositionRepositoryInterface
     }
 
     /**
-     * @param  array  $columns
-     * @param  array  $params
+     * @param array $columns
+     * @param array $params
      * @return LengthAwarePaginator
      */
     public function findSelectAllWithPagination(array $columns = ['*'], array $params = []): LengthAwarePaginator
@@ -39,7 +39,7 @@ readonly class JobPositionRepository implements JobPositionRepositoryInterface
     }
 
     /**
-     * @param  string  $uuid
+     * @param string $uuid
      * @return JobPosition|null
      */
     public function findByUuid(string $uuid): ?JobPosition
@@ -48,7 +48,7 @@ readonly class JobPositionRepository implements JobPositionRepositoryInterface
     }
 
     /**
-     * @param  array  $data
+     * @param array $data
      * @return JobPosition
      */
     public function create(array $data): JobPosition
@@ -57,8 +57,8 @@ readonly class JobPositionRepository implements JobPositionRepositoryInterface
     }
 
     /**
-     * @param  JobPosition|Model  $model
-     * @param  array  $data
+     * @param JobPosition|Model $model
+     * @param array $data
      * @return JobPosition
      */
     public function update(JobPosition|Model $model, array $data): JobPosition
@@ -69,7 +69,7 @@ readonly class JobPositionRepository implements JobPositionRepositoryInterface
     }
 
     /**
-     * @param  JobPosition|Model  $model
+     * @param JobPosition|Model $model
      * @return bool
      */
     public function delete(JobPosition|Model $model): bool

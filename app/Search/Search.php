@@ -23,7 +23,7 @@ abstract class Search implements SearchInterface
     protected bool $includeEmptyRelations = false;
 
     /**
-     * @param  Request  $request
+     * @param Request $request
      */
     public function __construct(
         protected Request $request
@@ -55,8 +55,8 @@ abstract class Search implements SearchInterface
     abstract protected function searchStringFields(): array;
 
     /**
-     * @param  Builder  $query
-     * @param  array  $params
+     * @param Builder $query
+     * @param array $params
      * @return void
      */
     abstract protected function preFilter(Builder $query, array $params): void;
@@ -101,7 +101,7 @@ abstract class Search implements SearchInterface
     }
 
     /**
-     * @param  array  $params
+     * @param array $params
      * @return LengthAwarePaginator
      */
     final public function search(array $params = []): LengthAwarePaginator
@@ -141,8 +141,8 @@ abstract class Search implements SearchInterface
     }
 
     /**
-     * @param  Builder  $query
-     * @param  array  $params
+     * @param Builder $query
+     * @param array $params
      * @return array
      */
     private function applyNullSentinelsFromParams(Builder $query, array $params): array
@@ -191,7 +191,7 @@ abstract class Search implements SearchInterface
     }
 
     /**
-     * @param  Builder  $query
+     * @param Builder $query
      * @return void
      */
     protected function applyFilters(Builder $query): void
@@ -409,7 +409,7 @@ abstract class Search implements SearchInterface
     }
 
     /**
-     * @param  Builder  $query
+     * @param Builder $query
      * @return void
      */
     protected function applySort(Builder $query): void
@@ -498,7 +498,7 @@ abstract class Search implements SearchInterface
     }
 
     /**
-     * @param  Builder  $query
+     * @param Builder $query
      * @return void
      */
     protected function applySearchString(Builder $query): void
@@ -544,7 +544,7 @@ abstract class Search implements SearchInterface
     }
 
     /**
-     * @param  string  $sortDirection
+     * @param string $sortDirection
      * @return string
      */
     protected function getSortDirection(string $sortDirection): string
@@ -564,7 +564,7 @@ abstract class Search implements SearchInterface
     }
 
     /**
-     * @param  string  $sortField
+     * @param string $sortField
      * @return bool
      */
     private function isRelationCountField(string $sortField): bool
@@ -607,7 +607,7 @@ abstract class Search implements SearchInterface
     }
 
     /**
-     * @param  Builder  $query
+     * @param Builder $query
      * @return void
      */
     private function loadRelations(Builder $query): void

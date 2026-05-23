@@ -8,10 +8,10 @@ namespace App\Dto;
 class PageableDto extends Dto
 {
     /**
-     * @param  array  $filters
-     * @param  array  $sorts
-     * @param  int  $perPage
-     * @param  int  $page
+     * @param array $filters
+     * @param array $sorts
+     * @param int $perPage
+     * @param int $page
      */
     public function __construct(
         private readonly array $filters = [],
@@ -53,7 +53,7 @@ class PageableDto extends Dto
     }
 
     /**
-     * @param  int  $perPage
+     * @param int $perPage
      * @return void
      */
     public function setPerPage(int $perPage): void

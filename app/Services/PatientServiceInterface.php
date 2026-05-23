@@ -25,26 +25,26 @@ interface PatientServiceInterface
     public function getPatientsList(): LengthAwarePaginator;
 
     /**
-     * @param  array  $data
+     * @param array $data
      * @return Patient
      */
     public function createPatient(array $data): Patient;
 
     /**
-     * @param  Patient  $patient
-     * @param  array  $data
+     * @param Patient $patient
+     * @param array $data
      * @return Patient
      */
     public function updatePatient(Patient $patient, array $data): Patient;
 
     /**
-     * @param  Patient  $patient
+     * @param Patient $patient
      * @return void
      */
     public function deletePatient(Patient $patient): void;
 
     /**
-     * @param  ExportRequest  $request
+     * @param ExportRequest $request
      * @return BinaryFileResponse
      *
      * @throws Exception

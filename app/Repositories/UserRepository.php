@@ -14,14 +14,14 @@ use Illuminate\Support\Facades\Auth;
 readonly class UserRepository implements UserRepositoryInterface
 {
     /**
-     * @param  UserSearch  $search
+     * @param UserSearch $search
      */
     public function __construct(
         private UserSearch $search
     ) {}
 
     /**
-     * @param  array  $params
+     * @param array $params
      * @return LengthAwarePaginator
      */
     public function findAllWithPagination(array $params = []): LengthAwarePaginator
@@ -30,8 +30,8 @@ readonly class UserRepository implements UserRepositoryInterface
     }
 
     /**
-     * @param  array  $columns
-     * @param  array  $params
+     * @param array $columns
+     * @param array $params
      * @return LengthAwarePaginator
      */
     public function findSelectAllWithPagination(array $columns = ['*'], array $params = []): LengthAwarePaginator
@@ -40,7 +40,7 @@ readonly class UserRepository implements UserRepositoryInterface
     }
 
     /**
-     * @param  string  $uuid
+     * @param string $uuid
      * @return User|null
      */
     public function findByUuid(string $uuid): ?User
@@ -49,7 +49,7 @@ readonly class UserRepository implements UserRepositoryInterface
     }
 
     /**
-     * @param  array  $data
+     * @param array $data
      * @return User
      */
     public function create(array $data): User
@@ -58,8 +58,8 @@ readonly class UserRepository implements UserRepositoryInterface
     }
 
     /**
-     * @param  User|Model  $user
-     * @param  array  $data
+     * @param User|Model $user
+     * @param array $data
      * @return User
      */
     public function update(User|Model $user, array $data): User
@@ -70,7 +70,7 @@ readonly class UserRepository implements UserRepositoryInterface
     }
 
     /**
-     * @param  User|Model  $model
+     * @param User|Model $model
      * @return bool
      */
     public function delete(User|Model $model): bool
@@ -79,7 +79,7 @@ readonly class UserRepository implements UserRepositoryInterface
     }
 
     /**
-     * @param  string  $token
+     * @param string $token
      * @return User|null
      */
     public function getUserByToken(string $token): ?User
@@ -96,7 +96,7 @@ readonly class UserRepository implements UserRepositoryInterface
     }
 
     /**
-     * @param  string  $userUuid
+     * @param string $userUuid
      * @return User
      */
     public function getUserInformation(string $userUuid): User

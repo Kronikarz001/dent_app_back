@@ -82,7 +82,7 @@ use Laravel\Sanctum\PersonalAccessToken;
     ];
 
     /**
-     * @param  string  $token
+     * @param string $token
      * @return User|null
      */
     public static function whereToken(string $token): ?self

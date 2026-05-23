@@ -10,7 +10,7 @@ use Illuminate\Support\Collection;
 class UserRouteDto
 {
     /**
-     * @param  Collection  $routes
+     * @param Collection $routes
      */
     public function __construct(
         private Collection $routes,
@@ -25,7 +25,7 @@ class UserRouteDto
     }
 
     /**
-     * @param  Collection  $routes
+     * @param Collection $routes
      * @return void
      */
     public function setRoutes(Collection $routes): void

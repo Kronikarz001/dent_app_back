@@ -11,26 +11,26 @@ use Illuminate\Database\Eloquent\Model;
 interface PatientRepositoryInterface extends BasicRepositoryInterface
 {
     /**
-     * @param  string  $uuid
+     * @param string $uuid
      * @return Patient|null
      */
     public function findByUuid(string $uuid): ?Patient;
 
     /**
-     * @param  array  $data
+     * @param array $data
      * @return Patient
      */
     public function create(array $data): Patient;
 
     /**
-     * @param  Patient|Model  $model
-     * @param  array  $data
+     * @param Patient|Model $model
+     * @param array $data
      * @return Patient
      */
     public function update(Patient|Model $model, array $data): Patient;
 
     /**
-     * @param  Model|Patient  $model
+     * @param Model|Patient $model
      * @return bool
      */
     public function delete(Model|Patient $model): bool;
