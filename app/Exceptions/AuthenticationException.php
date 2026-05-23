@@ -17,6 +17,10 @@ class AuthenticationException extends Exception
         parent::__construct(__('bad.credentials'));
     }
 
+    /**
+     * @param  Request  $request
+     * @return JsonResponse
+     */
     public function render(Request $request): JsonResponse
     {
         return ErrorHandlerResource::make($this)->response()->setStatusCode(code: 401);

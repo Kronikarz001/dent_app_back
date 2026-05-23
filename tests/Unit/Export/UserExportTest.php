@@ -11,6 +11,9 @@ use Tests\Unit\UnitTestCase;
  */
 final class UserExportTest extends UnitTestCase
 {
+    /**
+     * @return void
+     */
     public function test_headings_are_correct(): void
     {
         $export = new UserExport(collect());
@@ -24,6 +27,9 @@ final class UserExportTest extends UnitTestCase
         $this->assertEquals($expected, $export->headings());
     }
 
+    /**
+     * @return void
+     */
     public function test_map_with_all_values_returns_expected_array(): void
     {
         $user = new User([
@@ -46,6 +52,9 @@ final class UserExportTest extends UnitTestCase
         ], $result);
     }
 
+    /**
+     * @return void
+     */
     public function test_collection_returns_users_collection(): void
     {
         $user1 = new User(['first_name' => 'Jan']);

@@ -13,6 +13,9 @@ use Illuminate\Support\ServiceProvider;
  */
 class AuthServiceProvider extends ServiceProvider
 {
+    /**
+     * @return void
+     */
     public function register(): void
     {
         $this->app->bind(AuthServiceInterface::class, AuthService::class);

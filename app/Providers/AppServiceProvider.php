@@ -7,6 +7,9 @@ use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
+    /**
+     * @return void
+     */
     public function register(): void
     {
         $this->app->register(AuthServiceProvider::class);
@@ -15,6 +18,9 @@ class AppServiceProvider extends ServiceProvider
         $this->app->register(JobPositionServiceProvider::class);
     }
 
+    /**
+     * @return void
+     */
     public function boot(): void
     {
         JsonResource::withoutWrapping();

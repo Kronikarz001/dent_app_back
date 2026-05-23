@@ -24,6 +24,9 @@ class JobPositionServiceTest extends TestCase
 
     private JobPositionService $jobPositionService;
 
+    /**
+     * @return void
+     */
     protected function setUp(): void
     {
         parent::setUp();
@@ -33,12 +36,18 @@ class JobPositionServiceTest extends TestCase
         $this->jobPositionService = new JobPositionService($this->jobPositionRepository, $this->exportService);
     }
 
+    /**
+     * @return void
+     */
     protected function tearDown(): void
     {
         Mockery::close();
         parent::tearDown();
     }
 
+    /**
+     * @return void
+     */
     public function test_get_job_positions_delegates_to_repository_without_column_filter(): void
     {
         $paginator = new LengthAwarePaginator([], 0, 15, 1);
@@ -55,6 +64,9 @@ class JobPositionServiceTest extends TestCase
         $this->assertSame($paginator, $result);
     }
 
+    /**
+     * @return void
+     */
     public function test_get_job_positions_list_passes_only_uuid_and_name_columns(): void
     {
         $paginator = new LengthAwarePaginator([], 0, 100, 1);
@@ -71,6 +83,9 @@ class JobPositionServiceTest extends TestCase
         $this->assertSame($paginator, $result);
     }
 
+    /**
+     * @return void
+     */
     public function test_create_job_position_passes_data_unchanged_to_repository(): void
     {
         $data = ['name' => 'Lekarz', 'f_name' => 'Lekarka', 'm_name' => 'Lekarz'];
@@ -88,6 +103,9 @@ class JobPositionServiceTest extends TestCase
         $this->assertSame($newJobPosition, $result);
     }
 
+    /**
+     * @return void
+     */
     public function test_update_job_position_passes_job_position_and_data_to_repository(): void
     {
         $jobPosition = JobPosition::factory()->make();
@@ -106,6 +124,9 @@ class JobPositionServiceTest extends TestCase
         $this->assertSame($updatedJobPosition, $result);
     }
 
+    /**
+     * @return void
+     */
     public function test_delete_job_position_calls_repository_delete_not_update(): void
     {
         $jobPosition = JobPosition::factory()->make();
@@ -120,6 +141,9 @@ class JobPositionServiceTest extends TestCase
         $this->assertNull($this->jobPositionService->deleteJobPosition($jobPosition));
     }
 
+    /**
+     * @return void
+     */
     public function test_export_delegates_to_export_service(): void
     {
         $paginator = new LengthAwarePaginator(collect(), 0, 15, 1);

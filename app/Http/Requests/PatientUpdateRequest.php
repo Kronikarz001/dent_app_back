@@ -11,6 +11,9 @@ use Illuminate\Validation\Rules\Enum;
  */
 class PatientUpdateRequest extends FormRequest
 {
+    /**
+     * @return array
+     */
     public function rules(): array
     {
         return [
@@ -23,6 +26,9 @@ class PatientUpdateRequest extends FormRequest
         ];
     }
 
+    /**
+     * @return bool
+     */
     public function authorize(): bool
     {
         return true;

@@ -11,6 +11,9 @@ use Tests\Unit\UnitTestCase;
  */
 final class JobPositionExportTest extends UnitTestCase
 {
+    /**
+     * @return void
+     */
     public function test_headings_are_correct(): void
     {
         $export = new JobPositionExport(collect());
@@ -22,6 +25,9 @@ final class JobPositionExportTest extends UnitTestCase
         $this->assertEquals($expected, $export->headings());
     }
 
+    /**
+     * @return void
+     */
     public function test_map_with_all_values_returns_expected_array(): void
     {
         $jobPosition = new JobPosition([
@@ -40,6 +46,9 @@ final class JobPositionExportTest extends UnitTestCase
         ], $result);
     }
 
+    /**
+     * @return void
+     */
     public function test_collection_returns_job_positions_collection(): void
     {
         $jobPosition1 = new JobPosition(['name' => 'Lekarz']);

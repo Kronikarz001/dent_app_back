@@ -29,6 +29,9 @@ class Export implements ExportInterface, FromCollection, WithEvents, WithHeading
         // TODO: Implement map() method.
     }
 
+    /**
+     * @return array
+     */
     public function registerEvents(): array
     {
         return [

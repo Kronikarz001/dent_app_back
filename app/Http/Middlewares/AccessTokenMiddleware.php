@@ -22,6 +22,9 @@ class AccessTokenMiddleware
      */
     private const API_KEY = 'X-API-KEY';
 
+    /**
+     * @param  AuthServiceInterface  $authService
+     */
     public function __construct(
         private readonly AuthServiceInterface $authService
     ) {}

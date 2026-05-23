@@ -15,6 +15,11 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 interface ExportServiceInterface
 {
     /**
+     * @param  ExportRequest  $request
+     * @param  ExportInterface  $export
+     * @param  Model  $model
+     * @return BinaryFileResponse
+     *
      * @throws Exception
      * @throws WriterException
      */

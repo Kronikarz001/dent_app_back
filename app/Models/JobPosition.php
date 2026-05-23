@@ -35,6 +35,9 @@ class JobPosition extends UuidModel
         'm_name',
     ];
 
+    /**
+     * @return BelongsToMany
+     */
     public function user(): BelongsToMany
     {
         return $this->BelongsToMany(User::class, 'users_job_positions', 'job_position_uuid', 'user_uuid');

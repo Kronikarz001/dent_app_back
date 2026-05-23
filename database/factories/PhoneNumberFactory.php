@@ -11,6 +11,9 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class PhoneNumberFactory extends Factory
 {
+    /**
+     * @return array
+     */
     public function definition(): array
     {
         return [

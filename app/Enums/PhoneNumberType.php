@@ -10,6 +10,9 @@ enum PhoneNumberType: string
     case PRIVATE = 'PRIVATE';
     case WORK = 'WORK';
 
+    /**
+     * @return string
+     */
     public function name(): string
     {
         return match ($this) {

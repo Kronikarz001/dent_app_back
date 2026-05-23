@@ -28,6 +28,9 @@ class PhoneNumber extends UuidModel
         'type',
     ];
 
+    /**
+     * @return MorphTo
+     */
     public function phoneNumberable(): MorphTo
     {
         return $this->morphTo();

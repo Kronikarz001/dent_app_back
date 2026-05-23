@@ -13,6 +13,9 @@ use Illuminate\Support\ServiceProvider;
  */
 class JobPositionServiceProvider extends ServiceProvider
 {
+    /**
+     * @return void
+     */
     public function register(): void
     {
         $this->app->bind(JobPositionRepositoryInterface::class, JobPositionRepository::class);

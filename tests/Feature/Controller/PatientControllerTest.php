@@ -10,6 +10,9 @@ use Tests\TestCase;
  */
 class PatientControllerTest extends TestCase
 {
+    /**
+     * @return void
+     */
     public function test_index_patients_return_success_response(): void
     {
         Patient::factory()->count(5)->create();
@@ -19,6 +22,9 @@ class PatientControllerTest extends TestCase
         $response->assertOk();
     }
 
+    /**
+     * @return void
+     */
     public function test_index_patients_list_return_success_response(): void
     {
         Patient::factory()->count(5)->create();
@@ -28,6 +34,9 @@ class PatientControllerTest extends TestCase
         $response->assertOk();
     }
 
+    /**
+     * @return void
+     */
     public function test_show_patient_return_success_response(): void
     {
         $patient = Patient::factory()->create();
@@ -37,6 +46,9 @@ class PatientControllerTest extends TestCase
         $response->assertOk();
     }
 
+    /**
+     * @return void
+     */
     public function test_store_patient_return_created_response(): void
     {
         $response = $this->callApiWithLoggedUser()
@@ -54,6 +66,9 @@ class PatientControllerTest extends TestCase
         ]);
     }
 
+    /**
+     * @return void
+     */
     public function test_update_patient_return_no_content_response(): void
     {
         $patient = Patient::factory()->create();
@@ -73,6 +88,9 @@ class PatientControllerTest extends TestCase
         ]);
     }
 
+    /**
+     * @return void
+     */
     public function test_delete_patient_return_no_content_response(): void
     {
         $patient = Patient::factory()->create();
@@ -83,6 +101,9 @@ class PatientControllerTest extends TestCase
         $this->assertDatabaseMissing('patients', ['uuid' => $patient->uuid]);
     }
 
+    /**
+     * @return void
+     */
     public function test_export_patient_return_success_response(): void
     {
         Patient::factory()->count(5)->create();

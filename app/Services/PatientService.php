@@ -16,37 +16,63 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
  */
 readonly class PatientService implements PatientServiceInterface
 {
+    /**
+     * @param  PatientRepositoryInterface  $patientRepository
+     * @param  ExportServiceInterface  $exportService
+     */
     public function __construct(
         private PatientRepositoryInterface $patientRepository,
         private ExportServiceInterface $exportService,
     ) {}
 
+    /**
+     * @return LengthAwarePaginator
+     */
     public function getPatients(): LengthAwarePaginator
     {
         return $this->patientRepository->findAllWithPagination();
     }
 
+    /**
+     * @return LengthAwarePaginator
+     */
     public function getPatientsList(): LengthAwarePaginator
     {
         return $this->patientRepository->findAllWithPagination(['uuid', 'name']);
     }
 
+    /**
+     * @param  array  $data
+     * @return Patient
+     */
     public function createPatient(array $data): Patient
     {
         return $this->patientRepository->create($data);
     }
 
+    /**
+     * @param  Patient  $patient
+     * @param  array  $data
+     * @return Patient
+     */
     public function updatePatient(Patient $patient, array $data): Patient
     {
         return $this->patientRepository->update($patient, $data);
     }
 
+    /**
+     * @param  Patient  $patient
+     * @return void
+     */
     public function deletePatient(Patient $patient): void
     {
         $this->patientRepository->delete($patient);
     }
 
     /**
+     * @param  ExportRequest  $request
+     * @return BinaryFileResponse
+     *
      * @throws Exception
      * @throws WriterException
      */

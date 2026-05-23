@@ -12,6 +12,8 @@ use Tests\Unit\UnitTestCase;
 final class UserFactoryTest extends UnitTestCase
 {
     /**
+     * @return void
+     *
      * @throws BindingResolutionException
      */
     public function test_user_create_by_factory(): void

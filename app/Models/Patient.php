@@ -33,6 +33,9 @@ class Patient extends UuidModel
         'is_active',
     ];
 
+    /**
+     * @return string
+     */
     public function getName(): string
     {
         $firstName = $this->firstName;
@@ -41,6 +44,9 @@ class Patient extends UuidModel
         return "$firstName $lastName";
     }
 
+    /**
+     * @return MorphMany
+     */
     public function phoneNumbers(): MorphMany
     {
         return $this->morphMany(PhoneNumber::class, 'phoneable', 'phoneable_type', 'phoneable_id', 'uuid');

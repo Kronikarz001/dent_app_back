@@ -12,6 +12,8 @@ use Tests\Unit\UnitTestCase;
 final class PhoneNumberFactoryTest extends UnitTestCase
 {
     /**
+     * @return void
+     *
      * @throws BindingResolutionException
      */
     public function test_phone_number_create_by_factory(): void

@@ -17,24 +17,53 @@ use Illuminate\Support\Str;
  */
 abstract class Search implements SearchInterface
 {
+    /**
+     * @var bool
+     */
     protected bool $includeEmptyRelations = false;
 
+    /**
+     * @param  Request  $request
+     */
     public function __construct(
         protected Request $request
     ) {}
 
+    /**
+     * @return string
+     */
     abstract protected function modelClass(): string;
 
+    /**
+     * @return string
+     */
     abstract protected function prefix(): string;
 
+    /**
+     * @return array
+     */
     abstract protected function fillableSearchFields(): array;
 
+    /**
+     * @return array
+     */
     abstract protected function fillableSortFields(): array;
 
+    /**
+     * @return array
+     */
     abstract protected function searchStringFields(): array;
 
+    /**
+     * @param  Builder  $query
+     * @param  array  $params
+     * @return void
+     */
     abstract protected function preFilter(Builder $query, array $params): void;
 
+    /**
+     * @return array
+     */
     abstract protected function relationsShipLoad(): array;
 
     /**
@@ -45,6 +74,9 @@ abstract class Search implements SearchInterface
         return [];
     }
 
+    /**
+     * @return array
+     */
     protected function relationsCount(): array
     {
         return [];
@@ -68,6 +100,10 @@ abstract class Search implements SearchInterface
         ];
     }
 
+    /**
+     * @param  array  $params
+     * @return LengthAwarePaginator
+     */
     final public function search(array $params = []): LengthAwarePaginator
     {
         $query = $this->init();
@@ -104,6 +140,11 @@ abstract class Search implements SearchInterface
         $this->preFilter($query, $params);
     }
 
+    /**
+     * @param  Builder  $query
+     * @param  array  $params
+     * @return array
+     */
     private function applyNullSentinelsFromParams(Builder $query, array $params): array
     {
         if (empty($params)) {
@@ -149,6 +190,10 @@ abstract class Search implements SearchInterface
         $query->select($this->selectColumns());
     }
 
+    /**
+     * @param  Builder  $query
+     * @return void
+     */
     protected function applyFilters(Builder $query): void
     {
         $filterData = $this->request->get($this->prefix(), []);
@@ -363,6 +408,10 @@ abstract class Search implements SearchInterface
         return str_replace('.', '->', $field);
     }
 
+    /**
+     * @param  Builder  $query
+     * @return void
+     */
     protected function applySort(Builder $query): void
     {
         $sortKeyword = config('search.sort_keyword');
@@ -448,6 +497,10 @@ abstract class Search implements SearchInterface
         }
     }
 
+    /**
+     * @param  Builder  $query
+     * @return void
+     */
     protected function applySearchString(Builder $query): void
     {
         $searchKeyword = config('search.search_string_keyword', 'search');
@@ -490,6 +543,10 @@ abstract class Search implements SearchInterface
         });
     }
 
+    /**
+     * @param  string  $sortDirection
+     * @return string
+     */
     protected function getSortDirection(string $sortDirection): string
     {
         return config('search.sort_asc_default_character') === $sortDirection ? 'asc' : 'desc';
@@ -506,6 +563,10 @@ abstract class Search implements SearchInterface
         return array_key_exists($relation, $this->recursiveRelations());
     }
 
+    /**
+     * @param  string  $sortField
+     * @return bool
+     */
     private function isRelationCountField(string $sortField): bool
     {
         foreach ($this->relationsCount() as $relation) {
@@ -545,6 +606,10 @@ abstract class Search implements SearchInterface
         return $relation->getRelated()->qualifyColumn($field);
     }
 
+    /**
+     * @param  Builder  $query
+     * @return void
+     */
     private function loadRelations(Builder $query): void
     {
         $relations = $this->relationsShipLoad();
@@ -580,6 +645,9 @@ abstract class Search implements SearchInterface
         return array_values(array_unique($paths));
     }
 
+    /**
+     * @return Builder
+     */
     private function init(): Builder
     {
         $modelClass = $this->modelClass();

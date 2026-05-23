@@ -13,6 +13,9 @@ use Tests\TestCase;
  */
 class AuthControllerTest extends TestCase
 {
+    /**
+     * @return void
+     */
     public function test_login_return_success_response(): void
     {
         $user = User::factory()->create(['password' => bcrypt('password')]);
@@ -25,6 +28,9 @@ class AuthControllerTest extends TestCase
         $response->assertOk();
     }
 
+    /**
+     * @return void
+     */
     public function test_login_with_invalid_credentials_return_unauthorized_response(): void
     {
         User::factory()->create(['email' => 'test@example.com']);
@@ -37,6 +43,9 @@ class AuthControllerTest extends TestCase
         $response->assertUnauthorized();
     }
 
+    /**
+     * @return void
+     */
     public function test_logout_return_success_response(): void
     {
         $user = User::factory()->create();
@@ -48,6 +57,8 @@ class AuthControllerTest extends TestCase
     }
 
     /**
+     * @return void
+     *
      * @throws Exception
      */
     public function test_forgot_password_return_success_response(): void
@@ -66,6 +77,9 @@ class AuthControllerTest extends TestCase
         Notification::assertSentTo($user, ResetPassword::class);
     }
 
+    /**
+     * @return void
+     */
     public function test_reset_password_return_no_content_response(): void
     {
         $user = User::factory()->create();

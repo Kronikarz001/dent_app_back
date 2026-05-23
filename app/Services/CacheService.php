@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Cache;
 abstract class CacheService implements CacheServiceInterface
 {
     /**
+     * @param  $key
      * @return object
      */
     public function get($key): mixed
@@ -20,6 +21,7 @@ abstract class CacheService implements CacheServiceInterface
     /**
      * @param  string  $key
      * @param  object  $data
+     * @return void
      */
     public function set(mixed $key, mixed $data): void
     {
@@ -28,21 +30,36 @@ abstract class CacheService implements CacheServiceInterface
 
     /**
      * @param  string  $key
+     * @return void
      */
     public function delete(mixed $key): void
     {
         Cache::delete($this->getPrefix($key));
     }
 
+    /**
+     * @param  mixed  $key
+     * @return bool
+     */
     public function has(mixed $key): bool
     {
         return Cache::has($this->getPrefix($key));
     }
 
+    /**
+     * @return string
+     */
     abstract protected function getModulePrefix(): string;
 
+    /**
+     * @return int|null
+     */
     abstract protected function getTtl(): ?int;
 
+    /**
+     * @param  string  $key
+     * @return string
+     */
     public function getPrefix(string $key): string
     {
         return "{$this->getModulePrefix()}_$key";

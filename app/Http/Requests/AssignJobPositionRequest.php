@@ -9,6 +9,9 @@ use Illuminate\Foundation\Http\FormRequest;
  */
 class AssignJobPositionRequest extends FormRequest
 {
+    /**
+     * @return array
+     */
     public function rules(): array
     {
         return [
@@ -17,6 +20,9 @@ class AssignJobPositionRequest extends FormRequest
         ];
     }
 
+    /**
+     * @return bool
+     */
     public function authorize(): bool
     {
         return true;

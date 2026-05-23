@@ -19,35 +19,60 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
  */
 class UserController extends Controller
 {
+    /**
+     * @param  UserServiceInterface  $userService
+     */
     public function __construct(
         private readonly UserServiceInterface $userService
     ) {}
 
+    /**
+     * @return LengthAwarePaginator
+     */
     public function index(): LengthAwarePaginator
     {
         return $this->userService->getUsers();
     }
 
+    /**
+     * @return LengthAwarePaginator
+     */
     public function selectList(): LengthAwarePaginator
     {
         return $this->userService->getUsersList();
     }
 
+    /**
+     * @param  User  $user
+     * @return UserResource
+     */
     public function show(User $user): UserResource
     {
         return new UserResource($user);
     }
 
+    /**
+     * @return UserResource
+     */
     public function showLoggedUser(): UserResource
     {
         return new UserResource($this->userService->getLoggedUser());
     }
 
+    /**
+     * @param  UserStoreRequest  $request
+     * @return UserResource
+     */
     public function store(UserStoreRequest $request): UserResource
     {
         return new UserResource($this->userService->createUser($request->all()));
     }
 
+    /**
+     * @param  User  $user
+     * @param  UserUpdateRequest  $request
+     * @return JsonResponse
+     */
     public function update(User $user, UserUpdateRequest $request): JsonResponse
     {
         $this->userService->updateUser($user, $request->all());
@@ -55,6 +80,10 @@ class UserController extends Controller
         return response()->json([], 204);
     }
 
+    /**
+     * @param  User  $user
+     * @return JsonResponse
+     */
     public function destroy(User $user): JsonResponse
     {
         $this->userService->deactivateUser($user);
@@ -63,6 +92,9 @@ class UserController extends Controller
     }
 
     /**
+     * @param  ExportRequest  $request
+     * @return BinaryFileResponse
+     *
      * @throws Exception
      * @throws WriterException
      */

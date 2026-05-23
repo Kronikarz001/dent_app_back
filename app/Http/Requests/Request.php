@@ -10,5 +10,8 @@ use Illuminate\Foundation\Http\FormRequest;
  */
 abstract class Request extends FormRequest
 {
+    /**
+     * @return Dto
+     */
     abstract public function getDto(): Dto;
 }

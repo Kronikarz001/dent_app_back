@@ -16,11 +16,19 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
  */
 readonly class ExportService implements ExportServiceInterface
 {
+    /**
+     * @param  ExportMapper  $exportExtensionMapper
+     */
     public function __construct(
         private ExportMapper $exportExtensionMapper
     ) {}
 
     /**
+     * @param  ExportRequest  $request
+     * @param  ExportInterface  $export
+     * @param  Model  $model
+     * @return BinaryFileResponse
+     *
      * @throws Exception
      * @throws WriterException
      */

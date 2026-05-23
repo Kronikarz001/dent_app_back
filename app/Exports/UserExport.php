@@ -10,15 +10,24 @@ use Illuminate\Support\Collection;
  */
 final class UserExport extends Export
 {
+    /**
+     * @param  Collection  $users
+     */
     public function __construct(
         private Collection $users
     ) {}
 
+    /**
+     * @return Collection
+     */
     public function collection(): Collection
     {
         return $this->users;
     }
 
+    /**
+     * @return array
+     */
     public function headings(): array
     {
         return [
@@ -32,6 +41,7 @@ final class UserExport extends Export
 
     /**
      * @param  User  $row
+     * @return array
      */
     public function map(mixed $row): array
     {

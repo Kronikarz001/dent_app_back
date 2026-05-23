@@ -10,11 +10,17 @@ use Illuminate\Database\Eloquent\Builder;
  */
 class UserSearch extends Search
 {
+    /**
+     * @return string
+     */
     protected function modelClass(): string
     {
         return User::class;
     }
 
+    /**
+     * @return string
+     */
     protected function prefix(): string
     {
         return 'user';
@@ -62,8 +68,16 @@ class UserSearch extends Search
         ];
     }
 
+    /**
+     * @param  Builder  $query
+     * @param  array  $params
+     * @return void
+     */
     protected function preFilter(Builder $query, array $params): void {}
 
+    /**
+     * @return array
+     */
     protected function relationsShipLoad(): array
     {
         return [

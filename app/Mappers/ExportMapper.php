@@ -19,6 +19,7 @@ class ExportMapper implements MapperInterface
     ];
 
     /**
+     * @param  mixed  $data
      * @return mixed
      */
     public function map(mixed $data): string

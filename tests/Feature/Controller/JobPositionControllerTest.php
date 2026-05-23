@@ -10,6 +10,9 @@ use Tests\TestCase;
  */
 class JobPositionControllerTest extends TestCase
 {
+    /**
+     * @return void
+     */
     public function test_index_users_return_success_response(): void
     {
         JobPosition::factory()->count(5)->create();
@@ -19,6 +22,9 @@ class JobPositionControllerTest extends TestCase
         $response->assertOk();
     }
 
+    /**
+     * @return void
+     */
     public function test_index_users_list_return_success_response(): void
     {
         JobPosition::factory()->count(5)->create();
@@ -28,6 +34,9 @@ class JobPositionControllerTest extends TestCase
         $response->assertOk();
     }
 
+    /**
+     * @return void
+     */
     public function test_show_job_position_return_success_response(): void
     {
         $jobPosition = JobPosition::factory()->create();
@@ -37,6 +46,9 @@ class JobPositionControllerTest extends TestCase
         $response->assertOk();
     }
 
+    /**
+     * @return void
+     */
     public function test_store_job_position_return_created_response(): void
     {
         $response = $this->callApiWithLoggedUser()
@@ -53,6 +65,9 @@ class JobPositionControllerTest extends TestCase
         ]);
     }
 
+    /**
+     * @return void
+     */
     public function test_update_job_position_return_no_content_response(): void
     {
         $jobPosition = JobPosition::factory()->create();
@@ -71,6 +86,9 @@ class JobPositionControllerTest extends TestCase
         ]);
     }
 
+    /**
+     * @return void
+     */
     public function test_delete_job_position_return_no_content_response(): void
     {
         $jobPosition = JobPosition::factory()->create();

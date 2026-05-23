@@ -10,6 +10,9 @@ use Tests\TestCase;
  */
 class UserControllerTest extends TestCase
 {
+    /**
+     * @return void
+     */
     public function test_index_users_return_success_response(): void
     {
         $response = $this->callApiWithLoggedUser()
@@ -18,6 +21,9 @@ class UserControllerTest extends TestCase
         $response->assertOk();
     }
 
+    /**
+     * @return void
+     */
     public function test_index_users_list_return_success_response(): void
     {
         $response = $this->callApiWithLoggedUser()
@@ -26,6 +32,9 @@ class UserControllerTest extends TestCase
         $response->assertOk();
     }
 
+    /**
+     * @return void
+     */
     public function test_show_user_return_success_response(): void
     {
         $user = User::factory()->create();
@@ -35,6 +44,9 @@ class UserControllerTest extends TestCase
         $response->assertOk();
     }
 
+    /**
+     * @return void
+     */
     public function test_store_user_return_created_response(): void
     {
         $response = $this->callApiWithLoggedUser()
@@ -54,6 +66,9 @@ class UserControllerTest extends TestCase
         ]);
     }
 
+    /**
+     * @return void
+     */
     public function test_update_user_return_no_content_response(): void
     {
         $user = User::factory()->create();
@@ -71,6 +86,9 @@ class UserControllerTest extends TestCase
         ]);
     }
 
+    /**
+     * @return void
+     */
     public function test_delete_user_return_no_content_response(): void
     {
         $user = User::factory()->create();
@@ -83,6 +101,9 @@ class UserControllerTest extends TestCase
         ]);
     }
 
+    /**
+     * @return void
+     */
     public function test_show_logged_user_return_success_response(): void
     {
         $user = User::factory()->create();

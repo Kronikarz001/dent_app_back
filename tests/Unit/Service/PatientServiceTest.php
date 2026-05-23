@@ -24,6 +24,9 @@ class PatientServiceTest extends TestCase
 
     private PatientService $patientService;
 
+    /**
+     * @return void
+     */
     protected function setUp(): void
     {
         parent::setUp();
@@ -33,12 +36,18 @@ class PatientServiceTest extends TestCase
         $this->patientService = new PatientService($this->patientRepository, $this->exportService);
     }
 
+    /**
+     * @return void
+     */
     protected function tearDown(): void
     {
         Mockery::close();
         parent::tearDown();
     }
 
+    /**
+     * @return void
+     */
     public function test_get_patients_delegates_to_repository_without_column_filter(): void
     {
         $paginator = new LengthAwarePaginator([], 0, 15, 1);
@@ -55,6 +64,9 @@ class PatientServiceTest extends TestCase
         $this->assertSame($paginator, $result);
     }
 
+    /**
+     * @return void
+     */
     public function test_get_patients_list_passes_only_uuid_and_name_columns(): void
     {
         $paginator = new LengthAwarePaginator([], 0, 100, 1);
@@ -71,6 +83,9 @@ class PatientServiceTest extends TestCase
         $this->assertSame($paginator, $result);
     }
 
+    /**
+     * @return void
+     */
     public function test_create_patient_passes_data_unchanged_to_repository(): void
     {
         $data = ['first_name' => 'Jan', 'last_name' => 'Kowalski', 'email' => 'jan@example.com'];
@@ -88,6 +103,9 @@ class PatientServiceTest extends TestCase
         $this->assertSame($newPatient, $result);
     }
 
+    /**
+     * @return void
+     */
     public function test_update_patient_passes_patient_and_data_to_repository(): void
     {
         $patient = Patient::factory()->make();
@@ -106,6 +124,9 @@ class PatientServiceTest extends TestCase
         $this->assertSame($updatedPatient, $result);
     }
 
+    /**
+     * @return void
+     */
     public function test_delete_patient_calls_repository_delete_not_update(): void
     {
         $patient = Patient::factory()->make();
@@ -120,6 +141,9 @@ class PatientServiceTest extends TestCase
         $this->assertNull($this->patientService->deletePatient($patient));
     }
 
+    /**
+     * @return void
+     */
     public function test_export_delegates_to_export_service(): void
     {
         $paginator = new LengthAwarePaginator(collect(), 0, 15, 1);

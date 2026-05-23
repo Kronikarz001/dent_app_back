@@ -9,15 +9,24 @@ use Illuminate\Support\Collection;
  */
 final class JobPositionExport extends Export
 {
+    /**
+     * @param  Collection  $jobPositions
+     */
     public function __construct(
         private Collection $jobPositions
     ) {}
 
+    /**
+     * @return Collection
+     */
     public function collection(): Collection
     {
         return $this->jobPositions;
     }
 
+    /**
+     * @return array
+     */
     public function headings(): array
     {
         return [
@@ -27,6 +36,10 @@ final class JobPositionExport extends Export
         ];
     }
 
+    /**
+     * @param  mixed  $row
+     * @return array
+     */
     public function map(mixed $row): array
     {
         return [

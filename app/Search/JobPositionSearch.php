@@ -10,11 +10,17 @@ use Illuminate\Database\Eloquent\Builder;
  */
 class JobPositionSearch extends Search
 {
+    /**
+     * @return string
+     */
     protected function modelClass(): string
     {
         return JobPosition::class;
     }
 
+    /**
+     * @return string
+     */
     protected function prefix(): string
     {
         return 'jobPosition';
@@ -56,8 +62,16 @@ class JobPositionSearch extends Search
         ];
     }
 
+    /**
+     * @param  Builder  $query
+     * @param  array  $params
+     * @return void
+     */
     protected function preFilter(Builder $query, array $params): void {}
 
+    /**
+     * @return array
+     */
     protected function relationsShipLoad(): array
     {
         return [];

@@ -81,6 +81,10 @@ use Laravel\Sanctum\PersonalAccessToken;
         'remember_token',
     ];
 
+    /**
+     * @param  string  $token
+     * @return User|null
+     */
     public static function whereToken(string $token): ?self
     {
         $accessToken = PersonalAccessToken::findToken($token);
@@ -106,6 +110,9 @@ use Laravel\Sanctum\PersonalAccessToken;
         ];
     }
 
+    /**
+     * @return string
+     */
     public function getName(): string
     {
         $firstName = $this->firstName;
@@ -114,13 +121,20 @@ use Laravel\Sanctum\PersonalAccessToken;
         return "$firstName $lastName";
     }
 
+    /**
+     * @return HasMany
+     */
     public function jobPositions(): HasMany
     {
         return $this->hasMany(JobPosition::class, 'user_uuid', 'uuid');
     }
 
+    /**
+     * @return MorphMany
+     */
     public function phoneNumbers(): MorphMany
     {
         return $this->morphMany(PhoneNumber::class, 'phoneable', 'phoneable_type', 'phoneable_id', 'uuid');
     }
+
 }
