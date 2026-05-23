@@ -3,8 +3,8 @@
 namespace App\Http\Requests;
 
 use App\Enums\PhoneNumberType;
+use App\Rules\PhoneNumberRule;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
 
 /**
@@ -25,7 +25,7 @@ class UserUpdateRequest extends FormRequest
             'pesel' => ['nullable', 'string', 'size:11', 'unique:users,pesel'],
             'private_email' => ['nullable', 'email', 'unique:users,private_email'],
             'phone_numbers' => ['nullable', 'array'],
-            'phone_numbers.number' => ['string'],
+            'phone_numbers.number' => ['string', new PhoneNumberRule],
             'phone_numbers.type' => ['string', new Enum(PhoneNumberType::class)],
         ];
     }
