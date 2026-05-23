@@ -123,5 +123,4 @@ use Laravel\Sanctum\PersonalAccessToken;
     {
         return $this->morphMany(PhoneNumber::class, 'phoneable', 'phoneable_type', 'phoneable_id', 'uuid');
     }
-
 }
