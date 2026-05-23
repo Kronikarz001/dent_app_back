@@ -83,3 +83,12 @@ route-clear:
 
 route-list:
 	$(SUDO) docker-compose exec dent_app_back_app php artisan route:list
+
+composer-install:
+	$(SUDO) docker-compose exec dent_app_back_app composer install
+
+composer-update:
+	$(SUDO) docker-compose exec dent_app_back_app composer update
+
+composer-dump-autoload:
+	$(SUDO) docker-compose exec dent_app_back_app composer dump-autoload
