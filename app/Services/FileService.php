@@ -21,12 +21,15 @@ use Illuminate\Support\Str;
  */
 readonly class FileService implements FileServiceInterface
 {
+    /**
+     * @param FileRepositoryInterface $fileRepository
+     */
     public function __construct(
         private FileRepositoryInterface $fileRepository,
     ) {}
 
     /**
-     * @param UuidModel $model
+     * @param Model $model
      * @param array $excludeUuids
      * @return LengthAwarePaginator
      */
@@ -44,7 +47,7 @@ readonly class FileService implements FileServiceInterface
 
     /**
      * @param FileDto $fileDto
-     * @param UuidModel $model
+     * @param Model $model
      * @return array
      * @throws FileUploadException
      */
@@ -56,7 +59,7 @@ readonly class FileService implements FileServiceInterface
     /**
      * @param File $existingFile
      * @param FileDto $fileDto
-     * @param UuidModel $model
+     * @param Model $model
      * @return array
      * @throws FileUploadException
      */
@@ -122,7 +125,7 @@ readonly class FileService implements FileServiceInterface
 
     /**
      * @param FileDto $fileDto
-     * @param UuidModel $model
+     * @param Model $model
      * @param File|null $parentFile
      * @return array
      * @throws FileUploadException
@@ -146,7 +149,7 @@ readonly class FileService implements FileServiceInterface
     /**
      * @param UploadedFile $upload
      * @param FileableType $type
-     * @param UuidModel $model
+     * @param Model $model
      * @param File|null $parentFile
      * @return File
      * @throws FileUploadException
@@ -266,7 +269,7 @@ readonly class FileService implements FileServiceInterface
     }
 
     /**
-     * @param UuidModel $model
+     * @param Model $model
      * @return Collection
      */
     public function getAllFilesWithoutPagination(Model $model): Collection

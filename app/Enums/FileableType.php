@@ -7,6 +7,9 @@ use App\Models\JobPosition;
 use App\Models\Patient;
 use App\Models\User;
 
+/**
+ * Summary of FileableType
+ */
 enum FileableType: string
 {
     case USER = User::class;
