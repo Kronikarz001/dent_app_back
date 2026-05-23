@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\DTO\UserRouteDto;
+use App\Dto\UserRouteDto;
 use App\Models\User;
 
 /**
@@ -11,8 +11,8 @@ use App\Models\User;
 class UserRouteCacheService extends CacheService
 {
     /**
-     * @param User $key
-     * @param UserRouteDto $data
+     * @param  User  $key
+     * @param  UserRouteDto  $data
      * @return void
      */
     public function set(mixed $key, mixed $data): void
@@ -21,7 +21,7 @@ class UserRouteCacheService extends CacheService
     }
 
     /**
-     * @param User $key
+     * @param  User  $key
      * @return UserRouteDto
      */
     public function get(mixed $key): UserRouteDto
@@ -30,7 +30,7 @@ class UserRouteCacheService extends CacheService
     }
 
     /**
-     * @param User $key
+     * @param  User  $key
      * @return void
      */
     public function delete(mixed $key): void
@@ -39,7 +39,7 @@ class UserRouteCacheService extends CacheService
     }
 
     /**
-     * @param mixed $key
+     * @param  mixed  $key
      * @return bool
      */
     public function has(mixed $key): bool
