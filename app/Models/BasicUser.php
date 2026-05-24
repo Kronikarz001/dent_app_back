@@ -8,7 +8,7 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
@@ -102,10 +102,17 @@ abstract class BasicUser extends Authenticatable
     }
 
     /**
-     * @return HasMany
+     * @return BelongsToMany
      */
-    public function jobPositions(): HasMany
+    public function jobPositions(): BelongsToMany
     {
-        return $this->hasMany(JobPosition::class, 'user_uuid', 'uuid');
+        return $this->belongsToMany(
+            JobPosition::class,
+            'users_job_positions',
+            'user_uuid',
+            'job_position_uuid',
+            'uuid',
+            'uuid'
+        );
     }
 }

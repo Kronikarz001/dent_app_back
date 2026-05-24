@@ -99,4 +99,32 @@ class JobPositionControllerTest extends TestCase
 
         $this->assertSoftDeleted('job_positions', ['uuid' => $jobPosition->uuid]);
     }
+
+    /**
+     * @return void
+     */
+    public function testExportJobPositionReturnSuccessResponse(): void
+    {
+        JobPosition::factory()->count(3)->create();
+
+        $response = $this->callApiWithLoggedUser()
+            ->getJson(route('jobPosition.export', ['type' => 'xlsx']));
+
+        $response->assertOk();
+    }
+
+    /**
+     * @return void
+     */
+    public function testAssignJobPositionReturnNoContentResponse(): void
+    {
+        $user        = User::factory()->create();
+        $jobPosition = JobPosition::factory()->create();
+
+        $this->callApiWithLoggedUser()
+            ->patchJson(route('user.jobPosition.assignJobPosition', ['user' => $user->uuid]), [
+                'job_positions' => [$jobPosition->uuid],
+            ])
+            ->assertNoContent();
+    }
 }

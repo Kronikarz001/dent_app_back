@@ -106,10 +106,22 @@ class UserControllerTest extends TestCase
      */
     public function testShowLoggedUserReturnSuccessResponse(): void
     {
-        $user = User::factory()->create();
+        $response = $this->callApiWithLoggedUser()
+            ->getJson(route('user.user-info'));
+
+        $response->assertOk();
+    }
+
+    /**
+     * @return void
+     */
+    public function testExportUserReturnSuccessResponse(): void
+    {
+        User::factory()->count(3)->create();
 
         $response = $this->callApiWithLoggedUser()
-            ->getJson(route('user.show', ['user' => $user->uuid]));
+            ->getJson(route('user.export', ['type' => 'xlsx']));
+
         $response->assertOk();
     }
 }
