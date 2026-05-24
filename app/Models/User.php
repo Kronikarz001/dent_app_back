@@ -29,7 +29,8 @@ use Laravel\Sanctum\PersonalAccessToken;
  * @property Carbon|null $private_email_verified_at
  * @property-read Collection|JobPosition[] $jobPositions
  * @property-read Collection|PhoneNumber[] $phoneNumbers
- */ class User extends Authenticatable
+ */
+class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
     use HasApiTokens, HasFactory, HasUuids, Notifiable;
@@ -136,5 +137,4 @@ use Laravel\Sanctum\PersonalAccessToken;
     {
         return $this->morphMany(PhoneNumber::class, 'phoneable', 'phoneable_type', 'phoneable_id', 'uuid');
     }
-
 }
