@@ -16,12 +16,12 @@ class AuthControllerTest extends TestCase
     /**
      * @return void
      */
-    public function testLoginReturnSuccessResponse(): void
+    public function test_login_return_success_response(): void
     {
         $user = User::factory()->create(['password' => bcrypt('password')]);
 
         $response = $this->postJson(route('auth.login'), [
-            'email'    => $user->email,
+            'email' => $user->email,
             'password' => 'password',
         ]);
 
@@ -31,12 +31,12 @@ class AuthControllerTest extends TestCase
     /**
      * @return void
      */
-    public function testLoginWithInvalidCredentialsReturnUnauthorizedResponse(): void
+    public function test_login_with_invalid_credentials_return_unauthorized_response(): void
     {
         User::factory()->create(['email' => 'test@example.com']);
 
         $response = $this->postJson(route('auth.login'), [
-            'email'    => 'test@example.com',
+            'email' => 'test@example.com',
             'password' => 'wrong-password',
         ]);
 
@@ -46,7 +46,7 @@ class AuthControllerTest extends TestCase
     /**
      * @return void
      */
-    public function testLogoutReturnSuccessResponse(): void
+    public function test_logout_return_success_response(): void
     {
         $user = User::factory()->create();
 
@@ -58,9 +58,10 @@ class AuthControllerTest extends TestCase
 
     /**
      * @return void
+     *
      * @throws Exception
      */
-    public function testForgotPasswordReturnSuccessResponse(): void
+    public function test_forgot_password_return_success_response(): void
     {
         Notification::fake();
 
@@ -79,16 +80,16 @@ class AuthControllerTest extends TestCase
     /**
      * @return void
      */
-    public function testResetPasswordReturnNoContentResponse(): void
+    public function test_reset_password_return_no_content_response(): void
     {
-        $user  = User::factory()->create();
+        $user = User::factory()->create();
         $token = app('auth.password.broker')->createToken($user);
 
         $response = $this->callApiWithLoggedUser()
             ->patchJson(route('user.resetPassword', ['user' => $user->uuid]), [
-                'token'                 => $token,
-                'email'                 => $user->email,
-                'password'              => 'NewPassword123!',
+                'token' => $token,
+                'email' => $user->email,
+                'password' => 'NewPassword123!',
                 'password_confirmation' => 'NewPassword123!',
             ]);
 

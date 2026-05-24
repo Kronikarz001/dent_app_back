@@ -25,8 +25,7 @@ class JobPositionController extends Controller
      */
     public function __construct(
         private readonly JobPositionServiceInterface $jobPositionService
-    ) {
-    }
+    ) {}
 
     /**
      * @return LengthAwarePaginator
@@ -70,6 +69,7 @@ class JobPositionController extends Controller
     public function update(JobPosition $jobPosition, JobPositionRequest $request): JsonResponse
     {
         $this->jobPositionService->updateJobPosition($jobPosition, $request->all());
+
         return response()->json([], 204);
     }
 
@@ -80,6 +80,7 @@ class JobPositionController extends Controller
     public function destroy(JobPosition $jobPosition): JsonResponse
     {
         $this->jobPositionService->deleteJobPosition($jobPosition);
+
         return response()->json([], 204);
     }
 
@@ -91,12 +92,14 @@ class JobPositionController extends Controller
     public function assignJobPosition(User $user, AssignJobPositionRequest $request): JsonResponse
     {
         $this->jobPositionService->assignJobPosition($user, $request->all());
+
         return response()->json([], 204);
     }
 
     /**
      * @param ExportRequest $request
      * @return BinaryFileResponse
+     *
      * @throws Exception
      * @throws WriterException
      */

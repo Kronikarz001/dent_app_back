@@ -2,7 +2,4 @@
 
 namespace App\Traits;
 
-class HasPhoneNumber
-{
-
-}
+class HasPhoneNumber {}

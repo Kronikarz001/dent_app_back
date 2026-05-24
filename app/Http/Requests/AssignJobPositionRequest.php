@@ -16,7 +16,7 @@ class AssignJobPositionRequest extends FormRequest
     {
         return [
             'job_positions' => ['required', 'array'],
-            'job_positions.*' => ['required','exists:job_positions,uuid'],
+            'job_positions.*' => ['required', 'exists:job_positions,uuid'],
         ];
     }
 

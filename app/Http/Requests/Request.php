@@ -13,5 +13,5 @@ abstract class Request extends FormRequest
     /**
      * @return Dto
      */
-    public abstract function getDto(): Dto;
+    abstract public function getDto(): Dto;
 }

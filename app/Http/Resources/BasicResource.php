@@ -8,7 +8,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 /**
  * Summary of BasicResource
  */
-abstract class BasicResource  extends JsonResource
+abstract class BasicResource extends JsonResource
 {
     /**
      * @param Request $request

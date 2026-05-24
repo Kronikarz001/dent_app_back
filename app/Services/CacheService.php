@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Cache;
  */
 abstract class CacheService implements CacheServiceInterface
 {
-
     /**
      * @param $key
      * @return object
@@ -50,12 +49,12 @@ abstract class CacheService implements CacheServiceInterface
     /**
      * @return string
      */
-    protected abstract function getModulePrefix(): string;
+    abstract protected function getModulePrefix(): string;
 
     /**
      * @return int|null
      */
-    protected abstract function getTtl(): ?int;
+    abstract protected function getTtl(): ?int;
 
     /**
      * @param string $key

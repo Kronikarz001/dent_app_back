@@ -18,8 +18,7 @@ readonly class UserRepository implements UserRepositoryInterface
      */
     public function __construct(
         private UserSearch $search
-    ) {
-    }
+    ) {}
 
     /**
      * @param array $params
@@ -66,6 +65,7 @@ readonly class UserRepository implements UserRepositoryInterface
     public function update(User|Model $user, array $data): User
     {
         $user->update($data);
+
         return $user->fresh();
     }
 

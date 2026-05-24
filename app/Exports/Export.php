@@ -12,9 +12,8 @@ use PhpOffice\PhpSpreadsheet\Style\Border;
 /**
  * Summary of Export
  */
-class  Export implements FromCollection, WithHeadings, WithMapping, WithEvents, ExportInterface
+class Export implements ExportInterface, FromCollection, WithEvents, WithHeadings, WithMapping
 {
-
     public function collection()
     {
         // TODO: Implement collection() method.

@@ -20,11 +20,9 @@ readonly class AuthService implements AuthServiceInterface
      * @param UserRouteCacheService $userRouteCacheService
      */
     public function __construct(
-        private UserServiceInterface  $userService,
+        private UserServiceInterface $userService,
         private UserRouteCacheService $userRouteCacheService
-    )
-    {
-    }
+    ) {}
 
     /**
      * @param LoginRequest $request
@@ -32,8 +30,8 @@ readonly class AuthService implements AuthServiceInterface
      */
     public function login(LoginRequest $request): JsonResponse
     {
-        if (!Auth::attempt($request->only(['email', 'password']))) {
-            throw new AuthenticationException();
+        if (! Auth::attempt($request->only(['email', 'password']))) {
+            throw new AuthenticationException;
         }
 
         $user = Auth::user();
@@ -107,13 +105,13 @@ readonly class AuthService implements AuthServiceInterface
     public function authenticate(?string $token): void
     {
         if (is_null($token)) {
-            throw new AuthenticationException();
+            throw new AuthenticationException;
         }
 
         $user = $this->userService->getUserByToken($token);
 
         if (is_null($user)) {
-            throw new AuthenticationException();
+            throw new AuthenticationException;
         }
 
         Auth::setUser($user);
@@ -125,7 +123,7 @@ readonly class AuthService implements AuthServiceInterface
      */
     private function makeTokenResponse(User $user): array
     {
-        if (!is_null($user->token)) {
+        if (! is_null($user->token)) {
             return [
                 'token' => $user->token,
                 'type' => 'API_TOKEN',
