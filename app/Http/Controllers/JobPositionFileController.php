@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Dto\FileDto;
 use App\Enums\FileableType;
-use App\Exceptions\FileUploadException;
 use App\Http\Requests\FileStoreRequest;
 use App\Http\Requests\FileUpdateRequest;
 use App\Http\Resources\FileResource;

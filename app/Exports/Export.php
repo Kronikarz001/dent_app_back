@@ -14,17 +14,26 @@ use PhpOffice\PhpSpreadsheet\Style\Border;
  */
 class  Export implements FromCollection, WithHeadings, WithMapping, WithEvents, ExportInterface
 {
-
+    /**
+     * @return void
+     */
     public function collection()
     {
         // TODO: Implement collection() method.
     }
 
+    /**
+     * @return array
+     */
     public function headings(): array
     {
         // TODO: Implement headings() method.
     }
 
+    /**
+     * @param $row
+     * @return array
+     */
     public function map($row): array
     {
         // TODO: Implement map() method.

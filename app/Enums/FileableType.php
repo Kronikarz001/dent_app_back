@@ -16,6 +16,11 @@ enum FileableType: string
     case PATIENT = Patient::class;
     case JOB_POSITION = JobPosition::class;
 
+    /**
+     * @param string $name
+     * @return FileableType
+     * @throws FileableTypeException
+     */
     public final static function map(string $name): FileableType
     {
         foreach (self::cases() as $case) {
@@ -27,6 +32,9 @@ enum FileableType: string
         throw new FileableTypeException();
     }
 
+    /**
+     * @return string
+     */
     public final function getDefaultDirectory(): string
     {
         return match ($this) {

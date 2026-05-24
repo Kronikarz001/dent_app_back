@@ -13,6 +13,9 @@ use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 
+/**
+ * Summary of PublicPhotoController
+ */
 class PublicPhotoController extends Controller
 {
     public function __construct(
