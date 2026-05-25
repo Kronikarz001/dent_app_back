@@ -21,8 +21,17 @@ class JobPositionRepository extends SearchableRepository implements JobPositionR
      * @param JobPositionSearch $search
      */
     public function __construct(
-        private readonly JobPositionSearch $search
+        private JobPositionSearch $search
     ) {}
+
+    /**
+     * @param array $params
+     * @return LengthAwarePaginator
+     */
+    public function findAllWithPagination(array $params = []): LengthAwarePaginator
+    {
+        return $this->search->search($params);
+    }
 
     /**
      * @return Search

@@ -6,10 +6,12 @@ use App\Traits\HasFile;
 use App\Traits\HasPhoneNumber;
 use App\Observers\PatientObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Carbon;
 
 /**
  * Summary of JobPosition
+ *
  * @property string $uuid
  * @property string $first_name
  * @property string $last_name

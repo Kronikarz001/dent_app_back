@@ -16,10 +16,9 @@ class PageableDto extends Dto
     public function __construct(
         private readonly array $filters = [],
         private readonly array $sorts = [],
-        private readonly int   $page = 1,
-        private int   $perPage = 10
-    )
-    {}
+        private readonly int $page = 1,
+        private int $perPage = 10
+    ) {}
 
     /**
      * @return array

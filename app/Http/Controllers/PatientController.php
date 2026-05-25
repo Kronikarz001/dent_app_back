@@ -24,8 +24,7 @@ class PatientController extends Controller
      */
     public function __construct(
         private readonly PatientServiceInterface $patientService
-    ) {
-    }
+    ) {}
 
     /**
      * @return LengthAwarePaginator
@@ -69,6 +68,7 @@ class PatientController extends Controller
     public function update(Patient $patient, PatientUpdateRequest $request): JsonResponse
     {
         $this->patientService->updatePatient($patient, $request->all());
+
         return response()->json([], 204);
     }
 
@@ -79,12 +79,14 @@ class PatientController extends Controller
     public function destroy(Patient $patient): JsonResponse
     {
         $this->patientService->deletePatient($patient);
+
         return response()->json([], 204);
     }
 
     /**
      * @param ExportRequest $request
      * @return BinaryFileResponse
+     *
      * @throws Exception
      * @throws WriterException
      */

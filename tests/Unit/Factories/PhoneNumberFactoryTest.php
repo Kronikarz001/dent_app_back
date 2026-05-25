@@ -9,13 +9,14 @@ use Tests\Unit\UnitTestCase;
 /**
  * Summary of PhoneNumberFactoryTest
  */
-final class PhoneNumberFactoryTest  extends UnitTestCase
+final class PhoneNumberFactoryTest extends UnitTestCase
 {
     /**
      * @return void
+     *
      * @throws BindingResolutionException
      */
-    public function testPhoneNumberCreateByFactory(): void
+    public function test_phone_number_create_by_factory(): void
     {
         $phoneNumber = PhoneNumber::factory()->create(['number' => '+48123456789']);
 

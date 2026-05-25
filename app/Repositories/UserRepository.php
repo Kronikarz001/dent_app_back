@@ -21,37 +21,65 @@ class UserRepository extends SearchableRepository implements UserRepositoryInter
         return $this->search;
     }
 
+    /**
+     * @param string $uuid
+     * @return User|null
+     */
     public function findByUuid(string $uuid): ?User
     {
         return User::where('uuid', $uuid)->first();
     }
 
+    /**
+     * @param array $data
+     * @return User
+     */
     public function create(array $data): User
     {
         return User::create($data);
     }
 
+    /**
+     * @param User|Model $user
+     * @param array $data
+     * @return User
+     */
     public function update(User|Model $user, array $data): User
     {
         $user->update($data);
         return $user->fresh();
     }
 
+    /**
+     * @param User|Model $model
+     * @return bool
+     */
     public function delete(User|Model $model): bool
     {
         return $model->delete();
     }
 
+    /**
+     * @param string $token
+     * @return User|null
+     */
     public function getUserByToken(string $token): ?User
     {
         return User::whereToken($token);
     }
 
+    /**
+     * @return User
+     */
     public function getLoggedUser(): User
     {
         return Auth::user();
     }
 
+    /**
+     * @param string $userUuid
+     * @return User
+     */
     public function getUserInformation(string $userUuid): User
     {
         return User::find($userUuid);

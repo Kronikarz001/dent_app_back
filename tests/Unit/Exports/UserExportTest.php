@@ -14,9 +14,9 @@ final class UserExportTest extends UnitTestCase
     /**
      * @return void
      */
-    public function testHeadingsAreCorrect(): void
+    public function test_headings_are_correct(): void
     {
-        $export   = new UserExport(collect());
+        $export = new UserExport(collect());
         $expected = [
             'Imię',
             'Nazwisko',
@@ -30,32 +30,32 @@ final class UserExportTest extends UnitTestCase
     /**
      * @return void
      */
-    public function testMapWithAllValuesReturnsExpectedArray(): void
+    public function test_map_with_all_values_returns_expected_array(): void
     {
         $user = new User([
-            'first_name'    => 'Jan',
-            'last_name'     => 'Kowalski',
-            'email'         => 'jan@example.com',
+            'first_name' => 'Jan',
+            'last_name' => 'Kowalski',
+            'email' => 'jan@example.com',
             'private_email' => 'jan.priv@example.com',
-            'pesel'         => '12345678901',
+            'pesel' => '12345678901',
         ]);
 
         $export = new UserExport(collect());
         $result = $export->map($user);
 
         $this->assertEquals([
-            'first_name'    => 'Jan',
-            'last_name'     => 'Kowalski',
-            'email'         => 'jan@example.com',
+            'first_name' => 'Jan',
+            'last_name' => 'Kowalski',
+            'email' => 'jan@example.com',
             'private_email' => 'jan.priv@example.com',
-            'pesel'         => '12345678901',
+            'pesel' => '12345678901',
         ], $result);
     }
 
     /**
      * @return void
      */
-    public function testCollectionReturnsUsersCollection(): void
+    public function test_collection_returns_users_collection(): void
     {
         $user1 = new User(['first_name' => 'Jan']);
         $user2 = new User(['first_name' => 'Adam']);

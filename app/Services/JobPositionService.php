@@ -24,9 +24,7 @@ readonly class JobPositionService implements JobPositionServiceInterface
     public function __construct(
         private JobPositionRepositoryInterface $jobPositionRepository,
         private ExportServiceInterface $exportService,
-    )
-    {
-    }
+    ) {}
 
     /**
      * @return LengthAwarePaginator
@@ -79,7 +77,9 @@ readonly class JobPositionService implements JobPositionServiceInterface
      */
     public function assignJobPosition(User $user, array $data): void
     {
-        $user->jobPositions()->syncWithoutDetaching($data['job_positions']);
+        collect($data)->each(function (array $jobPosition) use ($user) {
+            $user->jobPositions()->syncWithoutDetaching($jobPosition['uuid']);
+        });
     }
 
     /**

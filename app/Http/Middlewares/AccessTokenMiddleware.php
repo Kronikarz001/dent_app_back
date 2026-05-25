@@ -27,12 +27,11 @@ class AccessTokenMiddleware
      */
     public function __construct(
         private readonly AuthServiceInterface $authService
-    )
-    {
-    }
+    ) {}
 
     /**
      * Handle an incoming request.
+     *
      * @param Closure(Request): (Response) $next
      */
     public function handle(Request $request, Closure $next): Response
