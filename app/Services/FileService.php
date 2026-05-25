@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\DTO\FileDto;
+use App\Dto\FileDto;
 use App\Enums\FileableType;
 use App\Exceptions\FileUploadException;
 use App\Models\File;

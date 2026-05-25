@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\DTO\FileDto;
+use App\Dto\FileDto;
 use App\Models\File;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Database\Eloquent\Model;
