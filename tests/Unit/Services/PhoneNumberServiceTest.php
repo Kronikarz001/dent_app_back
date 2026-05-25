@@ -18,13 +18,13 @@ class PhoneNumberServiceTest extends TestCase
     {
         parent::setUp();
 
-        $this->phoneNumberService = new PhoneNumberService();
+        $this->phoneNumberService = new PhoneNumberService;
     }
 
     /**
      * @return void
      */
-    public function testAssignPhonesInsertsRecordsWithCorrectData(): void
+    public function test_assign_phones_inserts_records_with_correct_data(): void
     {
         $patient = Patient::factory()->create();
 
@@ -36,32 +36,32 @@ class PhoneNumberServiceTest extends TestCase
         $this->phoneNumberService->assignPhones($patient, $phones);
 
         $this->assertDatabaseHas('phone_numbers', [
-            'number'         => '100200300',
-            'type'           => 'PRIVATE',
+            'number' => '100200300',
+            'type' => 'PRIVATE',
             'phoneable_type' => Patient::class,
-            'phoneable_id'   => $patient->uuid,
+            'phoneable_id' => $patient->uuid,
         ]);
 
         $this->assertDatabaseHas('phone_numbers', [
-            'number'         => '900800700',
-            'type'           => 'WORK',
+            'number' => '900800700',
+            'type' => 'WORK',
             'phoneable_type' => Patient::class,
-            'phoneable_id'   => $patient->uuid,
+            'phoneable_id' => $patient->uuid,
         ]);
     }
 
     /**
      * @return void
      */
-    public function testAssignPhonesUpdatesTypeOnDuplicateNumber(): void
+    public function test_assign_phones_updates_type_on_duplicate_number(): void
     {
         $patient = Patient::factory()->create();
 
         PhoneNumber::factory()->create([
-            'number'         => '100200300',
-            'type'           => 'PRIVATE',
+            'number' => '100200300',
+            'type' => 'PRIVATE',
             'phoneable_type' => Patient::class,
-            'phoneable_id'   => $patient->uuid,
+            'phoneable_id' => $patient->uuid,
         ]);
 
         $this->phoneNumberService->assignPhones($patient, [
@@ -70,7 +70,7 @@ class PhoneNumberServiceTest extends TestCase
 
         $this->assertDatabaseHas('phone_numbers', [
             'number' => '100200300',
-            'type'   => 'WORK',
+            'type' => 'WORK',
         ]);
 
         $this->assertDatabaseCount('phone_numbers', 1);
@@ -79,7 +79,7 @@ class PhoneNumberServiceTest extends TestCase
     /**
      * @return void
      */
-    public function testAssignPhonesWithEmptyArrayDoesNothing(): void
+    public function test_assign_phones_with_empty_array_does_nothing(): void
     {
         $patient = Patient::factory()->create();
 

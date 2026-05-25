@@ -13,7 +13,7 @@ class JobPositionMockRepository implements JobPositionRepositoryInterface
 {
     public function findByUuid(string $uuid): ?JobPosition
     {
-        return new JobPosition();
+        return new JobPosition;
     }
 
     public function create(array $data): JobPosition
@@ -33,7 +33,7 @@ class JobPositionMockRepository implements JobPositionRepositoryInterface
 
     public function findAllByUuids(array $uuids): Collection
     {
-        return new Collection();
+        return new Collection;
     }
 
     public function findAllWithPagination(array $params = []): LengthAwarePaginator

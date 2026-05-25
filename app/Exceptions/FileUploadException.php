@@ -11,13 +11,13 @@ use Illuminate\Support\Facades\Log;
 /**
  * Summary of FileUploadException
  */
-class  FileUploadException extends Exception
+class FileUploadException extends Exception
 {
     /**
      * @param string $message
      * @param int $code
      */
-    public function __construct(string $message = "Error with upload file", int $code = 500)
+    public function __construct(string $message = 'Error with upload file', int $code = 500)
     {
         parent::__construct($message, $code);
     }

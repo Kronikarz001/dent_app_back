@@ -3,8 +3,8 @@
 namespace App\Repositories;
 
 use App\Models\User;
-use App\Search\UserSearch;
 use App\Search\Search;
+use App\Search\UserSearch;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 
@@ -47,6 +47,7 @@ class UserRepository extends SearchableRepository implements UserRepositoryInter
     public function update(User|Model $user, array $data): User
     {
         $user->update($data);
+
         return $user->fresh();
     }
 

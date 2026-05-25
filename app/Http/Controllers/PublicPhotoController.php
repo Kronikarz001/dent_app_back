@@ -25,6 +25,7 @@ class PublicPhotoController extends Controller
     /**
      * @param File $file
      * @return Response
+     *
      * @throws FileNotFoundException
      */
     public function show(File $file): Response
@@ -38,7 +39,7 @@ class PublicPhotoController extends Controller
      */
     public function store(PublicPhotoStoreRequest $request): JsonResponse
     {
-        $type  = FileableType::map($request->input('fileable_type'));
+        $type = FileableType::map($request->input('fileable_type'));
         $model = ($type->value)::findOrFail($request->input('fileable_id'));
 
         $files = $this->fileService->saveFile(
@@ -64,11 +65,13 @@ class PublicPhotoController extends Controller
     /**
      * @param File $file
      * @return JsonResponse
+     *
      * @throws FileNotFoundException
      */
     public function destroy(File $file): JsonResponse
     {
         $this->fileService->deleteFile($file);
+
         return response()->json([], 204);
     }
 }

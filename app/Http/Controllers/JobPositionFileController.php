@@ -80,6 +80,7 @@ class JobPositionFileController extends Controller
     public function destroy(JobPosition $jobPosition, File $file): JsonResponse
     {
         $this->fileService->deleteFile($file);
+
         return response()->json([], 204);
     }
 

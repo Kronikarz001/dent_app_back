@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Models\JobPosition;
 use App\Search\JobPositionSearch;
 use App\Search\Search;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -67,6 +68,7 @@ class JobPositionRepository extends SearchableRepository implements JobPositionR
     public function update(JobPosition|Model $model, array $data): JobPosition
     {
         $model->update($data);
+
         return $model->fresh();
     }
 

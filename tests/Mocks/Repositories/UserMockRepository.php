@@ -21,7 +21,7 @@ class UserMockRepository implements UserRepositoryInterface
      */
     public function findByUuid(string $uuid): ?User
     {
-        return new User();
+        return new User;
     }
 
     /**
@@ -58,7 +58,7 @@ class UserMockRepository implements UserRepositoryInterface
      */
     public function findAllByUuids(array $uuids): Collection
     {
-        return new Collection();
+        return new Collection;
     }
 
     /**
@@ -114,6 +114,6 @@ class UserMockRepository implements UserRepositoryInterface
      */
     public function getUserInformation(string $userUuid): User
     {
-        return new User();
+        return new User;
     }
 }

@@ -14,9 +14,9 @@ class FileDto extends Dto
      * @param FileableType $type
      */
     public function __construct(
-        private readonly array|null $file,
+        private readonly ?array $file,
         private readonly FileableType $type
-    ){}
+    ) {}
 
     /**
      * @return FileableType
@@ -29,7 +29,7 @@ class FileDto extends Dto
     /**
      * @return array|null
      */
-    public function getFile(): array|null
+    public function getFile(): ?array
     {
         return $this->file;
     }

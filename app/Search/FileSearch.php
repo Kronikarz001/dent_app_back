@@ -10,7 +10,6 @@ use Illuminate\Database\Eloquent\Builder;
  */
 class FileSearch extends Search
 {
-
     /**
      * @return string
      */
@@ -33,7 +32,7 @@ class FileSearch extends Search
     protected function fillableSearchFields(): array
     {
         return [
-            'filename'
+            'filename',
         ];
     }
 
@@ -43,7 +42,7 @@ class FileSearch extends Search
     protected function fillableSortFields(): array
     {
         return [
-            'filename'
+            'filename',
         ];
     }
 
@@ -53,7 +52,7 @@ class FileSearch extends Search
     protected function searchStringFields(): array
     {
         return [
-            'filename'
+            'filename',
         ];
     }
 
@@ -67,7 +66,7 @@ class FileSearch extends Search
         $excludeUuids = $params['exclude_uuids'] ?? [];
         unset($params['exclude_uuids']);
 
-        if (is_array($excludeUuids) && !empty($excludeUuids)) {
+        if (is_array($excludeUuids) && ! empty($excludeUuids)) {
             $query->whereNotIn('uuid', $excludeUuids);
         }
 
@@ -82,7 +81,7 @@ class FileSearch extends Search
         return [
             'user',
             'files',
-            'files.user'
+            'files.user',
         ];
     }
 }

@@ -15,7 +15,7 @@ class FileStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'files'   => ['required', 'array'],
+            'files' => ['required', 'array'],
             'files.*' => ['required', 'file'],
         ];
     }

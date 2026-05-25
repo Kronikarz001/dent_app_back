@@ -33,6 +33,7 @@ abstract class BasicRepository implements BasicRepositoryInterface
     public function update(Model $model, array $data): Model
     {
         $model->update($data);
+
         return $model->fresh();
     }
 
@@ -95,18 +96,19 @@ abstract class BasicRepository implements BasicRepositoryInterface
         $toAttach = array_diff($desiredIds, $currentIds);
         $toDetach = array_diff($currentIds, $desiredIds);
 
-        if (!empty($toDetach)) {
+        if (! empty($toDetach)) {
             $relation->detach($toDetach);
         }
 
         if (is_null($pivotCallback)) {
-            if (!empty($toAttach)) {
+            if (! empty($toAttach)) {
                 $relation->attach($toAttach);
             }
+
             return;
         }
 
-        if (!empty($toAttach)) {
+        if (! empty($toAttach)) {
             $payload = [];
             foreach ($toAttach as $id) {
                 $payload[$id] = $pivotCallback($id);

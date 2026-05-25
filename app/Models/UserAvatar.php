@@ -5,6 +5,4 @@ namespace App\Models;
 /**
  * Summary of UserAvatar
  */
-class UserAvatar extends BasicUser
-{
-}
+class UserAvatar extends BasicUser {}

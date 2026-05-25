@@ -20,7 +20,7 @@ class PatientMockRepository implements PatientRepositoryInterface
      */
     public function findByUuid(string $uuid): ?Patient
     {
-        return new Patient();
+        return new Patient;
     }
 
     /**
@@ -57,7 +57,7 @@ class PatientMockRepository implements PatientRepositoryInterface
      */
     public function findAllByUuids(array $uuids): Collection
     {
-        return new Collection();
+        return new Collection;
     }
 
     /**

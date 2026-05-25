@@ -68,6 +68,7 @@ class PatientRepository extends SearchableRepository implements PatientRepositor
     public function update(Patient|Model $model, array $data): Patient
     {
         $model->update($data);
+
         return $model->fresh();
     }
 

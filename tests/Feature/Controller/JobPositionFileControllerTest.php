@@ -12,7 +12,7 @@ use Tests\TestCase;
 
 class JobPositionFileControllerTest extends TestCase
 {
-    public function testIndexReturnsSuccessResponse(): void
+    public function test_index_returns_success_response(): void
     {
         $jobPosition = JobPosition::factory()->create();
 
@@ -21,12 +21,12 @@ class JobPositionFileControllerTest extends TestCase
             ->assertOk();
     }
 
-    public function testStoreReturnsCreatedResponse(): void
+    public function test_store_returns_created_response(): void
     {
         Storage::fake('files');
 
         $jobPosition = JobPosition::factory()->create();
-        $file        = UploadedFile::fake()->create('document.pdf', 100, 'application/pdf');
+        $file = UploadedFile::fake()->create('document.pdf', 100, 'application/pdf');
 
         $this->callApiWithLoggedUser()
             ->post(route('jobpositionfile.store', ['jobPosition' => $jobPosition->uuid]), [
@@ -35,18 +35,18 @@ class JobPositionFileControllerTest extends TestCase
             ->assertCreated();
     }
 
-    public function testShowReturnsSuccessResponse(): void
+    public function test_show_returns_success_response(): void
     {
         Storage::fake('files');
 
-        $user        = User::factory()->create();
+        $user = User::factory()->create();
         $jobPosition = JobPosition::factory()->create();
-        $path        = 'job_position/ab/cd/ef/abcdef/file';
-        $fileModel   = File::factory()->create([
-            'path'          => $path,
-            'fileable_id'   => $jobPosition->uuid,
+        $path = 'job_position/ab/cd/ef/abcdef/file';
+        $fileModel = File::factory()->create([
+            'path' => $path,
+            'fileable_id' => $jobPosition->uuid,
             'fileable_type' => JobPosition::class,
-            'user_uuid'     => $user->uuid,
+            'user_uuid' => $user->uuid,
         ]);
 
         Storage::disk('files')->put($path, Crypt::encrypt('test content'));
@@ -56,14 +56,14 @@ class JobPositionFileControllerTest extends TestCase
             ->assertOk();
     }
 
-    public function testUpdateReturnsSuccessResponse(): void
+    public function test_update_returns_success_response(): void
     {
-        $user        = User::factory()->create();
+        $user = User::factory()->create();
         $jobPosition = JobPosition::factory()->create();
-        $fileModel   = File::factory()->create([
-            'fileable_id'   => $jobPosition->uuid,
+        $fileModel = File::factory()->create([
+            'fileable_id' => $jobPosition->uuid,
             'fileable_type' => JobPosition::class,
-            'user_uuid'     => $user->uuid,
+            'user_uuid' => $user->uuid,
         ]);
 
         $this->callApiWithLoggedUser()
@@ -73,18 +73,18 @@ class JobPositionFileControllerTest extends TestCase
             ->assertOk();
     }
 
-    public function testDestroyReturnsNoContentResponse(): void
+    public function test_destroy_returns_no_content_response(): void
     {
         Storage::fake('files');
 
-        $user        = User::factory()->create();
+        $user = User::factory()->create();
         $jobPosition = JobPosition::factory()->create();
-        $path        = 'job_position/ab/cd/ef/abcdef/file';
-        $fileModel   = File::factory()->create([
-            'path'          => $path,
-            'fileable_id'   => $jobPosition->uuid,
+        $path = 'job_position/ab/cd/ef/abcdef/file';
+        $fileModel = File::factory()->create([
+            'path' => $path,
+            'fileable_id' => $jobPosition->uuid,
             'fileable_type' => JobPosition::class,
-            'user_uuid'     => $user->uuid,
+            'user_uuid' => $user->uuid,
         ]);
 
         Storage::disk('files')->put($path, Crypt::encrypt('test'));
@@ -94,18 +94,18 @@ class JobPositionFileControllerTest extends TestCase
             ->assertNoContent();
     }
 
-    public function testDownloadReturnsSuccessResponse(): void
+    public function test_download_returns_success_response(): void
     {
         Storage::fake('files');
 
-        $user        = User::factory()->create();
+        $user = User::factory()->create();
         $jobPosition = JobPosition::factory()->create();
-        $path        = 'job_position/ab/cd/ef/abcdef/file';
-        $fileModel   = File::factory()->create([
-            'path'          => $path,
-            'fileable_id'   => $jobPosition->uuid,
+        $path = 'job_position/ab/cd/ef/abcdef/file';
+        $fileModel = File::factory()->create([
+            'path' => $path,
+            'fileable_id' => $jobPosition->uuid,
             'fileable_type' => JobPosition::class,
-            'user_uuid'     => $user->uuid,
+            'user_uuid' => $user->uuid,
         ]);
 
         Storage::disk('files')->put($path, Crypt::encrypt('test content'));
@@ -115,19 +115,19 @@ class JobPositionFileControllerTest extends TestCase
             ->assertOk();
     }
 
-    public function testStoreNewVersionReturnsCreatedResponse(): void
+    public function test_store_new_version_returns_created_response(): void
     {
         Storage::fake('files');
 
-        $user         = User::factory()->create();
-        $jobPosition  = JobPosition::factory()->create();
-        $path         = 'job_position/ab/cd/ef/abcdef/old';
+        $user = User::factory()->create();
+        $jobPosition = JobPosition::factory()->create();
+        $path = 'job_position/ab/cd/ef/abcdef/old';
         $existingFile = File::factory()->create([
-            'path'          => $path,
-            'fileable_id'   => $jobPosition->uuid,
+            'path' => $path,
+            'fileable_id' => $jobPosition->uuid,
             'fileable_type' => JobPosition::class,
-            'user_uuid'     => $user->uuid,
-            'is_latest'     => true,
+            'user_uuid' => $user->uuid,
+            'is_latest' => true,
         ]);
 
         Storage::disk('files')->put($path, Crypt::encrypt('old content'));
@@ -141,7 +141,7 @@ class JobPositionFileControllerTest extends TestCase
             ->assertCreated();
     }
 
-    public function testIndexRequiresAuthentication(): void
+    public function test_index_requires_authentication(): void
     {
         $jobPosition = JobPosition::factory()->create();
 

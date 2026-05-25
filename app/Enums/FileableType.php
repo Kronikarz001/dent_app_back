@@ -19,9 +19,10 @@ enum FileableType: string
     /**
      * @param string $name
      * @return FileableType
+     *
      * @throws FileableTypeException
      */
-    public final static function map(string $name): FileableType
+    final public static function map(string $name): FileableType
     {
         foreach (self::cases() as $case) {
             if ($case->name == $name) {
@@ -29,13 +30,13 @@ enum FileableType: string
             }
         }
 
-        throw new FileableTypeException();
+        throw new FileableTypeException;
     }
 
     /**
      * @return string
      */
-    public final function getDefaultDirectory(): string
+    final public function getDefaultDirectory(): string
     {
         return match ($this) {
             self::USER => 'user',

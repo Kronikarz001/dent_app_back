@@ -15,7 +15,7 @@ trait HasFile
      */
     public function files(): MorphMany
     {
-        return $this->morphMany(File::class , 'fileable');
+        return $this->morphMany(File::class, 'fileable');
     }
 
     /**

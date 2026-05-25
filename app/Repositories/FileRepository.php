@@ -59,6 +59,7 @@ class FileRepository extends SearchableRepository implements FileRepositoryInter
     public function update(Model|File $model, array $data): File
     {
         $model->update($data);
+
         return $model;
     }
 

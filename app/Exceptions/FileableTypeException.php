@@ -15,7 +15,7 @@ class FileableTypeException extends Exception
     /**
      * @param string $message
      */
-    public function __construct(string $message = "Bad fileable type")
+    public function __construct(string $message = 'Bad fileable type')
     {
         parent::__construct($message, 400);
     }

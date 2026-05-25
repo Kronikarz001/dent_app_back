@@ -3,6 +3,7 @@
 namespace Tests\Feature\Controller;
 
 use App\Models\JobPosition;
+use App\Models\User;
 use Tests\TestCase;
 
 /**
@@ -102,7 +103,7 @@ class JobPositionControllerTest extends TestCase
     /**
      * @return void
      */
-    public function testExportJobPositionReturnSuccessResponse(): void
+    public function test_export_job_position_return_success_response(): void
     {
         JobPosition::factory()->count(3)->create();
 
@@ -115,9 +116,9 @@ class JobPositionControllerTest extends TestCase
     /**
      * @return void
      */
-    public function testAssignJobPositionReturnNoContentResponse(): void
+    public function test_assign_job_position_return_no_content_response(): void
     {
-        $user        = User::factory()->create();
+        $user = User::factory()->create();
         $jobPosition = JobPosition::factory()->create();
 
         $this->callApiWithLoggedUser()

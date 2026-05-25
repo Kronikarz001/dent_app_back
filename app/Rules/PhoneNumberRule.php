@@ -26,8 +26,8 @@ class PhoneNumberRule implements ValidationRule
 
         $pattern = '/^(?:48[0-9]{9}|49[0-9]{7,11})$/';
 
-        if (!preg_match($pattern, $normalized)) {
-            $fail("Invalid phone number");
+        if (! preg_match($pattern, $normalized)) {
+            $fail('Invalid phone number');
         }
     }
 }

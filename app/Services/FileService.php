@@ -7,8 +7,8 @@ use App\Enums\FileableType;
 use App\Exceptions\FileUploadException;
 use App\Models\File;
 use App\Repositories\FileRepositoryInterface;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
@@ -35,7 +35,7 @@ readonly class FileService implements FileServiceInterface
      */
     public function getAllFiles(Model $model, array $excludeUuids = []): LengthAwarePaginator
     {
-        $excludeUuids = array_values(array_filter($excludeUuids, static fn($uuid) => !is_null($uuid)));
+        $excludeUuids = array_values(array_filter($excludeUuids, static fn ($uuid) => ! is_null($uuid)));
 
         return $this->fileRepository->findAllWithPagination([
             'fileable_type' => $model::class,
@@ -49,6 +49,7 @@ readonly class FileService implements FileServiceInterface
      * @param FileDto $fileDto
      * @param Model $model
      * @return array
+     *
      * @throws FileUploadException
      */
     public function saveFile(FileDto $fileDto, Model $model): array
@@ -61,6 +62,7 @@ readonly class FileService implements FileServiceInterface
      * @param FileDto $fileDto
      * @param Model $model
      * @return array
+     *
      * @throws FileUploadException
      */
     public function createNewVersionFile(File $existingFile, FileDto $fileDto, Model $model): array
@@ -83,18 +85,21 @@ readonly class FileService implements FileServiceInterface
     /**
      * @param File $file
      * @return bool
+     *
      * @throws FileNotFoundException
      */
     public function deleteFile(File $file): bool
     {
-        $file->files->each(fn(File $child) => $this->deletePhysicalFile($child));
+        $file->files->each(fn (File $child) => $this->deletePhysicalFile($child));
         $this->deletePhysicalFile($file);
+
         return $this->fileRepository->delete($file);
     }
 
     /**
      * @param File $file
      * @return array
+     *
      * @throws FileNotFoundException
      */
     public function getFile(File $file): array
@@ -102,21 +107,22 @@ readonly class FileService implements FileServiceInterface
         $decrypted = $this->getFileContent($file);
 
         return [
-            'filename'  => $file->filename,
+            'filename' => $file->filename,
             'extension' => $file->extension,
-            'mime'      => $file->mimetype,
-            'content'   => base64_encode($decrypted),
+            'mime' => $file->mimetype,
+            'content' => base64_encode($decrypted),
         ];
     }
 
     /**
      * @param File $file
      * @return string
+     *
      * @throws FileNotFoundException
      */
     public function getFileContent(File $file): string
     {
-        if (!Storage::disk('files')->exists($file->path)) {
+        if (! Storage::disk('files')->exists($file->path)) {
             throw new FileNotFoundException($file->path);
         }
 
@@ -128,6 +134,7 @@ readonly class FileService implements FileServiceInterface
      * @param Model $model
      * @param File|null $parentFile
      * @return array
+     *
      * @throws FileUploadException
      */
     private function processFiles(FileDto $fileDto, Model $model, ?File $parentFile = null): array
@@ -152,6 +159,7 @@ readonly class FileService implements FileServiceInterface
      * @param Model $model
      * @param File|null $parentFile
      * @return File
+     *
      * @throws FileUploadException
      */
     private function processSingleFile(UploadedFile $upload, FileableType $type, Model $model, ?File $parentFile = null): File
@@ -189,13 +197,14 @@ readonly class FileService implements FileServiceInterface
      * @param UploadedFile $file
      * @param string $path
      * @return void
+     *
      * @throws FileUploadException
      */
     private function saveFileToDisk(UploadedFile $file, string $path): void
     {
         $encrypted = Crypt::encrypt($file->getContent());
 
-        if (!Storage::disk('files')->put($path, $encrypted)) {
+        if (! Storage::disk('files')->put($path, $encrypted)) {
             throw new FileUploadException("Error uploading file to {$path}");
         }
     }
@@ -227,11 +236,12 @@ readonly class FileService implements FileServiceInterface
     /**
      * @param File $file
      * @return void
+     *
      * @throws FileNotFoundException
      */
     private function deletePhysicalFile(File $file): void
     {
-        if (!Storage::disk('files')->exists($file->path)) {
+        if (! Storage::disk('files')->exists($file->path)) {
             throw new FileNotFoundException($file->path);
         }
 
@@ -247,7 +257,7 @@ readonly class FileService implements FileServiceInterface
     private function makeFilePath(string $currentUuid, FileableType $type, string $rootUuid): string
     {
         $segments = str_split(substr($rootUuid, 0, 6), 2);
-        $uuidPath = implode('/', $segments) . '/' . $rootUuid;
+        $uuidPath = implode('/', $segments).'/'.$rootUuid;
 
         return "{$type->getDefaultDirectory()}/{$uuidPath}/{$currentUuid}";
     }
@@ -259,12 +269,13 @@ readonly class FileService implements FileServiceInterface
      */
     private function getRootUuidFromPath(string $path, FileableType $type): ?string
     {
-        $prefix = $type->getDefaultDirectory() . '/';
-        if (!str_starts_with($path, $prefix)) {
+        $prefix = $type->getDefaultDirectory().'/';
+        if (! str_starts_with($path, $prefix)) {
             return null;
         }
 
         $parts = explode('/', substr($path, strlen($prefix)));
+
         return $parts[3] ?? null;
     }
 

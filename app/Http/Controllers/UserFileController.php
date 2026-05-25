@@ -55,6 +55,7 @@ class UserFileController extends Controller
      * @param User $user
      * @param File $file
      * @return JsonResponse
+     *
      * @throws FileNotFoundException
      */
     public function show(User $user, File $file): JsonResponse
@@ -83,6 +84,7 @@ class UserFileController extends Controller
     public function destroy(User $user, File $file): JsonResponse
     {
         $this->fileService->deleteFile($file);
+
         return response()->json([], 204);
     }
 
@@ -90,6 +92,7 @@ class UserFileController extends Controller
      * @param User $user
      * @param File $file
      * @return Response
+     *
      * @throws FileNotFoundException
      */
     public function download(User $user, File $file): Response

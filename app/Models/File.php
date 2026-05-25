@@ -5,7 +5,6 @@ namespace App\Models;
 use App\Observers\FileObserver;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
@@ -35,7 +34,7 @@ class File extends UuidModel
         'fileable_id',
         'mimetype',
         'file_uuid',
-        'is_latest'
+        'is_latest',
     ];
 
     /**

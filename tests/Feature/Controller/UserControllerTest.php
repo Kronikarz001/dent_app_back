@@ -115,7 +115,7 @@ class UserControllerTest extends TestCase
     /**
      * @return void
      */
-    public function testExportUserReturnSuccessResponse(): void
+    public function test_export_user_return_success_response(): void
     {
         User::factory()->count(3)->create();
 

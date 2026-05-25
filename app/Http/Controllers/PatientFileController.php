@@ -80,6 +80,7 @@ class PatientFileController extends Controller
     public function destroy(Patient $patient, File $file): JsonResponse
     {
         $this->fileService->deleteFile($file);
+
         return response()->json([], 204);
     }
 

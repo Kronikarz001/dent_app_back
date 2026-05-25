@@ -77,14 +77,13 @@ readonly class JobPositionService implements JobPositionServiceInterface
      */
     public function assignJobPosition(User $user, array $data): void
     {
-        collect($data)->each(function (array $jobPosition) use ($user) {
-            $user->jobPositions()->syncWithoutDetaching($jobPosition['uuid']);
-        });
+        $user->jobPositions()->syncWithoutDetaching($data['job_positions']);
     }
 
     /**
      * @param ExportRequest $request
      * @return BinaryFileResponse
+     *
      * @throws Exception
      * @throws WriterException
      */

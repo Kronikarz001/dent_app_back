@@ -16,6 +16,7 @@ use Tests\TestCase;
 class ExportServiceTest extends TestCase
 {
     private MockInterface $exportMapper;
+
     private ExportService $exportService;
 
     /**
@@ -25,7 +26,7 @@ class ExportServiceTest extends TestCase
     {
         parent::setUp();
 
-        $this->exportMapper  = Mockery::mock(ExportMapper::class);
+        $this->exportMapper = Mockery::mock(ExportMapper::class);
         $this->exportService = new ExportService($this->exportMapper);
     }
 
@@ -41,13 +42,13 @@ class ExportServiceTest extends TestCase
     /**
      * @return void
      */
-    public function testExportDownloadsFileWithCorrectName(): void
+    public function test_export_downloads_file_with_correct_name(): void
     {
         Excel::fake();
 
         $request = Mockery::mock(ExportRequest::class);
-        $export  = Mockery::mock(ExportInterface::class);
-        $model   = Mockery::mock(Model::class);
+        $export = Mockery::mock(ExportInterface::class);
+        $model = Mockery::mock(Model::class);
 
         $dto = Mockery::mock(PageableDto::class);
         $dto->shouldReceive('setPerPage')->once()->with(-1);
@@ -72,13 +73,13 @@ class ExportServiceTest extends TestCase
     /**
      * @return void
      */
-    public function testExportUsesTableNameWhenNoNameProvided(): void
+    public function test_export_uses_table_name_when_no_name_provided(): void
     {
         Excel::fake();
 
         $request = Mockery::mock(ExportRequest::class);
-        $export  = Mockery::mock(ExportInterface::class);
-        $model   = Mockery::mock(Model::class);
+        $export = Mockery::mock(ExportInterface::class);
+        $model = Mockery::mock(Model::class);
 
         $dto = Mockery::mock(PageableDto::class);
         $dto->shouldReceive('setPerPage')->once()->with(-1);

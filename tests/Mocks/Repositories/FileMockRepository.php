@@ -18,7 +18,7 @@ class FileMockRepository implements FileRepositoryInterface
 
     public function findByUuid(string $uuid): File
     {
-        return new File();
+        return new File;
     }
 
     public function update(Model|File $model, array $data): File
@@ -33,7 +33,7 @@ class FileMockRepository implements FileRepositoryInterface
 
     public function findAllByUuids(array $uuids): Collection
     {
-        return new Collection();
+        return new Collection;
     }
 
     public function findAllWithPagination(array $params = []): LengthAwarePaginator
@@ -53,12 +53,12 @@ class FileMockRepository implements FileRepositoryInterface
 
     public function findAllByFileUuid(string $uuid): Collection
     {
-        return new Collection();
+        return new Collection;
     }
 
     public function findAllByFileableExceptUuid(string $fileableType, string $fileableId, string $excludeUuid, ?string $oldFileUuid): Collection
     {
-        return new Collection();
+        return new Collection;
     }
 
     public function getRootUuid(string $fileableType, string $fileableId): ?string
@@ -68,6 +68,6 @@ class FileMockRepository implements FileRepositoryInterface
 
     public function findAllWithParams(array $params): Collection
     {
-        return new Collection();
+        return new Collection;
     }
 }

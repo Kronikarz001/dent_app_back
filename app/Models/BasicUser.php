@@ -33,7 +33,7 @@ use Laravel\Sanctum\PersonalAccessToken;
 abstract class BasicUser extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable, HasUuids, HasApiTokens, HasPhoneNumber, HasFile;
+    use HasApiTokens, HasFactory, HasFile, HasPhoneNumber, HasUuids, Notifiable;
 
     protected $table = 'users';
 
@@ -54,7 +54,7 @@ abstract class BasicUser extends Authenticatable
         'password',
         'pesel',
         'is_active',
-        'avatar_path'
+        'avatar_path',
     ];
 
     /**
@@ -87,9 +87,9 @@ abstract class BasicUser extends Authenticatable
     protected function casts(): array
     {
         return [
-            'email_verified_at'         => 'datetime',
+            'email_verified_at' => 'datetime',
             'private_email_verified_at' => 'datetime',
-            'password'                  => 'hashed',
+            'password' => 'hashed',
         ];
     }
 

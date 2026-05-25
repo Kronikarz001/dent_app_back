@@ -9,10 +9,10 @@ class PublicPhotoStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'files'         => ['required', 'array'],
-            'files.*'       => ['required', 'file'],
+            'files' => ['required', 'array'],
+            'files.*' => ['required', 'file'],
             'fileable_type' => ['required', 'string'],
-            'fileable_id'   => ['required', 'string'],
+            'fileable_id' => ['required', 'string'],
         ];
     }
 }

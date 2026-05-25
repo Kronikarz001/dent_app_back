@@ -37,6 +37,7 @@ interface FileServiceInterface
     /**
      * @param File $file
      * @return array
+     *
      * @throws FileNotFoundException
      */
     public function getFile(File $file): array;
@@ -44,6 +45,7 @@ interface FileServiceInterface
     /**
      * @param File $file
      * @return string
+     *
      * @throws FileNotFoundException
      */
     public function getFileContent(File $file): string;

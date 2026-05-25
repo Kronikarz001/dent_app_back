@@ -2,6 +2,4 @@
 
 namespace App\Repositories;
 
-interface SearchableRepositoryInterface extends BasicRepositoryInterface
-{
-}
+interface SearchableRepositoryInterface extends BasicRepositoryInterface {}
