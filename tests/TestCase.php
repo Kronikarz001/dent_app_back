@@ -19,7 +19,7 @@ abstract class TestCase extends BaseTestCase
      */
     protected function callApiWithLoggedUser(?User $user = null): static
     {
-        $user  = $user ?? User::factory()->create();
+        $user = $user ?? User::factory()->create();
         $token = $user->createToken('test-token')->plainTextToken;
 
         $this->withToken($token);

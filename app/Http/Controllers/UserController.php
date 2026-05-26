@@ -24,8 +24,7 @@ class UserController extends Controller
      */
     public function __construct(
         private readonly UserServiceInterface $userService
-    ) {
-    }
+    ) {}
 
     /**
      * @return LengthAwarePaginator
@@ -77,6 +76,7 @@ class UserController extends Controller
     public function update(User $user, UserUpdateRequest $request): JsonResponse
     {
         $this->userService->updateUser($user, $request->all());
+
         return response()->json([], 204);
     }
 
@@ -87,12 +87,14 @@ class UserController extends Controller
     public function destroy(User $user): JsonResponse
     {
         $this->userService->deactivateUser($user);
+
         return response()->json([], 204);
     }
 
     /**
      * @param ExportRequest $request
      * @return BinaryFileResponse
+     *
      * @throws Exception
      * @throws WriterException
      */

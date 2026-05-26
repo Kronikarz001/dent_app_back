@@ -3,8 +3,6 @@
 namespace App\Services;
 
 use App\Http\Requests\LoginRequest;
-use App\Http\Requests\ResetPasswordRequest;
-use App\Models\User;
 use Illuminate\Http\JsonResponse;
 
 /**

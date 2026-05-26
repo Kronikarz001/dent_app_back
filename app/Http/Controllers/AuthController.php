@@ -18,8 +18,7 @@ class AuthController extends Controller
      */
     public function __construct(
         private readonly AuthServiceInterface $authService
-    )
-    {}
+    ) {}
 
     /**
      * @param LoginRequest $request
@@ -36,6 +35,7 @@ class AuthController extends Controller
     public function logout(): JsonResponse
     {
         $this->authService->logout();
+
         return response()->json();
     }
 
@@ -46,6 +46,7 @@ class AuthController extends Controller
     public function forgotPassword(ForgotPasswordRequest $request): JsonResponse
     {
         $this->authService->forgotPassword($request->all());
+
         return response()->json();
     }
 
@@ -56,6 +57,7 @@ class AuthController extends Controller
     public function resetPassword(ResetPasswordRequest $request): JsonResponse
     {
         $this->authService->resetPassword($request->all());
+
         return response()->json([], 204);
     }
 }

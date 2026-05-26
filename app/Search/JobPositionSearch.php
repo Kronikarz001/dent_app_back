@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Search;
 
 use App\Models\JobPosition;
@@ -66,9 +67,7 @@ class JobPositionSearch extends Search
      * @param array $params
      * @return void
      */
-    protected function preFilter(Builder $query, array $params): void
-    {
-    }
+    protected function preFilter(Builder $query, array $params): void {}
 
     /**
      * @return array

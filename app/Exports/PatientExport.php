@@ -43,9 +43,9 @@ final class PatientExport extends Export
     public function map(mixed $row): array
     {
         return [
-            'first_name'    => $row->first_name,
-            'last_name'     => $row->last_name,
-            'email'         => $row->email,
+            'first_name' => $row->first_name,
+            'last_name' => $row->last_name,
+            'email' => $row->email,
         ];
     }
 }

@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Exports\PatientExport;
 use App\Http\Requests\ExportRequest;
 use App\Models\Patient;
-use App\Models\User;
 use App\Repositories\PatientRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
 use PhpOffice\PhpSpreadsheet\Exception;
@@ -24,9 +23,7 @@ readonly class PatientService implements PatientServiceInterface
     public function __construct(
         private PatientRepositoryInterface $patientRepository,
         private ExportServiceInterface $exportService,
-    )
-    {
-    }
+    ) {}
 
     /**
      * @return LengthAwarePaginator
@@ -75,6 +72,7 @@ readonly class PatientService implements PatientServiceInterface
     /**
      * @param ExportRequest $request
      * @return BinaryFileResponse
+     *
      * @throws Exception
      * @throws WriterException
      */

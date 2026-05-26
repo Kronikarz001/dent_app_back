@@ -6,7 +6,6 @@ use App\Models\JobPosition;
 use App\Search\JobPositionSearch;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Auth;
 
 /**
  * Summary of JobPositionRepository
@@ -18,8 +17,7 @@ readonly class JobPositionRepository implements JobPositionRepositoryInterface
      */
     public function __construct(
         private JobPositionSearch $search
-    ) {
-    }
+    ) {}
 
     /**
      * @param array $params
@@ -66,6 +64,7 @@ readonly class JobPositionRepository implements JobPositionRepositoryInterface
     public function update(JobPosition|Model $model, array $data): JobPosition
     {
         $model->update($data);
+
         return $model->fresh();
     }
 

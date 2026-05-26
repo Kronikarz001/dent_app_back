@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Http\Requests\ExportRequest;
 use App\Models\Patient;
-use App\Models\User;
 use Illuminate\Pagination\LengthAwarePaginator;
 use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\Writer\Exception as WriterException;
@@ -47,6 +46,7 @@ interface PatientServiceInterface
     /**
      * @param ExportRequest $request
      * @return BinaryFileResponse
+     *
      * @throws Exception
      * @throws WriterException
      */

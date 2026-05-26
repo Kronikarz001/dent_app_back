@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Repositories;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -29,9 +30,9 @@ interface BasicRepositoryInterface
     public function findByUuid(string $uuid): ?Model;
 
     /**
-    * @param array $data
-    * @return Model
-    */
+     * @param array $data
+     * @return Model
+     */
     public function create(array $data): Model;
 
     /**
@@ -46,5 +47,4 @@ interface BasicRepositoryInterface
      * @return bool
      */
     public function delete(Model $model): bool;
-
 }
