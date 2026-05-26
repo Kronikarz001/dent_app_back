@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Search;
 
 use App\Models\Calendar;
@@ -78,9 +79,7 @@ class CalendarSearch extends Search
      * @param array $params
      * @return void
      */
-    protected function preFilter(Builder $query, array $params): void
-    {
-    }
+    protected function preFilter(Builder $query, array $params): void {}
 
     /**
      * @return array

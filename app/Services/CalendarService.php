@@ -16,9 +16,7 @@ readonly class CalendarService implements CalendarServiceInterface
      */
     public function __construct(
         private CalendarRepositoryInterface $calendarRepository,
-    )
-    {
-    }
+    ) {}
 
     /**
      * @return LengthAwarePaginator

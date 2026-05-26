@@ -6,7 +6,6 @@ use App\Models\Calendar;
 use App\Search\CalendarSearch;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Auth;
 
 /**
  * Summary of CalendarRepository
@@ -18,8 +17,7 @@ readonly class CalendarRepository implements CalendarRepositoryInterface
      */
     public function __construct(
         private CalendarSearch $search
-    ) {
-    }
+    ) {}
 
     /**
      * @param array $params
@@ -66,6 +64,7 @@ readonly class CalendarRepository implements CalendarRepositoryInterface
     public function update(Calendar|Model $model, array $data): Calendar
     {
         $model->update($data);
+
         return $model->fresh();
     }
 
