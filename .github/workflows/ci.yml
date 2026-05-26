@@ -76,4 +76,4 @@ jobs:
           php-version: '8.4'
           tools: composer
       - run: composer install --prefer-dist --no-progress --no-scripts
-      - run: composer audit --ignore-abandoned
+      - run: composer audit --abandoned=ignore
