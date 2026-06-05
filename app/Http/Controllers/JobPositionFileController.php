@@ -12,7 +12,7 @@ use App\Models\JobPosition;
 use App\Services\FileServiceInterface;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Response;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 /**
@@ -39,24 +39,38 @@ class JobPositionFileController extends Controller
     /**
      * @param JobPosition $jobPosition
      * @param FileStoreRequest $request
-     * @return JsonResponse
+     * @return AnonymousResourceCollection
      */
-    public function store(JobPosition $jobPosition, FileStoreRequest $request): JsonResponse
+    public function store(JobPosition $jobPosition, FileStoreRequest $request): AnonymousResourceCollection
     {
-        $files = $this->fileService->saveFile(
-            new FileDto($request->file('files'), FileableType::JOB_POSITION),
-            $jobPosition
+        return FileResource::collection(
+            $this->fileService->saveFile(
+                new FileDto($request->file('files'), FileableType::JOB_POSITION),
+                $jobPosition
+            )
         );
-
-        return response()->json(FileResource::collection($files), 201);
     }
 
     /**
+     * @param JobPosition $jobPosition
+     * @param File $file
+     * @return FileResource
+     */
+    public function show(JobPosition $jobPosition, File $file): FileResource
+    {
+        return new FileResource($file);
+    }
+
+    /**
+     * @param JobPosition $jobPosition
+     * @param File $file
+     * @return JsonResponse
+     *
      * @throws FileNotFoundException
      */
-    public function show(JobPosition $jobPosition, File $file): JsonResponse
+    public function download(JobPosition $jobPosition, File $file): JsonResponse
     {
-        return response()->json($this->fileService->getFile($file));
+        return new JsonResponse($this->fileService->getFile($file));
     }
 
     /**
@@ -81,31 +95,23 @@ class JobPositionFileController extends Controller
     {
         $this->fileService->deleteFile($file);
 
-        return response()->json([], 204);
-    }
-
-    /**
-     * @throws FileNotFoundException
-     */
-    public function download(JobPosition $jobPosition, File $file): Response
-    {
-        return response($this->fileService->getFileContent($file), 200, ['Content-Type' => $file->mimetype]);
+        return new JsonResponse(null, 204);
     }
 
     /**
      * @param JobPosition $jobPosition
      * @param File $file
      * @param FileStoreRequest $request
-     * @return JsonResponse
+     * @return AnonymousResourceCollection
      */
-    public function storeNewVersion(JobPosition $jobPosition, File $file, FileStoreRequest $request): JsonResponse
+    public function storeNewVersion(JobPosition $jobPosition, File $file, FileStoreRequest $request): AnonymousResourceCollection
     {
-        $files = $this->fileService->createNewVersionFile(
-            $file,
-            new FileDto($request->file('files'), FileableType::JOB_POSITION),
-            $jobPosition
+        return FileResource::collection(
+            $this->fileService->createNewVersionFile(
+                $file,
+                new FileDto($request->file('files'), FileableType::JOB_POSITION),
+                $jobPosition
+            )
         );
-
-        return response()->json(FileResource::collection($files), 201);
     }
 }

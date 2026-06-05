@@ -12,7 +12,7 @@ use App\Models\User;
 use App\Services\FileServiceInterface;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Response;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 /**
@@ -39,16 +39,26 @@ class UserFileController extends Controller
     /**
      * @param User $user
      * @param FileStoreRequest $request
-     * @return JsonResponse
+     * @return AnonymousResourceCollection
      */
-    public function store(User $user, FileStoreRequest $request): JsonResponse
+    public function store(User $user, FileStoreRequest $request): AnonymousResourceCollection
     {
-        $files = $this->fileService->saveFile(
-            new FileDto($request->file('files'), FileableType::USER),
-            $user
+        return FileResource::collection(
+            $this->fileService->saveFile(
+                new FileDto($request->file('files'), FileableType::USER),
+                $user
+            )
         );
+    }
 
-        return response()->json(FileResource::collection($files), 201);
+    /**
+     * @param User $user
+     * @param File $file
+     * @return FileResource
+     */
+    public function show(User $user, File $file): FileResource
+    {
+        return new FileResource($file);
     }
 
     /**
@@ -58,9 +68,9 @@ class UserFileController extends Controller
      *
      * @throws FileNotFoundException
      */
-    public function show(User $user, File $file): JsonResponse
+    public function download(User $user, File $file): JsonResponse
     {
-        return response()->json($this->fileService->getFile($file));
+        return new JsonResponse($this->fileService->getFile($file));
     }
 
     /**
@@ -85,35 +95,23 @@ class UserFileController extends Controller
     {
         $this->fileService->deleteFile($file);
 
-        return response()->json([], 204);
-    }
-
-    /**
-     * @param User $user
-     * @param File $file
-     * @return Response
-     *
-     * @throws FileNotFoundException
-     */
-    public function download(User $user, File $file): Response
-    {
-        return response($this->fileService->getFileContent($file), 200, ['Content-Type' => $file->mimetype]);
+        return new JsonResponse(null, 204);
     }
 
     /**
      * @param User $user
      * @param File $file
      * @param FileStoreRequest $request
-     * @return JsonResponse
+     * @return AnonymousResourceCollection
      */
-    public function storeNewVersion(User $user, File $file, FileStoreRequest $request): JsonResponse
+    public function storeNewVersion(User $user, File $file, FileStoreRequest $request): AnonymousResourceCollection
     {
-        $files = $this->fileService->createNewVersionFile(
-            $file,
-            new FileDto($request->file('files'), FileableType::USER),
-            $user
+        return FileResource::collection(
+            $this->fileService->createNewVersionFile(
+                $file,
+                new FileDto($request->file('files'), FileableType::USER),
+                $user
+            )
         );
-
-        return response()->json(FileResource::collection($files), 201);
     }
 }

@@ -21,7 +21,7 @@ class PatientFileControllerTest extends TestCase
             ->assertOk();
     }
 
-    public function testStoreReturnsCreatedResponse(): void
+    public function testStoreReturnsSuccessResponse(): void
     {
         Storage::fake('files');
 
@@ -32,10 +32,25 @@ class PatientFileControllerTest extends TestCase
             ->post(route('patientfile.store', ['patient' => $patient->uuid]), [
                 'files' => [$file],
             ])
-            ->assertCreated();
+            ->assertOk();
     }
 
     public function testShowReturnsSuccessResponse(): void
+    {
+        $user = User::factory()->create();
+        $patient = Patient::factory()->create();
+        $fileModel = File::factory()->create([
+            'fileable_id' => $patient->uuid,
+            'fileable_type' => Patient::class,
+            'user_uuid' => $user->uuid,
+        ]);
+
+        $this->callApiWithLoggedUser()
+            ->getJson(route('patientfile.show', ['patient' => $patient->uuid, 'file' => $fileModel->uuid]))
+            ->assertOk();
+    }
+
+    public function testDownloadReturnsSuccessResponse(): void
     {
         Storage::fake('files');
 
@@ -52,7 +67,7 @@ class PatientFileControllerTest extends TestCase
         Storage::disk('files')->put($path, Crypt::encrypt('test content'));
 
         $this->callApiWithLoggedUser()
-            ->getJson(route('patientfile.show', ['patient' => $patient->uuid, 'file' => $fileModel->uuid]))
+            ->getJson(route('patientfile.download', ['patient' => $patient->uuid, 'file' => $fileModel->uuid]))
             ->assertOk();
     }
 
@@ -94,28 +109,7 @@ class PatientFileControllerTest extends TestCase
             ->assertNoContent();
     }
 
-    public function testDownloadReturnsSuccessResponse(): void
-    {
-        Storage::fake('files');
-
-        $user = User::factory()->create();
-        $patient = Patient::factory()->create();
-        $path = 'patient/ab/cd/ef/abcdef/file';
-        $fileModel = File::factory()->create([
-            'path' => $path,
-            'fileable_id' => $patient->uuid,
-            'fileable_type' => Patient::class,
-            'user_uuid' => $user->uuid,
-        ]);
-
-        Storage::disk('files')->put($path, Crypt::encrypt('test content'));
-
-        $this->callApiWithLoggedUser()
-            ->getJson(route('patientfile.download', ['patient' => $patient->uuid, 'file' => $fileModel->uuid]))
-            ->assertOk();
-    }
-
-    public function testStoreNewVersionReturnsCreatedResponse(): void
+    public function testStoreNewVersionReturnsSuccessResponse(): void
     {
         Storage::fake('files');
 
@@ -138,7 +132,7 @@ class PatientFileControllerTest extends TestCase
             ->post(route('patientfile.newversion', ['patient' => $patient->uuid, 'file' => $existingFile->uuid]), [
                 'files' => [$newFile],
             ])
-            ->assertCreated();
+            ->assertOk();
     }
 
     public function testIndexRequiresAuthentication(): void

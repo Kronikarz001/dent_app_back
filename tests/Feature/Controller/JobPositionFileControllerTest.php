@@ -21,7 +21,7 @@ class JobPositionFileControllerTest extends TestCase
             ->assertOk();
     }
 
-    public function testStoreReturnsCreatedResponse(): void
+    public function testStoreReturnsSuccessResponse(): void
     {
         Storage::fake('files');
 
@@ -32,10 +32,25 @@ class JobPositionFileControllerTest extends TestCase
             ->post(route('jobpositionfile.store', ['jobPosition' => $jobPosition->uuid]), [
                 'files' => [$file],
             ])
-            ->assertCreated();
+            ->assertOk();
     }
 
     public function testShowReturnsSuccessResponse(): void
+    {
+        $user = User::factory()->create();
+        $jobPosition = JobPosition::factory()->create();
+        $fileModel = File::factory()->create([
+            'fileable_id' => $jobPosition->uuid,
+            'fileable_type' => JobPosition::class,
+            'user_uuid' => $user->uuid,
+        ]);
+
+        $this->callApiWithLoggedUser()
+            ->getJson(route('jobpositionfile.show', ['jobPosition' => $jobPosition->uuid, 'file' => $fileModel->uuid]))
+            ->assertOk();
+    }
+
+    public function testDownloadReturnsSuccessResponse(): void
     {
         Storage::fake('files');
 
@@ -52,7 +67,7 @@ class JobPositionFileControllerTest extends TestCase
         Storage::disk('files')->put($path, Crypt::encrypt('test content'));
 
         $this->callApiWithLoggedUser()
-            ->getJson(route('jobpositionfile.show', ['jobPosition' => $jobPosition->uuid, 'file' => $fileModel->uuid]))
+            ->getJson(route('jobpositionfile.download', ['jobPosition' => $jobPosition->uuid, 'file' => $fileModel->uuid]))
             ->assertOk();
     }
 
@@ -94,28 +109,7 @@ class JobPositionFileControllerTest extends TestCase
             ->assertNoContent();
     }
 
-    public function testDownloadReturnsSuccessResponse(): void
-    {
-        Storage::fake('files');
-
-        $user = User::factory()->create();
-        $jobPosition = JobPosition::factory()->create();
-        $path = 'job_position/ab/cd/ef/abcdef/file';
-        $fileModel = File::factory()->create([
-            'path' => $path,
-            'fileable_id' => $jobPosition->uuid,
-            'fileable_type' => JobPosition::class,
-            'user_uuid' => $user->uuid,
-        ]);
-
-        Storage::disk('files')->put($path, Crypt::encrypt('test content'));
-
-        $this->callApiWithLoggedUser()
-            ->getJson(route('jobpositionfile.download', ['jobPosition' => $jobPosition->uuid, 'file' => $fileModel->uuid]))
-            ->assertOk();
-    }
-
-    public function testStoreNewVersionReturnsCreatedResponse(): void
+    public function testStoreNewVersionReturnsSuccessResponse(): void
     {
         Storage::fake('files');
 
@@ -138,7 +132,7 @@ class JobPositionFileControllerTest extends TestCase
             ->post(route('jobpositionfile.newversion', ['jobPosition' => $jobPosition->uuid, 'file' => $existingFile->uuid]), [
                 'files' => [$newFile],
             ])
-            ->assertCreated();
+            ->assertOk();
     }
 
     public function testIndexRequiresAuthentication(): void

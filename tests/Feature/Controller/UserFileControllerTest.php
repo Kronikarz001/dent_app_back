@@ -20,7 +20,7 @@ class UserFileControllerTest extends TestCase
             ->assertOk();
     }
 
-    public function testStoreReturnsCreatedResponse(): void
+    public function testStoreReturnsSuccessResponse(): void
     {
         Storage::fake('files');
 
@@ -31,10 +31,24 @@ class UserFileControllerTest extends TestCase
             ->post(route('userfile.store', ['user' => $user->uuid]), [
                 'files' => [$file],
             ])
-            ->assertCreated();
+            ->assertOk();
     }
 
     public function testShowReturnsSuccessResponse(): void
+    {
+        $user = User::factory()->create();
+        $fileModel = File::factory()->create([
+            'fileable_id' => $user->uuid,
+            'fileable_type' => User::class,
+            'user_uuid' => $user->uuid,
+        ]);
+
+        $this->callApiWithLoggedUser($user)
+            ->getJson(route('userfile.show', ['user' => $user->uuid, 'file' => $fileModel->uuid]))
+            ->assertOk();
+    }
+
+    public function testDownloadReturnsSuccessResponse(): void
     {
         Storage::fake('files');
 
@@ -50,7 +64,7 @@ class UserFileControllerTest extends TestCase
         Storage::disk('files')->put($path, Crypt::encrypt('test content'));
 
         $this->callApiWithLoggedUser($user)
-            ->getJson(route('userfile.show', ['user' => $user->uuid, 'file' => $fileModel->uuid]))
+            ->getJson(route('userfile.download', ['user' => $user->uuid, 'file' => $fileModel->uuid]))
             ->assertOk();
     }
 
@@ -90,27 +104,7 @@ class UserFileControllerTest extends TestCase
             ->assertNoContent();
     }
 
-    public function testDownloadReturnsSuccessResponse(): void
-    {
-        Storage::fake('files');
-
-        $user = User::factory()->create();
-        $path = 'user/ab/cd/ef/abcdef/file';
-        $fileModel = File::factory()->create([
-            'path' => $path,
-            'fileable_id' => $user->uuid,
-            'fileable_type' => User::class,
-            'user_uuid' => $user->uuid,
-        ]);
-
-        Storage::disk('files')->put($path, Crypt::encrypt('test content'));
-
-        $this->callApiWithLoggedUser($user)
-            ->getJson(route('userfile.download', ['user' => $user->uuid, 'file' => $fileModel->uuid]))
-            ->assertOk();
-    }
-
-    public function testStoreNewVersionReturnsCreatedResponse(): void
+    public function testStoreNewVersionReturnsSuccessResponse(): void
     {
         Storage::fake('files');
 
@@ -132,7 +126,7 @@ class UserFileControllerTest extends TestCase
             ->post(route('userfile.newversion', ['user' => $user->uuid, 'file' => $existingFile->uuid]), [
                 'files' => [$newFile],
             ])
-            ->assertCreated();
+            ->assertOk();
     }
 
     public function testIndexRequiresAuthentication(): void
