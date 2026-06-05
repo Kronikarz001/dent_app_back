@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\ServiceProvider;
+use PhpOffice\PhpSpreadsheet\Shared\File as SpreadsheetFile;
 
 class AppServiceProvider extends ServiceProvider
 {

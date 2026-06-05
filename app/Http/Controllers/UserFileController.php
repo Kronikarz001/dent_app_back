@@ -6,6 +6,7 @@ use App\Dto\FileDto;
 use App\Enums\FileableType;
 use App\Http\Requests\FileStoreRequest;
 use App\Http\Requests\FileUpdateRequest;
+use App\Http\Requests\PhotoStoreRequest;
 use App\Http\Resources\FileResource;
 use App\Models\File;
 use App\Models\User;
@@ -266,11 +267,11 @@ class UserFileController extends Controller
             ),
         ]
     )]
-    public function storeAvatar(User $user, FileStoreRequest $request): AnonymousResourceCollection
+    public function storeAvatar(User $user, PhotoStoreRequest $request): AnonymousResourceCollection
     {
         return FileResource::collection(
             $this->fileService->saveFile(
-                new FileDto($request->file('files'), FileableType::USER_AVATAR),
+                new FileDto([$request->file('files')], FileableType::USER_AVATAR),
                 UserAvatar::find($user->uuid)
             )
         );
@@ -325,11 +326,11 @@ class UserFileController extends Controller
             ),
         ]
     )]
-    public function storeBackground(User $user, FileStoreRequest $request): AnonymousResourceCollection
+    public function storeBackground(User $user, PhotoStoreRequest $request): AnonymousResourceCollection
     {
         return FileResource::collection(
             $this->fileService->saveFile(
-                new FileDto($request->file('files'), FileableType::USER_BACKGROUND),
+                new FileDto([$request->file('files')], FileableType::USER_BACKGROUND),
                 UserBackground::find($user->uuid)
             )
         );
