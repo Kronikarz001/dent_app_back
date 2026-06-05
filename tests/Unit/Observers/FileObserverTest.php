@@ -16,7 +16,7 @@ class FileObserverTest extends UnitTestCase
     /**
      * @return void
      */
-    public function test_creating_sets_user_uuid_when_authenticated(): void
+    public function testCreatingSetsUserUuidWhenAuthenticated(): void
     {
         $user = User::factory()->make(['uuid' => 'test-user-uuid']);
 
@@ -32,7 +32,7 @@ class FileObserverTest extends UnitTestCase
     /**
      * @return void
      */
-    public function test_creating_does_not_set_user_uuid_when_not_authenticated(): void
+    public function testCreatingDoesNotSetUserUuidWhenNotAuthenticated(): void
     {
         Auth::shouldReceive('check')->once()->andReturn(false);
 

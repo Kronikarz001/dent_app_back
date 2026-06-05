@@ -14,7 +14,7 @@ class PatientObserverTest extends UnitTestCase
     /**
      * @return void
      */
-    public function test_creating_sets_is_active_to_true(): void
+    public function testCreatingSetsIsActiveToTrue(): void
     {
         $patient = new Patient;
 
@@ -26,7 +26,7 @@ class PatientObserverTest extends UnitTestCase
     /**
      * @return void
      */
-    public function test_creating_does_not_overwrite_explicit_is_active(): void
+    public function testCreatingDoesNotOverwriteExplicitIsActive(): void
     {
         $patient = new Patient;
         $patient->is_active = false;

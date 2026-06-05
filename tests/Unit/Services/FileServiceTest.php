@@ -47,7 +47,7 @@ class FileServiceTest extends UnitTestCase
      *
      * @throws FileNotFoundException
      */
-    public function test_get_file_returns_base64_encoded_array(): void
+    public function testGetFileReturnsBase64_encoded_array(): void
     {
         $path = 'registry_rows/test.txt';
         $filename = 'test.txt';
@@ -94,7 +94,7 @@ class FileServiceTest extends UnitTestCase
     /**
      * @return void
      */
-    public function test_get_all_files_calls_repository_with_correct_params(): void
+    public function testGetAllFilesCallsRepositoryWithCorrectParams(): void
     {
         $uuidModel = Mockery::mock(UuidModel::class);
         $paginator = new LengthAwarePaginator([], 0, 15);
@@ -121,7 +121,7 @@ class FileServiceTest extends UnitTestCase
      *
      * @throws FileNotFoundException
      */
-    public function test_get_file_throws_when_file_does_not_exist(): void
+    public function testGetFileThrowsWhenFileDoesNotExist(): void
     {
         $path = 'noexist.txt';
         $fileModel = new File(['path' => $path]);
@@ -142,7 +142,7 @@ class FileServiceTest extends UnitTestCase
     /**
      * @return void
      */
-    public function test_save_file_persists_correct_data(): void
+    public function testSaveFilePersistsCorrectData(): void
     {
         $dtoFile = Mockery::mock(UploadedFile::class);
         $dtoFile->shouldReceive('getClientOriginalName')->andReturn('orig.pdf');
@@ -190,7 +190,7 @@ class FileServiceTest extends UnitTestCase
      *
      * @throws FileNotFoundException
      */
-    public function test_delete_file(): void
+    public function testDeleteFile(): void
     {
         $repoMock = Mockery::mock(FileRepositoryInterface::class);
         $file = new File(['path' => 'some/path.pdf']);
@@ -222,7 +222,7 @@ class FileServiceTest extends UnitTestCase
      *
      * @throws FileNotFoundException
      */
-    public function test_delete_file_throws_when_file_does_not_exist(): void
+    public function testDeleteFileThrowsWhenFileDoesNotExist(): void
     {
         $repoMock = Mockery::mock(FileRepositoryInterface::class);
         $file = new File(['path' => 'some/path.pdf']);
@@ -252,7 +252,7 @@ class FileServiceTest extends UnitTestCase
     /**
      * @return void
      */
-    public function test_update_file(): void
+    public function testUpdateFile(): void
     {
         $repoMock = Mockery::mock(FileRepositoryInterface::class);
 
@@ -281,7 +281,7 @@ class FileServiceTest extends UnitTestCase
      *
      * @throws FileUploadException
      */
-    public function test_save_file_throws_exception_when_disk_put_fails(): void
+    public function testSaveFileThrowsExceptionWhenDiskPutFails(): void
     {
         $this->expectException(FileUploadException::class);
 
@@ -316,7 +316,7 @@ class FileServiceTest extends UnitTestCase
     /**
      * @return void
      */
-    public function test_update_file_name_calls_repository_update(): void
+    public function testUpdateFileNameCallsRepositoryUpdate(): void
     {
         $existing = new File(['uuid' => 'abc', 'filename' => 'old']);
         $updated = new File(['uuid' => 'abc', 'filename' => 'new']);
@@ -338,7 +338,7 @@ class FileServiceTest extends UnitTestCase
      *
      * @throws FileNotFoundException
      */
-    public function test_delete_file_deletes_children_and_parent_and_calls_repository_delete(): void
+    public function testDeleteFileDeletesChildrenAndParentAndCallsRepositoryDelete(): void
     {
         $child1 = new File(['path' => 'c1.txt']);
         $child2 = new File(['path' => 'c2.txt']);

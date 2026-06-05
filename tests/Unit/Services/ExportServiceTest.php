@@ -42,7 +42,7 @@ class ExportServiceTest extends TestCase
     /**
      * @return void
      */
-    public function test_export_downloads_file_with_correct_name(): void
+    public function testExportDownloadsFileWithCorrectName(): void
     {
         Excel::fake();
 
@@ -73,7 +73,7 @@ class ExportServiceTest extends TestCase
     /**
      * @return void
      */
-    public function test_export_uses_table_name_when_no_name_provided(): void
+    public function testExportUsesTableNameWhenNoNameProvided(): void
     {
         Excel::fake();
 

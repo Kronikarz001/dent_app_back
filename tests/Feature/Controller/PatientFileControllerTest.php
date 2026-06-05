@@ -12,7 +12,7 @@ use Tests\TestCase;
 
 class PatientFileControllerTest extends TestCase
 {
-    public function test_index_returns_success_response(): void
+    public function testIndexReturnsSuccessResponse(): void
     {
         $patient = Patient::factory()->create();
 
@@ -21,7 +21,7 @@ class PatientFileControllerTest extends TestCase
             ->assertOk();
     }
 
-    public function test_store_returns_created_response(): void
+    public function testStoreReturnsCreatedResponse(): void
     {
         Storage::fake('files');
 
@@ -35,7 +35,7 @@ class PatientFileControllerTest extends TestCase
             ->assertCreated();
     }
 
-    public function test_show_returns_success_response(): void
+    public function testShowReturnsSuccessResponse(): void
     {
         Storage::fake('files');
 
@@ -56,7 +56,7 @@ class PatientFileControllerTest extends TestCase
             ->assertOk();
     }
 
-    public function test_update_returns_success_response(): void
+    public function testUpdateReturnsSuccessResponse(): void
     {
         $user = User::factory()->create();
         $patient = Patient::factory()->create();
@@ -73,7 +73,7 @@ class PatientFileControllerTest extends TestCase
             ->assertOk();
     }
 
-    public function test_destroy_returns_no_content_response(): void
+    public function testDestroyReturnsNoContentResponse(): void
     {
         Storage::fake('files');
 
@@ -94,7 +94,7 @@ class PatientFileControllerTest extends TestCase
             ->assertNoContent();
     }
 
-    public function test_download_returns_success_response(): void
+    public function testDownloadReturnsSuccessResponse(): void
     {
         Storage::fake('files');
 
@@ -115,7 +115,7 @@ class PatientFileControllerTest extends TestCase
             ->assertOk();
     }
 
-    public function test_store_new_version_returns_created_response(): void
+    public function testStoreNewVersionReturnsCreatedResponse(): void
     {
         Storage::fake('files');
 
@@ -141,7 +141,7 @@ class PatientFileControllerTest extends TestCase
             ->assertCreated();
     }
 
-    public function test_index_requires_authentication(): void
+    public function testIndexRequiresAuthentication(): void
     {
         $patient = Patient::factory()->create();
 

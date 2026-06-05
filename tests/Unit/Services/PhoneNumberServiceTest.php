@@ -24,7 +24,7 @@ class PhoneNumberServiceTest extends TestCase
     /**
      * @return void
      */
-    public function test_assign_phones_inserts_records_with_correct_data(): void
+    public function testAssignPhonesInsertsRecordsWithCorrectData(): void
     {
         $patient = Patient::factory()->create();
 
@@ -53,7 +53,7 @@ class PhoneNumberServiceTest extends TestCase
     /**
      * @return void
      */
-    public function test_assign_phones_updates_type_on_duplicate_number(): void
+    public function testAssignPhonesUpdatesTypeOnDuplicateNumber(): void
     {
         $patient = Patient::factory()->create();
 
@@ -79,7 +79,7 @@ class PhoneNumberServiceTest extends TestCase
     /**
      * @return void
      */
-    public function test_assign_phones_with_empty_array_does_nothing(): void
+    public function testAssignPhonesWithEmptyArrayDoesNothing(): void
     {
         $patient = Patient::factory()->create();
 
