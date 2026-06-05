@@ -130,6 +130,21 @@ readonly class FileService implements FileServiceInterface
     }
 
     /**
+     * @param File $file
+     * @return string
+     *
+     * @throws FileNotFoundException
+     */
+    public function getPhotoFile(File $file): string
+    {
+        if (! Storage::disk('files')->exists($file->path)) {
+            throw new FileNotFoundException($file->path);
+        }
+
+        return Crypt::decrypt(Storage::disk('files')->get($file->path));
+    }
+
+    /**
      * @param FileDto $fileDto
      * @param Model $model
      * @param File|null $parentFile

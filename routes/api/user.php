@@ -19,4 +19,14 @@ Route::middleware('auth:sanctum')->group(function () {
         ->name('userfile.download');
     Route::post('/user/{user}/file-new-version/{file}', [UserFileController::class, 'storeNewVersion'])
         ->name('userfile.newversion');
+
+    Route::post('/user/{user}/avatar', [UserFileController::class, 'storeAvatar'])
+        ->name('userfile.avatar-store');
+    Route::get('/user/{user}/file-avatar-download/{file}', [UserFileController::class, 'avatarDownload'])
+        ->name('userfile.avatar-download');
+
+    Route::post('/user/{user}/background', [UserFileController::class, 'storeBackground'])
+        ->name('userfile.background-store');
+    Route::get('/user/{user}/file-background-download/{file}', [UserFileController::class, 'backgroundDownload'])
+        ->name('userfile.background-download');
 });

@@ -70,4 +70,12 @@ interface FileServiceInterface
      * @return File
      */
     public function updateFileName(File $existingFile, string $newFilename): File;
+
+    /**
+     * @param File $file
+     * @return string
+     *
+     * @throws FileNotFoundException
+     */
+    public function getPhotoFile(File $file): string;
 }

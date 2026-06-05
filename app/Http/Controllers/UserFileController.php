@@ -9,10 +9,13 @@ use App\Http\Requests\FileUpdateRequest;
 use App\Http\Resources\FileResource;
 use App\Models\File;
 use App\Models\User;
+use App\Models\UserAvatar;
+use App\Models\UserBackground;
 use App\Services\FileServiceInterface;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\Response;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 /**
@@ -113,5 +116,59 @@ class UserFileController extends Controller
                 $user
             )
         );
+    }
+
+    /**
+     * @param User $user
+     * @param FileStoreRequest $request
+     * @return AnonymousResourceCollection
+     */
+    public function storeAvatar(User $user, FileStoreRequest $request): AnonymousResourceCollection
+    {
+        return FileResource::collection(
+            $this->fileService->saveFile(
+                new FileDto($request->file('files'), FileableType::USER_AVATAR),
+                UserAvatar::find($user->uuid)
+            )
+        );
+    }
+
+    /**
+     * @param User $user
+     * @param File $file
+     * @return Response
+     *
+     * @throws FileNotFoundException
+     */
+    public function avatarDownload(User $user, File $file): Response
+    {
+        return response($this->fileService->getPhotoFile($file), 200, ['Content-Type' => $file->mimetype]);
+    }
+
+    /**
+     * @param User $user
+     * @param FileStoreRequest $request
+     * @return AnonymousResourceCollection
+     */
+    public function storeBackground(User $user, FileStoreRequest $request): AnonymousResourceCollection
+    {
+        return FileResource::collection(
+            $this->fileService->saveFile(
+                new FileDto($request->file('files'), FileableType::USER_BACKGROUND),
+                UserBackground::find($user->uuid)
+            )
+        );
+    }
+
+    /**
+     * @param User $user
+     * @param File $file
+     * @return Response
+     *
+     * @throws FileNotFoundException
+     */
+    public function backgroundDownload(User $user, File $file): Response
+    {
+        return response($this->fileService->getPhotoFile($file), 200, ['Content-Type' => $file->mimetype]);
     }
 }

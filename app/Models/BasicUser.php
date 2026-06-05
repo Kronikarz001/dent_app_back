@@ -67,6 +67,14 @@ abstract class BasicUser extends Authenticatable
     ];
 
     /**
+     * @var list<string>
+     */
+    protected $appends = [
+        'avatar_url',
+        'background_url',
+    ];
+
+    /**
      * @param string $token
      * @return static|null
      */
@@ -99,6 +107,42 @@ abstract class BasicUser extends Authenticatable
     public function getName(): string
     {
         return "{$this->firstName} {$this->lastName}";
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getAvatarUrlAttribute(): ?string
+    {
+        $file = File::where('fileable_type', UserAvatar::class)
+            ->where('fileable_id', $this->uuid)
+            ->where('is_latest', true)
+            ->latest()
+            ->first();
+
+        if (! $file) {
+            return null;
+        }
+
+        return route('userfile.avatar-download', ['user' => $this->uuid, 'file' => $file->uuid]);
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getBackgroundUrlAttribute(): ?string
+    {
+        $file = File::where('fileable_type', UserBackground::class)
+            ->where('fileable_id', $this->uuid)
+            ->where('is_latest', true)
+            ->latest()
+            ->first();
+
+        if (! $file) {
+            return null;
+        }
+
+        return route('userfile.background-download', ['user' => $this->uuid, 'file' => $file->uuid]);
     }
 
     /**

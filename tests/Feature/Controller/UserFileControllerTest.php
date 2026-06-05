@@ -129,11 +129,94 @@ class UserFileControllerTest extends TestCase
             ->assertOk();
     }
 
+    public function testStoreAvatarReturnsSuccessResponse(): void
+    {
+        Storage::fake('files');
+
+        $user = User::factory()->create();
+        $file = UploadedFile::fake()->image('avatar.jpg');
+
+        $this->callApiWithLoggedUser($user)
+            ->post(route('userfile.avatar-store', ['user' => $user->uuid]), [
+                'files' => [$file],
+            ])
+            ->assertOk();
+    }
+
+    public function testAvatarDownloadReturnsSuccessResponse(): void
+    {
+        Storage::fake('files');
+
+        $user = User::factory()->create();
+        $path = 'user_avatar/ab/cd/ef/abcdef/avatar';
+        $fileModel = File::factory()->create([
+            'path' => $path,
+            'fileable_id' => $user->uuid,
+            'fileable_type' => 'App\Models\UserAvatar',
+            'user_uuid' => $user->uuid,
+            'mimetype' => 'image/jpeg',
+        ]);
+
+        Storage::disk('files')->put($path, Crypt::encrypt('fake-image-content'));
+
+        $this->callApiWithLoggedUser($user)
+            ->get(route('userfile.avatar-download', ['user' => $user->uuid, 'file' => $fileModel->uuid]))
+            ->assertOk();
+    }
+
+    public function testStoreBackgroundReturnsSuccessResponse(): void
+    {
+        Storage::fake('files');
+
+        $user = User::factory()->create();
+        $file = UploadedFile::fake()->image('background.jpg');
+
+        $this->callApiWithLoggedUser($user)
+            ->post(route('userfile.background-store', ['user' => $user->uuid]), [
+                'files' => [$file],
+            ])
+            ->assertOk();
+    }
+
+    public function testBackgroundDownloadReturnsSuccessResponse(): void
+    {
+        Storage::fake('files');
+
+        $user = User::factory()->create();
+        $path = 'user_background/ab/cd/ef/abcdef/bg';
+        $fileModel = File::factory()->create([
+            'path' => $path,
+            'fileable_id' => $user->uuid,
+            'fileable_type' => 'App\Models\UserBackground',
+            'user_uuid' => $user->uuid,
+            'mimetype' => 'image/jpeg',
+        ]);
+
+        Storage::disk('files')->put($path, Crypt::encrypt('fake-bg-content'));
+
+        $this->callApiWithLoggedUser($user)
+            ->get(route('userfile.background-download', ['user' => $user->uuid, 'file' => $fileModel->uuid]))
+            ->assertOk();
+    }
+
     public function testIndexRequiresAuthentication(): void
     {
         $user = User::factory()->create();
 
         $this->getJson(route('userfile.index', ['user' => $user->uuid]))
+            ->assertUnauthorized();
+    }
+
+    public function testAvatarDownloadRequiresAuthentication(): void
+    {
+        $user = User::factory()->create();
+        $fileModel = File::factory()->create([
+            'fileable_id' => $user->uuid,
+            'fileable_type' => 'App\Models\UserAvatar',
+            'user_uuid' => $user->uuid,
+        ]);
+
+        $this->getJson(route('userfile.avatar-download', ['user' => $user->uuid, 'file' => $fileModel->uuid]))
             ->assertUnauthorized();
     }
 }
