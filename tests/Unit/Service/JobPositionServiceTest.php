@@ -48,7 +48,7 @@ class JobPositionServiceTest extends TestCase
     /**
      * @return void
      */
-    public function test_get_job_positions_delegates_to_repository_without_column_filter(): void
+    public function testGetJobPositionsDelegatesToRepositoryWithoutColumnFilter(): void
     {
         $paginator = new LengthAwarePaginator([], 0, 15, 1);
 
@@ -67,7 +67,7 @@ class JobPositionServiceTest extends TestCase
     /**
      * @return void
      */
-    public function test_get_job_positions_list_passes_only_uuid_and_name_columns(): void
+    public function testGetJobPositionsListPassesOnlyUuidAndNameColumns(): void
     {
         $paginator = new LengthAwarePaginator([], 0, 100, 1);
 
@@ -86,7 +86,7 @@ class JobPositionServiceTest extends TestCase
     /**
      * @return void
      */
-    public function test_create_job_position_passes_data_unchanged_to_repository(): void
+    public function testCreateJobPositionPassesDataUnchangedToRepository(): void
     {
         $data = ['name' => 'Lekarz', 'f_name' => 'Lekarka', 'm_name' => 'Lekarz'];
         $newJobPosition = JobPosition::factory()->make();
@@ -106,7 +106,7 @@ class JobPositionServiceTest extends TestCase
     /**
      * @return void
      */
-    public function test_update_job_position_passes_job_position_and_data_to_repository(): void
+    public function testUpdateJobPositionPassesJobPositionAndDataToRepository(): void
     {
         $jobPosition = JobPosition::factory()->make();
         $data = ['name' => 'Updated'];
@@ -127,7 +127,7 @@ class JobPositionServiceTest extends TestCase
     /**
      * @return void
      */
-    public function test_delete_job_position_calls_repository_delete_not_update(): void
+    public function testDeleteJobPositionCallsRepositoryDeleteNotUpdate(): void
     {
         $jobPosition = JobPosition::factory()->make();
 
@@ -144,7 +144,7 @@ class JobPositionServiceTest extends TestCase
     /**
      * @return void
      */
-    public function test_export_delegates_to_export_service(): void
+    public function testExportDelegatesToExportService(): void
     {
         $paginator = new LengthAwarePaginator(collect(), 0, 15, 1);
         $request = Mockery::mock(ExportRequest::class);

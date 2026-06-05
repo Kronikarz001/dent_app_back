@@ -13,7 +13,7 @@ class UserControllerTest extends TestCase
     /**
      * @return void
      */
-    public function test_index_users_return_success_response(): void
+    public function testIndexUsersReturnSuccessResponse(): void
     {
         $response = $this->callApiWithLoggedUser()
             ->getJson(route('user.index'));
@@ -24,7 +24,7 @@ class UserControllerTest extends TestCase
     /**
      * @return void
      */
-    public function test_index_users_list_return_success_response(): void
+    public function testIndexUsersListReturnSuccessResponse(): void
     {
         $response = $this->callApiWithLoggedUser()
             ->getJson(route('user.selectList'));
@@ -35,7 +35,7 @@ class UserControllerTest extends TestCase
     /**
      * @return void
      */
-    public function test_show_user_return_success_response(): void
+    public function testShowUserReturnSuccessResponse(): void
     {
         $user = User::factory()->create();
         $response = $this->callApiWithLoggedUser()
@@ -47,7 +47,7 @@ class UserControllerTest extends TestCase
     /**
      * @return void
      */
-    public function test_store_user_return_created_response(): void
+    public function testStoreUserReturnCreatedResponse(): void
     {
         $response = $this->callApiWithLoggedUser()
             ->postJson(route('user.store'), [
@@ -69,7 +69,7 @@ class UserControllerTest extends TestCase
     /**
      * @return void
      */
-    public function test_update_user_return_no_content_response(): void
+    public function testUpdateUserReturnNoContentResponse(): void
     {
         $user = User::factory()->create();
         $response = $this->callApiWithLoggedUser()
@@ -89,7 +89,7 @@ class UserControllerTest extends TestCase
     /**
      * @return void
      */
-    public function test_delete_user_return_no_content_response(): void
+    public function testDeleteUserReturnNoContentResponse(): void
     {
         $user = User::factory()->create();
         $response = $this->callApiWithLoggedUser()
@@ -104,7 +104,7 @@ class UserControllerTest extends TestCase
     /**
      * @return void
      */
-    public function test_show_logged_user_return_success_response(): void
+    public function testShowLoggedUserReturnSuccessResponse(): void
     {
         $user = User::factory()->create();
 

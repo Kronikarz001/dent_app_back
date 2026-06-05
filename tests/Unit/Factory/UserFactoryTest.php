@@ -16,7 +16,7 @@ final class UserFactoryTest extends UnitTestCase
      *
      * @throws BindingResolutionException
      */
-    public function test_user_create_by_factory(): void
+    public function testUserCreateByFactory(): void
     {
         $user = User::factory()->create(['first_name' => 'John', 'last_name' => 'Doe']);
 

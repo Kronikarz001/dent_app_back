@@ -14,7 +14,7 @@ final class JobPositionExportTest extends UnitTestCase
     /**
      * @return void
      */
-    public function test_headings_are_correct(): void
+    public function testHeadingsAreCorrect(): void
     {
         $export = new JobPositionExport(collect());
         $expected = [
@@ -28,7 +28,7 @@ final class JobPositionExportTest extends UnitTestCase
     /**
      * @return void
      */
-    public function test_map_with_all_values_returns_expected_array(): void
+    public function testMapWithAllValuesReturnsExpectedArray(): void
     {
         $jobPosition = new JobPosition([
             'name' => 'Lekarz',
@@ -49,7 +49,7 @@ final class JobPositionExportTest extends UnitTestCase
     /**
      * @return void
      */
-    public function test_collection_returns_job_positions_collection(): void
+    public function testCollectionReturnsJobPositionsCollection(): void
     {
         $jobPosition1 = new JobPosition(['name' => 'Lekarz']);
         $jobPosition2 = new JobPosition(['name' => 'Pielęgniarka']);
