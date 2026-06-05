@@ -14,9 +14,7 @@ class UserRouteDto
      */
     public function __construct(
         private Collection $routes,
-    )
-    {
-    }
+    ) {}
 
     /**
      * @return Collection

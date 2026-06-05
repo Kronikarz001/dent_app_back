@@ -9,10 +9,11 @@ use Tests\Unit\UnitTestCase;
 /**
  * Summary of PhoneNumberFactoryTest
  */
-final class PhoneNumberFactoryTest  extends UnitTestCase
+final class PhoneNumberFactoryTest extends UnitTestCase
 {
     /**
      * @return void
+     *
      * @throws BindingResolutionException
      */
     public function testPhoneNumberCreateByFactory(): void

@@ -16,7 +16,7 @@ abstract class UuidModel extends Model
      * @use HasFactory<Factory>
      * @use HasUuids
      */
-    use HasUuids, HasFactory;
+    use HasFactory, HasUuids;
 
     /**
      * @var string

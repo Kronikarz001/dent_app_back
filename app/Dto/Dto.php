@@ -13,7 +13,7 @@ abstract class Dto implements Arrayable
     /**
      * @return array
      */
-    public final function toArray(): array
+    final public function toArray(): array
     {
         $array = [];
         $ref = new ReflectionObject($this);
@@ -38,7 +38,7 @@ abstract class Dto implements Arrayable
         }
 
         if (is_array($value)) {
-            return array_map(fn($item) => $this->normalizeValue($item), $value);
+            return array_map(fn ($item) => $this->normalizeValue($item), $value);
         }
 
         return $value;
@@ -48,7 +48,7 @@ abstract class Dto implements Arrayable
      * @param array $data
      * @return static
      */
-    public static final function fromArray(array $data): static
+    final public static function fromArray(array $data): static
     {
         return new static(...array_values($data));
     }

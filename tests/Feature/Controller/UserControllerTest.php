@@ -16,7 +16,7 @@ class UserControllerTest extends TestCase
     public function testIndexUsersReturnSuccessResponse(): void
     {
         $response = $this->callApiWithLoggedUser()
-        ->getJson(route('user.index'));
+            ->getJson(route('user.index'));
 
         $response->assertOk();
     }
@@ -24,7 +24,7 @@ class UserControllerTest extends TestCase
     /**
      * @return void
      */
-     public function testIndexUsersListReturnSuccessResponse(): void
+    public function testIndexUsersListReturnSuccessResponse(): void
     {
         $response = $this->callApiWithLoggedUser()
             ->getJson(route('user.selectList'));

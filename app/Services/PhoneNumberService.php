@@ -18,11 +18,11 @@ class PhoneNumberService implements PhoneNumberServiceInterface
     public function assignPhones(Model $model, array $phones): void
     {
         $modelClass = get_class($model);
-        $records = array_map(fn(array $phone) => [
-            'number'         => $phone['number'],
-            'type'           => $phone['type'],
+        $records = array_map(fn (array $phone) => [
+            'number' => $phone['number'],
+            'type' => $phone['type'],
             'phoneable_type' => $modelClass,
-            'phoneable_id'   => $model->uuid,
+            'phoneable_id' => $model->uuid,
         ], $phones);
 
         PhoneNumber::upsert($records, ['number'], ['type']);

@@ -9,10 +9,11 @@ use Tests\Unit\UnitTestCase;
 /**
  * Summary of UserFactoryTest
  */
-final class UserFactoryTest  extends UnitTestCase
+final class UserFactoryTest extends UnitTestCase
 {
     /**
      * @return void
+     *
      * @throws BindingResolutionException
      */
     public function testUserCreateByFactory(): void

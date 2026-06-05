@@ -5,7 +5,4 @@ namespace App\Exports;
 /**
  * Summary of ExportInterface
  */
-interface ExportInterface
-{
-
-}
+interface ExportInterface {}

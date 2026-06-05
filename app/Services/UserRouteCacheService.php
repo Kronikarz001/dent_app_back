@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\DTO\UserRouteDto;
+use App\Dto\UserRouteDto;
 use App\Models\User;
 
 /**

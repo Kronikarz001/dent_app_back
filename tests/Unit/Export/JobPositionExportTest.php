@@ -16,7 +16,7 @@ final class JobPositionExportTest extends UnitTestCase
      */
     public function testHeadingsAreCorrect(): void
     {
-        $export   = new JobPositionExport(collect());
+        $export = new JobPositionExport(collect());
         $expected = [
             'Nazwa stanowiska',
             'Nazwa r.żeński',
@@ -31,7 +31,7 @@ final class JobPositionExportTest extends UnitTestCase
     public function testMapWithAllValuesReturnsExpectedArray(): void
     {
         $jobPosition = new JobPosition([
-            'name'   => 'Lekarz',
+            'name' => 'Lekarz',
             'f_name' => 'Lekarka',
             'm_name' => 'Lekarz',
         ]);
@@ -40,7 +40,7 @@ final class JobPositionExportTest extends UnitTestCase
         $result = $export->map($jobPosition);
 
         $this->assertEquals([
-            'name'   => 'Lekarz',
+            'name' => 'Lekarz',
             'f_name' => 'Lekarka',
             'm_name' => 'Lekarz',
         ], $result);
@@ -54,7 +54,7 @@ final class JobPositionExportTest extends UnitTestCase
         $jobPosition1 = new JobPosition(['name' => 'Lekarz']);
         $jobPosition2 = new JobPosition(['name' => 'Pielęgniarka']);
         $jobPositions = collect([$jobPosition1, $jobPosition2]);
-        $export       = new JobPositionExport($jobPositions);
+        $export = new JobPositionExport($jobPositions);
 
         $collection = $export->collection();
         $this->assertSame($jobPositions, $collection);

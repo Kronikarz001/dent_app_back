@@ -21,7 +21,7 @@ class AuthControllerTest extends TestCase
         $user = User::factory()->create(['password' => bcrypt('password')]);
 
         $response = $this->postJson(route('auth.login'), [
-            'email'    => $user->email,
+            'email' => $user->email,
             'password' => 'password',
         ]);
 
@@ -36,7 +36,7 @@ class AuthControllerTest extends TestCase
         User::factory()->create(['email' => 'test@example.com']);
 
         $response = $this->postJson(route('auth.login'), [
-            'email'    => 'test@example.com',
+            'email' => 'test@example.com',
             'password' => 'wrong-password',
         ]);
 
@@ -58,6 +58,7 @@ class AuthControllerTest extends TestCase
 
     /**
      * @return void
+     *
      * @throws Exception
      */
     public function testForgotPasswordReturnSuccessResponse(): void
@@ -81,14 +82,14 @@ class AuthControllerTest extends TestCase
      */
     public function testResetPasswordReturnNoContentResponse(): void
     {
-        $user  = User::factory()->create();
+        $user = User::factory()->create();
         $token = app('auth.password.broker')->createToken($user);
 
         $response = $this->callApiWithLoggedUser()
             ->patchJson(route('user.resetPassword', ['user' => $user->uuid]), [
-                'token'                 => $token,
-                'email'                 => $user->email,
-                'password'              => 'NewPassword123!',
+                'token' => $token,
+                'email' => $user->email,
+                'password' => 'NewPassword123!',
                 'password_confirmation' => 'NewPassword123!',
             ]);
 

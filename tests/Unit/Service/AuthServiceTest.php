@@ -39,9 +39,9 @@ class AuthServiceTest extends TestCase
      */
     public function testLoginReturnsUserOnValidCredentials(): void
     {
-        $user    = User::factory()->create(['password' => bcrypt('password123')]);
+        $user = User::factory()->create(['password' => bcrypt('password123')]);
         $request = LoginRequest::create('/login', 'POST', [
-            'email'    => $user->email,
+            'email' => $user->email,
             'password' => 'password123',
         ]);
 
@@ -59,7 +59,7 @@ class AuthServiceTest extends TestCase
         User::factory()->create(['email' => 'test@example.com']);
 
         $request = LoginRequest::create('/login', 'POST', [
-            'email'    => 'test@example.com',
+            'email' => 'test@example.com',
             'password' => 'wrong-password',
         ]);
 
@@ -73,7 +73,7 @@ class AuthServiceTest extends TestCase
      */
     public function testLogoutDeletesCurrentAccessToken(): void
     {
-        $user  = User::factory()->create();
+        $user = User::factory()->create();
         $token = $user->createToken('test-token')->plainTextToken;
 
         $this->actingAs($user, 'sanctum');
@@ -90,6 +90,7 @@ class AuthServiceTest extends TestCase
 
     /**
      * @return void
+     *
      * @throws Exception
      */
     public function testForgotPasswordSendsResetNotification(): void
@@ -110,7 +111,7 @@ class AuthServiceTest extends TestCase
     {
         Notification::fake();
 
-        $user   = User::factory()->create();
+        $user = User::factory()->create();
         $result = $this->authService->forgotPassword(['email' => $user->email]);
 
         $this->assertEquals(200, $result->getStatusCode());
@@ -131,13 +132,13 @@ class AuthServiceTest extends TestCase
      */
     public function testResetPasswordChangesUserPassword(): void
     {
-        $user  = User::factory()->create();
+        $user = User::factory()->create();
         $token = Password::createToken($user);
 
         $this->authService->resetPassword([
-            'email'                 => $user->email,
-            'token'                 => $token,
-            'password'              => 'NewPassword123!',
+            'email' => $user->email,
+            'token' => $token,
+            'password' => 'NewPassword123!',
             'password_confirmation' => 'NewPassword123!',
         ]);
 
@@ -149,13 +150,13 @@ class AuthServiceTest extends TestCase
      */
     public function testResetPasswordReturnsSuccessResponse(): void
     {
-        $user  = User::factory()->create();
+        $user = User::factory()->create();
         $token = Password::createToken($user);
 
         $result = $this->authService->resetPassword([
-            'email'                 => $user->email,
-            'token'                 => $token,
-            'password'              => 'NewPassword123!',
+            'email' => $user->email,
+            'token' => $token,
+            'password' => 'NewPassword123!',
             'password_confirmation' => 'NewPassword123!',
         ]);
 
@@ -170,9 +171,9 @@ class AuthServiceTest extends TestCase
         $user = User::factory()->create();
 
         $result = $this->authService->resetPassword([
-            'email'                 => $user->email,
-            'token'                 => 'invalid-token',
-            'password'              => 'NewPassword123!',
+            'email' => $user->email,
+            'token' => 'invalid-token',
+            'password' => 'NewPassword123!',
             'password_confirmation' => 'NewPassword123!',
         ]);
 
@@ -184,8 +185,8 @@ class AuthServiceTest extends TestCase
      */
     public function testAuthenticateSetsUserFromValidToken(): void
     {
-        $user        = User::factory()->create();
-        $plainToken  = $user->createToken('test-token')->plainTextToken;
+        $user = User::factory()->create();
+        $plainToken = $user->createToken('test-token')->plainTextToken;
 
         $this->authService->authenticate($plainToken);
 

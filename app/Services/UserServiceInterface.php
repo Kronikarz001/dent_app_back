@@ -70,6 +70,7 @@ interface UserServiceInterface
     /**
      * @param ExportRequest $request
      * @return BinaryFileResponse
+     *
      * @throws Exception
      * @throws WriterException
      */

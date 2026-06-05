@@ -19,7 +19,9 @@ use Tests\TestCase;
 class JobPositionServiceTest extends TestCase
 {
     private MockInterface $jobPositionRepository;
+
     private MockInterface $exportService;
+
     private JobPositionService $jobPositionService;
 
     /**
@@ -30,8 +32,8 @@ class JobPositionServiceTest extends TestCase
         parent::setUp();
 
         $this->jobPositionRepository = Mockery::mock(JobPositionRepositoryInterface::class);
-        $this->exportService         = Mockery::mock(ExportServiceInterface::class);
-        $this->jobPositionService    = new JobPositionService($this->jobPositionRepository, $this->exportService);
+        $this->exportService = Mockery::mock(ExportServiceInterface::class);
+        $this->jobPositionService = new JobPositionService($this->jobPositionRepository, $this->exportService);
     }
 
     /**
@@ -86,7 +88,7 @@ class JobPositionServiceTest extends TestCase
      */
     public function testCreateJobPositionPassesDataUnchangedToRepository(): void
     {
-        $data           = ['name' => 'Lekarz', 'f_name' => 'Lekarka', 'm_name' => 'Lekarz'];
+        $data = ['name' => 'Lekarz', 'f_name' => 'Lekarka', 'm_name' => 'Lekarz'];
         $newJobPosition = JobPosition::factory()->make();
 
         $this->jobPositionRepository
@@ -106,8 +108,8 @@ class JobPositionServiceTest extends TestCase
      */
     public function testUpdateJobPositionPassesJobPositionAndDataToRepository(): void
     {
-        $jobPosition        = JobPosition::factory()->make();
-        $data               = ['name' => 'Updated'];
+        $jobPosition = JobPosition::factory()->make();
+        $data = ['name' => 'Updated'];
         $updatedJobPosition = JobPosition::factory()->make(['name' => 'Updated']);
 
         $this->jobPositionRepository
@@ -145,8 +147,8 @@ class JobPositionServiceTest extends TestCase
     public function testExportDelegatesToExportService(): void
     {
         $paginator = new LengthAwarePaginator(collect(), 0, 15, 1);
-        $request   = Mockery::mock(ExportRequest::class);
-        $response  = Mockery::mock(BinaryFileResponse::class);
+        $request = Mockery::mock(ExportRequest::class);
+        $response = Mockery::mock(BinaryFileResponse::class);
 
         $this->jobPositionRepository
             ->shouldReceive('findAllWithPagination')

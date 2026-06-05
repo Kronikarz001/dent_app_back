@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Search;
 
 use App\Models\User;
@@ -36,7 +37,7 @@ class UserSearch extends Search
             'first_name',
             'last_name',
             'pesel',
-            'is_active'
+            'is_active',
         ];
     }
 
@@ -50,7 +51,7 @@ class UserSearch extends Search
             'last_name',
             'email',
             'created_at',
-            'is_active'
+            'is_active',
         ];
     }
 
@@ -63,7 +64,7 @@ class UserSearch extends Search
             'first_name',
             'last_name',
             'email',
-            'is_active'
+            'is_active',
         ];
     }
 
@@ -72,9 +73,7 @@ class UserSearch extends Search
      * @param array $params
      * @return void
      */
-    protected function preFilter(Builder $query, array $params): void
-    {
-    }
+    protected function preFilter(Builder $query, array $params): void {}
 
     /**
      * @return array
@@ -82,7 +81,7 @@ class UserSearch extends Search
     protected function relationsShipLoad(): array
     {
         return [
-            'phoneNumbers'
+            'phoneNumbers',
         ];
     }
 }

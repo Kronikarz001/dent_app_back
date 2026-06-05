@@ -10,10 +10,9 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
-     * @return void
      */
     public function up(): void
     {
-        (new JobPositionSeeder())->run();
+        (new JobPositionSeeder)->run();
     }
 };

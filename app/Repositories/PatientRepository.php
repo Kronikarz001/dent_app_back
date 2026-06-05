@@ -6,7 +6,6 @@ use App\Models\Patient;
 use App\Search\PatientSearch;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Auth;
 
 /**
  * Summary of PatientRepository
@@ -18,8 +17,7 @@ readonly class PatientRepository implements PatientRepositoryInterface
      */
     public function __construct(
         private PatientSearch $search
-    ) {
-    }
+    ) {}
 
     /**
      * @param array $params
@@ -66,6 +64,7 @@ readonly class PatientRepository implements PatientRepositoryInterface
     public function update(Patient|Model $model, array $data): Patient
     {
         $model->update($data);
+
         return $model->fresh();
     }
 

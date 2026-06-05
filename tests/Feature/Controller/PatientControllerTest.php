@@ -39,7 +39,7 @@ class PatientControllerTest extends TestCase
      */
     public function testShowPatientReturnSuccessResponse(): void
     {
-        $patient  = Patient::factory()->create();
+        $patient = Patient::factory()->create();
         $response = $this->callApiWithLoggedUser()
             ->getJson(route('patient.show', ['patient' => $patient->uuid]));
 
@@ -54,9 +54,9 @@ class PatientControllerTest extends TestCase
         $response = $this->callApiWithLoggedUser()
             ->postJson(route('patient.store'), [
                 'first_name' => 'Jan',
-                'last_name'  => 'Kowalski',
-                'email'      => 'jan@example.com',
-                'pesel'      => '12345678901',
+                'last_name' => 'Kowalski',
+                'email' => 'jan@example.com',
+                'pesel' => '12345678901',
             ]);
 
         $response->assertCreated();
@@ -71,20 +71,20 @@ class PatientControllerTest extends TestCase
      */
     public function testUpdatePatientReturnNoContentResponse(): void
     {
-        $patient  = Patient::factory()->create();
+        $patient = Patient::factory()->create();
         $response = $this->callApiWithLoggedUser()
             ->putJson(route('patient.update', ['patient' => $patient->uuid]), [
                 'first_name' => 'Updated',
-                'last_name'  => 'Kowalski',
-                'email'      => 'updated@example.com',
+                'last_name' => 'Kowalski',
+                'email' => 'updated@example.com',
             ]);
 
         $response->assertNoContent();
 
         $this->assertDatabaseHas('patients', [
             'first_name' => 'Updated',
-            'last_name'  => 'Kowalski',
-            'email'      => 'updated@example.com',
+            'last_name' => 'Kowalski',
+            'email' => 'updated@example.com',
         ]);
     }
 

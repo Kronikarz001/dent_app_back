@@ -3,7 +3,6 @@
 namespace Tests\Feature\Controller;
 
 use App\Models\JobPosition;
-use App\Models\User;
 use Tests\TestCase;
 
 /**
@@ -18,7 +17,7 @@ class JobPositionControllerTest extends TestCase
     {
         JobPosition::factory()->count(5)->create();
         $response = $this->callApiWithLoggedUser()
-        ->getJson(route('jobPosition.index'));
+            ->getJson(route('jobPosition.index'));
 
         $response->assertOk();
     }
@@ -26,7 +25,7 @@ class JobPositionControllerTest extends TestCase
     /**
      * @return void
      */
-     public function testIndexUsersListReturnSuccessResponse(): void
+    public function testIndexUsersListReturnSuccessResponse(): void
     {
         JobPosition::factory()->count(5)->create();
         $response = $this->callApiWithLoggedUser()

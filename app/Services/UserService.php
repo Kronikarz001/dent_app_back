@@ -25,9 +25,7 @@ readonly class UserService implements UserServiceInterface
         private UserRepositoryInterface $userRepository,
         private ExportServiceInterface $exportService,
         private PhoneNumberServiceInterface $phoneNumberService
-    )
-    {
-    }
+    ) {}
 
     /**
      * @return LengthAwarePaginator
@@ -61,10 +59,10 @@ readonly class UserService implements UserServiceInterface
      */
     public function updateUser(User $user, array $data): User
     {
-        if(array_key_exists("phone_numbers", $data))
-        {
+        if (array_key_exists('phone_numbers', $data)) {
             $this->phoneNumberService->assignPhones($user, $data['phone_numbers']);
         }
+
         return $this->userRepository->update($user, $data);
     }
 
@@ -94,6 +92,7 @@ readonly class UserService implements UserServiceInterface
     public function editPassword(User $user, array $data): User
     {
         $data['password'] = bcrypt($data['password']);
+
         return $this->userRepository->update($user, $data);
     }
 
@@ -126,6 +125,7 @@ readonly class UserService implements UserServiceInterface
     /**
      * @param ExportRequest $request
      * @return BinaryFileResponse
+     *
      * @throws Exception
      * @throws WriterException
      */

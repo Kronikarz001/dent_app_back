@@ -18,6 +18,7 @@ use Tests\TestCase;
 class UserServiceTest extends TestCase
 {
     private MockInterface $userRepository;
+
     private UserService $userService;
 
     /**
@@ -28,9 +29,9 @@ class UserServiceTest extends TestCase
         parent::setUp();
 
         $this->userRepository = Mockery::mock(UserRepositoryInterface::class);
-        $exportService        = Mockery::mock(ExportServiceInterface::class);
+        $exportService = Mockery::mock(ExportServiceInterface::class);
         $phoneNumberService = Mockery::mock(PhoneNumberServiceInterface::class);
-        $this->userService    = new UserService($this->userRepository, $exportService, $phoneNumberService);
+        $this->userService = new UserService($this->userRepository, $exportService, $phoneNumberService);
     }
 
     /**
@@ -103,7 +104,7 @@ class UserServiceTest extends TestCase
      */
     public function testCreateUserPassesDataUnchangedToRepository(): void
     {
-        $data    = ['name' => 'Jan', 'email' => 'jan@example.com', 'password' => 'plain'];
+        $data = ['name' => 'Jan', 'email' => 'jan@example.com', 'password' => 'plain'];
         $newUser = User::factory()->make(['id' => 1]);
 
         $this->userRepository
@@ -123,8 +124,8 @@ class UserServiceTest extends TestCase
      */
     public function testUpdateUserPassesUserAndDataToRepository(): void
     {
-        $user        = User::factory()->make(['id' => 5]);
-        $data        = ['name' => 'New name'];
+        $user = User::factory()->make(['id' => 5]);
+        $data = ['name' => 'New name'];
         $updatedUser = User::factory()->make(['id' => 5, 'name' => 'New name']);
 
         $this->userRepository
@@ -144,7 +145,7 @@ class UserServiceTest extends TestCase
      */
     public function testDeactivateUserAlwaysSetsActiveToFalse(): void
     {
-        $user            = User::factory()->make(['id' => 3, 'active' => true]);
+        $user = User::factory()->make(['id' => 3, 'active' => true]);
         $capturedPayload = null;
 
         $this->userRepository
@@ -152,6 +153,7 @@ class UserServiceTest extends TestCase
             ->once()
             ->with($user, Mockery::on(function (array $data) use (&$capturedPayload) {
                 $capturedPayload = $data;
+
                 return true;
             }));
 
@@ -195,8 +197,8 @@ class UserServiceTest extends TestCase
      */
     public function testEditPasswordHashesPasswordBeforeSaving(): void
     {
-        $user            = User::factory()->make(['id' => 2]);
-        $plaintext       = 'NewPassword123!';
+        $user = User::factory()->make(['id' => 2]);
+        $plaintext = 'NewPassword123!';
         $capturedPayload = null;
 
         $this->userRepository
@@ -204,6 +206,7 @@ class UserServiceTest extends TestCase
             ->once()
             ->with($user, Mockery::on(function (array $data) use (&$capturedPayload) {
                 $capturedPayload = $data;
+
                 return true;
             }))
             ->andReturn($user);
@@ -220,10 +223,10 @@ class UserServiceTest extends TestCase
      */
     public function testEditPasswordPreservesOtherDataFields(): void
     {
-        $user            = User::factory()->make();
+        $user = User::factory()->make();
         $capturedPayload = null;
-        $data            = [
-            'password'            => 'Secret123!',
+        $data = [
+            'password' => 'Secret123!',
             'password_updated_at' => '2024-01-01',
         ];
 
@@ -232,6 +235,7 @@ class UserServiceTest extends TestCase
             ->once()
             ->with($user, Mockery::on(function (array $received) use (&$capturedPayload) {
                 $capturedPayload = $received;
+
                 return true;
             }))
             ->andReturn($user);
@@ -265,8 +269,8 @@ class UserServiceTest extends TestCase
      */
     public function testGetUserInformationPassesUuidStringNotModelToRepository(): void
     {
-        $uuid     = 'abc-123-uuid';
-        $user     = User::factory()->make(['uuid' => $uuid]);
+        $uuid = 'abc-123-uuid';
+        $user = User::factory()->make(['uuid' => $uuid]);
         $fullUser = User::factory()->make(['uuid' => $uuid]);
 
         $this->userRepository
@@ -287,7 +291,7 @@ class UserServiceTest extends TestCase
     public function testGetUserByTokenReturnsUserWhenFound(): void
     {
         $token = 'valid-token-xyz';
-        $user  = User::factory()->make();
+        $user = User::factory()->make();
 
         $this->userRepository
             ->shouldReceive('getUserByToken')

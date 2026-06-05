@@ -16,7 +16,7 @@ final class UserExportTest extends UnitTestCase
      */
     public function testHeadingsAreCorrect(): void
     {
-        $export   = new UserExport(collect());
+        $export = new UserExport(collect());
         $expected = [
             'Imię',
             'Nazwisko',
@@ -33,22 +33,22 @@ final class UserExportTest extends UnitTestCase
     public function testMapWithAllValuesReturnsExpectedArray(): void
     {
         $user = new User([
-            'first_name'    => 'Jan',
-            'last_name'     => 'Kowalski',
-            'email'         => 'jan@example.com',
+            'first_name' => 'Jan',
+            'last_name' => 'Kowalski',
+            'email' => 'jan@example.com',
             'private_email' => 'jan.priv@example.com',
-            'pesel'         => '12345678901',
+            'pesel' => '12345678901',
         ]);
 
         $export = new UserExport(collect());
         $result = $export->map($user);
 
         $this->assertEquals([
-            'first_name'    => 'Jan',
-            'last_name'     => 'Kowalski',
-            'email'         => 'jan@example.com',
+            'first_name' => 'Jan',
+            'last_name' => 'Kowalski',
+            'email' => 'jan@example.com',
             'private_email' => 'jan.priv@example.com',
-            'pesel'         => '12345678901',
+            'pesel' => '12345678901',
         ], $result);
     }
 
