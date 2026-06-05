@@ -10,37 +10,75 @@ use App\Http\Resources\FileResource;
 use App\Models\File;
 use App\Models\JobPosition;
 use App\Services\FileServiceInterface;
-use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Pagination\LengthAwarePaginator;
+use OpenApi\Attributes as OA;
 
-/**
- * Summary of JobPositionFileController
- */
 class JobPositionFileController extends Controller
 {
-    /**
-     * @param FileServiceInterface $fileService
-     */
     public function __construct(
         private readonly FileServiceInterface $fileService
     ) {}
 
-    /**
-     * @param JobPosition $jobPosition
-     * @return LengthAwarePaginator
-     */
+    #[OA\Get(
+        path: '/api/job-position/{jobPosition}/file',
+        tags: ['JobPositionFile'],
+        summary: 'Lista plików stanowiska (paginacja)',
+        security: [['sanctum' => []]],
+        parameters: [
+            new OA\PathParameter(name: 'jobPosition', schema: new OA\Schema(type: 'string', format: 'uuid')),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'OK',
+                content: new OA\JsonContent(
+                    allOf: [
+                        new OA\Schema(ref: '#/components/schemas/PaginatedResponse'),
+                        new OA\Schema(properties: [
+                            new OA\Property(property: 'data', type: 'array', items: new OA\Items(ref: '#/components/schemas/FileResource')),
+                        ]),
+                    ]
+                )
+            ),
+        ]
+    )]
     public function index(JobPosition $jobPosition): LengthAwarePaginator
     {
         return $this->fileService->getAllFiles($jobPosition);
     }
 
-    /**
-     * @param JobPosition $jobPosition
-     * @param FileStoreRequest $request
-     * @return AnonymousResourceCollection
-     */
+    #[OA\Post(
+        path: '/api/job-position/{jobPosition}/file',
+        tags: ['JobPositionFile'],
+        summary: 'Wgrywa pliki dla stanowiska',
+        security: [['sanctum' => []]],
+        parameters: [
+            new OA\PathParameter(name: 'jobPosition', schema: new OA\Schema(type: 'string', format: 'uuid')),
+        ],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\MediaType(
+                mediaType: 'multipart/form-data',
+                schema: new OA\Schema(
+                    required: ['files[]'],
+                    properties: [
+                        new OA\Property(property: 'files[]', type: 'array', items: new OA\Items(type: 'string', format: 'binary')),
+                    ]
+                )
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'OK',
+                content: new OA\JsonContent(
+                    properties: [new OA\Property(property: 'data', type: 'array', items: new OA\Items(ref: '#/components/schemas/FileResource'))]
+                )
+            ),
+        ]
+    )]
     public function store(JobPosition $jobPosition, FileStoreRequest $request): AnonymousResourceCollection
     {
         return FileResource::collection(
@@ -51,34 +89,80 @@ class JobPositionFileController extends Controller
         );
     }
 
-    /**
-     * @param JobPosition $jobPosition
-     * @param File $file
-     * @return FileResource
-     */
+    #[OA\Get(
+        path: '/api/job-position/{jobPosition}/file/{file}',
+        tags: ['JobPositionFile'],
+        summary: 'Pobiera metadane pliku stanowiska',
+        security: [['sanctum' => []]],
+        parameters: [
+            new OA\PathParameter(name: 'jobPosition', schema: new OA\Schema(type: 'string', format: 'uuid')),
+            new OA\PathParameter(name: 'file', schema: new OA\Schema(type: 'string', format: 'uuid')),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'OK',
+                content: new OA\JsonContent(
+                    properties: [new OA\Property(property: 'data', ref: '#/components/schemas/FileResource')]
+                )
+            ),
+            new OA\Response(response: 404, description: 'Nie znaleziono'),
+        ]
+    )]
     public function show(JobPosition $jobPosition, File $file): FileResource
     {
         return new FileResource($file);
     }
 
-    /**
-     * @param JobPosition $jobPosition
-     * @param File $file
-     * @return JsonResponse
-     *
-     * @throws FileNotFoundException
-     */
+    #[OA\Get(
+        path: '/api/job-position/{jobPosition}/file-download/{file}',
+        tags: ['JobPositionFile'],
+        summary: 'Pobiera zawartość pliku stanowiska',
+        security: [['sanctum' => []]],
+        parameters: [
+            new OA\PathParameter(name: 'jobPosition', schema: new OA\Schema(type: 'string', format: 'uuid')),
+            new OA\PathParameter(name: 'file', schema: new OA\Schema(type: 'string', format: 'uuid')),
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'OK'),
+            new OA\Response(response: 404, description: 'Nie znaleziono'),
+        ]
+    )]
     public function download(JobPosition $jobPosition, File $file): JsonResponse
     {
         return new JsonResponse($this->fileService->getFile($file));
     }
 
-    /**
-     * @param JobPosition $jobPosition
-     * @param File $file
-     * @param FileUpdateRequest $request
-     * @return FileResource
-     */
+    #[OA\Put(
+        path: '/api/job-position/{jobPosition}/file/{file}',
+        tags: ['JobPositionFile'],
+        summary: 'Zmienia nazwę pliku stanowiska',
+        security: [['sanctum' => []]],
+        parameters: [
+            new OA\PathParameter(name: 'jobPosition', schema: new OA\Schema(type: 'string', format: 'uuid')),
+            new OA\PathParameter(name: 'file', schema: new OA\Schema(type: 'string', format: 'uuid')),
+        ],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ['filename'],
+                properties: [
+                    new OA\Property(property: 'filename', type: 'string', example: 'nowa_nazwa'),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'OK',
+                content: new OA\JsonContent(
+                    properties: [new OA\Property(property: 'data', ref: '#/components/schemas/FileResource')]
+                )
+            ),
+            new OA\Response(response: 404, description: 'Nie znaleziono'),
+            new OA\Response(response: 422, description: 'Błąd walidacji'),
+        ]
+    )]
     public function update(JobPosition $jobPosition, File $file, FileUpdateRequest $request): FileResource
     {
         return new FileResource(
@@ -86,11 +170,20 @@ class JobPositionFileController extends Controller
         );
     }
 
-    /**
-     * @param JobPosition $jobPosition
-     * @param File $file
-     * @return JsonResponse
-     */
+    #[OA\Delete(
+        path: '/api/job-position/{jobPosition}/file/{file}',
+        tags: ['JobPositionFile'],
+        summary: 'Usuwa plik stanowiska',
+        security: [['sanctum' => []]],
+        parameters: [
+            new OA\PathParameter(name: 'jobPosition', schema: new OA\Schema(type: 'string', format: 'uuid')),
+            new OA\PathParameter(name: 'file', schema: new OA\Schema(type: 'string', format: 'uuid')),
+        ],
+        responses: [
+            new OA\Response(response: 204, description: 'Usunięto'),
+            new OA\Response(response: 404, description: 'Nie znaleziono'),
+        ]
+    )]
     public function destroy(JobPosition $jobPosition, File $file): JsonResponse
     {
         $this->fileService->deleteFile($file);
@@ -98,12 +191,37 @@ class JobPositionFileController extends Controller
         return new JsonResponse(null, 204);
     }
 
-    /**
-     * @param JobPosition $jobPosition
-     * @param File $file
-     * @param FileStoreRequest $request
-     * @return AnonymousResourceCollection
-     */
+    #[OA\Post(
+        path: '/api/job-position/{jobPosition}/file-new-version/{file}',
+        tags: ['JobPositionFile'],
+        summary: 'Tworzy nową wersję pliku stanowiska',
+        security: [['sanctum' => []]],
+        parameters: [
+            new OA\PathParameter(name: 'jobPosition', schema: new OA\Schema(type: 'string', format: 'uuid')),
+            new OA\PathParameter(name: 'file', schema: new OA\Schema(type: 'string', format: 'uuid')),
+        ],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\MediaType(
+                mediaType: 'multipart/form-data',
+                schema: new OA\Schema(
+                    required: ['files[]'],
+                    properties: [
+                        new OA\Property(property: 'files[]', type: 'array', items: new OA\Items(type: 'string', format: 'binary')),
+                    ]
+                )
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'OK',
+                content: new OA\JsonContent(
+                    properties: [new OA\Property(property: 'data', type: 'array', items: new OA\Items(ref: '#/components/schemas/FileResource'))]
+                )
+            ),
+        ]
+    )]
     public function storeNewVersion(JobPosition $jobPosition, File $file, FileStoreRequest $request): AnonymousResourceCollection
     {
         return FileResource::collection(
