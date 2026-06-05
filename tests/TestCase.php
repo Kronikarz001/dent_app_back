@@ -3,7 +3,6 @@
 namespace Tests;
 
 use App\Models\User;
-use Dotenv\Dotenv;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 
@@ -16,9 +15,11 @@ abstract class TestCase extends BaseTestCase
 
     public function createApplication(): \Illuminate\Foundation\Application
     {
-        Dotenv::createMutable(dirname(__DIR__), '.env.testing')->safeLoad();
+        $app = parent::createApplication();
 
-        return parent::createApplication();
+        $app['config']->set('database.connections.pgsql.database', 'dent_db_back_test');
+
+        return $app;
     }
 
     /**
