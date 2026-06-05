@@ -138,7 +138,7 @@ class UserFileControllerTest extends TestCase
 
         $this->callApiWithLoggedUser($user)
             ->post(route('userfile.avatar-store', ['user' => $user->uuid]), [
-                'files' => [$file],
+                'file' => $file,
             ])
             ->assertOk();
     }
@@ -173,7 +173,7 @@ class UserFileControllerTest extends TestCase
 
         $this->callApiWithLoggedUser($user)
             ->post(route('userfile.background-store', ['user' => $user->uuid]), [
-                'files' => [$file],
+                'file' => $file,
             ])
             ->assertOk();
     }

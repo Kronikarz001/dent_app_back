@@ -2401,15 +2401,12 @@
                         "multipart/form-data": {
                             "schema": {
                                 "required": [
-                                    "files[]"
+                                    "file"
                                 ],
                                 "properties": {
-                                    "files[]": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string",
-                                            "format": "binary"
-                                        }
+                                    "file": {
+                                        "type": "string",
+                                        "format": "binary"
                                     }
                                 },
                                 "type": "object"
@@ -2513,15 +2510,12 @@
                         "multipart/form-data": {
                             "schema": {
                                 "required": [
-                                    "files[]"
+                                    "file"
                                 ],
                                 "properties": {
-                                    "files[]": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string",
-                                            "format": "binary"
-                                        }
+                                    "file": {
+                                        "type": "string",
+                                        "format": "binary"
                                     }
                                 },
                                 "type": "object"

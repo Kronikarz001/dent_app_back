@@ -15,7 +15,7 @@ class PhotoStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'files' => ['required', 'file'],
+            'file' => ['required', 'file'],
         ];
     }
 

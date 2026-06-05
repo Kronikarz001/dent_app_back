@@ -250,9 +250,9 @@ class UserFileController extends Controller
             content: new OA\MediaType(
                 mediaType: 'multipart/form-data',
                 schema: new OA\Schema(
-                    required: ['files[]'],
+                    required: ['file'],
                     properties: [
-                        new OA\Property(property: 'files[]', type: 'array', items: new OA\Items(type: 'string', format: 'binary')),
+                        new OA\Property(property: 'file', type: 'string', format: 'binary'),
                     ]
                 )
             )
@@ -271,7 +271,7 @@ class UserFileController extends Controller
     {
         return FileResource::collection(
             $this->fileService->saveFile(
-                new FileDto([$request->file('files')], FileableType::USER_AVATAR),
+                new FileDto([$request->file('file')], FileableType::USER_AVATAR),
                 UserAvatar::find($user->uuid)
             )
         );
@@ -309,9 +309,9 @@ class UserFileController extends Controller
             content: new OA\MediaType(
                 mediaType: 'multipart/form-data',
                 schema: new OA\Schema(
-                    required: ['files[]'],
+                    required: ['file'],
                     properties: [
-                        new OA\Property(property: 'files[]', type: 'array', items: new OA\Items(type: 'string', format: 'binary')),
+                        new OA\Property(property: 'file', type: 'string', format: 'binary'),
                     ]
                 )
             )
@@ -330,7 +330,7 @@ class UserFileController extends Controller
     {
         return FileResource::collection(
             $this->fileService->saveFile(
-                new FileDto([$request->file('files')], FileableType::USER_BACKGROUND),
+                new FileDto([$request->file('file')], FileableType::USER_BACKGROUND),
                 UserBackground::find($user->uuid)
             )
         );

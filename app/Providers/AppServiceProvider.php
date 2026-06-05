@@ -27,5 +27,7 @@ class AppServiceProvider extends ServiceProvider
     {
         JsonResource::withoutWrapping();
         $this->loadJsonTranslationsFrom(__DIR__.'/../lang');
+        ini_set('upload_tmp_dir', storage_path('temp'));
+        SpreadsheetFile::setUseUploadTempDirectory(true);
     }
 }
