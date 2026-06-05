@@ -48,7 +48,7 @@ class PatientServiceTest extends TestCase
     /**
      * @return void
      */
-    public function test_get_patients_delegates_to_repository_without_column_filter(): void
+    public function testGetPatientsDelegatesToRepositoryWithoutColumnFilter(): void
     {
         $paginator = new LengthAwarePaginator([], 0, 15, 1);
 
@@ -67,7 +67,7 @@ class PatientServiceTest extends TestCase
     /**
      * @return void
      */
-    public function test_get_patients_list_passes_only_uuid_and_name_columns(): void
+    public function testGetPatientsListPassesOnlyUuidAndNameColumns(): void
     {
         $paginator = new LengthAwarePaginator([], 0, 100, 1);
 
@@ -86,7 +86,7 @@ class PatientServiceTest extends TestCase
     /**
      * @return void
      */
-    public function test_create_patient_passes_data_unchanged_to_repository(): void
+    public function testCreatePatientPassesDataUnchangedToRepository(): void
     {
         $data = ['first_name' => 'Jan', 'last_name' => 'Kowalski', 'email' => 'jan@example.com'];
         $newPatient = Patient::factory()->make();
@@ -106,7 +106,7 @@ class PatientServiceTest extends TestCase
     /**
      * @return void
      */
-    public function test_update_patient_passes_patient_and_data_to_repository(): void
+    public function testUpdatePatientPassesPatientAndDataToRepository(): void
     {
         $patient = Patient::factory()->make();
         $data = ['first_name' => 'Updated'];
@@ -127,7 +127,7 @@ class PatientServiceTest extends TestCase
     /**
      * @return void
      */
-    public function test_delete_patient_calls_repository_delete_not_update(): void
+    public function testDeletePatientCallsRepositoryDeleteNotUpdate(): void
     {
         $patient = Patient::factory()->make();
 
@@ -144,7 +144,7 @@ class PatientServiceTest extends TestCase
     /**
      * @return void
      */
-    public function test_export_delegates_to_export_service(): void
+    public function testExportDelegatesToExportService(): void
     {
         $paginator = new LengthAwarePaginator(collect(), 0, 15, 1);
         $request = Mockery::mock(ExportRequest::class);

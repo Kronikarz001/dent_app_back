@@ -37,7 +37,7 @@ class AuthServiceTest extends TestCase
     /**
      * @return void
      */
-    public function test_login_returns_user_on_valid_credentials(): void
+    public function testLoginReturnsUserOnValidCredentials(): void
     {
         $user = User::factory()->create(['password' => bcrypt('password123')]);
         $request = LoginRequest::create('/login', 'POST', [
@@ -54,7 +54,7 @@ class AuthServiceTest extends TestCase
     /**
      * @return void
      */
-    public function test_login_throws_exception_on_invalid_credentials(): void
+    public function testLoginThrowsExceptionOnInvalidCredentials(): void
     {
         User::factory()->create(['email' => 'test@example.com']);
 
@@ -71,7 +71,7 @@ class AuthServiceTest extends TestCase
     /**
      * @return void
      */
-    public function test_logout_deletes_current_access_token(): void
+    public function testLogoutDeletesCurrentAccessToken(): void
     {
         $user = User::factory()->create();
         $token = $user->createToken('test-token')->plainTextToken;
@@ -93,7 +93,7 @@ class AuthServiceTest extends TestCase
      *
      * @throws Exception
      */
-    public function test_forgot_password_sends_reset_notification(): void
+    public function testForgotPasswordSendsResetNotification(): void
     {
         Notification::fake();
 
@@ -107,7 +107,7 @@ class AuthServiceTest extends TestCase
     /**
      * @return void
      */
-    public function test_forgot_password_returns_success_response(): void
+    public function testForgotPasswordReturnsSuccessResponse(): void
     {
         Notification::fake();
 
@@ -120,7 +120,7 @@ class AuthServiceTest extends TestCase
     /**
      * @return void
      */
-    public function test_forgot_password_returns_error_response_for_unknown_email(): void
+    public function testForgotPasswordReturnsErrorResponseForUnknownEmail(): void
     {
         $result = $this->authService->forgotPassword(['email' => 'nonexistent@example.com']);
 
@@ -130,7 +130,7 @@ class AuthServiceTest extends TestCase
     /**
      * @return void
      */
-    public function test_reset_password_changes_user_password(): void
+    public function testResetPasswordChangesUserPassword(): void
     {
         $user = User::factory()->create();
         $token = Password::createToken($user);
@@ -148,7 +148,7 @@ class AuthServiceTest extends TestCase
     /**
      * @return void
      */
-    public function test_reset_password_returns_success_response(): void
+    public function testResetPasswordReturnsSuccessResponse(): void
     {
         $user = User::factory()->create();
         $token = Password::createToken($user);
@@ -166,7 +166,7 @@ class AuthServiceTest extends TestCase
     /**
      * @return void
      */
-    public function test_reset_password_returns_error_response_for_invalid_token(): void
+    public function testResetPasswordReturnsErrorResponseForInvalidToken(): void
     {
         $user = User::factory()->create();
 
@@ -183,7 +183,7 @@ class AuthServiceTest extends TestCase
     /**
      * @return void
      */
-    public function test_authenticate_sets_user_from_valid_token(): void
+    public function testAuthenticateSetsUserFromValidToken(): void
     {
         $user = User::factory()->create();
         $plainToken = $user->createToken('test-token')->plainTextToken;
@@ -196,7 +196,7 @@ class AuthServiceTest extends TestCase
     /**
      * @return void
      */
-    public function test_authenticate_throws_exception_for_invalid_token(): void
+    public function testAuthenticateThrowsExceptionForInvalidToken(): void
     {
         $this->expectException(AuthenticationException::class);
 
@@ -206,7 +206,7 @@ class AuthServiceTest extends TestCase
     /**
      * @return void
      */
-    public function test_authenticate_throws_exception_for_null_token(): void
+    public function testAuthenticateThrowsExceptionForNullToken(): void
     {
         $this->expectException(AuthenticationException::class);
 

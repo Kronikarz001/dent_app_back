@@ -3,6 +3,7 @@
     "rules": {
         "no_superfluous_phpdoc_tags": false,
         "no_empty_phpdoc": false,
-        "phpdoc_align": false
+        "phpdoc_align": false,
+        "php_unit_method_casing": false
     }
 }

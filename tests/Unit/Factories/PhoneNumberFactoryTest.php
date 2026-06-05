@@ -16,7 +16,7 @@ final class PhoneNumberFactoryTest extends UnitTestCase
      *
      * @throws BindingResolutionException
      */
-    public function test_phone_number_create_by_factory(): void
+    public function testPhoneNumberCreateByFactory(): void
     {
         $phoneNumber = PhoneNumber::factory()->create(['number' => '+48123456789']);
 

@@ -16,7 +16,7 @@ class AuthControllerTest extends TestCase
     /**
      * @return void
      */
-    public function test_login_return_success_response(): void
+    public function testLoginReturnSuccessResponse(): void
     {
         $user = User::factory()->create(['password' => bcrypt('password')]);
 
@@ -31,7 +31,7 @@ class AuthControllerTest extends TestCase
     /**
      * @return void
      */
-    public function test_login_with_invalid_credentials_return_unauthorized_response(): void
+    public function testLoginWithInvalidCredentialsReturnUnauthorizedResponse(): void
     {
         User::factory()->create(['email' => 'test@example.com']);
 
@@ -46,7 +46,7 @@ class AuthControllerTest extends TestCase
     /**
      * @return void
      */
-    public function test_logout_return_success_response(): void
+    public function testLogoutReturnSuccessResponse(): void
     {
         $user = User::factory()->create();
 
@@ -61,7 +61,7 @@ class AuthControllerTest extends TestCase
      *
      * @throws Exception
      */
-    public function test_forgot_password_return_success_response(): void
+    public function testForgotPasswordReturnSuccessResponse(): void
     {
         Notification::fake();
 
@@ -80,7 +80,7 @@ class AuthControllerTest extends TestCase
     /**
      * @return void
      */
-    public function test_reset_password_return_no_content_response(): void
+    public function testResetPasswordReturnNoContentResponse(): void
     {
         $user = User::factory()->create();
         $token = app('auth.password.broker')->createToken($user);
