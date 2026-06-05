@@ -31,6 +31,9 @@ down-remove:
 createdb:
 	$(SUDO) docker-compose exec dent_app_back_db psql -U $(DB_USERNAME) -d postgres -c "CREATE DATABASE $(DB_DATABASE);"
 
+createdb-test:
+	$(SUDO) docker-compose exec dent_app_back_db psql -U $(DB_USERNAME) -d postgres -c "CREATE DATABASE dent_db_back_test;"
+
 createdb-role:
 	$(SUDO) docker-compose exec dent_app_back_db psql -U $(DB_USERNAME) -d postgres -c "CREATE ROLE $(DB_USERNAME) WITH LOGIN PASSWORD '$(DB_PASSWORD)';"
 

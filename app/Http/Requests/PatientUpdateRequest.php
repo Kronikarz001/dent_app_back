@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Enums\PhoneNumberType;
+use App\Rules\PhoneNumberRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Enum;
 
@@ -21,7 +22,7 @@ class PatientUpdateRequest extends FormRequest
             'last_name' => ['required', 'string'],
             'email' => ['required', 'email', 'unique:patients,email'],
             'phone_numbers' => ['nullable', 'array'],
-            'phone_numbers.number' => ['string'],
+            'phone_numbers.number' => ['string', new PhoneNumberRule],
             'phone_numbers.type' => ['string', new Enum(PhoneNumberType::class)],
         ];
     }

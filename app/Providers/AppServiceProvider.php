@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\ServiceProvider;
+use PhpOffice\PhpSpreadsheet\Shared\File as SpreadsheetFile;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -16,6 +17,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->register(UserServiceProvider::class);
         $this->app->register(PatientServiceProvider::class);
         $this->app->register(JobPositionServiceProvider::class);
+        $this->app->register(FileServiceProvider::class);
     }
 
     /**
@@ -25,5 +27,7 @@ class AppServiceProvider extends ServiceProvider
     {
         JsonResource::withoutWrapping();
         $this->loadJsonTranslationsFrom(__DIR__.'/../lang');
+        ini_set('upload_tmp_dir', storage_path('temp'));
+        SpreadsheetFile::setUseUploadTempDirectory(true);
     }
 }

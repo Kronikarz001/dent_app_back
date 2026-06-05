@@ -4,14 +4,20 @@ namespace App\Repositories;
 
 use App\Models\JobPosition;
 use App\Search\JobPositionSearch;
+use App\Search\Search;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Summary of JobPositionRepository
  */
-readonly class JobPositionRepository implements JobPositionRepositoryInterface
+class JobPositionRepository extends SearchableRepository implements JobPositionRepositoryInterface
 {
+    /**
+     * @var string
+     */
+    protected string $modelClass = JobPosition::class;
+
     /**
      * @param JobPositionSearch $search
      */
@@ -29,13 +35,11 @@ readonly class JobPositionRepository implements JobPositionRepositoryInterface
     }
 
     /**
-     * @param array $columns
-     * @param array $params
-     * @return LengthAwarePaginator
+     * @return Search
      */
-    public function findSelectAllWithPagination(array $columns = ['*'], array $params = []): LengthAwarePaginator
+    protected function getSearchModel(): Search
     {
-        return $this->search->search($params);
+        return $this->search;
     }
 
     /**
