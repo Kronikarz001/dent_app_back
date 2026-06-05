@@ -28,6 +28,27 @@ class PatientFileController extends Controller
     ) {}
 
     /**
+     * @OA\Get(
+     *     path="/api/patient/{patient}/file",
+     *     tags={"PatientFile"},
+     *     summary="Lista plików pacjenta (paginacja)",
+     *     security={{"sanctum": {}}},
+     *
+     *     @OA\Parameter(name="patient", in="path", required=true, @OA\Schema(type="string", format="uuid")),
+     *
+     *     @OA\Response(response=200, description="OK",
+     *
+     *         @OA\JsonContent(allOf={
+     *
+     *             @OA\Schema(ref="#/components/schemas/PaginatedResponse"),
+     *             @OA\Schema(@OA\Property(property="data", type="array",
+     *
+     *                 @OA\Items(ref="#/components/schemas/FileResource")
+     *             ))
+     *         })
+     *     )
+     * )
+     *
      * @param Patient $patient
      * @return LengthAwarePaginator
      */
@@ -37,6 +58,39 @@ class PatientFileController extends Controller
     }
 
     /**
+     * @OA\Post(
+     *     path="/api/patient/{patient}/file",
+     *     tags={"PatientFile"},
+     *     summary="Wgrywa pliki dla pacjenta",
+     *     security={{"sanctum": {}}},
+     *
+     *     @OA\Parameter(name="patient", in="path", required=true, @OA\Schema(type="string", format="uuid")),
+     *
+     *     @OA\RequestBody(
+     *         required=true,
+     *
+     *         @OA\MediaType(mediaType="multipart/form-data",
+     *
+     *             @OA\Schema(
+     *                 required={"files[]"},
+     *
+     *                 @OA\Property(property="files[]", type="array",
+     *
+     *                     @OA\Items(type="string", format="binary")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *
+     *     @OA\Response(response=200, description="OK",
+     *
+     *         @OA\JsonContent(@OA\Property(property="data", type="array",
+     *
+     *             @OA\Items(ref="#/components/schemas/FileResource")
+     *         ))
+     *     )
+     * )
+     *
      * @param Patient $patient
      * @param FileStoreRequest $request
      * @return AnonymousResourceCollection
@@ -52,6 +106,23 @@ class PatientFileController extends Controller
     }
 
     /**
+     * @OA\Get(
+     *     path="/api/patient/{patient}/file/{file}",
+     *     tags={"PatientFile"},
+     *     summary="Pobiera metadane pliku pacjenta",
+     *     security={{"sanctum": {}}},
+     *
+     *     @OA\Parameter(name="patient", in="path", required=true, @OA\Schema(type="string", format="uuid")),
+     *     @OA\Parameter(name="file", in="path", required=true, @OA\Schema(type="string", format="uuid")),
+     *
+     *     @OA\Response(response=200, description="OK",
+     *
+     *         @OA\JsonContent(@OA\Property(property="data", ref="#/components/schemas/FileResource"))
+     *     ),
+     *
+     *     @OA\Response(response=404, description="Nie znaleziono")
+     * )
+     *
      * @param Patient $patient
      * @param File $file
      * @return FileResource
@@ -62,6 +133,19 @@ class PatientFileController extends Controller
     }
 
     /**
+     * @OA\Get(
+     *     path="/api/patient/{patient}/file-download/{file}",
+     *     tags={"PatientFile"},
+     *     summary="Pobiera zawartość pliku pacjenta",
+     *     security={{"sanctum": {}}},
+     *
+     *     @OA\Parameter(name="patient", in="path", required=true, @OA\Schema(type="string", format="uuid")),
+     *     @OA\Parameter(name="file", in="path", required=true, @OA\Schema(type="string", format="uuid")),
+     *
+     *     @OA\Response(response=200, description="OK"),
+     *     @OA\Response(response=404, description="Nie znaleziono")
+     * )
+     *
      * @param Patient $patient
      * @param File $file
      * @return JsonResponse
@@ -74,6 +158,34 @@ class PatientFileController extends Controller
     }
 
     /**
+     * @OA\Put(
+     *     path="/api/patient/{patient}/file/{file}",
+     *     tags={"PatientFile"},
+     *     summary="Zmienia nazwę pliku pacjenta",
+     *     security={{"sanctum": {}}},
+     *
+     *     @OA\Parameter(name="patient", in="path", required=true, @OA\Schema(type="string", format="uuid")),
+     *     @OA\Parameter(name="file", in="path", required=true, @OA\Schema(type="string", format="uuid")),
+     *
+     *     @OA\RequestBody(
+     *         required=true,
+     *
+     *         @OA\JsonContent(
+     *             required={"filename"},
+     *
+     *             @OA\Property(property="filename", type="string", example="nowa_nazwa")
+     *         )
+     *     ),
+     *
+     *     @OA\Response(response=200, description="OK",
+     *
+     *         @OA\JsonContent(@OA\Property(property="data", ref="#/components/schemas/FileResource"))
+     *     ),
+     *
+     *     @OA\Response(response=404, description="Nie znaleziono"),
+     *     @OA\Response(response=422, description="Błąd walidacji")
+     * )
+     *
      * @param Patient $patient
      * @param File $file
      * @param FileUpdateRequest $request
@@ -87,6 +199,19 @@ class PatientFileController extends Controller
     }
 
     /**
+     * @OA\Delete(
+     *     path="/api/patient/{patient}/file/{file}",
+     *     tags={"PatientFile"},
+     *     summary="Usuwa plik pacjenta",
+     *     security={{"sanctum": {}}},
+     *
+     *     @OA\Parameter(name="patient", in="path", required=true, @OA\Schema(type="string", format="uuid")),
+     *     @OA\Parameter(name="file", in="path", required=true, @OA\Schema(type="string", format="uuid")),
+     *
+     *     @OA\Response(response=204, description="Usunięto"),
+     *     @OA\Response(response=404, description="Nie znaleziono")
+     * )
+     *
      * @param Patient $patient
      * @param File $file
      * @return JsonResponse
@@ -99,6 +224,40 @@ class PatientFileController extends Controller
     }
 
     /**
+     * @OA\Post(
+     *     path="/api/patient/{patient}/file-new-version/{file}",
+     *     tags={"PatientFile"},
+     *     summary="Tworzy nową wersję pliku pacjenta",
+     *     security={{"sanctum": {}}},
+     *
+     *     @OA\Parameter(name="patient", in="path", required=true, @OA\Schema(type="string", format="uuid")),
+     *     @OA\Parameter(name="file", in="path", required=true, @OA\Schema(type="string", format="uuid")),
+     *
+     *     @OA\RequestBody(
+     *         required=true,
+     *
+     *         @OA\MediaType(mediaType="multipart/form-data",
+     *
+     *             @OA\Schema(
+     *                 required={"files[]"},
+     *
+     *                 @OA\Property(property="files[]", type="array",
+     *
+     *                     @OA\Items(type="string", format="binary")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *
+     *     @OA\Response(response=200, description="OK",
+     *
+     *         @OA\JsonContent(@OA\Property(property="data", type="array",
+     *
+     *             @OA\Items(ref="#/components/schemas/FileResource")
+     *         ))
+     *     )
+     * )
+     *
      * @param Patient $patient
      * @param File $file
      * @param FileStoreRequest $request
