@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\HasFile;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
@@ -22,7 +23,7 @@ class JobPosition extends UuidModel
     /**
      * @use SoftDeletes
      */
-    use SoftDeletes;
+    use HasFile, SoftDeletes;
 
     protected $table = 'job_positions';
 

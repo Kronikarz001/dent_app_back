@@ -70,7 +70,7 @@ class JobPositionController extends Controller
     {
         $this->jobPositionService->updateJobPosition($jobPosition, $request->all());
 
-        return response()->json([], 204);
+        return new JsonResponse(null, 204);
     }
 
     /**
@@ -81,7 +81,7 @@ class JobPositionController extends Controller
     {
         $this->jobPositionService->deleteJobPosition($jobPosition);
 
-        return response()->json([], 204);
+        return new JsonResponse(null, 204);
     }
 
     /**
@@ -93,7 +93,7 @@ class JobPositionController extends Controller
     {
         $this->jobPositionService->assignJobPosition($user, $request->all());
 
-        return response()->json([], 204);
+        return new JsonResponse(null, 204);
     }
 
     /**

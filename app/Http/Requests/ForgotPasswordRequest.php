@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
@@ -11,7 +10,7 @@ use Illuminate\Foundation\Http\FormRequest;
 class ForgotPasswordRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * @return bool
      */
     public function authorize(): bool
     {
@@ -19,9 +18,7 @@ class ForgotPasswordRequest extends FormRequest
     }
 
     /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, ValidationRule|array|string>
+     * @return string[]
      */
     public function rules(): array
     {

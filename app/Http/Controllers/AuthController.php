@@ -36,7 +36,7 @@ class AuthController extends Controller
     {
         $this->authService->logout();
 
-        return response()->json();
+        return new JsonResponse;
     }
 
     /**
@@ -47,7 +47,7 @@ class AuthController extends Controller
     {
         $this->authService->forgotPassword($request->all());
 
-        return response()->json();
+        return new JsonResponse;
     }
 
     /**
@@ -58,6 +58,6 @@ class AuthController extends Controller
     {
         $this->authService->resetPassword($request->all());
 
-        return response()->json([], 204);
+        return new JsonResponse(null, 204);
     }
 }

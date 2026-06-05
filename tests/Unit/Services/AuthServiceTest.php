@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Service;
+namespace Tests\Unit\Services;
 
 use App\Exceptions\AuthenticationException;
 use App\Http\Requests\LoginRequest;

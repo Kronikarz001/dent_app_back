@@ -4,19 +4,25 @@ namespace App\Repositories;
 
 use App\Models\Patient;
 use App\Search\PatientSearch;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use App\Search\Search;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 /**
  * Summary of PatientRepository
  */
-readonly class PatientRepository implements PatientRepositoryInterface
+class PatientRepository extends SearchableRepository implements PatientRepositoryInterface
 {
+    /**
+     * @var string
+     */
+    protected string $modelClass = Patient::class;
+
     /**
      * @param PatientSearch $search
      */
     public function __construct(
-        private PatientSearch $search
+        private readonly PatientSearch $search
     ) {}
 
     /**
@@ -29,13 +35,11 @@ readonly class PatientRepository implements PatientRepositoryInterface
     }
 
     /**
-     * @param array $columns
-     * @param array $params
-     * @return LengthAwarePaginator
+     * @return Search
      */
-    public function findSelectAllWithPagination(array $columns = ['*'], array $params = []): LengthAwarePaginator
+    protected function getSearchModel(): Search
     {
-        return $this->search->search($params);
+        return $this->search;
     }
 
     /**

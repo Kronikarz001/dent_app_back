@@ -69,7 +69,7 @@ class PatientController extends Controller
     {
         $this->patientService->updatePatient($patient, $request->all());
 
-        return response()->json([], 204);
+        return new JsonResponse(null, 204);
     }
 
     /**
@@ -80,7 +80,7 @@ class PatientController extends Controller
     {
         $this->patientService->deletePatient($patient);
 
-        return response()->json([], 204);
+        return new JsonResponse(null, 204);
     }
 
     /**

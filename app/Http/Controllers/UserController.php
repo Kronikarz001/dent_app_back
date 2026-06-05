@@ -77,7 +77,7 @@ class UserController extends Controller
     {
         $this->userService->updateUser($user, $request->all());
 
-        return response()->json([], 204);
+        return new JsonResponse(null, 204);
     }
 
     /**
@@ -88,7 +88,7 @@ class UserController extends Controller
     {
         $this->userService->deactivateUser($user);
 
-        return response()->json([], 204);
+        return new JsonResponse(null, 204);
     }
 
     /**

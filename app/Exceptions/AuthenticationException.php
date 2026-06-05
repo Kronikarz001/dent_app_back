@@ -12,6 +12,9 @@ use Illuminate\Http\Request;
  */
 class AuthenticationException extends Exception
 {
+    /**
+     * @return void
+     */
     public function __construct()
     {
         parent::__construct(__('bad.credentials'));
