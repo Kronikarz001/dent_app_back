@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Controller;
+namespace Tests\Feature\Controllers;
 
 use App\Models\Patient;
 use Tests\TestCase;
@@ -13,7 +13,7 @@ class PatientControllerTest extends TestCase
     /**
      * @return void
      */
-    public function test_index_patients_return_success_response(): void
+    public function testIndexPatientsReturnSuccessResponse(): void
     {
         Patient::factory()->count(5)->create();
         $response = $this->callApiWithLoggedUser()
@@ -25,7 +25,7 @@ class PatientControllerTest extends TestCase
     /**
      * @return void
      */
-    public function test_index_patients_list_return_success_response(): void
+    public function testIndexPatientsListReturnSuccessResponse(): void
     {
         Patient::factory()->count(5)->create();
         $response = $this->callApiWithLoggedUser()
@@ -37,7 +37,7 @@ class PatientControllerTest extends TestCase
     /**
      * @return void
      */
-    public function test_show_patient_return_success_response(): void
+    public function testShowPatientReturnSuccessResponse(): void
     {
         $patient = Patient::factory()->create();
         $response = $this->callApiWithLoggedUser()
@@ -49,7 +49,7 @@ class PatientControllerTest extends TestCase
     /**
      * @return void
      */
-    public function test_store_patient_return_created_response(): void
+    public function testStorePatientReturnCreatedResponse(): void
     {
         $response = $this->callApiWithLoggedUser()
             ->postJson(route('patient.store'), [
@@ -69,7 +69,7 @@ class PatientControllerTest extends TestCase
     /**
      * @return void
      */
-    public function test_update_patient_return_no_content_response(): void
+    public function testUpdatePatientReturnNoContentResponse(): void
     {
         $patient = Patient::factory()->create();
         $response = $this->callApiWithLoggedUser()
@@ -91,7 +91,7 @@ class PatientControllerTest extends TestCase
     /**
      * @return void
      */
-    public function test_delete_patient_return_no_content_response(): void
+    public function testDeletePatientReturnNoContentResponse(): void
     {
         $patient = Patient::factory()->create();
         $this->callApiWithLoggedUser()
@@ -104,7 +104,7 @@ class PatientControllerTest extends TestCase
     /**
      * @return void
      */
-    public function test_export_patient_return_success_response(): void
+    public function testExportPatientReturnSuccessResponse(): void
     {
         Patient::factory()->count(5)->create();
         $response = $this->callApiWithLoggedUser()

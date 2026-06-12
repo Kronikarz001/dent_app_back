@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Controller;
+namespace Tests\Feature\Controllers;
 
 use App\Models\JobPosition;
 use Tests\TestCase;
@@ -13,7 +13,7 @@ class JobPositionControllerTest extends TestCase
     /**
      * @return void
      */
-    public function test_index_users_return_success_response(): void
+    public function testIndexUsersReturnSuccessResponse(): void
     {
         JobPosition::factory()->count(5)->create();
         $response = $this->callApiWithLoggedUser()
@@ -25,7 +25,7 @@ class JobPositionControllerTest extends TestCase
     /**
      * @return void
      */
-    public function test_index_users_list_return_success_response(): void
+    public function testIndexUsersListReturnSuccessResponse(): void
     {
         JobPosition::factory()->count(5)->create();
         $response = $this->callApiWithLoggedUser()
@@ -37,7 +37,7 @@ class JobPositionControllerTest extends TestCase
     /**
      * @return void
      */
-    public function test_show_job_position_return_success_response(): void
+    public function testShowJobPositionReturnSuccessResponse(): void
     {
         $jobPosition = JobPosition::factory()->create();
         $response = $this->callApiWithLoggedUser()
@@ -49,7 +49,7 @@ class JobPositionControllerTest extends TestCase
     /**
      * @return void
      */
-    public function test_store_job_position_return_created_response(): void
+    public function testStoreJobPositionReturnCreatedResponse(): void
     {
         $response = $this->callApiWithLoggedUser()
             ->postJson(route('jobPosition.store'), [
@@ -68,7 +68,7 @@ class JobPositionControllerTest extends TestCase
     /**
      * @return void
      */
-    public function test_update_job_position_return_no_content_response(): void
+    public function testUpdateJobPositionReturnNoContentResponse(): void
     {
         $jobPosition = JobPosition::factory()->create();
         $response = $this->callApiWithLoggedUser()
@@ -89,7 +89,7 @@ class JobPositionControllerTest extends TestCase
     /**
      * @return void
      */
-    public function test_delete_job_position_return_no_content_response(): void
+    public function testDeleteJobPositionReturnNoContentResponse(): void
     {
         $jobPosition = JobPosition::factory()->create();
         $this->callApiWithLoggedUser()

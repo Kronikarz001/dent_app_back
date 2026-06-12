@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Export;
+namespace Tests\Unit\Exports;
 
 use App\Exports\UserExport;
 use App\Models\User;
@@ -14,7 +14,7 @@ final class UserExportTest extends UnitTestCase
     /**
      * @return void
      */
-    public function test_headings_are_correct(): void
+    public function testHeadingsAreCorrect(): void
     {
         $export = new UserExport(collect());
         $expected = [
@@ -30,7 +30,7 @@ final class UserExportTest extends UnitTestCase
     /**
      * @return void
      */
-    public function test_map_with_all_values_returns_expected_array(): void
+    public function testMapWithAllValuesReturnsExpectedArray(): void
     {
         $user = new User([
             'first_name' => 'Jan',
@@ -55,7 +55,7 @@ final class UserExportTest extends UnitTestCase
     /**
      * @return void
      */
-    public function test_collection_returns_users_collection(): void
+    public function testCollectionReturnsUsersCollection(): void
     {
         $user1 = new User(['first_name' => 'Jan']);
         $user2 = new User(['first_name' => 'Adam']);

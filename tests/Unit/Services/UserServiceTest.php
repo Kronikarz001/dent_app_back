@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Service;
+namespace Tests\Unit\Services;
 
 use App\Models\User;
 use App\Repositories\UserRepositoryInterface;
@@ -46,7 +46,7 @@ class UserServiceTest extends TestCase
     /**
      * @return void
      */
-    public function test_get_users_delegates_to_repository_without_column_filter(): void
+    public function testGetUsersDelegatesToRepositoryWithoutColumnFilter(): void
     {
         $paginator = new LengthAwarePaginator([], 0, 15, 1);
 
@@ -65,7 +65,7 @@ class UserServiceTest extends TestCase
     /**
      * @return void
      */
-    public function test_get_users_list_passes_only_uuid_and_name_columns(): void
+    public function testGetUsersListPassesOnlyUuidAndNameColumns(): void
     {
         $paginator = new LengthAwarePaginator([], 0, 100, 1);
 
@@ -84,7 +84,7 @@ class UserServiceTest extends TestCase
     /**
      * @return void
      */
-    public function test_get_users_list_does_not_pass_empty_columns(): void
+    public function testGetUsersListDoesNotPassEmptyColumns(): void
     {
         $paginator = new LengthAwarePaginator([], 0, 100, 1);
 
@@ -102,7 +102,7 @@ class UserServiceTest extends TestCase
     /**
      * @return void
      */
-    public function test_create_user_passes_data_unchanged_to_repository(): void
+    public function testCreateUserPassesDataUnchangedToRepository(): void
     {
         $data = ['name' => 'Jan', 'email' => 'jan@example.com', 'password' => 'plain'];
         $newUser = User::factory()->make(['id' => 1]);
@@ -122,7 +122,7 @@ class UserServiceTest extends TestCase
     /**
      * @return void
      */
-    public function test_update_user_passes_user_and_data_to_repository(): void
+    public function testUpdateUserPassesUserAndDataToRepository(): void
     {
         $user = User::factory()->make(['id' => 5]);
         $data = ['name' => 'New name'];
@@ -143,7 +143,7 @@ class UserServiceTest extends TestCase
     /**
      * @return void
      */
-    public function test_deactivate_user_always_sets_active_to_false(): void
+    public function testDeactivateUserAlwaysSetsActiveToFalse(): void
     {
         $user = User::factory()->make(['id' => 3, 'active' => true]);
         $capturedPayload = null;
@@ -166,7 +166,7 @@ class UserServiceTest extends TestCase
     /**
      * @return void
      */
-    public function test_deactivate_user_returns_void(): void
+    public function testDeactivateUserReturnsVoid(): void
     {
         $user = User::factory()->make();
 
@@ -178,7 +178,7 @@ class UserServiceTest extends TestCase
     /**
      * @return void
      */
-    public function test_delete_user_calls_repository_delete_not_update(): void
+    public function testDeleteUserCallsRepositoryDeleteNotUpdate(): void
     {
         $user = User::factory()->make(['uuid' => 8]);
 
@@ -195,7 +195,7 @@ class UserServiceTest extends TestCase
     /**
      * @return void
      */
-    public function test_edit_password_hashes_password_before_saving(): void
+    public function testEditPasswordHashesPasswordBeforeSaving(): void
     {
         $user = User::factory()->make(['id' => 2]);
         $plaintext = 'NewPassword123!';
@@ -221,7 +221,7 @@ class UserServiceTest extends TestCase
     /**
      * @return void
      */
-    public function test_edit_password_preserves_other_data_fields(): void
+    public function testEditPasswordPreservesOtherDataFields(): void
     {
         $user = User::factory()->make();
         $capturedPayload = null;
@@ -249,7 +249,7 @@ class UserServiceTest extends TestCase
     /**
      * @return void
      */
-    public function test_edit_password_returns_updated_user(): void
+    public function testEditPasswordReturnsUpdatedUser(): void
     {
         $user = User::factory()->make(['id' => 10]);
 
@@ -267,7 +267,7 @@ class UserServiceTest extends TestCase
     /**
      * @return void
      */
-    public function test_get_user_information_passes_uuid_string_not_model_to_repository(): void
+    public function testGetUserInformationPassesUuidStringNotModelToRepository(): void
     {
         $uuid = 'abc-123-uuid';
         $user = User::factory()->make(['uuid' => $uuid]);
@@ -288,7 +288,7 @@ class UserServiceTest extends TestCase
     /**
      * @return void
      */
-    public function test_get_user_by_token_returns_user_when_found(): void
+    public function testGetUserByTokenReturnsUserWhenFound(): void
     {
         $token = 'valid-token-xyz';
         $user = User::factory()->make();
@@ -308,7 +308,7 @@ class UserServiceTest extends TestCase
     /**
      * @return void
      */
-    public function test_get_user_by_token_returns_null_when_not_found(): void
+    public function testGetUserByTokenReturnsNullWhenNotFound(): void
     {
         $this->userRepository
             ->shouldReceive('getUserByToken')
@@ -324,7 +324,7 @@ class UserServiceTest extends TestCase
     /**
      * @return void
      */
-    public function test_get_logged_user_delegates_to_repository(): void
+    public function testGetLoggedUserDelegatesToRepository(): void
     {
         $loggedUser = User::factory()->make(['name' => 'Adam Kowalski']);
 
