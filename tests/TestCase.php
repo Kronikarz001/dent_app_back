@@ -3,6 +3,7 @@
 namespace Tests;
 
 use App\Models\User;
+use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 
@@ -12,6 +13,18 @@ use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 abstract class TestCase extends BaseTestCase
 {
     use RefreshDatabase;
+
+    /**
+     * @return Application
+     */
+    public function createApplication(): Application
+    {
+        $app = parent::createApplication();
+
+        $app['config']->set('database.connections.pgsql.database', 'dent_db_back_test');
+
+        return $app;
+    }
 
     /**
      * @param User|null $user

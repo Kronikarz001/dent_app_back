@@ -3,40 +3,22 @@
 namespace App\Repositories;
 
 use App\Models\User;
+use App\Search\Search;
 use App\Search\UserSearch;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 
-/**
- * Summary of UserRepository
- */
-readonly class UserRepository implements UserRepositoryInterface
+class UserRepository extends SearchableRepository implements UserRepositoryInterface
 {
-    /**
-     * @param UserSearch $search
-     */
+    protected string $modelClass = User::class;
+
     public function __construct(
-        private UserSearch $search
+        private readonly UserSearch $search
     ) {}
 
-    /**
-     * @param array $params
-     * @return LengthAwarePaginator
-     */
-    public function findAllWithPagination(array $params = []): LengthAwarePaginator
+    protected function getSearchModel(): Search
     {
-        return $this->search->search($params);
-    }
-
-    /**
-     * @param array $columns
-     * @param array $params
-     * @return LengthAwarePaginator
-     */
-    public function findSelectAllWithPagination(array $columns = ['*'], array $params = []): LengthAwarePaginator
-    {
-        return $this->search->search($params);
+        return $this->search;
     }
 
     /**

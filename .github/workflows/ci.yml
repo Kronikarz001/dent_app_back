@@ -60,6 +60,7 @@ jobs:
           php-version: '8.4'
           extensions: mbstring, pdo_pgsql, pgsql
       - run: composer install --prefer-dist --no-progress
+      - run: cp .env.testing.example .env.testing
       - run: php artisan key:generate --env=testing
       - run: php artisan migrate --env=testing --force
       - run: php artisan test --env=testing
