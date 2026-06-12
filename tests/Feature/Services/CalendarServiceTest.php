@@ -59,7 +59,7 @@ class CalendarServiceTest extends TestCase
      */
     public function testCreateCalendarPersistsToDatabase(): void
     {
-        $data = Calendar::factory()->make()->toArray();
+        $data = Calendar::factory()->make()->getAttributes();
 
         $calendar = $this->service->createCalendar($data);
 

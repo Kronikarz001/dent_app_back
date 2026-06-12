@@ -20,8 +20,8 @@ class Calendar extends UuidModel
         return [
             'ownerable_uuid' => 'string',
             'connected_calendar_uuid' => 'string',
-            'start_date' => 'datetime',
-            'end_date' => 'datetime',
+            'start_date' => 'timestamp',
+            'end_date' => 'timestamp',
             'is_active' => 'boolean',
         ];
     }

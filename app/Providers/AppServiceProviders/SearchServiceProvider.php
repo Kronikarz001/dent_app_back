@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Providers;
+namespace App\Providers\AppServiceProviders;
 
 use App\Repositories\SearchRepository;
 use App\Repositories\SearchRepositoryInterface;

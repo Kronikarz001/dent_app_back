@@ -2,6 +2,13 @@
 
 namespace App\Providers;
 
+use App\Providers\AppServiceProviders\AuthServiceProvider;
+use App\Providers\AppServiceProviders\CalendarServiceProvider;
+use App\Providers\AppServiceProviders\FileServiceProvider;
+use App\Providers\AppServiceProviders\JobPositionServiceProvider;
+use App\Providers\AppServiceProviders\PatientServiceProvider;
+use App\Providers\AppServiceProviders\SearchServiceProvider;
+use App\Providers\AppServiceProviders\UserServiceProvider;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\ServiceProvider;
 use PhpOffice\PhpSpreadsheet\Shared\File as SpreadsheetFile;
