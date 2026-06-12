@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Repositories\CalendarRepository;
+use App\Repositories\CalendarRepositoryInterface;
 use App\Services\CalendarService;
 use App\Services\CalendarServiceInterface;
 use Illuminate\Support\ServiceProvider;
@@ -16,6 +18,7 @@ class CalendarServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        $this->app->bind(CalendarRepositoryInterface::class, CalendarRepository::class);
         $this->app->bind(CalendarServiceInterface::class, CalendarService::class);
     }
 }

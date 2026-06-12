@@ -4,7 +4,6 @@ namespace Database\Factories;
 
 use App\Enums\CalendarEventType;
 use App\Models\Calendar;
-use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Carbon;
 
@@ -29,7 +28,6 @@ class CalendarFactory extends Factory
             'type' => $this->faker->randomElement(CalendarEventType::cases())->value,
             'start_date' => Carbon::now(),
             'end_date' => Carbon::now(),
-            'created_by' => User::factory(),
             'is_active' => $this->faker->boolean(),
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),

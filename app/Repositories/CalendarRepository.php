@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Models\Calendar;
 use App\Search\CalendarSearch;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -66,6 +67,26 @@ readonly class CalendarRepository implements CalendarRepositoryInterface
         $model->update($data);
 
         return $model->fresh();
+    }
+
+    /**
+     * @param array $uuids
+     * @return Collection
+     */
+    public function findAllByUuids(array $uuids): Collection
+    {
+        return Calendar::whereIn('uuid', $uuids)->get();
+    }
+
+    /**
+     * @param string $modelClass
+     * @param array $uniqueAttributes
+     * @param array $values
+     * @return Calendar
+     */
+    public function createOrUpdate(string $modelClass, array $uniqueAttributes, array $values): Calendar
+    {
+        return $modelClass::updateOrCreate($uniqueAttributes, $values);
     }
 
     /**

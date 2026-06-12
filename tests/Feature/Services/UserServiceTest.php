@@ -4,6 +4,7 @@ namespace Tests\Feature\Services;
 
 use App\Models\User;
 use App\Services\UserServiceInterface;
+use Illuminate\Foundation\Application;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -11,14 +12,27 @@ use Tests\TestCase;
 
 class UserServiceTest extends TestCase
 {
+    /**
+     * @var UserServiceInterface|Application|mixed|object
+     */
     private UserServiceInterface $service;
 
+    protected const USERS_TABLE = 'users';
+
+    protected const TOKENS_TABLE = 'personal_access_tokens';
+
+    /**
+     * @return void
+     */
     protected function setUp(): void
     {
         parent::setUp();
         $this->service = app(UserServiceInterface::class);
     }
 
+    /**
+     * @return void
+     */
     public function testGetUsersReturnsPaginatedResults(): void
     {
         User::factory()->count(3)->create();
@@ -29,6 +43,9 @@ class UserServiceTest extends TestCase
         $this->assertGreaterThanOrEqual(3, $result->total());
     }
 
+    /**
+     * @return void
+     */
     public function testGetUsersListReturnsPaginator(): void
     {
         User::factory()->count(2)->create();
@@ -38,17 +55,30 @@ class UserServiceTest extends TestCase
         $this->assertInstanceOf(LengthAwarePaginator::class, $result);
     }
 
+    /**
+     * @return void
+     */
     public function testCreateUserPersistsToDatabase(): void
     {
-        $data = User::factory()->make()->toArray();
-        $data['password'] = Hash::make('password');
+        $data = [
+            'first_name' => 'Jan',
+            'last_name' => 'Kowalski',
+            'email' => 'jan.kowalski@example.com',
+            'private_email' => 'jan.private@example.com',
+            'password' => Hash::make('password'),
+            'pesel' => '90010112345',
+            'is_active' => true,
+        ];
 
         $user = $this->service->createUser($data);
 
         $this->assertInstanceOf(User::class, $user);
-        $this->assertDatabaseHas('users', ['email' => $data['email']]);
+        $this->assertDatabaseHas(self::USERS_TABLE, ['email' => 'jan.kowalski@example.com']);
     }
 
+    /**
+     * @return void
+     */
     public function testUpdateUserPersistsChangesToDatabase(): void
     {
         $user = User::factory()->create();
@@ -56,27 +86,36 @@ class UserServiceTest extends TestCase
         $result = $this->service->updateUser($user, ['first_name' => 'Zmienione']);
 
         $this->assertInstanceOf(User::class, $result);
-        $this->assertDatabaseHas('users', ['uuid' => $user->uuid, 'first_name' => 'Zmienione']);
+        $this->assertDatabaseHas(self::USERS_TABLE, ['uuid' => $user->uuid, 'first_name' => 'Zmienione']);
     }
 
+    /**
+     * @return void
+     */
     public function testDeactivateUserSetsActiveToFalse(): void
     {
         $user = User::factory()->create(['is_active' => true]);
 
         $this->service->deactivateUser($user);
 
-        $this->assertDatabaseHas('users', ['uuid' => $user->uuid, 'is_active' => false]);
+        $this->assertDatabaseHas(self::USERS_TABLE, ['uuid' => $user->uuid, 'is_active' => false]);
     }
 
+    /**
+     * @return void
+     */
     public function testDeleteUserRemovesFromDatabase(): void
     {
         $user = User::factory()->create();
 
         $this->service->deleteUser($user);
 
-        $this->assertDatabaseMissing('users', ['uuid' => $user->uuid]);
+        $this->assertDatabaseMissing(self::USERS_TABLE, ['uuid' => $user->uuid]);
     }
 
+    /**
+     * @return void
+     */
     public function testEditPasswordHashesAndPersistsNewPassword(): void
     {
         $user = User::factory()->create();
@@ -89,6 +128,9 @@ class UserServiceTest extends TestCase
         $this->assertTrue(Hash::check($plaintext, $fresh->password));
     }
 
+    /**
+     * @return void
+     */
     public function testGetUserInformationReturnsUser(): void
     {
         $user = User::factory()->create();
@@ -99,6 +141,9 @@ class UserServiceTest extends TestCase
         $this->assertSame($user->uuid, $result->uuid);
     }
 
+    /**
+     * @return void
+     */
     public function testGetUserByTokenReturnsUserForValidToken(): void
     {
         $user = User::factory()->create();
@@ -111,6 +156,9 @@ class UserServiceTest extends TestCase
         $this->assertSame($user->uuid, $result->uuid);
     }
 
+    /**
+     * @return void
+     */
     public function testGetUserByTokenReturnsNullForInvalidToken(): void
     {
         $result = $this->service->getUserByToken('invalid-token-xyz');
@@ -118,6 +166,9 @@ class UserServiceTest extends TestCase
         $this->assertNull($result);
     }
 
+    /**
+     * @return void
+     */
     public function testGetLoggedUserReturnsAuthenticatedUser(): void
     {
         $user = User::factory()->create();
