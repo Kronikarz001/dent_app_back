@@ -72,6 +72,7 @@ readonly class CalendarService implements CalendarServiceInterface
     /**
      * @param ExportRequest $request
      * @return BinaryFileResponse
+     *
      * @throws Exception
      * @throws WriterException
      */
