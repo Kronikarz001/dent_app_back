@@ -54,7 +54,6 @@ interface JobPositionServiceInterface
     /**
      * @param ExportRequest $request
      * @return BinaryFileResponse
-     *
      * @throws Exception
      * @throws WriterException
      */

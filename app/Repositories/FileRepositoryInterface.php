@@ -37,10 +37,10 @@ interface FileRepositoryInterface extends SearchableRepositoryInterface
     public function delete(File|Model $model): bool;
 
     /**
-     * @param string $parentUuid
+     * @param string $parentParentUuid
      * @return Collection
      */
-    public function findAllByFileUuid(string $parentUuid): Collection;
+    public function findAllByFileUuid(string $parentParentUuid): Collection;
 
     /**
      * @param string $fileableType

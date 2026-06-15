@@ -2,9 +2,14 @@
 
 namespace App\Services;
 
+use App\Exports\CalendarExport;
+use App\Http\Requests\ExportRequest;
 use App\Models\Calendar;
 use App\Repositories\CalendarRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
+use PhpOffice\PhpSpreadsheet\Exception;
+use PhpOffice\PhpSpreadsheet\Writer\Exception as WriterException;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 /**
  * Summary of CalendarService
@@ -13,9 +18,11 @@ readonly class CalendarService implements CalendarServiceInterface
 {
     /**
      * @param CalendarRepositoryInterface $calendarRepository
+     * @param ExportServiceInterface $exportService
      */
     public function __construct(
         private CalendarRepositoryInterface $calendarRepository,
+        private ExportServiceInterface $exportService,
     ) {}
 
     /**
@@ -60,5 +67,16 @@ readonly class CalendarService implements CalendarServiceInterface
     public function deleteCalendar(Calendar $calendar): void
     {
         $this->calendarRepository->delete($calendar);
+    }
+
+    /**
+     * @param ExportRequest $request
+     * @return BinaryFileResponse
+     * @throws Exception
+     * @throws WriterException
+     */
+    public function export(ExportRequest $request): BinaryFileResponse
+    {
+        return $this->exportService->export($request, new CalendarExport($this->getCalendars()->getCollection()), Calendar::getModel());
     }
 }

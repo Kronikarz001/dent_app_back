@@ -4,13 +4,13 @@ namespace App\Http\Controllers;
 
 use OpenApi\Attributes as OA;
 
-#[OA\Info(title: 'DentApp API', version: '1.0.0', description: 'API aplikacji DentApp')]
+#[OA\Info(version: '1.0.0', description: 'API aplikacji DentApp', title: 'DentApp API')]
 #[OA\SecurityScheme(
     securityScheme: 'sanctum',
     type: 'http',
-    scheme: 'bearer',
+    description: 'Token Sanctum — przekaż w nagłówku: Authorization: Bearer {token}',
     bearerFormat: 'JWT',
-    description: 'Token Sanctum — przekaż w nagłówku: Authorization: Bearer {token}'
+    scheme: 'bearer'
 )]
 #[OA\Schema(
     schema: 'PaginatedResponse',
@@ -66,6 +66,23 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: 'uuid', type: 'string', format: 'uuid'),
         new OA\Property(property: 'name', type: 'string'),
         new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
+    ]
+)]
+#[OA\Schema(
+    schema: 'CalendarResource',
+    properties: [
+        new OA\Property(property: 'uuid', type: 'string', format: 'uuid'),
+        new OA\Property(property: 'type', type: 'string'),
+        new OA\Property(property: 'name', type: 'string', nullable: true),
+        new OA\Property(property: 'description', type: 'string', nullable: true),
+        new OA\Property(property: 'ownerable_uuid', type: 'string', format: 'uuid', nullable: true),
+        new OA\Property(property: 'ownerable_type', type: 'string', nullable: true),
+        new OA\Property(property: 'connected_calendar_uuid', type: 'string', format: 'uuid', nullable: true),
+        new OA\Property(property: 'start_date', type: 'string', format: 'date-time', nullable: true),
+        new OA\Property(property: 'end_date', type: 'string', format: 'date-time', nullable: true),
+        new OA\Property(property: 'is_active', type: 'boolean'),
+        new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
+        new OA\Property(property: 'updated_at', type: 'string', format: 'date-time'),
     ]
 )]
 abstract class Controller

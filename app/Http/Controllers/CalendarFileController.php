@@ -15,8 +15,14 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use OpenApi\Attributes as OA;
 
+/**
+ *
+ */
 class CalendarFileController extends Controller
 {
+    /**
+     * @param FileServiceInterface $fileService
+     */
     public function __construct(
         private readonly FileServiceInterface $fileService
     ) {}
@@ -44,6 +50,9 @@ class CalendarFileController extends Controller
             ),
         ]
     )]
+    /**
+     *
+     */
     public function index(Calendar $calendar): LengthAwarePaginator
     {
         return $this->fileService->getAllFiles($calendar);

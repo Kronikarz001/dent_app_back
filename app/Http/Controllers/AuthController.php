@@ -9,15 +9,24 @@ use App\Services\AuthServiceInterface;
 use Illuminate\Http\JsonResponse;
 use OpenApi\Attributes as OA;
 
+/**
+ * Summary of AuthController
+ */
 class AuthController extends Controller
 {
+    /**
+     * @param AuthServiceInterface $authService
+     */
     public function __construct(
         private readonly AuthServiceInterface $authService
     ) {}
 
+    /**
+     * @param LoginRequest $request
+     * @return JsonResponse
+     */
     #[OA\Post(
         path: '/api/auth/login',
-        tags: ['Auth'],
         summary: 'Logowanie użytkownika',
         requestBody: new OA\RequestBody(
             required: true,
@@ -29,6 +38,7 @@ class AuthController extends Controller
                 ]
             )
         ),
+        tags: ['Auth'],
         responses: [
             new OA\Response(
                 response: 200,
@@ -45,11 +55,14 @@ class AuthController extends Controller
         return $this->authService->login($request);
     }
 
+    /**
+     * @return JsonResponse
+     */
     #[OA\Post(
         path: '/api/auth/logout',
-        tags: ['Auth'],
         summary: 'Wylogowanie użytkownika',
         security: [['sanctum' => []]],
+        tags: ['Auth'],
         responses: [
             new OA\Response(response: 200, description: 'Wylogowano pomyślnie'),
         ]
@@ -61,9 +74,12 @@ class AuthController extends Controller
         return new JsonResponse;
     }
 
+    /**
+     * @param ForgotPasswordRequest $request
+     * @return JsonResponse
+     */
     #[OA\Post(
         path: '/api/auth/forgot-password',
-        tags: ['Auth'],
         summary: 'Wysłanie linku do resetowania hasła',
         requestBody: new OA\RequestBody(
             required: true,
@@ -74,6 +90,7 @@ class AuthController extends Controller
                 ]
             )
         ),
+        tags: ['Auth'],
         responses: [
             new OA\Response(response: 200, description: 'Link wysłany'),
             new OA\Response(response: 422, description: 'Błąd walidacji'),
@@ -86,9 +103,12 @@ class AuthController extends Controller
         return new JsonResponse;
     }
 
+    /**
+     * @param ResetPasswordRequest $request
+     * @return JsonResponse
+     */
     #[OA\Post(
         path: '/api/auth/reset-password',
-        tags: ['Auth'],
         summary: 'Resetowanie hasła',
         requestBody: new OA\RequestBody(
             required: true,
@@ -102,6 +122,7 @@ class AuthController extends Controller
                 ]
             )
         ),
+        tags: ['Auth'],
         responses: [
             new OA\Response(response: 204, description: 'Hasło zmienione'),
             new OA\Response(response: 422, description: 'Nieprawidłowy token lub dane'),
