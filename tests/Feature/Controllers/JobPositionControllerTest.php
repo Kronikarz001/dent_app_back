@@ -7,7 +7,7 @@ use App\Models\User;
 use Tests\TestCase;
 
 /**
- * Summary of UserControllerTest
+ * Summary of JobPositionControllerTest
  */
 class JobPositionControllerTest extends TestCase
 {

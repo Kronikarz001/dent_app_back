@@ -2,15 +2,23 @@
 
 namespace App\Models;
 
+use App\Traits\HasFile;
+
 /**
  * Summary of Calendar
  */
 class Calendar extends UuidModel
 {
-    /**
-     * @var string[]
-     */
-    protected $guarded = [];
+    use HasFile;
+
+    protected $fillable = [
+        'name',
+        'description',
+        'type',
+        'start_date',
+        'end_date',
+        'is_active',
+    ];
 
     /**
      * @return string[]
