@@ -17,10 +17,10 @@ class UserStoreRequest extends FormRequest
         return [
             'first_name' => ['required', 'string'],
             'last_name' => ['required', 'string'],
-            'email' => ['required', 'email', 'unique:users,email'],
+            'email' => ['nullable', 'email', 'unique:users,email'],
             'password' => ['required', 'string', 'confirmed'],
             'pesel' => ['required', 'string', 'size:11', 'unique:users,pesel'],
-            'private_email' => ['nullable', 'email', 'unique:users,private_email'],
+            'private_email' => ['required', 'email', 'unique:users,private_email'],
         ];
     }
 

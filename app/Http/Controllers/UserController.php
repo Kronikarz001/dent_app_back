@@ -11,19 +11,30 @@ use App\Services\UserServiceInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Pagination\LengthAwarePaginator;
 use OpenApi\Attributes as OA;
+use PhpOffice\PhpSpreadsheet\Exception;
+use PhpOffice\PhpSpreadsheet\Writer\Exception as WriterException;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
+/**
+ * Summary of UserController
+ */
 class UserController extends Controller
 {
+    /**
+     * @param UserServiceInterface $userService
+     */
     public function __construct(
         private readonly UserServiceInterface $userService
     ) {}
 
+    /**
+     * @return LengthAwarePaginator
+     */
     #[OA\Get(
         path: '/api/user',
-        tags: ['User'],
         summary: 'Lista użytkowników (paginacja)',
         security: [['sanctum' => []]],
+        tags: ['User'],
         responses: [
             new OA\Response(
                 response: 200,
@@ -44,11 +55,14 @@ class UserController extends Controller
         return $this->userService->getUsers();
     }
 
+    /**
+     * @return LengthAwarePaginator
+     */
     #[OA\Get(
         path: '/api/user/selectlist',
-        tags: ['User'],
         summary: 'Lista użytkowników do selecta (uuid + name)',
         security: [['sanctum' => []]],
+        tags: ['User'],
         responses: [
             new OA\Response(response: 200, description: 'OK'),
         ]
@@ -58,11 +72,15 @@ class UserController extends Controller
         return $this->userService->getUsersList();
     }
 
+    /**
+     * @param User $user
+     * @return UserResource
+     */
     #[OA\Get(
         path: '/api/user/{uuid}',
-        tags: ['User'],
         summary: 'Pobiera jednego użytkownika',
         security: [['sanctum' => []]],
+        tags: ['User'],
         parameters: [
             new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
         ],
@@ -82,11 +100,14 @@ class UserController extends Controller
         return new UserResource($user);
     }
 
+    /**
+     * @return UserResource
+     */
     #[OA\Get(
         path: '/api/user/user-info',
-        tags: ['User'],
         summary: 'Dane zalogowanego użytkownika',
         security: [['sanctum' => []]],
+        tags: ['User'],
         responses: [
             new OA\Response(
                 response: 200,
@@ -102,9 +123,12 @@ class UserController extends Controller
         return new UserResource($this->userService->getLoggedUser());
     }
 
+    /**
+     * @param UserStoreRequest $request
+     * @return UserResource
+     */
     #[OA\Post(
         path: '/api/user',
-        tags: ['User'],
         summary: 'Tworzy nowego użytkownika',
         security: [['sanctum' => []]],
         requestBody: new OA\RequestBody(
@@ -121,6 +145,7 @@ class UserController extends Controller
                 ]
             )
         ),
+        tags: ['User'],
         responses: [
             new OA\Response(
                 response: 201,
@@ -137,14 +162,15 @@ class UserController extends Controller
         return new UserResource($this->userService->createUser($request->all()));
     }
 
+    /**
+     * @param User $user
+     * @param UserUpdateRequest $request
+     * @return JsonResponse
+     */
     #[OA\Put(
         path: '/api/user/{uuid}',
-        tags: ['User'],
         summary: 'Aktualizuje użytkownika',
         security: [['sanctum' => []]],
-        parameters: [
-            new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
-        ],
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
@@ -157,6 +183,10 @@ class UserController extends Controller
                 ]
             )
         ),
+        tags: ['User'],
+        parameters: [
+            new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
+        ],
         responses: [
             new OA\Response(response: 204, description: 'Zaktualizowano'),
             new OA\Response(response: 404, description: 'Nie znaleziono'),
@@ -170,11 +200,15 @@ class UserController extends Controller
         return new JsonResponse(null, 204);
     }
 
+    /**
+     * @param User $user
+     * @return JsonResponse
+     */
     #[OA\Delete(
         path: '/api/user/{uuid}',
-        tags: ['User'],
         summary: 'Deaktywuje użytkownika',
         security: [['sanctum' => []]],
+        tags: ['User'],
         parameters: [
             new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
         ],
@@ -190,11 +224,17 @@ class UserController extends Controller
         return new JsonResponse(null, 204);
     }
 
+    /**
+     * @param ExportRequest $request
+     * @return BinaryFileResponse
+     * @throws Exception
+     * @throws WriterException
+     */
     #[OA\Get(
         path: '/api/user/export',
-        tags: ['User'],
         summary: 'Eksport użytkowników do pliku',
         security: [['sanctum' => []]],
+        tags: ['User'],
         parameters: [
             new OA\QueryParameter(name: 'type', required: true, schema: new OA\Schema(type: 'string', enum: ['xlsx', 'csv', 'ods'])),
         ],
