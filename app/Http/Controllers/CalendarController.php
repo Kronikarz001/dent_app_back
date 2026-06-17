@@ -2,13 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\AssignJobPositionRequest;
+use App\Http\Requests\CalendarRequest;
 use App\Http\Requests\ExportRequest;
-use App\Http\Requests\JobPositionRequest;
-use App\Http\Resources\JobPositionResource;
-use App\Models\JobPosition;
-use App\Models\User;
-use App\Services\JobPositionServiceInterface;
+use App\Http\Resources\CalendarResource;
+use App\Models\Calendar;
+use App\Services\CalendarServiceInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Pagination\LengthAwarePaginator;
 use OpenApi\Attributes as OA;
@@ -17,25 +15,25 @@ use PhpOffice\PhpSpreadsheet\Writer\Exception as WriterException;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 /**
- * Summary of JobPositionController
+ * Summary of CalendarController
  */
-class JobPositionController extends Controller
+class CalendarController extends Controller
 {
     /**
-     * @param JobPositionServiceInterface $jobPositionService
+     * @param CalendarServiceInterface $calendarService
      */
     public function __construct(
-        private readonly JobPositionServiceInterface $jobPositionService
+        private readonly CalendarServiceInterface $calendarService
     ) {}
 
     /**
      * @return LengthAwarePaginator
      */
     #[OA\Get(
-        path: '/api/job-position',
-        summary: 'Lista stanowisk (paginacja)',
+        path: '/api/calendar',
+        summary: 'Lista wydarzeń w kalendarzu',
         security: [['sanctum' => []]],
-        tags: ['JobPosition'],
+        tags: ['Calendar'],
         responses: [
             new OA\Response(
                 response: 200,
@@ -44,7 +42,7 @@ class JobPositionController extends Controller
                     allOf: [
                         new OA\Schema(ref: '#/components/schemas/PaginatedResponse'),
                         new OA\Schema(properties: [
-                            new OA\Property(property: 'data', type: 'array', items: new OA\Items(ref: '#/components/schemas/JobPositionResource')),
+                            new OA\Property(property: 'data', type: 'array', items: new OA\Items(ref: '#/components/schemas/CalendarResource')),
                         ]),
                     ]
                 )
@@ -53,35 +51,35 @@ class JobPositionController extends Controller
     )]
     public function index(): LengthAwarePaginator
     {
-        return $this->jobPositionService->getJobPositions();
+        return $this->calendarService->getCalendars();
     }
 
     /**
      * @return LengthAwarePaginator
      */
     #[OA\Get(
-        path: '/api/job-position/selectlist',
-        summary: 'Lista stanowisk do selecta (uuid + name)',
+        path: '/api/calendar/selectlist',
+        summary: 'Wydarzenia do selecta (uuid + name)',
         security: [['sanctum' => []]],
-        tags: ['JobPosition'],
+        tags: ['Calendar'],
         responses: [
             new OA\Response(response: 200, description: 'OK'),
         ]
     )]
     public function selectList(): LengthAwarePaginator
     {
-        return $this->jobPositionService->getJobPositionsList();
+        return $this->calendarService->getCalendarsList();
     }
 
     /**
-     * @param JobPosition $jobPosition
-     * @return JobPositionResource
+     * @param Calendar $calendar
+     * @return CalendarResource
      */
     #[OA\Get(
-        path: '/api/job-position/{uuid}',
-        summary: 'Pobiera jedno stanowisko',
+        path: '/api/calendar/{uuid}',
+        summary: 'Pobiera jedno wydarzenie',
         security: [['sanctum' => []]],
-        tags: ['JobPosition'],
+        tags: ['Calendar'],
         parameters: [
             new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
         ],
@@ -90,24 +88,24 @@ class JobPositionController extends Controller
                 response: 200,
                 description: 'OK',
                 content: new OA\JsonContent(
-                    properties: [new OA\Property(property: 'data', ref: '#/components/schemas/JobPositionResource')]
+                    properties: [new OA\Property(property: 'data', ref: '#/components/schemas/CalendarResource')]
                 )
             ),
             new OA\Response(response: 404, description: 'Nie znaleziono'),
         ]
     )]
-    public function show(JobPosition $jobPosition): JobPositionResource
+    public function show(Calendar $calendar): CalendarResource
     {
-        return new JobPositionResource($jobPosition);
+        return new CalendarResource($calendar);
     }
 
     /**
-     * @param JobPositionRequest $request
-     * @return JobPositionResource
+     * @param CalendarRequest $request
+     * @return CalendarResource
      */
     #[OA\Post(
-        path: '/api/job-position',
-        summary: 'Tworzy nowe stanowisko',
+        path: '/api/calendar',
+        summary: 'Tworzy nowe wydarzenie w kalendarzu',
         security: [['sanctum' => []]],
         requestBody: new OA\RequestBody(
             required: true,
@@ -120,31 +118,31 @@ class JobPositionController extends Controller
                 ]
             )
         ),
-        tags: ['JobPosition'],
+        tags: ['Calendar'],
         responses: [
             new OA\Response(
                 response: 201,
                 description: 'Utworzono',
                 content: new OA\JsonContent(
-                    properties: [new OA\Property(property: 'data', ref: '#/components/schemas/JobPositionResource')]
+                    properties: [new OA\Property(property: 'data', ref: '#/components/schemas/CalendarResource')]
                 )
             ),
             new OA\Response(response: 422, description: 'Błąd walidacji'),
         ]
     )]
-    public function store(JobPositionRequest $request): JobPositionResource
+    public function store(CalendarRequest $request): CalendarResource
     {
-        return new JobPositionResource($this->jobPositionService->createJobPosition($request->all()));
+        return new CalendarResource($this->calendarService->createCalendar($request->all()));
     }
 
     /**
-     * @param JobPosition $jobPosition
-     * @param JobPositionRequest $request
+     * @param Calendar $calendar
+     * @param CalendarRequest $request
      * @return JsonResponse
      */
     #[OA\Put(
-        path: '/api/job-position/{uuid}',
-        summary: 'Aktualizuje stanowisko',
+        path: '/api/calendar/{uuid}',
+        summary: 'Aktualizuje wydarzenie w kalendarzu',
         security: [['sanctum' => []]],
         requestBody: new OA\RequestBody(
             required: true,
@@ -157,7 +155,7 @@ class JobPositionController extends Controller
                 ]
             )
         ),
-        tags: ['JobPosition'],
+        tags: ['Calendar'],
         parameters: [
             new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
         ],
@@ -167,22 +165,22 @@ class JobPositionController extends Controller
             new OA\Response(response: 422, description: 'Błąd walidacji'),
         ]
     )]
-    public function update(JobPosition $jobPosition, JobPositionRequest $request): JsonResponse
+    public function update(Calendar $calendar, CalendarRequest $request): JsonResponse
     {
-        $this->jobPositionService->updateJobPosition($jobPosition, $request->all());
+        $this->calendarService->updateCalendar($calendar, $request->all());
 
         return new JsonResponse(null, 204);
     }
 
     /**
-     * @param JobPosition $jobPosition
+     * @param Calendar $calendar
      * @return JsonResponse
      */
     #[OA\Delete(
-        path: '/api/job-position/{uuid}',
+        path: '/api/calendar/{uuid}',
         summary: 'Usuwa stanowisko',
         security: [['sanctum' => []]],
-        tags: ['JobPosition'],
+        tags: ['Calendar'],
         parameters: [
             new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
         ],
@@ -191,44 +189,9 @@ class JobPositionController extends Controller
             new OA\Response(response: 404, description: 'Nie znaleziono'),
         ]
     )]
-    public function destroy(JobPosition $jobPosition): JsonResponse
+    public function destroy(Calendar $calendar): JsonResponse
     {
-        $this->jobPositionService->deleteJobPosition($jobPosition);
-
-        return new JsonResponse(null, 204);
-    }
-
-    /**
-     * @param User $user
-     * @param AssignJobPositionRequest $request
-     * @return JsonResponse
-     */
-    #[OA\Patch(
-        path: '/api/user/{uuid}/jobposition',
-        summary: 'Przypisuje stanowiska do użytkownika',
-        security: [['sanctum' => []]],
-        requestBody: new OA\RequestBody(
-            required: true,
-            content: new OA\JsonContent(
-                required: ['job_positions'],
-                properties: [
-                    new OA\Property(property: 'job_positions', type: 'array', items: new OA\Items(type: 'string', format: 'uuid')),
-                ]
-            )
-        ),
-        tags: ['JobPosition'],
-        parameters: [
-            new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
-        ],
-        responses: [
-            new OA\Response(response: 204, description: 'Przypisano'),
-            new OA\Response(response: 404, description: 'Nie znaleziono'),
-            new OA\Response(response: 422, description: 'Błąd walidacji'),
-        ]
-    )]
-    public function assignJobPosition(User $user, AssignJobPositionRequest $request): JsonResponse
-    {
-        $this->jobPositionService->assignJobPosition($user, $request->all());
+        $this->calendarService->deleteCalendar($calendar);
 
         return new JsonResponse(null, 204);
     }
@@ -241,10 +204,10 @@ class JobPositionController extends Controller
      * @throws WriterException
      */
     #[OA\Get(
-        path: '/api/job-position/export',
-        summary: 'Eksport stanowisk do pliku',
+        path: '/api/calendar/export',
+        summary: 'Eksport wydarzeń do pliku',
         security: [['sanctum' => []]],
-        tags: ['JobPosition'],
+        tags: ['Calendar'],
         parameters: [
             new OA\QueryParameter(name: 'type', required: true, schema: new OA\Schema(type: 'string', enum: ['xlsx', 'csv', 'ods'])),
         ],
@@ -254,6 +217,6 @@ class JobPositionController extends Controller
     )]
     public function export(ExportRequest $request): BinaryFileResponse
     {
-        return $this->jobPositionService->export($request);
+        return $this->calendarService->export($request);
     }
 }

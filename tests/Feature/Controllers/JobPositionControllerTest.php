@@ -1,13 +1,13 @@
 <?php
 
-namespace Tests\Feature\Controller;
+namespace Tests\Feature\Controllers;
 
 use App\Models\JobPosition;
 use App\Models\User;
 use Tests\TestCase;
 
 /**
- * Summary of UserControllerTest
+ * Summary of JobPositionControllerTest
  */
 class JobPositionControllerTest extends TestCase
 {

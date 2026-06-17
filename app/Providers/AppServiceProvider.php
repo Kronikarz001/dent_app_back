@@ -2,10 +2,20 @@
 
 namespace App\Providers;
 
+use App\Providers\AppServiceProviders\AuthServiceProvider;
+use App\Providers\AppServiceProviders\CalendarServiceProvider;
+use App\Providers\AppServiceProviders\FileServiceProvider;
+use App\Providers\AppServiceProviders\JobPositionServiceProvider;
+use App\Providers\AppServiceProviders\PatientServiceProvider;
+use App\Providers\AppServiceProviders\SearchServiceProvider;
+use App\Providers\AppServiceProviders\UserServiceProvider;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\ServiceProvider;
 use PhpOffice\PhpSpreadsheet\Shared\File as SpreadsheetFile;
 
+/**
+ * Summary of AppServiceProvider
+ */
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -14,9 +24,11 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->register(AuthServiceProvider::class);
+        $this->app->register(SearchServiceProvider::class);
         $this->app->register(UserServiceProvider::class);
         $this->app->register(PatientServiceProvider::class);
         $this->app->register(JobPositionServiceProvider::class);
+        $this->app->register(CalendarServiceProvider::class);
         $this->app->register(FileServiceProvider::class);
     }
 

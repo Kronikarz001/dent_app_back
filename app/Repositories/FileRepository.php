@@ -73,12 +73,12 @@ class FileRepository extends SearchableRepository implements FileRepositoryInter
     }
 
     /**
-     * @param string $parentUuid
+     * @param string $parentParentUuid
      * @return Collection
      */
-    public function findAllByFileUuid(string $parentUuid): Collection
+    public function findAllByFileUuid(string $parentParentUuid): Collection
     {
-        return File::whereFileUuid($parentUuid)->get();
+        return File::whereFileUuid($parentParentUuid)->get();
     }
 
     /**
