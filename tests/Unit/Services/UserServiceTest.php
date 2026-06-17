@@ -159,8 +159,8 @@ class UserServiceTest extends TestCase
 
         $this->userService->deactivateUser($user);
 
-        $this->assertArrayHasKey('active', $capturedPayload);
-        $this->assertFalse($capturedPayload['active']);
+        $this->assertArrayHasKey('is_active', $capturedPayload);
+        $this->assertFalse($capturedPayload['is_active']);
     }
 
     /**

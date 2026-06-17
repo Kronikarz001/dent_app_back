@@ -72,7 +72,7 @@ readonly class UserService implements UserServiceInterface
      */
     public function deactivateUser(User $user): void
     {
-        $this->userRepository->update($user, ['active' => false]);
+        $this->userRepository->update($user, ['is_active' => false]);
     }
 
     /**
