@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
@@ -152,5 +153,13 @@ abstract class BasicUser extends Authenticatable
             'uuid',
             'uuid'
         );
+    }
+
+    /**
+     * @return MorphToMany
+     */
+    public function calendars(): MorphToMany
+    {
+        return $this->morphToMany(Calendar::class, 'userable', 'calendar_users');
     }
 }

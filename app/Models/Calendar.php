@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\HasFile;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 /**
  * Summary of Calendar
@@ -32,5 +33,21 @@ class Calendar extends UuidModel
             'end_date' => 'timestamp',
             'is_active' => 'boolean',
         ];
+    }
+
+    /**
+     * @return MorphToMany
+     */
+    public function users(): MorphToMany
+    {
+        return $this->morphedByMany(User::class, 'userable', 'calendar_users');
+    }
+
+    /**
+     * @return MorphToMany
+     */
+    public function patients(): MorphToMany
+    {
+        return $this->morphedByMany(Patient::class, 'userable', 'calendar_users');
     }
 }

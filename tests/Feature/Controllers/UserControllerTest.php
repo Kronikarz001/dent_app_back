@@ -35,6 +35,53 @@ class UserControllerTest extends TestCase
     /**
      * @return void
      */
+    public function testIndexFiltersByExactFieldValue(): void
+    {
+        User::factory()->create(['first_name' => 'Zbigniew']);
+        $target = User::factory()->create(['first_name' => 'Unikalniejszy']);
+
+        $response = $this->callApiWithLoggedUser()
+            ->getJson(route('user.index', ['user' => ['first_name' => 'Unikalniejszy']]));
+
+        $response->assertOk();
+        $response->assertJsonCount(1, 'data');
+        $response->assertJsonPath('data.0.uuid', $target->uuid);
+    }
+
+    /**
+     * @return void
+     */
+    public function testIndexSortsResultsByField(): void
+    {
+        User::factory()->create(['first_name' => 'Bartosz']);
+        User::factory()->create(['first_name' => 'Adam']);
+
+        $response = $this->callApiWithLoggedUser()
+            ->getJson(route('user.index', ['sort' => 'first_name,asc']));
+
+        $response->assertOk();
+        $names = collect($response->json('data'))->pluck('first_name')->all();
+        $this->assertSame(collect($names)->sort()->values()->all(), $names);
+    }
+
+    /**
+     * @return void
+     */
+    public function testIndexSearchStringMatchesPartialValue(): void
+    {
+        $target = User::factory()->create(['first_name' => 'Wyjatkowy']);
+        User::factory()->create(['first_name' => 'Inny']);
+
+        $response = $this->callApiWithLoggedUser()
+            ->getJson(route('user.index', ['searchString' => 'Wyjatkowy']));
+
+        $response->assertOk();
+        $response->assertJsonPath('data.0.uuid', $target->uuid);
+    }
+
+    /**
+     * @return void
+     */
     public function testShowUserReturnSuccessResponse(): void
     {
         $user = User::factory()->create();

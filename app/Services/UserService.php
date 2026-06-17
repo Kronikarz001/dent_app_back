@@ -20,11 +20,13 @@ readonly class UserService implements UserServiceInterface
      * @param UserRepositoryInterface $userRepository
      * @param ExportServiceInterface $exportService
      * @param PhoneNumberServiceInterface $phoneNumberService
+     * @param JobPositionServiceInterface $jobPositionService
      */
     public function __construct(
         private UserRepositoryInterface $userRepository,
         private ExportServiceInterface $exportService,
-        private PhoneNumberServiceInterface $phoneNumberService
+        private PhoneNumberServiceInterface $phoneNumberService,
+        private JobPositionServiceInterface $jobPositionService
     ) {}
 
     /**
@@ -61,6 +63,10 @@ readonly class UserService implements UserServiceInterface
     {
         if (array_key_exists('phone_numbers', $data)) {
             $this->phoneNumberService->assignPhones($user, $data['phone_numbers']);
+        }
+
+        if (array_key_exists('job_positions', $data)) {
+            $this->jobPositionService->assignJobPosition($user, ['job_positions' => $data['job_positions']]);
         }
 
         return $this->userRepository->update($user, $data);

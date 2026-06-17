@@ -6,8 +6,8 @@ use App\Http\Controllers\CalendarFileController;
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/calendar/export', [CalendarController::class, 'export'])
         ->name('calendar.export');
-    Route::patch('/user/{user}/calendar', [CalendarController::class, 'assignCalendar'])
-        ->name('user.calendar.assignCalendar');
+    Route::patch('/calendar/{calendar}/users', [CalendarController::class, 'assignUsers'])
+        ->name('calendar.assignUsers');
     Route::get('/calendar/selectlist', [CalendarController::class, 'selectList'])
         ->name('calendar.selectList');
     Route::apiResource('/calendar', CalendarController::class)

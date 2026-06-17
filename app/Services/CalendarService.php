@@ -70,6 +70,17 @@ readonly class CalendarService implements CalendarServiceInterface
     }
 
     /**
+     * @param Calendar $calendar
+     * @param array $data
+     * @return void
+     */
+    public function assignUsers(Calendar $calendar, array $data): void
+    {
+        $calendar->users()->sync($data['users'] ?? []);
+        $calendar->patients()->sync($data['patients'] ?? []);
+    }
+
+    /**
      * @param ExportRequest $request
      * @return BinaryFileResponse
      *

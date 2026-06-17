@@ -37,6 +37,53 @@ class PatientControllerTest extends TestCase
     /**
      * @return void
      */
+    public function testIndexFiltersByExactFieldValue(): void
+    {
+        Patient::factory()->create(['first_name' => 'Zbigniew']);
+        $target = Patient::factory()->create(['first_name' => 'Unikalniejszy']);
+
+        $response = $this->callApiWithLoggedUser()
+            ->getJson(route('patient.index', ['patient' => ['first_name' => 'Unikalniejszy']]));
+
+        $response->assertOk();
+        $response->assertJsonCount(1, 'data');
+        $response->assertJsonPath('data.0.uuid', $target->uuid);
+    }
+
+    /**
+     * @return void
+     */
+    public function testIndexSortsResultsByField(): void
+    {
+        Patient::factory()->create(['first_name' => 'Bartosz']);
+        Patient::factory()->create(['first_name' => 'Adam']);
+
+        $response = $this->callApiWithLoggedUser()
+            ->getJson(route('patient.index', ['sort' => 'first_name,asc']));
+
+        $response->assertOk();
+        $names = collect($response->json('data'))->pluck('first_name')->all();
+        $this->assertSame(collect($names)->sort()->values()->all(), $names);
+    }
+
+    /**
+     * @return void
+     */
+    public function testIndexSearchStringMatchesPartialValue(): void
+    {
+        $target = Patient::factory()->create(['first_name' => 'Wyjatkowy']);
+        Patient::factory()->create(['first_name' => 'Inny']);
+
+        $response = $this->callApiWithLoggedUser()
+            ->getJson(route('patient.index', ['searchString' => 'Wyjatkowy']));
+
+        $response->assertOk();
+        $response->assertJsonPath('data.0.uuid', $target->uuid);
+    }
+
+    /**
+     * @return void
+     */
     public function testShowPatientReturnSuccessResponse(): void
     {
         $patient = Patient::factory()->create();

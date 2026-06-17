@@ -15,6 +15,7 @@ class UserResource extends BasicResource
     {
         return array_merge(parent::toArray($request), [
             'phone_number' => PhoneNumberResource::collection($this->phoneNumbers),
+            'job_positions' => JobPositionResource::collection($this->jobPositions),
             'avatar_path' => $this->avatar_path,
             'background_path' => $this->background_path,
         ]);

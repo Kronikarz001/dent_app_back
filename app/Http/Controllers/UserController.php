@@ -181,6 +181,7 @@ class UserController extends Controller
                     new OA\Property(property: 'last_name', type: 'string'),
                     new OA\Property(property: 'email', type: 'string', format: 'email'),
                     new OA\Property(property: 'pesel', type: 'string'),
+                    new OA\Property(property: 'job_positions', type: 'array', items: new OA\Items(type: 'string', format: 'uuid')),
                 ]
             )
         ),

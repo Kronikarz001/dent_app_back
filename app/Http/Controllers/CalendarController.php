@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AssignCalendarUsersRequest;
 use App\Http\Requests\CalendarRequest;
 use App\Http\Requests\ExportRequest;
 use App\Http\Resources\CalendarResource;
@@ -192,6 +193,41 @@ class CalendarController extends Controller
     public function destroy(Calendar $calendar): JsonResponse
     {
         $this->calendarService->deleteCalendar($calendar);
+
+        return new JsonResponse(null, 204);
+    }
+
+    /**
+     * @param Calendar $calendar
+     * @param AssignCalendarUsersRequest $request
+     * @return JsonResponse
+     */
+    #[OA\Patch(
+        path: '/api/calendar/{uuid}/users',
+        summary: 'Przypisuje uczestników (użytkowników i pacjentów) do wydarzenia, zastępując poprzednią listę',
+        security: [['sanctum' => []]],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                properties: [
+                    new OA\Property(property: 'users', type: 'array', items: new OA\Items(type: 'string', format: 'uuid')),
+                    new OA\Property(property: 'patients', type: 'array', items: new OA\Items(type: 'string', format: 'uuid')),
+                ]
+            )
+        ),
+        tags: ['Calendar'],
+        parameters: [
+            new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
+        ],
+        responses: [
+            new OA\Response(response: 204, description: 'Przypisano'),
+            new OA\Response(response: 404, description: 'Nie znaleziono'),
+            new OA\Response(response: 422, description: 'Błąd walidacji'),
+        ]
+    )]
+    public function assignUsers(Calendar $calendar, AssignCalendarUsersRequest $request): JsonResponse
+    {
+        $this->calendarService->assignUsers($calendar, $request->all());
 
         return new JsonResponse(null, 204);
     }
