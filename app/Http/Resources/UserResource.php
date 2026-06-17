@@ -15,8 +15,8 @@ class UserResource extends BasicResource
     {
         return array_merge(parent::toArray($request), [
             'phone_number' => PhoneNumberResource::collection($this->phoneNumbers),
-            'avatar_url' => $this->avatar_url,
-            'background_url' => $this->background_url,
+            'avatar_path' => $this->avatar_path,
+            'background_path' => $this->background_path,
         ]);
     }
 }

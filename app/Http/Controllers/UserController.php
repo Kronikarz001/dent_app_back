@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ExportRequest;
 use App\Http\Requests\UserStoreRequest;
 use App\Http\Requests\UserUpdateRequest;
+use App\Http\Resources\LoggedUserResource;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use App\Services\UserServiceInterface;
@@ -101,7 +102,7 @@ class UserController extends Controller
     }
 
     /**
-     * @return UserResource
+     * @return LoggedUserResource
      */
     #[OA\Get(
         path: '/api/user/user-info',
@@ -113,14 +114,14 @@ class UserController extends Controller
                 response: 200,
                 description: 'OK',
                 content: new OA\JsonContent(
-                    properties: [new OA\Property(property: 'data', ref: '#/components/schemas/UserResource')]
+                    properties: [new OA\Property(property: 'data', ref: '#/components/schemas/LoggedUserResource')]
                 )
             ),
         ]
     )]
-    public function showLoggedUser(): UserResource
+    public function showLoggedUser(): LoggedUserResource
     {
-        return new UserResource($this->userService->getLoggedUser());
+        return new LoggedUserResource($this->userService->getLoggedUser());
     }
 
     /**

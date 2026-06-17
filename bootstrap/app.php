@@ -14,9 +14,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        $middleware->redirectGuestsTo(fn () => null);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
+        $exceptions->shouldRenderJsonWhen(fn () => true);
+
         $exceptions->render(function (FileNotFoundException $e, Request $request) {
             return response()->json(['message' => 'File not found.'], 404);
         });

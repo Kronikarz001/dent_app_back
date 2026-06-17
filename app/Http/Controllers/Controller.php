@@ -44,8 +44,20 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: 'last_name', type: 'string'),
         new OA\Property(property: 'email', type: 'string', format: 'email'),
         new OA\Property(property: 'is_active', type: 'boolean'),
-        new OA\Property(property: 'avatar_url', type: 'string', nullable: true),
-        new OA\Property(property: 'background_url', type: 'string', nullable: true),
+        new OA\Property(property: 'avatar_path', type: 'string', nullable: true),
+        new OA\Property(property: 'background_path', type: 'string', nullable: true),
+        new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
+    ]
+)]
+#[OA\Schema(
+    schema: 'LoggedUserResource',
+    properties: [
+        new OA\Property(property: 'uuid', type: 'string', format: 'uuid'),
+        new OA\Property(property: 'first_name', type: 'string'),
+        new OA\Property(property: 'last_name', type: 'string'),
+        new OA\Property(property: 'email', type: 'string', format: 'email'),
+        new OA\Property(property: 'is_active', type: 'boolean'),
+        new OA\Property(property: 'avatar_path', type: 'string', nullable: true),
         new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
     ]
 )]

@@ -54,6 +54,7 @@ class UserControllerTest extends TestCase
                 'first_name' => 'Test',
                 'last_name' => 'User',
                 'email' => 'example@mail',
+                'private_email' => 'example_private@mail',
                 'pesel' => '12345678901',
                 'password' => 'password',
                 'password_confirmation' => 'password',
