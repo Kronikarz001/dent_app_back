@@ -21,6 +21,7 @@ class UserStoreRequest extends FormRequest
             'password' => ['required', 'string', 'confirmed'],
             'pesel' => ['required', 'string', 'size:11', 'unique:users,pesel'],
             'private_email' => ['required', 'email', 'unique:users,private_email'],
+            'pwz_numer' => ['nullable', 'string'],
         ];
     }
 

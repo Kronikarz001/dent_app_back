@@ -28,6 +28,7 @@ class UserUpdateRequest extends FormRequest
             'phone_numbers.number' => ['string', new PhoneNumberRule],
             'phone_numbers.type' => ['string', new Enum(PhoneNumberType::class)],
             'is_active' => ['nullable', 'boolean'],
+            'pwz_numer' => ['nullable', 'string'],
         ];
     }
 

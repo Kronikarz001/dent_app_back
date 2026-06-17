@@ -24,6 +24,7 @@ use Laravel\Sanctum\PersonalAccessToken;
  * @property string $password
  * @property string $pesel
  * @property string|null $avatar_path
+ * @property string|null $pwz_numer
  * @property string|null $remember_token
  * @property Carbon|null $email_verified_at
  * @property Carbon|null $private_email_verified_at
@@ -55,6 +56,7 @@ abstract class BasicUser extends Authenticatable
         'pesel',
         'is_active',
         'avatar_path',
+        'pwz_numer',
     ];
 
     /**
