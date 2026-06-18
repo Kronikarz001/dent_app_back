@@ -3,9 +3,18 @@
 namespace App\Services;
 
 use App\Enums\AuditableEventType;
+use App\Enums\AuditableType;
+use App\Exports\AuditExport;
+use App\Http\Requests\ExportRequest;
+use App\Models\Audit;
 use App\Repositories\AuditRepositoryInterface;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
+use PhpOffice\PhpSpreadsheet\Exception;
+use PhpOffice\PhpSpreadsheet\Writer\Exception as WriterException;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 /**
  * Summary of AuditService
@@ -14,9 +23,11 @@ readonly class AuditService implements AuditServiceInterface
 {
     /**
      * @param AuditRepositoryInterface $auditRepository
+     * @param ExportServiceInterface $exportService
      */
     public function __construct(
-        private AuditRepositoryInterface $auditRepository
+        private AuditRepositoryInterface $auditRepository,
+        private ExportServiceInterface $exportService,
     ) {}
 
     /**
@@ -102,5 +113,46 @@ readonly class AuditService implements AuditServiceInterface
     private function withoutHidden(Model $model, array $attributes): array
     {
         return array_diff_key($attributes, array_flip($model->getHidden()));
+    }
+
+    /**
+     * @param Model $model
+     * @return LengthAwarePaginator
+     */
+    public function getHistory(Model $model): LengthAwarePaginator
+    {
+        return $this->auditRepository->findAllWithPagination([
+            'auditable_type' => $model->getMorphClass(),
+            'auditable_id' => $model->getKey(),
+        ]);
+    }
+
+    /**
+     * @param Model $model
+     * @param ExportRequest $request
+     * @return BinaryFileResponse
+     *
+     * @throws Exception
+     * @throws WriterException
+     */
+    public function exportHistory(Model $model, ExportRequest $request): BinaryFileResponse
+    {
+        return $this->exportService->export($request, new AuditExport($this->getHistory($model)->getCollection()), Audit::getModel());
+    }
+
+    /**
+     * @param string $resource
+     * @param string $uuid
+     * @return Model
+     */
+    public function resolveAuditable(string $resource, string $uuid): Model
+    {
+        $type = AuditableType::tryFrom($resource);
+
+        if ($type === null) {
+            throw new ModelNotFoundException("Unknown auditable resource [{$resource}].");
+        }
+
+        return $this->auditRepository->findAuditableOrFail($type->modelClass(), $uuid);
     }
 }

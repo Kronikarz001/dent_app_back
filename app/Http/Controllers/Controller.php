@@ -120,6 +120,19 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
     ]
 )]
+#[OA\Schema(
+    schema: 'AuditResource',
+    properties: [
+        new OA\Property(property: 'uuid', type: 'string', format: 'uuid'),
+        new OA\Property(property: 'auditable_type', type: 'string'),
+        new OA\Property(property: 'auditable_id', type: 'string', format: 'uuid'),
+        new OA\Property(property: 'user_uuid', type: 'string', format: 'uuid'),
+        new OA\Property(property: 'type', type: 'string', enum: ['CREATE', 'UPDATE', 'DELETE']),
+        new OA\Property(property: 'change_from', type: 'object', nullable: true),
+        new OA\Property(property: 'change_to', type: 'object', nullable: true),
+        new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
+    ]
+)]
 abstract class Controller
 {
     //

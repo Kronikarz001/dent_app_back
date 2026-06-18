@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use App\Enums\PhoneNumberType;
 use App\Rules\PhoneNumberRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
 
 /**
@@ -20,7 +21,7 @@ class PatientUpdateRequest extends FormRequest
         return [
             'first_name' => ['required', 'string'],
             'last_name' => ['required', 'string'],
-            'email' => ['required', 'email', 'unique:patients,email'],
+            'email' => ['required', 'email', Rule::unique('patients', 'email')->ignore($this->route('patient'))],
             'phone_numbers' => ['nullable', 'array'],
             'phone_numbers.number' => ['string', new PhoneNumberRule],
             'phone_numbers.type' => ['string', new Enum(PhoneNumberType::class)],

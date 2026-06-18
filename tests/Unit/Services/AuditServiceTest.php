@@ -7,6 +7,8 @@ use App\Models\Audit;
 use App\Models\User;
 use App\Repositories\AuditRepositoryInterface;
 use App\Services\AuditService;
+use App\Services\ExportServiceInterface;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
 use Mockery;
 use Mockery\MockInterface;
@@ -29,7 +31,7 @@ class AuditServiceTest extends TestCase
         parent::setUp();
 
         $this->auditRepository = Mockery::mock(AuditRepositoryInterface::class);
-        $this->auditService = new AuditService($this->auditRepository);
+        $this->auditService = new AuditService($this->auditRepository, Mockery::mock(ExportServiceInterface::class));
     }
 
     /**
@@ -160,5 +162,35 @@ class AuditServiceTest extends TestCase
             'detached' => ['old-uuid'],
             'updated' => [],
         ]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testResolveAuditableDelegatesToRepositoryWithMappedModelClass(): void
+    {
+        $user = User::factory()->make(['uuid' => 'subject-uuid']);
+
+        $this->auditRepository
+            ->shouldReceive('findAuditableOrFail')
+            ->once()
+            ->with(User::class, 'subject-uuid')
+            ->andReturn($user);
+
+        $result = $this->auditService->resolveAuditable('user', 'subject-uuid');
+
+        $this->assertSame($user, $result);
+    }
+
+    /**
+     * @return void
+     */
+    public function testResolveAuditableThrowsForUnknownResource(): void
+    {
+        $this->auditRepository->shouldNotReceive('findAuditableOrFail');
+
+        $this->expectException(ModelNotFoundException::class);
+
+        $this->auditService->resolveAuditable('unknown-resource', 'subject-uuid');
     }
 }

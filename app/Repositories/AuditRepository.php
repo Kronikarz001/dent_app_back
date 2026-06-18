@@ -6,6 +6,7 @@ use App\Models\Audit;
 use App\Search\AuditSearch;
 use App\Search\Search;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * Summary of AuditRepository
@@ -48,5 +49,15 @@ class AuditRepository extends SearchableRepository implements AuditRepositoryInt
     public function create(array $data): Audit
     {
         return Audit::create($data);
+    }
+
+    /**
+     * @param string $modelClass
+     * @param string $uuid
+     * @return Model
+     */
+    public function findAuditableOrFail(string $modelClass, string $uuid): Model
+    {
+        return $modelClass::query()->findOrFail($uuid);
     }
 }
