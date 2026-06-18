@@ -87,6 +87,24 @@ class MessageControllerTest extends TestCase
     /**
      * @return void
      */
+    public function testIndexSearchStringFiltersInboxByMessageContent(): void
+    {
+        $user = User::factory()->create();
+        $other = User::factory()->create();
+        $target = Message::factory()->create(['user_uuid' => $other->uuid, 'recipient_user_uuid' => $user->uuid, 'message' => 'Wyjatkowa tresc']);
+        Message::factory()->create(['user_uuid' => $other->uuid, 'recipient_user_uuid' => $user->uuid, 'message' => 'Inna tresc']);
+
+        $response = $this->callApiWithLoggedUser($user)
+            ->getJson(route('message.index', ['searchString' => 'Wyjatkowa']));
+
+        $response->assertOk();
+        $uuids = collect($response->json('data'))->pluck('uuid')->all();
+        $this->assertSame([$target->uuid], $uuids);
+    }
+
+    /**
+     * @return void
+     */
     public function testGroupMessagesReturnsConversation(): void
     {
         $sender = User::factory()->create();
