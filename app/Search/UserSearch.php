@@ -34,6 +34,7 @@ class UserSearch extends Search
         return [
             'uuid',
             'email',
+            'private_email',
             'first_name',
             'last_name',
             'pesel',
@@ -50,6 +51,7 @@ class UserSearch extends Search
             'first_name',
             'last_name',
             'email',
+            'private_email',
             'created_at',
             'is_active',
         ];
@@ -64,6 +66,8 @@ class UserSearch extends Search
             'first_name',
             'last_name',
             'email',
+            'private_email',
+            'created_at',
             'is_active',
         ];
     }

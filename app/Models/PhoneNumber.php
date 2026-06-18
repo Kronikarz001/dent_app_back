@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\Auditable;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
@@ -18,6 +19,8 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  */
 class PhoneNumber extends UuidModel
 {
+    use Auditable;
+
     /**
      * @var string[]
      */
@@ -33,6 +36,6 @@ class PhoneNumber extends UuidModel
      */
     public function phoneNumberable(): MorphTo
     {
-        return $this->morphTo();
+        return $this->morphTo('phoneable', 'phoneable_type', 'phoneable_uuid');
     }
 }

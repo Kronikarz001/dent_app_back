@@ -18,7 +18,7 @@ class PhoneNumberFactory extends Factory
     {
         return [
             'phoneable_type' => User::class,
-            'phoneable_id' => User::factory()->create()->uuid,
+            'phoneable_uuid' => User::factory()->create()->uuid,
             'number' => fake()->unique()->numerify('##########'),
             'type' => fake()->randomElement(PhoneNumberType::cases())->value,
         ];

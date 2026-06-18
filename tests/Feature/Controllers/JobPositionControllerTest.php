@@ -38,6 +38,53 @@ class JobPositionControllerTest extends TestCase
     /**
      * @return void
      */
+    public function testIndexFiltersByExactFieldValue(): void
+    {
+        JobPosition::factory()->create(['name' => 'Zbigniew']);
+        $target = JobPosition::factory()->create(['name' => 'Unikalniejszy']);
+
+        $response = $this->callApiWithLoggedUser()
+            ->getJson(route('jobPosition.index', ['jobPosition' => ['name' => 'Unikalniejszy']]));
+
+        $response->assertOk();
+        $response->assertJsonCount(1, 'data');
+        $response->assertJsonPath('data.0.uuid', $target->uuid);
+    }
+
+    /**
+     * @return void
+     */
+    public function testIndexSortsResultsByField(): void
+    {
+        JobPosition::factory()->create(['name' => 'Bartosz']);
+        JobPosition::factory()->create(['name' => 'Adam']);
+
+        $response = $this->callApiWithLoggedUser()
+            ->getJson(route('jobPosition.index', ['sort' => 'name,asc']));
+
+        $response->assertOk();
+        $names = collect($response->json('data'))->pluck('name')->all();
+        $this->assertSame(collect($names)->sort()->values()->all(), $names);
+    }
+
+    /**
+     * @return void
+     */
+    public function testIndexSearchStringMatchesPartialValue(): void
+    {
+        $target = JobPosition::factory()->create(['name' => 'Wyjatkowy']);
+        JobPosition::factory()->create(['name' => 'Inny']);
+
+        $response = $this->callApiWithLoggedUser()
+            ->getJson(route('jobPosition.index', ['searchString' => 'Wyjatkowy']));
+
+        $response->assertOk();
+        $response->assertJsonPath('data.0.uuid', $target->uuid);
+    }
+
+    /**
+     * @return void
+     */
     public function testShowJobPositionReturnSuccessResponse(): void
     {
         $jobPosition = JobPosition::factory()->create();

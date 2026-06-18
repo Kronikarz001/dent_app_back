@@ -1,15 +1,24 @@
 <?php
 
+use App\Http\Controllers\AuditableController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserFileController;
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user/user-info', [UserController::class, 'showLoggedUser'])
         ->name('user.user-info');
+    Route::get('/user/{uuid}/history', [AuditableController::class, 'index'])
+        ->defaults('resource', 'user')
+        ->name('user.history');
+    Route::get('/user/{uuid}/history/export', [AuditableController::class, 'export'])
+        ->defaults('resource', 'user')
+        ->name('user.history.export');
     Route::get('/user/export', [UserController::class, 'export'])
         ->name('user.export');
     Route::get('/user/selectlist', [UserController::class, 'selectList'])
         ->name('user.selectList');
+    Route::patch('/user/edit-password', [UserController::class, 'editPassword'])
+        ->name('user.edit_password');
     Route::apiResource('/user', UserController::class)
         ->names('user');
 

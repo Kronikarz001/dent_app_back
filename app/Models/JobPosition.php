@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\Auditable;
 use App\Traits\HasFile;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -23,7 +24,7 @@ class JobPosition extends UuidModel
     /**
      * @use SoftDeletes
      */
-    use HasFile, SoftDeletes;
+    use Auditable, HasFile, SoftDeletes;
 
     protected $table = 'job_positions';
 

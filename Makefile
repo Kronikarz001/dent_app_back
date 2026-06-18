@@ -50,6 +50,9 @@ create-user:
 	$(SUDO) docker exec dent_app_back_app php artisan cache:clear
 	$(SUDO) docker exec dent_app_back_app php scripts/create_user.php
 
+migration:
+	$(SUDO) docker-compose exec dent_app_back_app php artisan make:migration $(name)
+
 migrate:
 	$(SUDO) docker-compose exec dent_app_back_app php artisan migrate
 

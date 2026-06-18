@@ -19,10 +19,12 @@ readonly class CalendarService implements CalendarServiceInterface
     /**
      * @param CalendarRepositoryInterface $calendarRepository
      * @param ExportServiceInterface $exportService
+     * @param AuditServiceInterface $auditService
      */
     public function __construct(
         private CalendarRepositoryInterface $calendarRepository,
         private ExportServiceInterface $exportService,
+        private AuditServiceInterface $auditService,
     ) {}
 
     /**
@@ -47,7 +49,13 @@ readonly class CalendarService implements CalendarServiceInterface
      */
     public function createCalendar(array $data): Calendar
     {
-        return $this->calendarRepository->create($data);
+        $calendar = $this->calendarRepository->create($data);
+
+        if (array_key_exists('dental_examinations', $data)) {
+            $this->auditService->recordSync($calendar, 'dental_examinations', $calendar->dentalExaminations()->sync($data['dental_examinations']));
+        }
+
+        return $calendar;
     }
 
     /**
@@ -57,7 +65,13 @@ readonly class CalendarService implements CalendarServiceInterface
      */
     public function updateCalendar(Calendar $calendar, array $data): Calendar
     {
-        return $this->calendarRepository->update($calendar, $data);
+        $calendar = $this->calendarRepository->update($calendar, $data);
+
+        if (array_key_exists('dental_examinations', $data)) {
+            $this->auditService->recordSync($calendar, 'dental_examinations', $calendar->dentalExaminations()->sync($data['dental_examinations']));
+        }
+
+        return $calendar;
     }
 
     /**
@@ -67,6 +81,17 @@ readonly class CalendarService implements CalendarServiceInterface
     public function deleteCalendar(Calendar $calendar): void
     {
         $this->calendarRepository->delete($calendar);
+    }
+
+    /**
+     * @param Calendar $calendar
+     * @param array $data
+     * @return void
+     */
+    public function assignUsers(Calendar $calendar, array $data): void
+    {
+        $this->auditService->recordSync($calendar, 'users', $calendar->users()->sync($data['users'] ?? []));
+        $this->auditService->recordSync($calendar, 'patients', $calendar->patients()->sync($data['patients'] ?? []));
     }
 
     /**

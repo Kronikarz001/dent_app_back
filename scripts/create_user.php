@@ -19,6 +19,7 @@ $user->email = getenv('CREATE_EMAIL');
 $user->password = Hash::make(getenv('CREATE_PASSWORD'));
 $user->pesel = getenv('CREATE_PESEL');
 $user->is_admin = getenv('CREATE_IS_ADMIN');
+$user->is_active = true;
 
 if (User::where('email', $user->email)->exists() || User::where('pesel', $user->pesel)->exists()) {
     echo "User with this credentials already exists.\n";

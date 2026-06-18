@@ -126,12 +126,20 @@ class PatientController extends Controller
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
-                required: ['first_name', 'last_name', 'email', 'pesel'],
+                required: ['first_name', 'last_name', 'email'],
                 properties: [
                     new OA\Property(property: 'first_name', type: 'string'),
                     new OA\Property(property: 'last_name', type: 'string'),
                     new OA\Property(property: 'email', type: 'string', format: 'email'),
-                    new OA\Property(property: 'pesel', type: 'string'),
+                    new OA\Property(
+                        property: 'phone_numbers',
+                        type: 'array',
+                        nullable: true,
+                        items: new OA\Items(properties: [
+                            new OA\Property(property: 'number', type: 'string', example: '48500100200'),
+                            new OA\Property(property: 'type', type: 'string', enum: ['PRIVATE', 'WORK']),
+                        ])
+                    ),
                 ]
             )
         ),

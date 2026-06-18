@@ -13,7 +13,9 @@ return new class extends Migration
     {
         Schema::create('phone_numbers', function (Blueprint $table) {
             $table->uuid()->primary();
-            $table->uuidMorphs('phoneable');
+            $table->string('phoneable_type');
+            $table->uuid('phoneable_uuid');
+            $table->index(['phoneable_type', 'phoneable_uuid']);
             $table->string('number')->unique();
             $table->string('type');
             $table->timestamps();

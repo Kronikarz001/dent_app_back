@@ -1,0 +1,36 @@
+<?php
+
+namespace App\Http\Requests;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+/**
+ * Summary of DentalExaminationRequest
+ */
+class DentalExaminationRequest extends FormRequest
+{
+    /**
+     * @return array
+     */
+    public function rules(): array
+    {
+        return [
+            'name' => ['required', 'string'],
+            'description' => ['nullable', 'string'],
+            'short_description' => ['nullable', 'string'],
+            'price' => ['nullable', 'integer'],
+            'materials' => ['nullable', 'array'],
+            'materials.*' => ['string', 'exists:materials,uuid'],
+            'calendars' => ['nullable', 'array'],
+            'calendars.*' => ['string', 'exists:calendars,uuid'],
+        ];
+    }
+
+    /**
+     * @return bool
+     */
+    public function authorize(): bool
+    {
+        return true;
+    }
+}

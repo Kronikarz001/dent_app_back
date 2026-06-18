@@ -44,6 +44,13 @@ interface CalendarServiceInterface
     public function deleteCalendar(Calendar $calendar): void;
 
     /**
+     * @param Calendar $calendar
+     * @param array $data
+     * @return void
+     */
+    public function assignUsers(Calendar $calendar, array $data): void;
+
+    /**
      * @param ExportRequest $request
      * @return BinaryFileResponse
      *
