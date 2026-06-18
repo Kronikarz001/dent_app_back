@@ -20,10 +20,12 @@ readonly class JobPositionService implements JobPositionServiceInterface
     /**
      * @param JobPositionRepositoryInterface $jobPositionRepository
      * @param ExportServiceInterface $exportService
+     * @param AuditServiceInterface $auditService
      */
     public function __construct(
         private JobPositionRepositoryInterface $jobPositionRepository,
         private ExportServiceInterface $exportService,
+        private AuditServiceInterface $auditService,
     ) {}
 
     /**
@@ -77,7 +79,7 @@ readonly class JobPositionService implements JobPositionServiceInterface
      */
     public function assignJobPosition(User $user, array $data): void
     {
-        $user->jobPositions()->syncWithoutDetaching($data['job_positions']);
+        $this->auditService->recordSync($user, 'job_positions', $user->jobPositions()->syncWithoutDetaching($data['job_positions']));
     }
 
     /**

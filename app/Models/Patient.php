@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Observers\PatientObserver;
+use App\Traits\Auditable;
 use App\Traits\HasFile;
 use App\Traits\HasPhoneNumber;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -24,7 +25,7 @@ use Illuminate\Support\Carbon;
 #[ObservedBy(PatientObserver::class)]
 class Patient extends UuidModel
 {
-    use HasFile, HasPhoneNumber;
+    use Auditable, HasFile, HasPhoneNumber;
 
     /**
      * @var string[]

@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('phone_numbers', function (Blueprint $table) {
+        Schema::create('auditables', function (Blueprint $table) {
             $table->uuid()->primary();
-            $table->string('phoneable_type');
-            $table->uuid('phoneable_uuid');
-            $table->index(['phoneable_type', 'phoneable_uuid']);
-            $table->string('number')->unique();
+            $table->uuidMorphs('auditable');
+            $table->foreignUuid('user_uuid')->references('uuid')->on('users')->onDelete('cascade');
             $table->string('type');
+            $table->json('change_from')->nullable();
+            $table->json('change_to')->nullable();
             $table->timestamps();
         });
     }
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('phone_numbers');
+        Schema::dropIfExists('auditables');
     }
 };

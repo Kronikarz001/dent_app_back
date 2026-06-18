@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Observers\FileObserver;
+use App\Traits\Auditable;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -20,6 +21,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class File extends UuidModel
 {
+    use Auditable;
+
     /**
      * @var string[]
      */

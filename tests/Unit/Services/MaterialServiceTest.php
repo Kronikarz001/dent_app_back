@@ -5,6 +5,7 @@ namespace Tests\Unit\Services;
 use App\Http\Requests\ExportRequest;
 use App\Models\Material;
 use App\Repositories\MaterialRepositoryInterface;
+use App\Services\AuditServiceInterface;
 use App\Services\ExportServiceInterface;
 use App\Services\MaterialService;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -33,7 +34,7 @@ class MaterialServiceTest extends TestCase
 
         $this->materialRepository = Mockery::mock(MaterialRepositoryInterface::class);
         $this->exportService = Mockery::mock(ExportServiceInterface::class);
-        $this->materialService = new MaterialService($this->materialRepository, $this->exportService);
+        $this->materialService = new MaterialService($this->materialRepository, $this->exportService, Mockery::mock(AuditServiceInterface::class));
     }
 
     /**

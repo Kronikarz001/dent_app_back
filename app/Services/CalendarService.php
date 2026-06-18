@@ -19,10 +19,12 @@ readonly class CalendarService implements CalendarServiceInterface
     /**
      * @param CalendarRepositoryInterface $calendarRepository
      * @param ExportServiceInterface $exportService
+     * @param AuditServiceInterface $auditService
      */
     public function __construct(
         private CalendarRepositoryInterface $calendarRepository,
         private ExportServiceInterface $exportService,
+        private AuditServiceInterface $auditService,
     ) {}
 
     /**
@@ -50,7 +52,7 @@ readonly class CalendarService implements CalendarServiceInterface
         $calendar = $this->calendarRepository->create($data);
 
         if (array_key_exists('dental_examinations', $data)) {
-            $calendar->dentalExaminations()->sync($data['dental_examinations']);
+            $this->auditService->recordSync($calendar, 'dental_examinations', $calendar->dentalExaminations()->sync($data['dental_examinations']));
         }
 
         return $calendar;
@@ -66,7 +68,7 @@ readonly class CalendarService implements CalendarServiceInterface
         $calendar = $this->calendarRepository->update($calendar, $data);
 
         if (array_key_exists('dental_examinations', $data)) {
-            $calendar->dentalExaminations()->sync($data['dental_examinations']);
+            $this->auditService->recordSync($calendar, 'dental_examinations', $calendar->dentalExaminations()->sync($data['dental_examinations']));
         }
 
         return $calendar;
@@ -88,8 +90,8 @@ readonly class CalendarService implements CalendarServiceInterface
      */
     public function assignUsers(Calendar $calendar, array $data): void
     {
-        $calendar->users()->sync($data['users'] ?? []);
-        $calendar->patients()->sync($data['patients'] ?? []);
+        $this->auditService->recordSync($calendar, 'users', $calendar->users()->sync($data['users'] ?? []));
+        $this->auditService->recordSync($calendar, 'patients', $calendar->patients()->sync($data['patients'] ?? []));
     }
 
     /**

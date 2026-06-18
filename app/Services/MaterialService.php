@@ -19,10 +19,12 @@ readonly class MaterialService implements MaterialServiceInterface
     /**
      * @param MaterialRepositoryInterface $materialRepository
      * @param ExportServiceInterface $exportService
+     * @param AuditServiceInterface $auditService
      */
     public function __construct(
         private MaterialRepositoryInterface $materialRepository,
         private ExportServiceInterface $exportService,
+        private AuditServiceInterface $auditService,
     ) {}
 
     /**
@@ -50,7 +52,7 @@ readonly class MaterialService implements MaterialServiceInterface
         $material = $this->materialRepository->create($data);
 
         if (array_key_exists('dental_examinations', $data)) {
-            $material->dentalExaminations()->sync($data['dental_examinations']);
+            $this->auditService->recordSync($material, 'dental_examinations', $material->dentalExaminations()->sync($data['dental_examinations']));
         }
 
         return $material;
@@ -66,7 +68,7 @@ readonly class MaterialService implements MaterialServiceInterface
         $material = $this->materialRepository->update($material, $data);
 
         if (array_key_exists('dental_examinations', $data)) {
-            $material->dentalExaminations()->sync($data['dental_examinations']);
+            $this->auditService->recordSync($material, 'dental_examinations', $material->dentalExaminations()->sync($data['dental_examinations']));
         }
 
         return $material;

@@ -11,13 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('phone_numbers', function (Blueprint $table) {
+        Schema::create('messages', function (Blueprint $table) {
             $table->uuid()->primary();
-            $table->string('phoneable_type');
-            $table->uuid('phoneable_uuid');
-            $table->index(['phoneable_type', 'phoneable_uuid']);
-            $table->string('number')->unique();
-            $table->string('type');
+            $table->foreignUuid('user_uuid')->nullable()->references('uuid')->on('users')->onDelete('set null');
+            $table->text('message');
             $table->timestamps();
         });
     }
@@ -27,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('phone_numbers');
+        Schema::dropIfExists('messages');
     }
 };

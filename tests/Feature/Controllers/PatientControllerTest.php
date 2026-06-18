@@ -2,7 +2,10 @@
 
 namespace Tests\Feature\Controllers;
 
+use App\Enums\AuditableEventType;
+use App\Models\Audit;
 use App\Models\Patient;
+use App\Models\User;
 use Tests\TestCase;
 
 /**
@@ -111,6 +114,33 @@ class PatientControllerTest extends TestCase
         $this->assertDatabaseHas('patients', [
             'email' => 'jan@example.com',
         ]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testStorePatientRecordsAuditAttributedToActingUser(): void
+    {
+        $actor = User::factory()->create();
+
+        $response = $this->callApiWithLoggedUser($actor)
+            ->postJson(route('patient.store'), [
+                'first_name' => 'Jan',
+                'last_name' => 'Kowalski',
+                'email' => 'jan@example.com',
+                'pesel' => '12345678901',
+            ]);
+
+        $response->assertCreated();
+
+        $patient = Patient::query()->where('email', 'jan@example.com')->first();
+        $audit = Audit::query()->where('auditable_id', $patient->uuid)->first();
+
+        $this->assertNotNull($audit);
+        $this->assertSame(Patient::class, $audit->auditable_type);
+        $this->assertSame(AuditableEventType::CREATE, $audit->type);
+        $this->assertSame($actor->uuid, $audit->user_uuid);
+        $this->assertSame('jan@example.com', $audit->change_to['email']);
     }
 
     /**

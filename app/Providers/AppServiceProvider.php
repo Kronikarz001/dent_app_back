@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Providers\AppServiceProviders\AuditServiceProvider;
 use App\Providers\AppServiceProviders\AuthServiceProvider;
 use App\Providers\AppServiceProviders\CalendarServiceProvider;
 use App\Providers\AppServiceProviders\DentalExaminationServiceProvider;
@@ -25,6 +26,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        $this->app->register(AuditServiceProvider::class);
         $this->app->register(AuthServiceProvider::class);
         $this->app->register(SearchServiceProvider::class);
         $this->app->register(UserServiceProvider::class);

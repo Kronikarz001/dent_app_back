@@ -44,7 +44,7 @@ class PhoneNumberServiceTest extends TestCase
             'number' => '500100200',
             'type' => PhoneNumberType::WORK->value,
             'phoneable_type' => User::class,
-            'phoneable_id' => $user->uuid,
+            'phoneable_uuid' => $user->uuid,
         ]);
         $this->assertDatabaseHas(self::PHONE_NUMBERS_TABLE, [
             'number' => '600200300',
@@ -80,6 +80,6 @@ class PhoneNumberServiceTest extends TestCase
 
         $this->service->assignPhones($user, []);
 
-        $this->assertDatabaseMissing(self::PHONE_NUMBERS_TABLE, ['phoneable_id' => $user->uuid]);
+        $this->assertDatabaseMissing(self::PHONE_NUMBERS_TABLE, ['phoneable_uuid' => $user->uuid]);
     }
 }

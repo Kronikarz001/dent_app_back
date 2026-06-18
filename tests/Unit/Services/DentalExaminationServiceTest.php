@@ -5,6 +5,7 @@ namespace Tests\Unit\Services;
 use App\Http\Requests\ExportRequest;
 use App\Models\DentalExamination;
 use App\Repositories\DentalExaminationRepositoryInterface;
+use App\Services\AuditServiceInterface;
 use App\Services\DentalExaminationService;
 use App\Services\ExportServiceInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -33,7 +34,7 @@ class DentalExaminationServiceTest extends TestCase
 
         $this->dentalExaminationRepository = Mockery::mock(DentalExaminationRepositoryInterface::class);
         $this->exportService = Mockery::mock(ExportServiceInterface::class);
-        $this->dentalExaminationService = new DentalExaminationService($this->dentalExaminationRepository, $this->exportService);
+        $this->dentalExaminationService = new DentalExaminationService($this->dentalExaminationRepository, $this->exportService, Mockery::mock(AuditServiceInterface::class));
     }
 
     /**

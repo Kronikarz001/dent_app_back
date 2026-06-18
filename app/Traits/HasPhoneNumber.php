@@ -15,6 +15,6 @@ trait HasPhoneNumber
      */
     public function phoneNumbers(): MorphMany
     {
-        return $this->morphMany(PhoneNumber::class, 'phoneable');
+        return $this->morphMany(PhoneNumber::class, 'phoneable', 'phoneable_type', 'phoneable_uuid');
     }
 }

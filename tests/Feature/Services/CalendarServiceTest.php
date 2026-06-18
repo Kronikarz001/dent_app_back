@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Services;
 
+use App\Enums\AuditableEventType;
+use App\Models\Audit;
 use App\Models\Calendar;
 use App\Models\DentalExamination;
 use App\Models\Patient;
@@ -9,6 +11,7 @@ use App\Models\User;
 use App\Services\CalendarServiceInterface;
 use Illuminate\Foundation\Application;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Auth;
 use Tests\TestCase;
 
 /**
@@ -196,5 +199,41 @@ class CalendarServiceTest extends TestCase
             'calendar_uuid' => $calendar->uuid,
             'dental_examination_uuid' => $newDentalExamination->uuid,
         ]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testAssignUsersRecordsAuditEntryWhenAuthenticated(): void
+    {
+        $actor = User::factory()->create();
+        Auth::setUser($actor);
+
+        $calendar = Calendar::factory()->create();
+        $user = User::factory()->create();
+
+        $this->service->assignUsers($calendar, ['users' => [$user->uuid]]);
+
+        $audit = Audit::query()
+            ->where('auditable_id', $calendar->uuid)
+            ->where('type', AuditableEventType::UPDATE->value)
+            ->first();
+
+        $this->assertNotNull($audit);
+        $this->assertSame($actor->uuid, $audit->user_uuid);
+        $this->assertSame(['users' => [$user->uuid]], $audit->change_to);
+    }
+
+    /**
+     * @return void
+     */
+    public function testAssignUsersDoesNotRecordAuditWhenNotAuthenticated(): void
+    {
+        $calendar = Calendar::factory()->create();
+        $user = User::factory()->create();
+
+        $this->service->assignUsers($calendar, ['users' => [$user->uuid]]);
+
+        $this->assertSame(0, Audit::query()->where('auditable_id', $calendar->uuid)->count());
     }
 }

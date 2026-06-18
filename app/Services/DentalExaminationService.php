@@ -19,10 +19,12 @@ readonly class DentalExaminationService implements DentalExaminationServiceInter
     /**
      * @param DentalExaminationRepositoryInterface $dentalExaminationRepository
      * @param ExportServiceInterface $exportService
+     * @param AuditServiceInterface $auditService
      */
     public function __construct(
         private DentalExaminationRepositoryInterface $dentalExaminationRepository,
         private ExportServiceInterface $exportService,
+        private AuditServiceInterface $auditService,
     ) {}
 
     /**
@@ -50,11 +52,11 @@ readonly class DentalExaminationService implements DentalExaminationServiceInter
         $dentalExamination = $this->dentalExaminationRepository->create($data);
 
         if (array_key_exists('materials', $data)) {
-            $dentalExamination->materials()->sync($data['materials']);
+            $this->auditService->recordSync($dentalExamination, 'materials', $dentalExamination->materials()->sync($data['materials']));
         }
 
         if (array_key_exists('calendars', $data)) {
-            $dentalExamination->calendars()->sync($data['calendars']);
+            $this->auditService->recordSync($dentalExamination, 'calendars', $dentalExamination->calendars()->sync($data['calendars']));
         }
 
         return $dentalExamination;
@@ -70,11 +72,11 @@ readonly class DentalExaminationService implements DentalExaminationServiceInter
         $dentalExamination = $this->dentalExaminationRepository->update($dentalExamination, $data);
 
         if (array_key_exists('materials', $data)) {
-            $dentalExamination->materials()->sync($data['materials']);
+            $this->auditService->recordSync($dentalExamination, 'materials', $dentalExamination->materials()->sync($data['materials']));
         }
 
         if (array_key_exists('calendars', $data)) {
-            $dentalExamination->calendars()->sync($data['calendars']);
+            $this->auditService->recordSync($dentalExamination, 'calendars', $dentalExamination->calendars()->sync($data['calendars']));
         }
 
         return $dentalExamination;

@@ -2,12 +2,16 @@
 
 namespace Tests\Feature\Services;
 
+use App\Enums\AuditableEventType;
+use App\Models\Audit;
 use App\Models\Calendar;
 use App\Models\DentalExamination;
 use App\Models\Material;
+use App\Models\User;
 use App\Services\DentalExaminationServiceInterface;
 use Illuminate\Foundation\Application;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Auth;
 use Tests\TestCase;
 
 /**
@@ -187,5 +191,28 @@ class DentalExaminationServiceTest extends TestCase
             'dental_examination_uuid' => $dentalExamination->uuid,
             'calendar_uuid' => $newCalendar->uuid,
         ]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testUpdateDentalExaminationSyncingMaterialsRecordsAuditEntryWhenAuthenticated(): void
+    {
+        $actor = User::factory()->create();
+        Auth::setUser($actor);
+
+        $dentalExamination = DentalExamination::factory()->create();
+        $material = Material::factory()->create();
+
+        $this->service->updateDentalExamination($dentalExamination, ['materials' => [$material->uuid]]);
+
+        $audit = Audit::query()
+            ->where('auditable_id', $dentalExamination->uuid)
+            ->where('type', AuditableEventType::UPDATE->value)
+            ->first();
+
+        $this->assertNotNull($audit);
+        $this->assertSame($actor->uuid, $audit->user_uuid);
+        $this->assertSame(['materials' => [$material->uuid]], $audit->change_to);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\Auditable;
 use App\Traits\HasFile;
 use App\Traits\HasPhoneNumber;
 use Database\Factories\UserFactory;
@@ -35,7 +36,7 @@ use Laravel\Sanctum\PersonalAccessToken;
 abstract class BasicUser extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasApiTokens, HasFactory, HasFile, HasPhoneNumber, HasUuids, Notifiable;
+    use Auditable, HasApiTokens, HasFactory, HasFile, HasPhoneNumber, HasUuids, Notifiable;
 
     protected $table = 'users';
 
