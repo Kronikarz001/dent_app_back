@@ -2,11 +2,13 @@
 
 namespace App\Repositories;
 
+use App\Exceptions\InvalidAuditableIdentifierException;
 use App\Models\Audit;
 use App\Search\AuditSearch;
 use App\Search\Search;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\QueryException;
 
 /**
  * Summary of AuditRepository
@@ -58,6 +60,10 @@ class AuditRepository extends SearchableRepository implements AuditRepositoryInt
      */
     public function findAuditableOrFail(string $modelClass, string $uuid): Model
     {
-        return $modelClass::query()->findOrFail($uuid);
+        try {
+            return $modelClass::query()->findOrFail($uuid);
+        } catch (QueryException $e) {
+            throw new InvalidAuditableIdentifierException("Invalid identifier [{$uuid}] for [{$modelClass}].");
+        }
     }
 }

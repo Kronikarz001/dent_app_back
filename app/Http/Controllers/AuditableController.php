@@ -23,19 +23,16 @@ class AuditableController extends Controller
     ) {}
 
     /**
-     * @param string $resource
      * @param string $uuid
+     * @param string $resource
      * @return LengthAwarePaginator
      */
     #[OA\Get(
-        path: '/api/{resource}/{uuid}/history',
-        summary: 'Historia zmian danego rekordu',
+        path: '/api/user/{uuid}/history',
+        summary: 'Historia zmian użytkownika',
         security: [['sanctum' => []]],
         tags: ['Auditable'],
-        parameters: [
-            new OA\PathParameter(name: 'resource', schema: new OA\Schema(type: 'string', enum: ['user', 'patient', 'calendar', 'dental-examination', 'material', 'job-position'])),
-            new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
-        ],
+        parameters: [new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid'))],
         responses: [
             new OA\Response(
                 response: 200,
@@ -43,23 +40,121 @@ class AuditableController extends Controller
                 content: new OA\JsonContent(
                     allOf: [
                         new OA\Schema(ref: '#/components/schemas/PaginatedResponse'),
-                        new OA\Schema(properties: [
-                            new OA\Property(property: 'data', type: 'array', items: new OA\Items(ref: '#/components/schemas/AuditResource')),
-                        ]),
+                        new OA\Schema(properties: [new OA\Property(property: 'data', type: 'array', items: new OA\Items(ref: '#/components/schemas/AuditResource'))]),
                     ]
                 )
             ),
             new OA\Response(response: 404, description: 'Nie znaleziono'),
         ]
     )]
-    public function index(string $resource, string $uuid): LengthAwarePaginator
+    #[OA\Get(
+        path: '/api/patient/{uuid}/history',
+        summary: 'Historia zmian pacjenta',
+        security: [['sanctum' => []]],
+        tags: ['Auditable'],
+        parameters: [new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid'))],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'OK',
+                content: new OA\JsonContent(
+                    allOf: [
+                        new OA\Schema(ref: '#/components/schemas/PaginatedResponse'),
+                        new OA\Schema(properties: [new OA\Property(property: 'data', type: 'array', items: new OA\Items(ref: '#/components/schemas/AuditResource'))]),
+                    ]
+                )
+            ),
+            new OA\Response(response: 404, description: 'Nie znaleziono'),
+        ]
+    )]
+    #[OA\Get(
+        path: '/api/calendar/{uuid}/history',
+        summary: 'Historia zmian wydarzenia w kalendarzu',
+        security: [['sanctum' => []]],
+        tags: ['Auditable'],
+        parameters: [new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid'))],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'OK',
+                content: new OA\JsonContent(
+                    allOf: [
+                        new OA\Schema(ref: '#/components/schemas/PaginatedResponse'),
+                        new OA\Schema(properties: [new OA\Property(property: 'data', type: 'array', items: new OA\Items(ref: '#/components/schemas/AuditResource'))]),
+                    ]
+                )
+            ),
+            new OA\Response(response: 404, description: 'Nie znaleziono'),
+        ]
+    )]
+    #[OA\Get(
+        path: '/api/dental-examination/{uuid}/history',
+        summary: 'Historia zmian badania stomatologicznego',
+        security: [['sanctum' => []]],
+        tags: ['Auditable'],
+        parameters: [new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid'))],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'OK',
+                content: new OA\JsonContent(
+                    allOf: [
+                        new OA\Schema(ref: '#/components/schemas/PaginatedResponse'),
+                        new OA\Schema(properties: [new OA\Property(property: 'data', type: 'array', items: new OA\Items(ref: '#/components/schemas/AuditResource'))]),
+                    ]
+                )
+            ),
+            new OA\Response(response: 404, description: 'Nie znaleziono'),
+        ]
+    )]
+    #[OA\Get(
+        path: '/api/material/{uuid}/history',
+        summary: 'Historia zmian materiału',
+        security: [['sanctum' => []]],
+        tags: ['Auditable'],
+        parameters: [new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid'))],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'OK',
+                content: new OA\JsonContent(
+                    allOf: [
+                        new OA\Schema(ref: '#/components/schemas/PaginatedResponse'),
+                        new OA\Schema(properties: [new OA\Property(property: 'data', type: 'array', items: new OA\Items(ref: '#/components/schemas/AuditResource'))]),
+                    ]
+                )
+            ),
+            new OA\Response(response: 404, description: 'Nie znaleziono'),
+        ]
+    )]
+    #[OA\Get(
+        path: '/api/job-position/{uuid}/history',
+        summary: 'Historia zmian stanowiska',
+        security: [['sanctum' => []]],
+        tags: ['Auditable'],
+        parameters: [new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid'))],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'OK',
+                content: new OA\JsonContent(
+                    allOf: [
+                        new OA\Schema(ref: '#/components/schemas/PaginatedResponse'),
+                        new OA\Schema(properties: [new OA\Property(property: 'data', type: 'array', items: new OA\Items(ref: '#/components/schemas/AuditResource'))]),
+                    ]
+                )
+            ),
+            new OA\Response(response: 404, description: 'Nie znaleziono'),
+        ]
+    )]
+    public function index(string $uuid, string $resource): LengthAwarePaginator
     {
         return $this->auditService->getHistory($this->auditService->resolveAuditable($resource, $uuid));
     }
 
     /**
-     * @param string $resource
      * @param string $uuid
+     * @param string $resource
      * @param ExportRequest $request
      * @return BinaryFileResponse
      *
@@ -67,21 +162,72 @@ class AuditableController extends Controller
      * @throws WriterException
      */
     #[OA\Get(
-        path: '/api/{resource}/{uuid}/history/export',
-        summary: 'Eksport historii zmian danego rekordu do pliku',
+        path: '/api/user/{uuid}/history/export',
+        summary: 'Eksport historii zmian użytkownika',
         security: [['sanctum' => []]],
         tags: ['Auditable'],
         parameters: [
-            new OA\PathParameter(name: 'resource', schema: new OA\Schema(type: 'string', enum: ['user', 'patient', 'calendar', 'dental-examination', 'material', 'job-position'])),
             new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
             new OA\QueryParameter(name: 'type', required: true, schema: new OA\Schema(type: 'string', enum: ['xlsx', 'csv', 'ods'])),
         ],
-        responses: [
-            new OA\Response(response: 200, description: 'Plik do pobrania', content: new OA\MediaType(mediaType: 'application/octet-stream')),
-            new OA\Response(response: 404, description: 'Nie znaleziono'),
-        ]
+        responses: [new OA\Response(response: 200, description: 'Plik do pobrania'), new OA\Response(response: 404, description: 'Nie znaleziono')]
     )]
-    public function export(string $resource, string $uuid, ExportRequest $request): BinaryFileResponse
+    #[OA\Get(
+        path: '/api/patient/{uuid}/history/export',
+        summary: 'Eksport historii zmian pacjenta',
+        security: [['sanctum' => []]],
+        tags: ['Auditable'],
+        parameters: [
+            new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
+            new OA\QueryParameter(name: 'type', required: true, schema: new OA\Schema(type: 'string', enum: ['xlsx', 'csv', 'ods'])),
+        ],
+        responses: [new OA\Response(response: 200, description: 'Plik do pobrania'), new OA\Response(response: 404, description: 'Nie znaleziono')]
+    )]
+    #[OA\Get(
+        path: '/api/calendar/{uuid}/history/export',
+        summary: 'Eksport historii zmian wydarzenia w kalendarzu',
+        security: [['sanctum' => []]],
+        tags: ['Auditable'],
+        parameters: [
+            new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
+            new OA\QueryParameter(name: 'type', required: true, schema: new OA\Schema(type: 'string', enum: ['xlsx', 'csv', 'ods'])),
+        ],
+        responses: [new OA\Response(response: 200, description: 'Plik do pobrania'), new OA\Response(response: 404, description: 'Nie znaleziono')]
+    )]
+    #[OA\Get(
+        path: '/api/dental-examination/{uuid}/history/export',
+        summary: 'Eksport historii zmian badania stomatologicznego',
+        security: [['sanctum' => []]],
+        tags: ['Auditable'],
+        parameters: [
+            new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
+            new OA\QueryParameter(name: 'type', required: true, schema: new OA\Schema(type: 'string', enum: ['xlsx', 'csv', 'ods'])),
+        ],
+        responses: [new OA\Response(response: 200, description: 'Plik do pobrania'), new OA\Response(response: 404, description: 'Nie znaleziono')]
+    )]
+    #[OA\Get(
+        path: '/api/material/{uuid}/history/export',
+        summary: 'Eksport historii zmian materiału',
+        security: [['sanctum' => []]],
+        tags: ['Auditable'],
+        parameters: [
+            new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
+            new OA\QueryParameter(name: 'type', required: true, schema: new OA\Schema(type: 'string', enum: ['xlsx', 'csv', 'ods'])),
+        ],
+        responses: [new OA\Response(response: 200, description: 'Plik do pobrania'), new OA\Response(response: 404, description: 'Nie znaleziono')]
+    )]
+    #[OA\Get(
+        path: '/api/job-position/{uuid}/history/export',
+        summary: 'Eksport historii zmian stanowiska',
+        security: [['sanctum' => []]],
+        tags: ['Auditable'],
+        parameters: [
+            new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
+            new OA\QueryParameter(name: 'type', required: true, schema: new OA\Schema(type: 'string', enum: ['xlsx', 'csv', 'ods'])),
+        ],
+        responses: [new OA\Response(response: 200, description: 'Plik do pobrania'), new OA\Response(response: 404, description: 'Nie znaleziono')]
+    )]
+    public function export(string $uuid, string $resource, ExportRequest $request): BinaryFileResponse
     {
         return $this->auditService->exportHistory($this->auditService->resolveAuditable($resource, $uuid), $request);
     }

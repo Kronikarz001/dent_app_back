@@ -1,11 +1,18 @@
 <?php
 
+use App\Http\Controllers\AuditableController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\PatientFileController;
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/patient/export', [PatientController::class, 'export'])
         ->name('patient.export');
+    Route::get('/patient/{uuid}/history', [AuditableController::class, 'index'])
+        ->defaults('resource', 'patient')
+        ->name('patient.history');
+    Route::get('/patient/{uuid}/history/export', [AuditableController::class, 'export'])
+        ->defaults('resource', 'patient')
+        ->name('patient.history.export');
     Route::get('/patient/selectlist', [PatientController::class, 'selectList'])
         ->name('patient.selectList');
     Route::apiResource('/patient', PatientController::class)

@@ -1,11 +1,18 @@
 <?php
 
+use App\Http\Controllers\AuditableController;
 use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\MaterialFileController;
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/material/export', [MaterialController::class, 'export'])
         ->name('material.export');
+    Route::get('/material/{uuid}/history', [AuditableController::class, 'index'])
+        ->defaults('resource', 'material')
+        ->name('material.history');
+    Route::get('/material/{uuid}/history/export', [AuditableController::class, 'export'])
+        ->defaults('resource', 'material')
+        ->name('material.history.export');
     Route::get('/material/selectlist', [MaterialController::class, 'selectList'])
         ->name('material.selectList');
     Route::apiResource('/material', MaterialController::class)

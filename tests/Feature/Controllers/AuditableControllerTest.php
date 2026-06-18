@@ -27,7 +27,7 @@ class AuditableControllerTest extends TestCase
             ]);
 
         $response = $this->callApiWithLoggedUser($actor)
-            ->getJson(route('auditable.history', ['resource' => 'patient', 'uuid' => $patient->uuid]));
+            ->getJson(route('patient.history', ['uuid' => $patient->uuid]));
 
         $response->assertOk();
         $response->assertJsonCount(1, 'data');
@@ -37,10 +37,10 @@ class AuditableControllerTest extends TestCase
     /**
      * @return void
      */
-    public function testHistoryReturnsNotFoundForUnknownResource(): void
+    public function testHistoryReturnsNotFoundForMissingEntity(): void
     {
         $response = $this->callApiWithLoggedUser()
-            ->getJson(route('auditable.history', ['resource' => 'unknown', 'uuid' => '019e99cf-9ffe-70a8-9b4c-8b889d28eeff']));
+            ->getJson(route('patient.history', ['uuid' => '019e99cf-9ffe-70a8-9b4c-8b889d28eeff']));
 
         $response->assertNotFound();
     }
@@ -48,10 +48,10 @@ class AuditableControllerTest extends TestCase
     /**
      * @return void
      */
-    public function testHistoryReturnsNotFoundForMissingEntity(): void
+    public function testHistoryReturnsNotFoundForMalformedUuid(): void
     {
         $response = $this->callApiWithLoggedUser()
-            ->getJson(route('auditable.history', ['resource' => 'patient', 'uuid' => '019e99cf-9ffe-70a8-9b4c-8b889d28eeff']));
+            ->getJson(route('patient.history', ['uuid' => 'not-a-uuid']));
 
         $response->assertNotFound();
     }
@@ -63,7 +63,7 @@ class AuditableControllerTest extends TestCase
     {
         $patient = Patient::factory()->create();
 
-        $response = $this->getJson(route('auditable.history', ['resource' => 'patient', 'uuid' => $patient->uuid]));
+        $response = $this->getJson(route('patient.history', ['uuid' => $patient->uuid]));
 
         $response->assertUnauthorized();
     }
@@ -84,7 +84,7 @@ class AuditableControllerTest extends TestCase
             ]);
 
         $response = $this->callApiWithLoggedUser($actor)
-            ->getJson(route('auditable.history.export', ['resource' => 'patient', 'uuid' => $patient->uuid, 'type' => 'xlsx']));
+            ->getJson(route('patient.history.export', ['uuid' => $patient->uuid, 'type' => 'xlsx']));
 
         $response->assertOk();
     }

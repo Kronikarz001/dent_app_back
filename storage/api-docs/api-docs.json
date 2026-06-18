@@ -6,6 +6,142 @@
         "version": "1.0.0"
     },
     "paths": {
+        "/api/{resource}/{uuid}/history": {
+            "get": {
+                "tags": [
+                    "Auditable"
+                ],
+                "summary": "Historia zmian danego rekordu",
+                "operationId": "42abb8dac6868ee6ce82242533099469",
+                "parameters": [
+                    {
+                        "name": "resource",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "user",
+                                "patient",
+                                "calendar",
+                                "dental-examination",
+                                "material",
+                                "job-position"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/PaginatedResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/AuditResource"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/{resource}/{uuid}/history/export": {
+            "get": {
+                "tags": [
+                    "Auditable"
+                ],
+                "summary": "Eksport historii zmian danego rekordu do pliku",
+                "operationId": "c67a35e48562820f57a48714c5ba88cb",
+                "parameters": [
+                    {
+                        "name": "resource",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "user",
+                                "patient",
+                                "calendar",
+                                "dental-examination",
+                                "material",
+                                "job-position"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "xlsx",
+                                "csv",
+                                "ods"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Plik do pobrania",
+                        "content": {
+                            "application/octet-stream": {}
+                        }
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/auth/login": {
             "post": {
                 "tags": [
@@ -5099,6 +5235,46 @@
                     }
                 },
                 "type": "object"
+            },
+            "AuditResource": {
+                "properties": {
+                    "uuid": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "auditable_type": {
+                        "type": "string"
+                    },
+                    "auditable_id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "user_uuid": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "CREATE",
+                            "UPDATE",
+                            "DELETE"
+                        ]
+                    },
+                    "change_from": {
+                        "type": "object",
+                        "nullable": true
+                    },
+                    "change_to": {
+                        "type": "object",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
             }
         },
         "securitySchemes": {
@@ -5111,6 +5287,10 @@
         }
     },
     "tags": [
+        {
+            "name": "Auditable",
+            "description": "Auditable"
+        },
         {
             "name": "Auth",
             "description": "Auth"
