@@ -183,6 +183,19 @@ class AuthServiceTest extends TestCase
     /**
      * @return void
      */
+    public function testEditPasswordUpdatesAuthenticatedUsersPassword(): void
+    {
+        $user = User::factory()->create(['password' => bcrypt('OldPassword123!')]);
+        Auth::setUser($user);
+
+        $this->authService->editPassword(['password' => 'NewPassword123!']);
+
+        $this->assertTrue(password_verify('NewPassword123!', $user->fresh()->password));
+    }
+
+    /**
+     * @return void
+     */
     public function testAuthenticateSetsUserFromValidToken(): void
     {
         $user = User::factory()->create();

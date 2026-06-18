@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\EditPasswordRequest;
 use App\Http\Requests\ForgotPasswordRequest;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\ResetPasswordRequest;
@@ -79,7 +80,7 @@ class AuthController extends Controller
      * @return JsonResponse
      */
     #[OA\Post(
-        path: '/api/auth/forgot-password',
+        path: '/api/user/forgot-password',
         summary: 'Wysłanie linku do resetowania hasła',
         requestBody: new OA\RequestBody(
             required: true,
@@ -108,7 +109,7 @@ class AuthController extends Controller
      * @return JsonResponse
      */
     #[OA\Post(
-        path: '/api/auth/reset-password',
+        path: '/api/user/reset-password',
         summary: 'Resetowanie hasła',
         requestBody: new OA\RequestBody(
             required: true,
@@ -131,6 +132,38 @@ class AuthController extends Controller
     public function resetPassword(ResetPasswordRequest $request): JsonResponse
     {
         $this->authService->resetPassword($request->all());
+
+        return new JsonResponse(null, 204);
+    }
+
+    /**
+     * @param EditPasswordRequest $request
+     * @return JsonResponse
+     */
+    #[OA\Patch(
+        path: '/api/user/edit-password',
+        summary: 'Zmiana hasła przez zalogowanego użytkownika',
+        security: [['sanctum' => []]],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ['current_password', 'password', 'password_confirmation'],
+                properties: [
+                    new OA\Property(property: 'current_password', type: 'string', format: 'password'),
+                    new OA\Property(property: 'password', type: 'string', format: 'password'),
+                    new OA\Property(property: 'password_confirmation', type: 'string', format: 'password'),
+                ]
+            )
+        ),
+        tags: ['Auth'],
+        responses: [
+            new OA\Response(response: 204, description: 'Hasło zmienione'),
+            new OA\Response(response: 422, description: 'Nieprawidłowe obecne hasło lub błąd walidacji'),
+        ]
+    )]
+    public function editPassword(EditPasswordRequest $request): JsonResponse
+    {
+        $this->authService->editPassword($request->all());
 
         return new JsonResponse(null, 204);
     }

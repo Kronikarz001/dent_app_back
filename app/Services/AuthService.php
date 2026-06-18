@@ -95,9 +95,17 @@ readonly class AuthService implements AuthServiceInterface
     }
 
     /**
-     * @param string|null $token
+     * @param array $data
      * @return void
      */
+    public function editPassword(array $data): void
+    {
+        /** @var User $user */
+        $user = Auth::user();
+
+        $this->userService->editPassword($user, $data);
+    }
+
     /**
      * @param string|null $token
      * @return void
