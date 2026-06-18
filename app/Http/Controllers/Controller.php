@@ -57,7 +57,8 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: 'pwz_numer', type: 'string', nullable: true),
         new OA\Property(property: 'avatar_path', type: 'string', nullable: true),
         new OA\Property(property: 'background_path', type: 'string', nullable: true),
-        new OA\Property(property: 'phone_number', type: 'array', items: new OA\Items(ref: '#/components/schemas/PhoneNumberResource')),
+        new OA\Property(property: 'private_phone_number', type: 'string', nullable: true),
+        new OA\Property(property: 'phone_number', type: 'string', nullable: true),
         new OA\Property(property: 'job_positions', type: 'array', items: new OA\Items(ref: '#/components/schemas/JobPositionResource')),
         new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
     ]
@@ -73,7 +74,8 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: 'is_active', type: 'boolean'),
         new OA\Property(property: 'pwz_numer', type: 'string', nullable: true),
         new OA\Property(property: 'avatar_path', type: 'string', nullable: true),
-        new OA\Property(property: 'phone_number', type: 'array', items: new OA\Items(ref: '#/components/schemas/PhoneNumberResource')),
+        new OA\Property(property: 'private_phone_number', type: 'string', nullable: true),
+        new OA\Property(property: 'phone_number', type: 'string', nullable: true),
         new OA\Property(property: 'job_positions', type: 'array', items: new OA\Items(ref: '#/components/schemas/JobPositionResource')),
         new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
     ]

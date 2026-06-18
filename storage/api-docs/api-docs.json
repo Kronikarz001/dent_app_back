@@ -5854,11 +5854,13 @@
                         "type": "string",
                         "nullable": true
                     },
+                    "private_phone_number": {
+                        "type": "string",
+                        "nullable": true
+                    },
                     "phone_number": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/PhoneNumberResource"
-                        }
+                        "type": "string",
+                        "nullable": true
                     },
                     "job_positions": {
                         "type": "array",
@@ -5905,11 +5907,13 @@
                         "type": "string",
                         "nullable": true
                     },
+                    "private_phone_number": {
+                        "type": "string",
+                        "nullable": true
+                    },
                     "phone_number": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/PhoneNumberResource"
-                        }
+                        "type": "string",
+                        "nullable": true
                     },
                     "job_positions": {
                         "type": "array",

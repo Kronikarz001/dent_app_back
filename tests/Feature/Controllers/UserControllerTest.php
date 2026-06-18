@@ -167,6 +167,26 @@ class UserControllerTest extends TestCase
     /**
      * @return void
      */
+    public function testShowUserReturnsPrivateAndWorkPhoneNumbers(): void
+    {
+        $user = User::factory()->create();
+        $this->callApiWithLoggedUser()
+            ->putJson(route('user.update', ['user' => $user->uuid]), [
+                'private_phone_number' => '48500100200',
+                'phone_number' => '48600200300',
+            ]);
+
+        $response = $this->callApiWithLoggedUser()
+            ->getJson(route('user.show', ['user' => $user->uuid]));
+
+        $response->assertOk();
+        $response->assertJsonPath('private_phone_number', '48500100200');
+        $response->assertJsonPath('phone_number', '48600200300');
+    }
+
+    /**
+     * @return void
+     */
     public function testUpdateUserRejectsInvalidPhoneNumber(): void
     {
         $user = User::factory()->create();
