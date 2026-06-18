@@ -98,6 +98,28 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: 'updated_at', type: 'string', format: 'date-time'),
     ]
 )]
+#[OA\Schema(
+    schema: 'DentalExaminationResource',
+    properties: [
+        new OA\Property(property: 'uuid', type: 'string', format: 'uuid'),
+        new OA\Property(property: 'name', type: 'string'),
+        new OA\Property(property: 'description', type: 'string', nullable: true),
+        new OA\Property(property: 'short_description', type: 'string', nullable: true),
+        new OA\Property(property: 'price', type: 'integer', nullable: true),
+        new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
+    ]
+)]
+#[OA\Schema(
+    schema: 'MaterialResource',
+    properties: [
+        new OA\Property(property: 'uuid', type: 'string', format: 'uuid'),
+        new OA\Property(property: 'name', type: 'string'),
+        new OA\Property(property: 'description', type: 'string', nullable: true),
+        new OA\Property(property: 'short_description', type: 'string', nullable: true),
+        new OA\Property(property: 'price', type: 'integer', nullable: true),
+        new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
+    ]
+)]
 abstract class Controller
 {
     //
