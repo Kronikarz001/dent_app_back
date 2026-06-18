@@ -115,7 +115,8 @@ class MaterialController extends Controller
                     new OA\Property(property: 'name', type: 'string', example: 'Kompozyt światłoutwardzalny'),
                     new OA\Property(property: 'description', type: 'string', nullable: true),
                     new OA\Property(property: 'short_description', type: 'string', nullable: true),
-                    new OA\Property(property: 'price', type: 'integer', nullable: true, example: 50),
+                    new OA\Property(property: 'price', type: 'integer', example: 50, nullable: true),
+                    new OA\Property(property: 'dental_examinations', type: 'array', items: new OA\Items(type: 'string', format: 'uuid'), nullable: true),
                 ]
             )
         ),
@@ -154,6 +155,7 @@ class MaterialController extends Controller
                     new OA\Property(property: 'description', type: 'string', nullable: true),
                     new OA\Property(property: 'short_description', type: 'string', nullable: true),
                     new OA\Property(property: 'price', type: 'integer', nullable: true),
+                    new OA\Property(property: 'dental_examinations', type: 'array', nullable: true, items: new OA\Items(type: 'string', format: 'uuid')),
                 ]
             )
         ),

@@ -825,22 +825,45 @@
                         "application/json": {
                             "schema": {
                                 "required": [
-                                    "name",
-                                    "f_name",
-                                    "m_name"
+                                    "type",
+                                    "end_date"
                                 ],
                                 "properties": {
+                                    "type": {
+                                        "type": "string"
+                                    },
                                     "name": {
                                         "type": "string",
-                                        "example": "Stomatolog"
+                                        "nullable": true
                                     },
-                                    "f_name": {
+                                    "description": {
                                         "type": "string",
-                                        "example": "Stomatolożka"
+                                        "nullable": true
                                     },
-                                    "m_name": {
+                                    "start_date": {
                                         "type": "string",
-                                        "example": "Stomatolodzy"
+                                        "format": "date-time",
+                                        "nullable": true
+                                    },
+                                    "end_date": {
+                                        "type": "string",
+                                        "format": "date-time"
+                                    },
+                                    "created_by": {
+                                        "type": "string",
+                                        "format": "uuid",
+                                        "nullable": true
+                                    },
+                                    "is_active": {
+                                        "type": "boolean"
+                                    },
+                                    "dental_examinations": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        },
+                                        "nullable": true
                                     }
                                 },
                                 "type": "object"
@@ -961,19 +984,45 @@
                         "application/json": {
                             "schema": {
                                 "required": [
-                                    "name",
-                                    "f_name",
-                                    "m_name"
+                                    "type",
+                                    "end_date"
                                 ],
                                 "properties": {
+                                    "type": {
+                                        "type": "string"
+                                    },
                                     "name": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "nullable": true
                                     },
-                                    "f_name": {
-                                        "type": "string"
+                                    "description": {
+                                        "type": "string",
+                                        "nullable": true
                                     },
-                                    "m_name": {
-                                        "type": "string"
+                                    "start_date": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "nullable": true
+                                    },
+                                    "end_date": {
+                                        "type": "string",
+                                        "format": "date-time"
+                                    },
+                                    "created_by": {
+                                        "type": "string",
+                                        "format": "uuid",
+                                        "nullable": true
+                                    },
+                                    "is_active": {
+                                        "type": "boolean"
+                                    },
+                                    "dental_examinations": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        },
+                                        "nullable": true
                                     }
                                 },
                                 "type": "object"
@@ -1603,6 +1652,22 @@
                                         "type": "integer",
                                         "example": 150,
                                         "nullable": true
+                                    },
+                                    "materials": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        },
+                                        "nullable": true
+                                    },
+                                    "calendars": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        },
+                                        "nullable": true
                                     }
                                 },
                                 "type": "object"
@@ -1739,6 +1804,22 @@
                                     },
                                     "price": {
                                         "type": "integer",
+                                        "nullable": true
+                                    },
+                                    "materials": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        },
+                                        "nullable": true
+                                    },
+                                    "calendars": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        },
                                         "nullable": true
                                     }
                                 },
@@ -3062,6 +3143,14 @@
                                         "type": "integer",
                                         "example": 50,
                                         "nullable": true
+                                    },
+                                    "dental_examinations": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        },
+                                        "nullable": true
                                     }
                                 },
                                 "type": "object"
@@ -3198,6 +3287,14 @@
                                     },
                                     "price": {
                                         "type": "integer",
+                                        "nullable": true
+                                    },
+                                    "dental_examinations": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        },
                                         "nullable": true
                                     }
                                 },
@@ -3695,6 +3792,164 @@
                 ]
             }
         },
+        "/api/message": {
+            "get": {
+                "tags": [
+                    "Message"
+                ],
+                "summary": "Skrzynka wiadomości zalogowanego użytkownika (odebrane, wysłane, broadcasty)",
+                "operationId": "a7c6abc72ab4d49342f875a1643ecea4",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/PaginatedResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/MessageResource"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Message"
+                ],
+                "summary": "Wysyła wiadomość do konkretnej osoby, do grupy, lub jako nowy broadcast do wszystkich",
+                "operationId": "ee15771b1dadd0efb04ebd263be4f168",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "message"
+                                ],
+                                "properties": {
+                                    "message": {
+                                        "type": "string"
+                                    },
+                                    "recipient_uuid": {
+                                        "description": "Wiadomość bezpośrednia do tego użytkownika",
+                                        "type": "string",
+                                        "format": "uuid",
+                                        "nullable": true
+                                    },
+                                    "message_group_uuid": {
+                                        "description": "Dopisanie do istniejącej grupy/konwersacji",
+                                        "type": "string",
+                                        "format": "uuid",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Utworzono",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/MessageResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Błąd walidacji"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/message-group/{uuid}/messages": {
+            "get": {
+                "tags": [
+                    "Message"
+                ],
+                "summary": "Pobiera konwersację (wiadomości) należące do danej grupy",
+                "operationId": "6828cf755200692934d070834baf8c3c",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/PaginatedResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/MessageResource"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/patient": {
             "get": {
                 "tags": [
@@ -3890,8 +4145,7 @@
                                 "required": [
                                     "first_name",
                                     "last_name",
-                                    "email",
-                                    "pesel"
+                                    "email"
                                 ],
                                 "properties": {
                                     "first_name": {
@@ -3904,8 +4158,25 @@
                                         "type": "string",
                                         "format": "email"
                                     },
-                                    "pesel": {
-                                        "type": "string"
+                                    "phone_numbers": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "number": {
+                                                    "type": "string",
+                                                    "example": "48500100200"
+                                                },
+                                                "type": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "PRIVATE",
+                                                        "WORK"
+                                                    ]
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "nullable": true
                                     }
                                 },
                                 "type": "object"
@@ -4456,8 +4727,8 @@
                                 "required": [
                                     "first_name",
                                     "last_name",
-                                    "email",
                                     "pesel",
+                                    "private_email",
                                     "password",
                                     "password_confirmation"
                                 ],
@@ -4472,11 +4743,16 @@
                                     },
                                     "email": {
                                         "type": "string",
-                                        "format": "email"
+                                        "format": "email",
+                                        "nullable": true
                                     },
                                     "pesel": {
                                         "type": "string",
                                         "example": "12345678901"
+                                    },
+                                    "private_email": {
+                                        "type": "string",
+                                        "format": "email"
                                     },
                                     "password": {
                                         "type": "string",
@@ -4485,6 +4761,10 @@
                                     "password_confirmation": {
                                         "type": "string",
                                         "format": "password"
+                                    },
+                                    "pwz_numer": {
+                                        "type": "string",
+                                        "nullable": true
                                     }
                                 },
                                 "type": "object"
@@ -4604,32 +4884,64 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "required": [
-                                    "first_name",
-                                    "last_name",
-                                    "email",
-                                    "pesel"
-                                ],
                                 "properties": {
                                     "first_name": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "nullable": true
                                     },
                                     "last_name": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "nullable": true
                                     },
                                     "email": {
                                         "type": "string",
-                                        "format": "email"
+                                        "format": "email",
+                                        "nullable": true
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "nullable": true
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "nullable": true
                                     },
                                     "pesel": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "private_email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "nullable": true
+                                    },
+                                    "private_phone_number": {
+                                        "type": "string",
+                                        "example": "48500100200",
+                                        "nullable": true
+                                    },
+                                    "phone_number": {
+                                        "type": "string",
+                                        "example": "48500100200",
+                                        "nullable": true
+                                    },
+                                    "is_active": {
+                                        "type": "boolean",
+                                        "nullable": true
+                                    },
+                                    "pwz_numer": {
+                                        "type": "string",
+                                        "nullable": true
                                     },
                                     "job_positions": {
                                         "type": "array",
                                         "items": {
                                             "type": "string",
                                             "format": "uuid"
-                                        }
+                                        },
+                                        "nullable": true
                                     }
                                 },
                                 "type": "object"
@@ -5483,6 +5795,29 @@
                 },
                 "type": "object"
             },
+            "PhoneNumberResource": {
+                "properties": {
+                    "uuid": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "number": {
+                        "type": "string"
+                    },
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "PRIVATE",
+                            "WORK"
+                        ]
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
             "UserResource": {
                 "properties": {
                     "uuid": {
@@ -5497,10 +5832,19 @@
                     },
                     "email": {
                         "type": "string",
+                        "format": "email",
+                        "nullable": true
+                    },
+                    "private_email": {
+                        "type": "string",
                         "format": "email"
                     },
                     "is_active": {
                         "type": "boolean"
+                    },
+                    "pwz_numer": {
+                        "type": "string",
+                        "nullable": true
                     },
                     "avatar_path": {
                         "type": "string",
@@ -5509,6 +5853,12 @@
                     "background_path": {
                         "type": "string",
                         "nullable": true
+                    },
+                    "phone_number": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PhoneNumberResource"
+                        }
                     },
                     "job_positions": {
                         "type": "array",
@@ -5537,14 +5887,35 @@
                     },
                     "email": {
                         "type": "string",
+                        "format": "email",
+                        "nullable": true
+                    },
+                    "private_email": {
+                        "type": "string",
                         "format": "email"
                     },
                     "is_active": {
                         "type": "boolean"
                     },
+                    "pwz_numer": {
+                        "type": "string",
+                        "nullable": true
+                    },
                     "avatar_path": {
                         "type": "string",
                         "nullable": true
+                    },
+                    "phone_number": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PhoneNumberResource"
+                        }
+                    },
+                    "job_positions": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/JobPositionResource"
+                        }
                     },
                     "created_at": {
                         "type": "string",
@@ -5571,6 +5942,15 @@
                     },
                     "pesel": {
                         "type": "string"
+                    },
+                    "is_active": {
+                        "type": "boolean"
+                    },
+                    "phone_number": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PhoneNumberResource"
+                        }
                     },
                     "created_at": {
                         "type": "string",
@@ -5706,6 +6086,37 @@
                 },
                 "type": "object"
             },
+            "MessageResource": {
+                "properties": {
+                    "uuid": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "user_uuid": {
+                        "type": "string",
+                        "format": "uuid",
+                        "nullable": true
+                    },
+                    "recipient_user_uuid": {
+                        "type": "string",
+                        "format": "uuid",
+                        "nullable": true
+                    },
+                    "message_group_uuid": {
+                        "type": "string",
+                        "format": "uuid",
+                        "nullable": true
+                    },
+                    "message": {
+                        "type": "string"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
             "AuditResource": {
                 "properties": {
                     "uuid": {
@@ -5796,6 +6207,10 @@
         {
             "name": "MaterialFile",
             "description": "MaterialFile"
+        },
+        {
+            "name": "Message",
+            "description": "Message"
         },
         {
             "name": "Patient",

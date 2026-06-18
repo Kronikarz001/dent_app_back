@@ -86,6 +86,8 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: 'last_name', type: 'string'),
         new OA\Property(property: 'email', type: 'string', format: 'email'),
         new OA\Property(property: 'pesel', type: 'string'),
+        new OA\Property(property: 'is_active', type: 'boolean'),
+        new OA\Property(property: 'phone_number', type: 'array', items: new OA\Items(ref: '#/components/schemas/PhoneNumberResource')),
         new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
     ]
 )]

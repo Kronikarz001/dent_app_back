@@ -138,6 +138,50 @@ class UserControllerTest extends TestCase
     /**
      * @return void
      */
+    public function testUpdateUserAssignsPrivateAndWorkPhoneNumbers(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->callApiWithLoggedUser()
+            ->putJson(route('user.update', ['user' => $user->uuid]), [
+                'private_phone_number' => '48500100200',
+                'phone_number' => '48600200300',
+            ]);
+
+        $response->assertNoContent();
+
+        $this->assertDatabaseHas('phone_numbers', [
+            'phoneable_uuid' => $user->uuid,
+            'phoneable_type' => User::class,
+            'number' => '48500100200',
+            'type' => 'PRIVATE',
+        ]);
+        $this->assertDatabaseHas('phone_numbers', [
+            'phoneable_uuid' => $user->uuid,
+            'phoneable_type' => User::class,
+            'number' => '48600200300',
+            'type' => 'WORK',
+        ]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testUpdateUserRejectsInvalidPhoneNumber(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->callApiWithLoggedUser()
+            ->putJson(route('user.update', ['user' => $user->uuid]), [
+                'private_phone_number' => 'not-a-phone-number',
+            ]);
+
+        $response->assertUnprocessable();
+    }
+
+    /**
+     * @return void
+     */
     public function testDeleteUserReturnNoContentResponse(): void
     {
         $user = User::factory()->create();

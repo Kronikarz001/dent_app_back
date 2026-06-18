@@ -116,6 +116,8 @@ class DentalExaminationController extends Controller
                     new OA\Property(property: 'description', type: 'string', nullable: true),
                     new OA\Property(property: 'short_description', type: 'string', nullable: true),
                     new OA\Property(property: 'price', type: 'integer', nullable: true, example: 150),
+                    new OA\Property(property: 'materials', type: 'array', nullable: true, items: new OA\Items(type: 'string', format: 'uuid')),
+                    new OA\Property(property: 'calendars', type: 'array', nullable: true, items: new OA\Items(type: 'string', format: 'uuid')),
                 ]
             )
         ),
@@ -154,6 +156,8 @@ class DentalExaminationController extends Controller
                     new OA\Property(property: 'description', type: 'string', nullable: true),
                     new OA\Property(property: 'short_description', type: 'string', nullable: true),
                     new OA\Property(property: 'price', type: 'integer', nullable: true),
+                    new OA\Property(property: 'materials', type: 'array', nullable: true, items: new OA\Items(type: 'string', format: 'uuid')),
+                    new OA\Property(property: 'calendars', type: 'array', nullable: true, items: new OA\Items(type: 'string', format: 'uuid')),
                 ]
             )
         ),
