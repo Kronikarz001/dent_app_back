@@ -98,10 +98,6 @@ readonly class AuthService implements AuthServiceInterface
      * @param string|null $token
      * @return void
      */
-    /**
-     * @param string|null $token
-     * @return void
-     */
     public function authenticate(?string $token): void
     {
         if (is_null($token)) {

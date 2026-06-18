@@ -2,7 +2,10 @@
 
 namespace Tests\Feature\Controllers;
 
+use App\Enums\AuditableEventType;
+use App\Models\Audit;
 use App\Models\Patient;
+use App\Models\User;
 use Tests\TestCase;
 
 /**
@@ -37,6 +40,53 @@ class PatientControllerTest extends TestCase
     /**
      * @return void
      */
+    public function testIndexFiltersByExactFieldValue(): void
+    {
+        Patient::factory()->create(['first_name' => 'Zbigniew']);
+        $target = Patient::factory()->create(['first_name' => 'Unikalniejszy']);
+
+        $response = $this->callApiWithLoggedUser()
+            ->getJson(route('patient.index', ['patient' => ['first_name' => 'Unikalniejszy']]));
+
+        $response->assertOk();
+        $response->assertJsonCount(1, 'data');
+        $response->assertJsonPath('data.0.uuid', $target->uuid);
+    }
+
+    /**
+     * @return void
+     */
+    public function testIndexSortsResultsByField(): void
+    {
+        Patient::factory()->create(['first_name' => 'Bartosz']);
+        Patient::factory()->create(['first_name' => 'Adam']);
+
+        $response = $this->callApiWithLoggedUser()
+            ->getJson(route('patient.index', ['sort' => 'first_name,asc']));
+
+        $response->assertOk();
+        $names = collect($response->json('data'))->pluck('first_name')->all();
+        $this->assertSame(collect($names)->sort()->values()->all(), $names);
+    }
+
+    /**
+     * @return void
+     */
+    public function testIndexSearchStringMatchesPartialValue(): void
+    {
+        $target = Patient::factory()->create(['first_name' => 'Wyjatkowy']);
+        Patient::factory()->create(['first_name' => 'Inny']);
+
+        $response = $this->callApiWithLoggedUser()
+            ->getJson(route('patient.index', ['searchString' => 'Wyjatkowy']));
+
+        $response->assertOk();
+        $response->assertJsonPath('data.0.uuid', $target->uuid);
+    }
+
+    /**
+     * @return void
+     */
     public function testShowPatientReturnSuccessResponse(): void
     {
         $patient = Patient::factory()->create();
@@ -64,6 +114,33 @@ class PatientControllerTest extends TestCase
         $this->assertDatabaseHas('patients', [
             'email' => 'jan@example.com',
         ]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testStorePatientRecordsAuditAttributedToActingUser(): void
+    {
+        $actor = User::factory()->create();
+
+        $response = $this->callApiWithLoggedUser($actor)
+            ->postJson(route('patient.store'), [
+                'first_name' => 'Jan',
+                'last_name' => 'Kowalski',
+                'email' => 'jan@example.com',
+                'pesel' => '12345678901',
+            ]);
+
+        $response->assertCreated();
+
+        $patient = Patient::query()->where('email', 'jan@example.com')->first();
+        $audit = Audit::query()->where('auditable_id', $patient->uuid)->first();
+
+        $this->assertNotNull($audit);
+        $this->assertSame(Patient::class, $audit->auditable_type);
+        $this->assertSame(AuditableEventType::CREATE, $audit->type);
+        $this->assertSame($actor->uuid, $audit->user_uuid);
+        $this->assertSame('jan@example.com', $audit->change_to['email']);
     }
 
     /**

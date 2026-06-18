@@ -79,7 +79,7 @@ class AuthController extends Controller
      * @return JsonResponse
      */
     #[OA\Post(
-        path: '/api/auth/forgot-password',
+        path: '/api/user/forgot-password',
         summary: 'Wysłanie linku do resetowania hasła',
         requestBody: new OA\RequestBody(
             required: true,
@@ -108,7 +108,7 @@ class AuthController extends Controller
      * @return JsonResponse
      */
     #[OA\Post(
-        path: '/api/auth/reset-password',
+        path: '/api/user/reset-password',
         summary: 'Resetowanie hasła',
         requestBody: new OA\RequestBody(
             required: true,

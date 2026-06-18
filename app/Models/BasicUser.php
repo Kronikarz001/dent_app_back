@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\Auditable;
 use App\Traits\HasFile;
 use App\Traits\HasPhoneNumber;
 use Database\Factories\UserFactory;
@@ -9,6 +10,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
@@ -24,6 +26,7 @@ use Laravel\Sanctum\PersonalAccessToken;
  * @property string $password
  * @property string $pesel
  * @property string|null $avatar_path
+ * @property string|null $pwz_numer
  * @property string|null $remember_token
  * @property Carbon|null $email_verified_at
  * @property Carbon|null $private_email_verified_at
@@ -33,7 +36,7 @@ use Laravel\Sanctum\PersonalAccessToken;
 abstract class BasicUser extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasApiTokens, HasFactory, HasFile, HasPhoneNumber, HasUuids, Notifiable;
+    use Auditable, HasApiTokens, HasFactory, HasFile, HasPhoneNumber, HasUuids, Notifiable;
 
     protected $table = 'users';
 
@@ -55,6 +58,7 @@ abstract class BasicUser extends Authenticatable
         'pesel',
         'is_active',
         'avatar_path',
+        'pwz_numer',
     ];
 
     /**
@@ -64,14 +68,6 @@ abstract class BasicUser extends Authenticatable
         'password',
         'pesel',
         'remember_token',
-    ];
-
-    /**
-     * @var list<string>
-     */
-    protected $appends = [
-        'avatar_url',
-        'background_url',
     ];
 
     /**
@@ -112,7 +108,7 @@ abstract class BasicUser extends Authenticatable
     /**
      * @return string|null
      */
-    public function getAvatarUrlAttribute(): ?string
+    public function getAvatarPathAttribute(): ?string
     {
         $file = File::where('fileable_type', UserAvatar::class)
             ->where('fileable_id', $this->uuid)
@@ -130,7 +126,7 @@ abstract class BasicUser extends Authenticatable
     /**
      * @return string|null
      */
-    public function getBackgroundUrlAttribute(): ?string
+    public function getBackgroundPathAttribute(): ?string
     {
         $file = File::where('fileable_type', UserBackground::class)
             ->where('fileable_id', $this->uuid)
@@ -158,5 +154,13 @@ abstract class BasicUser extends Authenticatable
             'uuid',
             'uuid'
         );
+    }
+
+    /**
+     * @return MorphToMany
+     */
+    public function calendars(): MorphToMany
+    {
+        return $this->morphToMany(Calendar::class, 'userable', 'calendar_users');
     }
 }

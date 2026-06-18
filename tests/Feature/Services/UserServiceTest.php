@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Services;
 
+use App\Enums\PhoneNumberType;
 use App\Models\User;
 use App\Services\UserServiceInterface;
 use Illuminate\Foundation\Application;
@@ -87,6 +88,30 @@ class UserServiceTest extends TestCase
 
         $this->assertInstanceOf(User::class, $result);
         $this->assertDatabaseHas(self::USERS_TABLE, ['uuid' => $user->uuid, 'first_name' => 'Zmienione']);
+    }
+
+    /**
+     * @return void
+     */
+    public function testUpdateUserAssignsPrivateAndWorkPhoneNumbers(): void
+    {
+        $user = User::factory()->create();
+
+        $this->service->updateUser($user, [
+            'private_phone_number' => '48500100200',
+            'phone_number' => '48600200300',
+        ]);
+
+        $this->assertDatabaseHas('phone_numbers', [
+            'phoneable_uuid' => $user->uuid,
+            'number' => '48500100200',
+            'type' => PhoneNumberType::PRIVATE->value,
+        ]);
+        $this->assertDatabaseHas('phone_numbers', [
+            'phoneable_uuid' => $user->uuid,
+            'number' => '48600200300',
+            'type' => PhoneNumberType::WORK->value,
+        ]);
     }
 
     /**

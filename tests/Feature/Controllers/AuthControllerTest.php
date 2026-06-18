@@ -67,10 +67,9 @@ class AuthControllerTest extends TestCase
 
         $user = User::factory()->create();
 
-        $response = $this->callApiWithLoggedUser()
-            ->postJson(route('user.forgot_password', ['user' => $user->uuid]), [
-                'email' => $user->email,
-            ]);
+        $response = $this->postJson(route('user.forgot_password'), [
+            'email' => $user->email,
+        ]);
 
         $response->assertOk();
 
@@ -85,13 +84,12 @@ class AuthControllerTest extends TestCase
         $user = User::factory()->create();
         $token = app('auth.password.broker')->createToken($user);
 
-        $response = $this->callApiWithLoggedUser()
-            ->patchJson(route('user.resetPassword', ['user' => $user->uuid]), [
-                'token' => $token,
-                'email' => $user->email,
-                'password' => 'NewPassword123!',
-                'password_confirmation' => 'NewPassword123!',
-            ]);
+        $response = $this->postJson(route('user.reset_password'), [
+            'token' => $token,
+            'email' => $user->email,
+            'password' => 'NewPassword123!',
+            'password_confirmation' => 'NewPassword123!',
+        ]);
 
         $response->assertNoContent();
     }

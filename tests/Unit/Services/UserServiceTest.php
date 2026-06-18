@@ -5,6 +5,7 @@ namespace Tests\Unit\Services;
 use App\Models\User;
 use App\Repositories\UserRepositoryInterface;
 use App\Services\ExportServiceInterface;
+use App\Services\JobPositionServiceInterface;
 use App\Services\PhoneNumberServiceInterface;
 use App\Services\UserService;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -31,7 +32,8 @@ class UserServiceTest extends TestCase
         $this->userRepository = Mockery::mock(UserRepositoryInterface::class);
         $exportService = Mockery::mock(ExportServiceInterface::class);
         $phoneNumberService = Mockery::mock(PhoneNumberServiceInterface::class);
-        $this->userService = new UserService($this->userRepository, $exportService, $phoneNumberService);
+        $jobPositionService = Mockery::mock(JobPositionServiceInterface::class);
+        $this->userService = new UserService($this->userRepository, $exportService, $phoneNumberService, $jobPositionService);
     }
 
     /**

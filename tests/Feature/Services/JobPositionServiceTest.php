@@ -2,11 +2,14 @@
 
 namespace Tests\Feature\Services;
 
+use App\Enums\AuditableEventType;
+use App\Models\Audit;
 use App\Models\JobPosition;
 use App\Models\User;
 use App\Services\JobPositionServiceInterface;
 use Illuminate\Foundation\Application;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Auth;
 use Tests\TestCase;
 
 class JobPositionServiceTest extends TestCase
@@ -120,5 +123,28 @@ class JobPositionServiceTest extends TestCase
         $this->service->assignJobPosition($user, ['job_positions' => [$jobPosition->uuid]]);
 
         $this->assertSame(1, $user->jobPositions()->count());
+    }
+
+    /**
+     * @return void
+     */
+    public function testAssignJobPositionRecordsAuditEntryWhenAuthenticated(): void
+    {
+        $actor = User::factory()->create();
+        Auth::setUser($actor);
+
+        $user = User::factory()->create();
+        $jobPosition = JobPosition::factory()->create();
+
+        $this->service->assignJobPosition($user, ['job_positions' => [$jobPosition->uuid]]);
+
+        $audit = Audit::query()
+            ->where('auditable_id', $user->uuid)
+            ->where('type', AuditableEventType::UPDATE->value)
+            ->first();
+
+        $this->assertNotNull($audit);
+        $this->assertSame($actor->uuid, $audit->user_uuid);
+        $this->assertSame(['job_positions' => [$jobPosition->uuid]], $audit->change_to);
     }
 }

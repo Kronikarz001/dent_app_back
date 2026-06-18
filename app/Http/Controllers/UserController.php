@@ -2,28 +2,41 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\EditPasswordRequest;
 use App\Http\Requests\ExportRequest;
 use App\Http\Requests\UserStoreRequest;
 use App\Http\Requests\UserUpdateRequest;
+use App\Http\Resources\LoggedUserResource;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use App\Services\UserServiceInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Pagination\LengthAwarePaginator;
 use OpenApi\Attributes as OA;
+use PhpOffice\PhpSpreadsheet\Exception;
+use PhpOffice\PhpSpreadsheet\Writer\Exception as WriterException;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
+/**
+ * Summary of UserController
+ */
 class UserController extends Controller
 {
+    /**
+     * @param UserServiceInterface $userService
+     */
     public function __construct(
         private readonly UserServiceInterface $userService
     ) {}
 
+    /**
+     * @return LengthAwarePaginator
+     */
     #[OA\Get(
         path: '/api/user',
-        tags: ['User'],
         summary: 'Lista użytkowników (paginacja)',
         security: [['sanctum' => []]],
+        tags: ['User'],
         responses: [
             new OA\Response(
                 response: 200,
@@ -44,11 +57,14 @@ class UserController extends Controller
         return $this->userService->getUsers();
     }
 
+    /**
+     * @return LengthAwarePaginator
+     */
     #[OA\Get(
         path: '/api/user/selectlist',
-        tags: ['User'],
         summary: 'Lista użytkowników do selecta (uuid + name)',
         security: [['sanctum' => []]],
+        tags: ['User'],
         responses: [
             new OA\Response(response: 200, description: 'OK'),
         ]
@@ -58,11 +74,15 @@ class UserController extends Controller
         return $this->userService->getUsersList();
     }
 
+    /**
+     * @param User $user
+     * @return UserResource
+     */
     #[OA\Get(
         path: '/api/user/{uuid}',
-        tags: ['User'],
         summary: 'Pobiera jednego użytkownika',
         security: [['sanctum' => []]],
+        tags: ['User'],
         parameters: [
             new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
         ],
@@ -82,45 +102,54 @@ class UserController extends Controller
         return new UserResource($user);
     }
 
+    /**
+     * @return LoggedUserResource
+     */
     #[OA\Get(
         path: '/api/user/user-info',
-        tags: ['User'],
         summary: 'Dane zalogowanego użytkownika',
         security: [['sanctum' => []]],
+        tags: ['User'],
         responses: [
             new OA\Response(
                 response: 200,
                 description: 'OK',
                 content: new OA\JsonContent(
-                    properties: [new OA\Property(property: 'data', ref: '#/components/schemas/UserResource')]
+                    properties: [new OA\Property(property: 'data', ref: '#/components/schemas/LoggedUserResource')]
                 )
             ),
         ]
     )]
-    public function showLoggedUser(): UserResource
+    public function showLoggedUser(): LoggedUserResource
     {
-        return new UserResource($this->userService->getLoggedUser());
+        return new LoggedUserResource($this->userService->getLoggedUser());
     }
 
+    /**
+     * @param UserStoreRequest $request
+     * @return UserResource
+     */
     #[OA\Post(
         path: '/api/user',
-        tags: ['User'],
         summary: 'Tworzy nowego użytkownika',
         security: [['sanctum' => []]],
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
-                required: ['first_name', 'last_name', 'email', 'pesel', 'password', 'password_confirmation'],
+                required: ['first_name', 'last_name', 'pesel', 'private_email', 'password', 'password_confirmation'],
                 properties: [
                     new OA\Property(property: 'first_name', type: 'string', example: 'Jan'),
                     new OA\Property(property: 'last_name', type: 'string', example: 'Kowalski'),
-                    new OA\Property(property: 'email', type: 'string', format: 'email'),
+                    new OA\Property(property: 'email', type: 'string', format: 'email', nullable: true),
                     new OA\Property(property: 'pesel', type: 'string', example: '12345678901'),
+                    new OA\Property(property: 'private_email', type: 'string', format: 'email'),
                     new OA\Property(property: 'password', type: 'string', format: 'password'),
                     new OA\Property(property: 'password_confirmation', type: 'string', format: 'password'),
+                    new OA\Property(property: 'pwz_numer', type: 'string', nullable: true),
                 ]
             )
         ),
+        tags: ['User'],
         responses: [
             new OA\Response(
                 response: 201,
@@ -137,26 +166,38 @@ class UserController extends Controller
         return new UserResource($this->userService->createUser($request->all()));
     }
 
+    /**
+     * @param User $user
+     * @param UserUpdateRequest $request
+     * @return JsonResponse
+     */
     #[OA\Put(
         path: '/api/user/{uuid}',
-        tags: ['User'],
         summary: 'Aktualizuje użytkownika',
         security: [['sanctum' => []]],
-        parameters: [
-            new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
-        ],
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
-                required: ['first_name', 'last_name', 'email', 'pesel'],
                 properties: [
-                    new OA\Property(property: 'first_name', type: 'string'),
-                    new OA\Property(property: 'last_name', type: 'string'),
-                    new OA\Property(property: 'email', type: 'string', format: 'email'),
-                    new OA\Property(property: 'pesel', type: 'string'),
+                    new OA\Property(property: 'first_name', type: 'string', nullable: true),
+                    new OA\Property(property: 'last_name', type: 'string', nullable: true),
+                    new OA\Property(property: 'email', type: 'string', format: 'email', nullable: true),
+                    new OA\Property(property: 'password', type: 'string', format: 'password', nullable: true),
+                    new OA\Property(property: 'password_confirmation', type: 'string', format: 'password', nullable: true),
+                    new OA\Property(property: 'pesel', type: 'string', nullable: true),
+                    new OA\Property(property: 'private_email', type: 'string', format: 'email', nullable: true),
+                    new OA\Property(property: 'private_phone_number', type: 'string', nullable: true, example: '48500100200'),
+                    new OA\Property(property: 'phone_number', type: 'string', nullable: true, example: '48500100200'),
+                    new OA\Property(property: 'is_active', type: 'boolean', nullable: true),
+                    new OA\Property(property: 'pwz_numer', type: 'string', nullable: true),
+                    new OA\Property(property: 'job_positions', type: 'array', nullable: true, items: new OA\Items(type: 'string', format: 'uuid')),
                 ]
             )
         ),
+        tags: ['User'],
+        parameters: [
+            new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
+        ],
         responses: [
             new OA\Response(response: 204, description: 'Zaktualizowano'),
             new OA\Response(response: 404, description: 'Nie znaleziono'),
@@ -170,11 +211,15 @@ class UserController extends Controller
         return new JsonResponse(null, 204);
     }
 
+    /**
+     * @param User $user
+     * @return JsonResponse
+     */
     #[OA\Delete(
         path: '/api/user/{uuid}',
-        tags: ['User'],
         summary: 'Deaktywuje użytkownika',
         security: [['sanctum' => []]],
+        tags: ['User'],
         parameters: [
             new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
         ],
@@ -190,11 +235,18 @@ class UserController extends Controller
         return new JsonResponse(null, 204);
     }
 
+    /**
+     * @param ExportRequest $request
+     * @return BinaryFileResponse
+     *
+     * @throws Exception
+     * @throws WriterException
+     */
     #[OA\Get(
         path: '/api/user/export',
-        tags: ['User'],
         summary: 'Eksport użytkowników do pliku',
         security: [['sanctum' => []]],
+        tags: ['User'],
         parameters: [
             new OA\QueryParameter(name: 'type', required: true, schema: new OA\Schema(type: 'string', enum: ['xlsx', 'csv', 'ods'])),
         ],
@@ -205,5 +257,37 @@ class UserController extends Controller
     public function export(ExportRequest $request): BinaryFileResponse
     {
         return $this->userService->export($request);
+    }
+
+    /**
+     * @param EditPasswordRequest $request
+     * @return JsonResponse
+     */
+    #[OA\Patch(
+        path: '/api/user/edit-password',
+        summary: 'Zmiana hasła przez zalogowanego użytkownika',
+        security: [['sanctum' => []]],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ['current_password', 'password', 'password_confirmation'],
+                properties: [
+                    new OA\Property(property: 'current_password', type: 'string', format: 'password'),
+                    new OA\Property(property: 'password', type: 'string', format: 'password'),
+                    new OA\Property(property: 'password_confirmation', type: 'string', format: 'password'),
+                ]
+            )
+        ),
+        tags: ['User'],
+        responses: [
+            new OA\Response(response: 204, description: 'Hasło zmienione'),
+            new OA\Response(response: 422, description: 'Nieprawidłowe obecne hasło lub błąd walidacji'),
+        ]
+    )]
+    public function editPassword(EditPasswordRequest $request): JsonResponse
+    {
+        $this->userService->editPassword($this->userService->getLoggedUser(), $request->all());
+
+        return new JsonResponse(null, 204);
     }
 }
