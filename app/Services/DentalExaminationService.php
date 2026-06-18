@@ -47,7 +47,17 @@ readonly class DentalExaminationService implements DentalExaminationServiceInter
      */
     public function createDentalExamination(array $data): DentalExamination
     {
-        return $this->dentalExaminationRepository->create($data);
+        $dentalExamination = $this->dentalExaminationRepository->create($data);
+
+        if (array_key_exists('materials', $data)) {
+            $dentalExamination->materials()->sync($data['materials']);
+        }
+
+        if (array_key_exists('calendars', $data)) {
+            $dentalExamination->calendars()->sync($data['calendars']);
+        }
+
+        return $dentalExamination;
     }
 
     /**
@@ -57,7 +67,17 @@ readonly class DentalExaminationService implements DentalExaminationServiceInter
      */
     public function updateDentalExamination(DentalExamination $dentalExamination, array $data): DentalExamination
     {
-        return $this->dentalExaminationRepository->update($dentalExamination, $data);
+        $dentalExamination = $this->dentalExaminationRepository->update($dentalExamination, $data);
+
+        if (array_key_exists('materials', $data)) {
+            $dentalExamination->materials()->sync($data['materials']);
+        }
+
+        if (array_key_exists('calendars', $data)) {
+            $dentalExamination->calendars()->sync($data['calendars']);
+        }
+
+        return $dentalExamination;
     }
 
     /**

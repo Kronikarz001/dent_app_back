@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\EditPasswordRequest;
 use App\Http\Requests\ExportRequest;
 use App\Http\Requests\UserStoreRequest;
 use App\Http\Requests\UserUpdateRequest;
@@ -248,5 +249,37 @@ class UserController extends Controller
     public function export(ExportRequest $request): BinaryFileResponse
     {
         return $this->userService->export($request);
+    }
+
+    /**
+     * @param EditPasswordRequest $request
+     * @return JsonResponse
+     */
+    #[OA\Patch(
+        path: '/api/user/edit-password',
+        summary: 'Zmiana hasła przez zalogowanego użytkownika',
+        security: [['sanctum' => []]],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ['current_password', 'password', 'password_confirmation'],
+                properties: [
+                    new OA\Property(property: 'current_password', type: 'string', format: 'password'),
+                    new OA\Property(property: 'password', type: 'string', format: 'password'),
+                    new OA\Property(property: 'password_confirmation', type: 'string', format: 'password'),
+                ]
+            )
+        ),
+        tags: ['User'],
+        responses: [
+            new OA\Response(response: 204, description: 'Hasło zmienione'),
+            new OA\Response(response: 422, description: 'Nieprawidłowe obecne hasło lub błąd walidacji'),
+        ]
+    )]
+    public function editPassword(EditPasswordRequest $request): JsonResponse
+    {
+        $this->userService->editPassword($this->userService->getLoggedUser(), $request->all());
+
+        return new JsonResponse(null, 204);
     }
 }

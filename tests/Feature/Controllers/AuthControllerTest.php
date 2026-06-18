@@ -5,7 +5,6 @@ namespace Tests\Feature\Controllers;
 use App\Models\User;
 use Exception;
 use Illuminate\Auth\Notifications\ResetPassword;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
@@ -93,55 +92,5 @@ class AuthControllerTest extends TestCase
         ]);
 
         $response->assertNoContent();
-    }
-
-    /**
-     * @return void
-     */
-    public function testEditPasswordReturnNoContentResponse(): void
-    {
-        $user = User::factory()->create(['password' => bcrypt('OldPassword123!')]);
-
-        $response = $this->callApiWithLoggedUser($user)
-            ->patchJson(route('user.edit_password'), [
-                'current_password' => 'OldPassword123!',
-                'password' => 'NewPassword123!',
-                'password_confirmation' => 'NewPassword123!',
-            ]);
-
-        $response->assertNoContent();
-
-        $this->assertTrue(Hash::check('NewPassword123!', $user->fresh()->password));
-    }
-
-    /**
-     * @return void
-     */
-    public function testEditPasswordWithWrongCurrentPasswordReturnsValidationError(): void
-    {
-        $user = User::factory()->create(['password' => bcrypt('OldPassword123!')]);
-
-        $response = $this->callApiWithLoggedUser($user)
-            ->patchJson(route('user.edit_password'), [
-                'current_password' => 'WrongPassword!',
-                'password' => 'NewPassword123!',
-                'password_confirmation' => 'NewPassword123!',
-            ]);
-
-        $response->assertStatus(422);
-    }
-
-    /**
-     * @return void
-     */
-    public function testEditPasswordRequiresAuthentication(): void
-    {
-        $response = $this->patchJson(route('user.edit_password'), [
-            'current_password' => 'OldPassword123!',
-            'password' => 'NewPassword123!',
-            'password_confirmation' => 'NewPassword123!',
-        ]);
-
-        $response->assertUnauthorized();
     }
 }

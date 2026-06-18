@@ -2,7 +2,9 @@
 
 namespace Tests\Feature\Services;
 
+use App\Models\Calendar;
 use App\Models\DentalExamination;
+use App\Models\Material;
 use App\Services\DentalExaminationServiceInterface;
 use Illuminate\Foundation\Application;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -90,5 +92,100 @@ class DentalExaminationServiceTest extends TestCase
         $this->service->deleteDentalExamination($dentalExamination);
 
         $this->assertDatabaseMissing(self::DENTAL_EXAMINATIONS_TABLE, ['uuid' => $dentalExamination->uuid]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testCreateDentalExaminationSyncsMaterials(): void
+    {
+        $material = Material::factory()->create();
+        $data = array_merge(DentalExamination::factory()->make()->toArray(), [
+            'materials' => [$material->uuid],
+        ]);
+
+        $dentalExamination = $this->service->createDentalExamination($data);
+
+        $this->assertDatabaseHas('dental_examinations_materials', [
+            'dental_examination_uuid' => $dentalExamination->uuid,
+            'material_uuid' => $material->uuid,
+        ]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testUpdateDentalExaminationSyncsMaterialsReplacingPrevious(): void
+    {
+        $dentalExamination = DentalExamination::factory()->create();
+        $oldMaterial = Material::factory()->create();
+        $newMaterial = Material::factory()->create();
+        $dentalExamination->materials()->sync([$oldMaterial->uuid]);
+
+        $this->service->updateDentalExamination($dentalExamination, ['materials' => [$newMaterial->uuid]]);
+
+        $this->assertDatabaseMissing('dental_examinations_materials', [
+            'dental_examination_uuid' => $dentalExamination->uuid,
+            'material_uuid' => $oldMaterial->uuid,
+        ]);
+        $this->assertDatabaseHas('dental_examinations_materials', [
+            'dental_examination_uuid' => $dentalExamination->uuid,
+            'material_uuid' => $newMaterial->uuid,
+        ]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testDentalExaminationCanBeAssignedToMultipleMaterials(): void
+    {
+        $dentalExaminationA = DentalExamination::factory()->create();
+        $dentalExaminationB = DentalExamination::factory()->create();
+        $material = Material::factory()->create();
+
+        $this->service->updateDentalExamination($dentalExaminationA, ['materials' => [$material->uuid]]);
+        $this->service->updateDentalExamination($dentalExaminationB, ['materials' => [$material->uuid]]);
+
+        $this->assertCount(2, $material->dentalExaminations()->get());
+    }
+
+    /**
+     * @return void
+     */
+    public function testCreateDentalExaminationSyncsCalendars(): void
+    {
+        $calendar = Calendar::factory()->create();
+        $data = array_merge(DentalExamination::factory()->make()->toArray(), [
+            'calendars' => [$calendar->uuid],
+        ]);
+
+        $dentalExamination = $this->service->createDentalExamination($data);
+
+        $this->assertDatabaseHas('calendars_dental_examinations', [
+            'dental_examination_uuid' => $dentalExamination->uuid,
+            'calendar_uuid' => $calendar->uuid,
+        ]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testUpdateDentalExaminationSyncsCalendarsReplacingPrevious(): void
+    {
+        $dentalExamination = DentalExamination::factory()->create();
+        $oldCalendar = Calendar::factory()->create();
+        $newCalendar = Calendar::factory()->create();
+        $dentalExamination->calendars()->sync([$oldCalendar->uuid]);
+
+        $this->service->updateDentalExamination($dentalExamination, ['calendars' => [$newCalendar->uuid]]);
+
+        $this->assertDatabaseMissing('calendars_dental_examinations', [
+            'dental_examination_uuid' => $dentalExamination->uuid,
+            'calendar_uuid' => $oldCalendar->uuid,
+        ]);
+        $this->assertDatabaseHas('calendars_dental_examinations', [
+            'dental_examination_uuid' => $dentalExamination->uuid,
+            'calendar_uuid' => $newCalendar->uuid,
+        ]);
     }
 }

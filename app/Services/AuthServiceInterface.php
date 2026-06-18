@@ -34,12 +34,6 @@ interface AuthServiceInterface
     public function resetPassword(array $data): JsonResponse;
 
     /**
-     * @param array $data
-     * @return void
-     */
-    public function editPassword(array $data): void;
-
-    /**
      * @param string|null $token
      * @return void
      */

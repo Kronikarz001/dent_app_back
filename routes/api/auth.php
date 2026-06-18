@@ -13,6 +13,4 @@ Route::post('/user/reset-password', [AuthController::class, 'resetPassword'])
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])
         ->name('auth.logout');
-    Route::patch('/user/edit-password', [AuthController::class, 'editPassword'])
-        ->name('user.edit_password');
 });

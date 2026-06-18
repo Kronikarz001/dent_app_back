@@ -86,6 +86,8 @@ class CalendarSearch extends Search
      */
     protected function relationsShipLoad(): array
     {
-        return [];
+        return [
+            'dentalExaminations',
+        ];
     }
 }

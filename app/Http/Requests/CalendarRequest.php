@@ -16,6 +16,8 @@ class CalendarRequest extends FormRequest
             'end_date' => ['required', 'date'],
             'created_by' => ['nullable', 'exists:users,uuid'],
             'is_active' => ['boolean'],
+            'dental_examinations' => ['nullable', 'array'],
+            'dental_examinations.*' => ['string', 'exists:dental_examinations,uuid'],
         ];
     }
 

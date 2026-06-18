@@ -3,6 +3,7 @@
 namespace Tests\Feature\Services;
 
 use App\Models\Calendar;
+use App\Models\DentalExamination;
 use App\Models\Patient;
 use App\Models\User;
 use App\Services\CalendarServiceInterface;
@@ -155,5 +156,45 @@ class CalendarServiceTest extends TestCase
         $this->service->assignUsers($calendar, []);
 
         $this->assertDatabaseMissing('calendar_users', ['calendar_uuid' => $calendar->uuid]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testCreateCalendarSyncsDentalExaminations(): void
+    {
+        $dentalExamination = DentalExamination::factory()->create();
+        $data = array_merge(Calendar::factory()->make()->getAttributes(), [
+            'dental_examinations' => [$dentalExamination->uuid],
+        ]);
+
+        $calendar = $this->service->createCalendar($data);
+
+        $this->assertDatabaseHas('calendars_dental_examinations', [
+            'calendar_uuid' => $calendar->uuid,
+            'dental_examination_uuid' => $dentalExamination->uuid,
+        ]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testUpdateCalendarSyncsDentalExaminationsReplacingPrevious(): void
+    {
+        $calendar = Calendar::factory()->create();
+        $oldDentalExamination = DentalExamination::factory()->create();
+        $newDentalExamination = DentalExamination::factory()->create();
+        $calendar->dentalExaminations()->sync([$oldDentalExamination->uuid]);
+
+        $this->service->updateCalendar($calendar, ['dental_examinations' => [$newDentalExamination->uuid]]);
+
+        $this->assertDatabaseMissing('calendars_dental_examinations', [
+            'calendar_uuid' => $calendar->uuid,
+            'dental_examination_uuid' => $oldDentalExamination->uuid,
+        ]);
+        $this->assertDatabaseHas('calendars_dental_examinations', [
+            'calendar_uuid' => $calendar->uuid,
+            'dental_examination_uuid' => $newDentalExamination->uuid,
+        ]);
     }
 }

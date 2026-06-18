@@ -47,7 +47,13 @@ readonly class CalendarService implements CalendarServiceInterface
      */
     public function createCalendar(array $data): Calendar
     {
-        return $this->calendarRepository->create($data);
+        $calendar = $this->calendarRepository->create($data);
+
+        if (array_key_exists('dental_examinations', $data)) {
+            $calendar->dentalExaminations()->sync($data['dental_examinations']);
+        }
+
+        return $calendar;
     }
 
     /**
@@ -57,7 +63,13 @@ readonly class CalendarService implements CalendarServiceInterface
      */
     public function updateCalendar(Calendar $calendar, array $data): Calendar
     {
-        return $this->calendarRepository->update($calendar, $data);
+        $calendar = $this->calendarRepository->update($calendar, $data);
+
+        if (array_key_exists('dental_examinations', $data)) {
+            $calendar->dentalExaminations()->sync($data['dental_examinations']);
+        }
+
+        return $calendar;
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace Tests\Feature\Controllers;
 
 use App\Models\Calendar;
+use App\Models\DentalExamination;
 use App\Models\Patient;
 use App\Models\User;
 use Tests\TestCase;
@@ -130,6 +131,76 @@ class CalendarControllerTest extends TestCase
 
         $this->assertDatabaseHas('calendars', [
             'name' => 'Updated',
+        ]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testStoreWithDentalExaminationsAttachesThem(): void
+    {
+        $dentalExamination = DentalExamination::factory()->create();
+
+        $response = $this->callApiWithLoggedUser()
+            ->postJson(route('calendar.store'), [
+                'name' => 'Test',
+                'type' => 'EXAMINATION',
+                'end_date' => '2026-12-31 00:00:00',
+                'dental_examinations' => [$dentalExamination->uuid],
+            ]);
+
+        $response->assertCreated();
+
+        $calendar = Calendar::query()->where('name', 'Test')->first();
+        $this->assertDatabaseHas('calendars_dental_examinations', [
+            'calendar_uuid' => $calendar->uuid,
+            'dental_examination_uuid' => $dentalExamination->uuid,
+        ]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testStoreWithNonExistentDentalExaminationReturnsValidationError(): void
+    {
+        $response = $this->callApiWithLoggedUser()
+            ->postJson(route('calendar.store'), [
+                'name' => 'Test',
+                'type' => 'EXAMINATION',
+                'end_date' => '2026-12-31 00:00:00',
+                'dental_examinations' => ['019e99cf-9ffe-70a8-9b4c-8b889d28eeff'],
+            ]);
+
+        $response->assertStatus(422);
+    }
+
+    /**
+     * @return void
+     */
+    public function testUpdateWithDentalExaminationsReplacesPreviousAssignments(): void
+    {
+        $calendar = Calendar::factory()->create();
+        $oldDentalExamination = DentalExamination::factory()->create();
+        $newDentalExamination = DentalExamination::factory()->create();
+        $calendar->dentalExaminations()->sync([$oldDentalExamination->uuid]);
+
+        $response = $this->callApiWithLoggedUser()
+            ->putJson(route('calendar.update', ['calendar' => $calendar->uuid]), [
+                'name' => $calendar->name,
+                'type' => 'WORK',
+                'end_date' => '2026-12-31 00:00:00',
+                'dental_examinations' => [$newDentalExamination->uuid],
+            ]);
+
+        $response->assertNoContent();
+
+        $this->assertDatabaseMissing('calendars_dental_examinations', [
+            'calendar_uuid' => $calendar->uuid,
+            'dental_examination_uuid' => $oldDentalExamination->uuid,
+        ]);
+        $this->assertDatabaseHas('calendars_dental_examinations', [
+            'calendar_uuid' => $calendar->uuid,
+            'dental_examination_uuid' => $newDentalExamination->uuid,
         ]);
     }
 

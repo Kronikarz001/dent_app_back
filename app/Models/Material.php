@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\HasFile;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Carbon;
 
 /**
@@ -29,4 +30,19 @@ class Material extends UuidModel
         'short_description',
         'price',
     ];
+
+    /**
+     * @return BelongsToMany
+     */
+    public function dentalExaminations(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            DentalExamination::class,
+            'dental_examinations_materials',
+            'material_uuid',
+            'dental_examination_uuid',
+            'uuid',
+            'uuid'
+        );
+    }
 }

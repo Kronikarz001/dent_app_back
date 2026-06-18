@@ -47,7 +47,13 @@ readonly class MaterialService implements MaterialServiceInterface
      */
     public function createMaterial(array $data): Material
     {
-        return $this->materialRepository->create($data);
+        $material = $this->materialRepository->create($data);
+
+        if (array_key_exists('dental_examinations', $data)) {
+            $material->dentalExaminations()->sync($data['dental_examinations']);
+        }
+
+        return $material;
     }
 
     /**
@@ -57,7 +63,13 @@ readonly class MaterialService implements MaterialServiceInterface
      */
     public function updateMaterial(Material $material, array $data): Material
     {
-        return $this->materialRepository->update($material, $data);
+        $material = $this->materialRepository->update($material, $data);
+
+        if (array_key_exists('dental_examinations', $data)) {
+            $material->dentalExaminations()->sync($data['dental_examinations']);
+        }
+
+        return $material;
     }
 
     /**

@@ -2,7 +2,9 @@
 
 namespace Tests\Feature\Controllers;
 
+use App\Models\Calendar;
 use App\Models\DentalExamination;
+use App\Models\Material;
 use Tests\TestCase;
 
 /**
@@ -156,6 +158,134 @@ class DentalExaminationControllerTest extends TestCase
             'uuid' => $dentalExamination->uuid,
             'name' => 'Updated',
             'price' => 200,
+        ]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testStoreWithMaterialsAttachesThem(): void
+    {
+        $material = Material::factory()->create();
+
+        $response = $this->callApiWithLoggedUser()
+            ->postJson(route('dentalExamination.store'), [
+                'name' => 'Przegląd jamy ustnej',
+                'materials' => [$material->uuid],
+            ]);
+
+        $response->assertCreated();
+
+        $dentalExamination = DentalExamination::query()->where('name', 'Przegląd jamy ustnej')->first();
+        $this->assertDatabaseHas('dental_examinations_materials', [
+            'dental_examination_uuid' => $dentalExamination->uuid,
+            'material_uuid' => $material->uuid,
+        ]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testStoreWithNonExistentMaterialReturnsValidationError(): void
+    {
+        $response = $this->callApiWithLoggedUser()
+            ->postJson(route('dentalExamination.store'), [
+                'name' => 'Przegląd jamy ustnej',
+                'materials' => ['019e99cf-9ffe-70a8-9b4c-8b889d28eeff'],
+            ]);
+
+        $response->assertStatus(422);
+    }
+
+    /**
+     * @return void
+     */
+    public function testUpdateWithMaterialsReplacesPreviousAssignments(): void
+    {
+        $dentalExamination = DentalExamination::factory()->create();
+        $oldMaterial = Material::factory()->create();
+        $newMaterial = Material::factory()->create();
+        $dentalExamination->materials()->sync([$oldMaterial->uuid]);
+
+        $response = $this->callApiWithLoggedUser()
+            ->putJson(route('dentalExamination.update', ['dental_examination' => $dentalExamination->uuid]), [
+                'name' => $dentalExamination->name,
+                'materials' => [$newMaterial->uuid],
+            ]);
+
+        $response->assertNoContent();
+
+        $this->assertDatabaseMissing('dental_examinations_materials', [
+            'dental_examination_uuid' => $dentalExamination->uuid,
+            'material_uuid' => $oldMaterial->uuid,
+        ]);
+        $this->assertDatabaseHas('dental_examinations_materials', [
+            'dental_examination_uuid' => $dentalExamination->uuid,
+            'material_uuid' => $newMaterial->uuid,
+        ]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testStoreWithCalendarsAttachesThem(): void
+    {
+        $calendar = Calendar::factory()->create();
+
+        $response = $this->callApiWithLoggedUser()
+            ->postJson(route('dentalExamination.store'), [
+                'name' => 'Przegląd jamy ustnej',
+                'calendars' => [$calendar->uuid],
+            ]);
+
+        $response->assertCreated();
+
+        $dentalExamination = DentalExamination::query()->where('name', 'Przegląd jamy ustnej')->first();
+        $this->assertDatabaseHas('calendars_dental_examinations', [
+            'dental_examination_uuid' => $dentalExamination->uuid,
+            'calendar_uuid' => $calendar->uuid,
+        ]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testStoreWithNonExistentCalendarReturnsValidationError(): void
+    {
+        $response = $this->callApiWithLoggedUser()
+            ->postJson(route('dentalExamination.store'), [
+                'name' => 'Przegląd jamy ustnej',
+                'calendars' => ['019e99cf-9ffe-70a8-9b4c-8b889d28eeff'],
+            ]);
+
+        $response->assertStatus(422);
+    }
+
+    /**
+     * @return void
+     */
+    public function testUpdateWithCalendarsReplacesPreviousAssignments(): void
+    {
+        $dentalExamination = DentalExamination::factory()->create();
+        $oldCalendar = Calendar::factory()->create();
+        $newCalendar = Calendar::factory()->create();
+        $dentalExamination->calendars()->sync([$oldCalendar->uuid]);
+
+        $response = $this->callApiWithLoggedUser()
+            ->putJson(route('dentalExamination.update', ['dental_examination' => $dentalExamination->uuid]), [
+                'name' => $dentalExamination->name,
+                'calendars' => [$newCalendar->uuid],
+            ]);
+
+        $response->assertNoContent();
+
+        $this->assertDatabaseMissing('calendars_dental_examinations', [
+            'dental_examination_uuid' => $dentalExamination->uuid,
+            'calendar_uuid' => $oldCalendar->uuid,
+        ]);
+        $this->assertDatabaseHas('calendars_dental_examinations', [
+            'dental_examination_uuid' => $dentalExamination->uuid,
+            'calendar_uuid' => $newCalendar->uuid,
         ]);
     }
 

@@ -19,6 +19,8 @@ class MaterialRequest extends FormRequest
             'description' => ['nullable', 'string'],
             'short_description' => ['nullable', 'string'],
             'price' => ['nullable', 'integer'],
+            'dental_examinations' => ['nullable', 'array'],
+            'dental_examinations.*' => ['string', 'exists:dental_examinations,uuid'],
         ];
     }
 

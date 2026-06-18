@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Controllers;
 
+use App\Models\DentalExamination;
 use App\Models\Material;
 use Tests\TestCase;
 
@@ -156,6 +157,70 @@ class MaterialControllerTest extends TestCase
             'uuid' => $material->uuid,
             'name' => 'Updated',
             'price' => 200,
+        ]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testStoreWithDentalExaminationsAttachesThem(): void
+    {
+        $dentalExamination = DentalExamination::factory()->create();
+
+        $response = $this->callApiWithLoggedUser()
+            ->postJson(route('material.store'), [
+                'name' => 'Kompozyt światłoutwardzalny',
+                'dental_examinations' => [$dentalExamination->uuid],
+            ]);
+
+        $response->assertCreated();
+
+        $material = Material::query()->where('name', 'Kompozyt światłoutwardzalny')->first();
+        $this->assertDatabaseHas('dental_examinations_materials', [
+            'material_uuid' => $material->uuid,
+            'dental_examination_uuid' => $dentalExamination->uuid,
+        ]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testStoreWithNonExistentDentalExaminationReturnsValidationError(): void
+    {
+        $response = $this->callApiWithLoggedUser()
+            ->postJson(route('material.store'), [
+                'name' => 'Kompozyt światłoutwardzalny',
+                'dental_examinations' => ['019e99cf-9ffe-70a8-9b4c-8b889d28eeff'],
+            ]);
+
+        $response->assertStatus(422);
+    }
+
+    /**
+     * @return void
+     */
+    public function testUpdateWithDentalExaminationsReplacesPreviousAssignments(): void
+    {
+        $material = Material::factory()->create();
+        $oldDentalExamination = DentalExamination::factory()->create();
+        $newDentalExamination = DentalExamination::factory()->create();
+        $material->dentalExaminations()->sync([$oldDentalExamination->uuid]);
+
+        $response = $this->callApiWithLoggedUser()
+            ->putJson(route('material.update', ['material' => $material->uuid]), [
+                'name' => $material->name,
+                'dental_examinations' => [$newDentalExamination->uuid],
+            ]);
+
+        $response->assertNoContent();
+
+        $this->assertDatabaseMissing('dental_examinations_materials', [
+            'material_uuid' => $material->uuid,
+            'dental_examination_uuid' => $oldDentalExamination->uuid,
+        ]);
+        $this->assertDatabaseHas('dental_examinations_materials', [
+            'material_uuid' => $material->uuid,
+            'dental_examination_uuid' => $newDentalExamination->uuid,
         ]);
     }
 

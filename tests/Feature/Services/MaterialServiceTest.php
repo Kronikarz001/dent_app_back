@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Services;
 
+use App\Models\DentalExamination;
 use App\Models\Material;
 use App\Services\MaterialServiceInterface;
 use Illuminate\Foundation\Application;
@@ -90,5 +91,60 @@ class MaterialServiceTest extends TestCase
         $this->service->deleteMaterial($material);
 
         $this->assertDatabaseMissing(self::MATERIALS_TABLE, ['uuid' => $material->uuid]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testCreateMaterialSyncsDentalExaminations(): void
+    {
+        $dentalExamination = DentalExamination::factory()->create();
+        $data = array_merge(Material::factory()->make()->toArray(), [
+            'dental_examinations' => [$dentalExamination->uuid],
+        ]);
+
+        $material = $this->service->createMaterial($data);
+
+        $this->assertDatabaseHas('dental_examinations_materials', [
+            'material_uuid' => $material->uuid,
+            'dental_examination_uuid' => $dentalExamination->uuid,
+        ]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testUpdateMaterialSyncsDentalExaminationsReplacingPrevious(): void
+    {
+        $material = Material::factory()->create();
+        $oldDentalExamination = DentalExamination::factory()->create();
+        $newDentalExamination = DentalExamination::factory()->create();
+        $material->dentalExaminations()->sync([$oldDentalExamination->uuid]);
+
+        $this->service->updateMaterial($material, ['dental_examinations' => [$newDentalExamination->uuid]]);
+
+        $this->assertDatabaseMissing('dental_examinations_materials', [
+            'material_uuid' => $material->uuid,
+            'dental_examination_uuid' => $oldDentalExamination->uuid,
+        ]);
+        $this->assertDatabaseHas('dental_examinations_materials', [
+            'material_uuid' => $material->uuid,
+            'dental_examination_uuid' => $newDentalExamination->uuid,
+        ]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testMaterialCanBeAssignedToMultipleDentalExaminations(): void
+    {
+        $materialA = Material::factory()->create();
+        $materialB = Material::factory()->create();
+        $dentalExamination = DentalExamination::factory()->create();
+
+        $this->service->updateMaterial($materialA, ['dental_examinations' => [$dentalExamination->uuid]]);
+        $this->service->updateMaterial($materialB, ['dental_examinations' => [$dentalExamination->uuid]]);
+
+        $this->assertCount(2, $dentalExamination->materials()->get());
     }
 }

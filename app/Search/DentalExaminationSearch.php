@@ -33,8 +33,9 @@ class DentalExaminationSearch extends Search
     {
         return [
             'name',
-            'f_name',
-            'm_name',
+            'description',
+            'short_description',
+            'price',
         ];
     }
 
@@ -45,6 +46,8 @@ class DentalExaminationSearch extends Search
     {
         return [
             'name',
+            'price',
+            'created_at',
         ];
     }
 
@@ -55,6 +58,8 @@ class DentalExaminationSearch extends Search
     {
         return [
             'name',
+            'description',
+            'short_description',
         ];
     }
 
@@ -70,6 +75,9 @@ class DentalExaminationSearch extends Search
      */
     protected function relationsShipLoad(): array
     {
-        return [];
+        return [
+            'materials',
+            'calendars',
+        ];
     }
 }

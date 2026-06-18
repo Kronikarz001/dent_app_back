@@ -19,6 +19,10 @@ class DentalExaminationRequest extends FormRequest
             'description' => ['nullable', 'string'],
             'short_description' => ['nullable', 'string'],
             'price' => ['nullable', 'integer'],
+            'materials' => ['nullable', 'array'],
+            'materials.*' => ['string', 'exists:materials,uuid'],
+            'calendars' => ['nullable', 'array'],
+            'calendars.*' => ['string', 'exists:calendars,uuid'],
         ];
     }
 

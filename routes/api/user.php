@@ -10,6 +10,8 @@ Route::middleware('auth:sanctum')->group(function () {
         ->name('user.export');
     Route::get('/user/selectlist', [UserController::class, 'selectList'])
         ->name('user.selectList');
+    Route::patch('/user/edit-password', [UserController::class, 'editPassword'])
+        ->name('user.edit_password');
     Route::apiResource('/user', UserController::class)
         ->names('user');
 

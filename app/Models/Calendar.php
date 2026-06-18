@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\HasFile;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 /**
@@ -49,5 +50,20 @@ class Calendar extends UuidModel
     public function patients(): MorphToMany
     {
         return $this->morphedByMany(Patient::class, 'userable', 'calendar_users');
+    }
+
+    /**
+     * @return BelongsToMany
+     */
+    public function dentalExaminations(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            DentalExamination::class,
+            'calendars_dental_examinations',
+            'calendar_uuid',
+            'dental_examination_uuid',
+            'uuid',
+            'uuid'
+        );
     }
 }

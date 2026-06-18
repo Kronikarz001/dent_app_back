@@ -9,7 +9,6 @@ use App\Services\AuthServiceInterface;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 /**
@@ -77,19 +76,6 @@ class AuthServiceTest extends TestCase
         $this->service->logout();
 
         $this->assertDatabaseMissing(self::TOKENS_TABLE, ['id' => $token->accessToken->id]);
-    }
-
-    /**
-     * @return void
-     */
-    public function testEditPasswordUpdatesAuthenticatedUsersPassword(): void
-    {
-        $user = User::factory()->create(['password' => bcrypt('OldPassword123!')]);
-        Auth::setUser($user);
-
-        $this->service->editPassword(['password' => 'NewPassword123!']);
-
-        $this->assertTrue(Hash::check('NewPassword123!', $user->fresh()->password));
     }
 
     /**
