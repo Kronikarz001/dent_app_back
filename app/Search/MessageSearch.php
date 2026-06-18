@@ -2,20 +2,20 @@
 
 namespace App\Search;
 
-use App\Models\User;
+use App\Models\Message;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
- * Summary of UserSearch
+ * Summary of MessageSearch
  */
-class UserSearch extends Search
+class MessageSearch extends Search
 {
     /**
      * @return string
      */
     protected function modelClass(): string
     {
-        return User::class;
+        return Message::class;
     }
 
     /**
@@ -23,7 +23,7 @@ class UserSearch extends Search
      */
     protected function prefix(): string
     {
-        return 'user';
+        return 'message';
     }
 
     /**
@@ -32,13 +32,10 @@ class UserSearch extends Search
     protected function fillableSearchFields(): array
     {
         return [
-            'uuid',
-            'email',
-            'private_email',
-            'first_name',
-            'last_name',
-            'pesel',
-            'is_active',
+            'message',
+            'user_uuid',
+            'recipient_user_uuid',
+            'message_group_uuid',
         ];
     }
 
@@ -48,12 +45,7 @@ class UserSearch extends Search
     protected function fillableSortFields(): array
     {
         return [
-            'first_name',
-            'last_name',
-            'email',
-            'private_email',
             'created_at',
-            'is_active',
         ];
     }
 
@@ -63,12 +55,7 @@ class UserSearch extends Search
     protected function searchStringFields(): array
     {
         return [
-            'first_name',
-            'last_name',
-            'email',
-            'private_email',
-            'created_at',
-            'is_active',
+            'message',
         ];
     }
 
@@ -77,15 +64,30 @@ class UserSearch extends Search
      * @param array $params
      * @return void
      */
-    protected function preFilter(Builder $query, array $params): void {}
+    protected function preFilter(Builder $query, array $params): void
+    {
+        $forUser = $params['for_user'] ?? null;
+        unset($params['for_user']);
+
+        if ($forUser !== null) {
+            $query->where(function (Builder $inbox) use ($forUser) {
+                $inbox->where('user_uuid', $forUser)
+                    ->orWhere('recipient_user_uuid', $forUser)
+                    ->orWhereNotNull('message_group_uuid');
+            });
+        }
+
+        $query->where($params);
+    }
 
     /**
-     * @return array
+     * @return string[]
      */
     protected function relationsShipLoad(): array
     {
         return [
-            'phoneNumbers',
+            'sender',
+            'recipient',
         ];
     }
 }

@@ -33,7 +33,7 @@ class PhoneNumberServiceTest extends TestCase
             ['number' => '900800700', 'type' => 'WORK'],
         ];
 
-        $this->phoneNumberService->assignPhones($patient, $phones);
+        $this->phoneNumberService->assignPhone($patient, $phones);
 
         $this->assertDatabaseHas('phone_numbers', [
             'number' => '100200300',
@@ -64,7 +64,7 @@ class PhoneNumberServiceTest extends TestCase
             'phoneable_uuid' => $patient->uuid,
         ]);
 
-        $this->phoneNumberService->assignPhones($patient, [
+        $this->phoneNumberService->assignPhone($patient, [
             ['number' => '100200300', 'type' => 'WORK'],
         ]);
 
@@ -83,7 +83,7 @@ class PhoneNumberServiceTest extends TestCase
     {
         $patient = Patient::factory()->create();
 
-        $this->phoneNumberService->assignPhones($patient, []);
+        $this->phoneNumberService->assignPhone($patient, []);
 
         $this->assertDatabaseCount('phone_numbers', 0);
     }

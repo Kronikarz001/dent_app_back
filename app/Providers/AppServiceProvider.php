@@ -9,6 +9,7 @@ use App\Providers\AppServiceProviders\DentalExaminationServiceProvider;
 use App\Providers\AppServiceProviders\FileServiceProvider;
 use App\Providers\AppServiceProviders\JobPositionServiceProvider;
 use App\Providers\AppServiceProviders\MaterialServiceProvider;
+use App\Providers\AppServiceProviders\MessageServiceProvider;
 use App\Providers\AppServiceProviders\PatientServiceProvider;
 use App\Providers\AppServiceProviders\SearchServiceProvider;
 use App\Providers\AppServiceProviders\UserServiceProvider;
@@ -36,6 +37,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->register(FileServiceProvider::class);
         $this->app->register(DentalExaminationServiceProvider::class);
         $this->app->register(MaterialServiceProvider::class);
+        $this->app->register(MessageServiceProvider::class);
     }
 
     /**

@@ -2,11 +2,9 @@
 
 namespace App\Http\Requests;
 
-use App\Enums\PhoneNumberType;
 use App\Rules\PhoneNumberRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\Enum;
 
 /**
  * Summary of UserRequest
@@ -25,9 +23,8 @@ class UserUpdateRequest extends FormRequest
             'password' => ['nullable', 'string', 'confirmed'],
             'pesel' => ['nullable', 'string', 'size:11', Rule::unique('users', 'pesel')->ignore($this->route('user'))],
             'private_email' => ['nullable', 'email', Rule::unique('users', 'private_email')->ignore($this->route('user'))],
-            'phone_numbers' => ['nullable', 'array'],
-            'phone_numbers.number' => ['string', new PhoneNumberRule],
-            'phone_numbers.type' => ['string', new Enum(PhoneNumberType::class)],
+            'private_phone_number' => ['nullable', 'string', new PhoneNumberRule()],
+            'phone_number' => ['nullable', 'string', new PhoneNumberRule()],
             'is_active' => ['nullable', 'boolean'],
             'pwz_numer' => ['nullable', 'string'],
             'job_positions' => ['nullable', 'array'],

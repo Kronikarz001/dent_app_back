@@ -15,7 +15,7 @@ class PhoneNumberService implements PhoneNumberServiceInterface
      * @param array $phones
      * @return void
      */
-    public function assignPhones(Model $model, array $phones): void
+    public function assignPhone(Model $model, array $phones): void
     {
         $modelClass = get_class($model);
 

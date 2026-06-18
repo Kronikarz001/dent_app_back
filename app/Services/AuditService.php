@@ -131,7 +131,6 @@ readonly class AuditService implements AuditServiceInterface
      * @param Model $model
      * @param ExportRequest $request
      * @return BinaryFileResponse
-     *
      * @throws Exception
      * @throws WriterException
      */

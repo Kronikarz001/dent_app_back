@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\PhoneNumberType;
 use App\Exports\UserExport;
 use App\Http\Requests\ExportRequest;
 use App\Models\User;
@@ -61,8 +62,16 @@ readonly class UserService implements UserServiceInterface
      */
     public function updateUser(User $user, array $data): User
     {
-        if (array_key_exists('phone_numbers', $data)) {
-            $this->phoneNumberService->assignPhones($user, $data['phone_numbers']);
+        if (array_key_exists('private_phone_number', $data)) {
+            $this->phoneNumberService->assignPhone($user, [
+                ['type' => PhoneNumberType::PRIVATE->value, 'number' => $data['private_phone_number']],
+            ]);
+        }
+
+        if (array_key_exists('phone_number', $data)) {
+            $this->phoneNumberService->assignPhone($user, [
+                ['type' => PhoneNumberType::WORK->value, 'number' => $data['phone_number']],
+            ]);
         }
 
         if (array_key_exists('job_positions', $data)) {

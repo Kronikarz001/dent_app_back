@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('messages', function (Blueprint $table) {
             $table->uuid()->primary();
             $table->foreignUuid('user_uuid')->nullable()->references('uuid')->on('users')->onDelete('set null');
+            $table->foreignUuid('recipient_user_uuid')->nullable()->references('uuid')->on('users')->onDelete('set null');
+            $table->uuid('message_group_uuid')->nullable();
             $table->text('message');
             $table->timestamps();
         });

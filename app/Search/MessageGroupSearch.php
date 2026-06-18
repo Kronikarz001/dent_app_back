@@ -2,20 +2,20 @@
 
 namespace App\Search;
 
-use App\Models\User;
+use App\Models\MessageGroup;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
- * Summary of UserSearch
+ * Summary of MessageGroupSearch
  */
-class UserSearch extends Search
+class MessageGroupSearch extends Search
 {
     /**
      * @return string
      */
     protected function modelClass(): string
     {
-        return User::class;
+        return MessageGroup::class;
     }
 
     /**
@@ -23,7 +23,7 @@ class UserSearch extends Search
      */
     protected function prefix(): string
     {
-        return 'user';
+        return 'messageGroup';
     }
 
     /**
@@ -32,13 +32,7 @@ class UserSearch extends Search
     protected function fillableSearchFields(): array
     {
         return [
-            'uuid',
-            'email',
-            'private_email',
-            'first_name',
-            'last_name',
-            'pesel',
-            'is_active',
+            'message_uuid',
         ];
     }
 
@@ -48,12 +42,7 @@ class UserSearch extends Search
     protected function fillableSortFields(): array
     {
         return [
-            'first_name',
-            'last_name',
-            'email',
-            'private_email',
             'created_at',
-            'is_active',
         ];
     }
 
@@ -62,14 +51,7 @@ class UserSearch extends Search
      */
     protected function searchStringFields(): array
     {
-        return [
-            'first_name',
-            'last_name',
-            'email',
-            'private_email',
-            'created_at',
-            'is_active',
-        ];
+        return [];
     }
 
     /**
@@ -77,15 +59,18 @@ class UserSearch extends Search
      * @param array $params
      * @return void
      */
-    protected function preFilter(Builder $query, array $params): void {}
+    protected function preFilter(Builder $query, array $params): void
+    {
+        $query->where($params);
+    }
 
     /**
-     * @return array
+     * @return string[]
      */
     protected function relationsShipLoad(): array
     {
         return [
-            'phoneNumbers',
+            'rootMessage',
         ];
     }
 }

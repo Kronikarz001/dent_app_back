@@ -37,15 +37,27 @@ use OpenApi\Attributes as OA;
     ]
 )]
 #[OA\Schema(
+    schema: 'PhoneNumberResource',
+    properties: [
+        new OA\Property(property: 'uuid', type: 'string', format: 'uuid'),
+        new OA\Property(property: 'number', type: 'string'),
+        new OA\Property(property: 'type', type: 'string', enum: ['PRIVATE', 'WORK']),
+        new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
+    ]
+)]
+#[OA\Schema(
     schema: 'UserResource',
     properties: [
         new OA\Property(property: 'uuid', type: 'string', format: 'uuid'),
         new OA\Property(property: 'first_name', type: 'string'),
         new OA\Property(property: 'last_name', type: 'string'),
-        new OA\Property(property: 'email', type: 'string', format: 'email'),
+        new OA\Property(property: 'email', type: 'string', format: 'email', nullable: true),
+        new OA\Property(property: 'private_email', type: 'string', format: 'email'),
         new OA\Property(property: 'is_active', type: 'boolean'),
+        new OA\Property(property: 'pwz_numer', type: 'string', nullable: true),
         new OA\Property(property: 'avatar_path', type: 'string', nullable: true),
         new OA\Property(property: 'background_path', type: 'string', nullable: true),
+        new OA\Property(property: 'phone_number', type: 'array', items: new OA\Items(ref: '#/components/schemas/PhoneNumberResource')),
         new OA\Property(property: 'job_positions', type: 'array', items: new OA\Items(ref: '#/components/schemas/JobPositionResource')),
         new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
     ]
@@ -56,9 +68,13 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: 'uuid', type: 'string', format: 'uuid'),
         new OA\Property(property: 'first_name', type: 'string'),
         new OA\Property(property: 'last_name', type: 'string'),
-        new OA\Property(property: 'email', type: 'string', format: 'email'),
+        new OA\Property(property: 'email', type: 'string', format: 'email', nullable: true),
+        new OA\Property(property: 'private_email', type: 'string', format: 'email'),
         new OA\Property(property: 'is_active', type: 'boolean'),
+        new OA\Property(property: 'pwz_numer', type: 'string', nullable: true),
         new OA\Property(property: 'avatar_path', type: 'string', nullable: true),
+        new OA\Property(property: 'phone_number', type: 'array', items: new OA\Items(ref: '#/components/schemas/PhoneNumberResource')),
+        new OA\Property(property: 'job_positions', type: 'array', items: new OA\Items(ref: '#/components/schemas/JobPositionResource')),
         new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
     ]
 )]
@@ -117,6 +133,17 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: 'description', type: 'string', nullable: true),
         new OA\Property(property: 'short_description', type: 'string', nullable: true),
         new OA\Property(property: 'price', type: 'integer', nullable: true),
+        new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
+    ]
+)]
+#[OA\Schema(
+    schema: 'MessageResource',
+    properties: [
+        new OA\Property(property: 'uuid', type: 'string', format: 'uuid'),
+        new OA\Property(property: 'user_uuid', type: 'string', format: 'uuid', nullable: true),
+        new OA\Property(property: 'recipient_user_uuid', type: 'string', format: 'uuid', nullable: true),
+        new OA\Property(property: 'message_group_uuid', type: 'string', format: 'uuid', nullable: true),
+        new OA\Property(property: 'message', type: 'string'),
         new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
     ]
 )]

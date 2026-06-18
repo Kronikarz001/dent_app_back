@@ -136,14 +136,16 @@ class UserController extends Controller
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
-                required: ['first_name', 'last_name', 'email', 'pesel', 'password', 'password_confirmation'],
+                required: ['first_name', 'last_name', 'pesel', 'private_email', 'password', 'password_confirmation'],
                 properties: [
                     new OA\Property(property: 'first_name', type: 'string', example: 'Jan'),
                     new OA\Property(property: 'last_name', type: 'string', example: 'Kowalski'),
-                    new OA\Property(property: 'email', type: 'string', format: 'email'),
+                    new OA\Property(property: 'email', type: 'string', format: 'email', nullable: true),
                     new OA\Property(property: 'pesel', type: 'string', example: '12345678901'),
+                    new OA\Property(property: 'private_email', type: 'string', format: 'email'),
                     new OA\Property(property: 'password', type: 'string', format: 'password'),
                     new OA\Property(property: 'password_confirmation', type: 'string', format: 'password'),
+                    new OA\Property(property: 'pwz_numer', type: 'string', nullable: true),
                 ]
             )
         ),
@@ -176,13 +178,19 @@ class UserController extends Controller
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
-                required: ['first_name', 'last_name', 'email', 'pesel'],
                 properties: [
-                    new OA\Property(property: 'first_name', type: 'string'),
-                    new OA\Property(property: 'last_name', type: 'string'),
-                    new OA\Property(property: 'email', type: 'string', format: 'email'),
-                    new OA\Property(property: 'pesel', type: 'string'),
-                    new OA\Property(property: 'job_positions', type: 'array', items: new OA\Items(type: 'string', format: 'uuid')),
+                    new OA\Property(property: 'first_name', type: 'string', nullable: true),
+                    new OA\Property(property: 'last_name', type: 'string', nullable: true),
+                    new OA\Property(property: 'email', type: 'string', format: 'email', nullable: true),
+                    new OA\Property(property: 'password', type: 'string', format: 'password', nullable: true),
+                    new OA\Property(property: 'password_confirmation', type: 'string', format: 'password', nullable: true),
+                    new OA\Property(property: 'pesel', type: 'string', nullable: true),
+                    new OA\Property(property: 'private_email', type: 'string', format: 'email', nullable: true),
+                    new OA\Property(property: 'private_phone_number', type: 'string', nullable: true, example: '48500100200'),
+                    new OA\Property(property: 'phone_number', type: 'string', nullable: true, example: '48500100200'),
+                    new OA\Property(property: 'is_active', type: 'boolean', nullable: true),
+                    new OA\Property(property: 'pwz_numer', type: 'string', nullable: true),
+                    new OA\Property(property: 'job_positions', type: 'array', nullable: true, items: new OA\Items(type: 'string', format: 'uuid')),
                 ]
             )
         ),
