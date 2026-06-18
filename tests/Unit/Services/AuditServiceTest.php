@@ -3,12 +3,12 @@
 namespace Tests\Unit\Services;
 
 use App\Enums\AuditableEventType;
+use App\Exceptions\InvalidAuditableIdentifierException;
 use App\Models\Audit;
 use App\Models\User;
 use App\Repositories\AuditRepositoryInterface;
 use App\Services\AuditService;
 use App\Services\ExportServiceInterface;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
 use Mockery;
 use Mockery\MockInterface;
@@ -189,7 +189,7 @@ class AuditServiceTest extends TestCase
     {
         $this->auditRepository->shouldNotReceive('findAuditableOrFail');
 
-        $this->expectException(ModelNotFoundException::class);
+        $this->expectException(InvalidAuditableIdentifierException::class);
 
         $this->auditService->resolveAuditable('unknown-resource', 'subject-uuid');
     }

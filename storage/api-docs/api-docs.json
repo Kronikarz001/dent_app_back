@@ -6,30 +6,14 @@
         "version": "1.0.0"
     },
     "paths": {
-        "/api/{resource}/{uuid}/history": {
+        "/api/user/{uuid}/history": {
             "get": {
                 "tags": [
                     "Auditable"
                 ],
-                "summary": "Historia zmian danego rekordu",
-                "operationId": "42abb8dac6868ee6ce82242533099469",
+                "summary": "Historia zmian użytkownika",
+                "operationId": "1f7fe7ce5cd9ff107015fe9d2baf3bbd",
                 "parameters": [
-                    {
-                        "name": "resource",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "enum": [
-                                "user",
-                                "patient",
-                                "calendar",
-                                "dental-examination",
-                                "material",
-                                "job-position"
-                            ]
-                        }
-                    },
                     {
                         "name": "uuid",
                         "in": "path",
@@ -77,30 +61,289 @@
                 ]
             }
         },
-        "/api/{resource}/{uuid}/history/export": {
+        "/api/patient/{uuid}/history": {
             "get": {
                 "tags": [
                     "Auditable"
                 ],
-                "summary": "Eksport historii zmian danego rekordu do pliku",
-                "operationId": "c67a35e48562820f57a48714c5ba88cb",
+                "summary": "Historia zmian pacjenta",
+                "operationId": "ef161eaea636c2b8232e7d7b11f2bc63",
                 "parameters": [
                     {
-                        "name": "resource",
+                        "name": "uuid",
                         "in": "path",
                         "required": true,
                         "schema": {
                             "type": "string",
-                            "enum": [
-                                "user",
-                                "patient",
-                                "calendar",
-                                "dental-examination",
-                                "material",
-                                "job-position"
-                            ]
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/PaginatedResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/AuditResource"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
                         }
                     },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/calendar/{uuid}/history": {
+            "get": {
+                "tags": [
+                    "Auditable"
+                ],
+                "summary": "Historia zmian wydarzenia w kalendarzu",
+                "operationId": "4eb7ab64eebfb24965ac5ba20a889650",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/PaginatedResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/AuditResource"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/dental-examination/{uuid}/history": {
+            "get": {
+                "tags": [
+                    "Auditable"
+                ],
+                "summary": "Historia zmian badania stomatologicznego",
+                "operationId": "31cbc5460ca91c54d0649fc3c2b246d7",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/PaginatedResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/AuditResource"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/material/{uuid}/history": {
+            "get": {
+                "tags": [
+                    "Auditable"
+                ],
+                "summary": "Historia zmian materiału",
+                "operationId": "c4e8a5ef543d69e83902b03bfef63f23",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/PaginatedResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/AuditResource"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/job-position/{uuid}/history": {
+            "get": {
+                "tags": [
+                    "Auditable"
+                ],
+                "summary": "Historia zmian stanowiska",
+                "operationId": "be24877c376dce768fcb15bfd5e2ec4c",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/PaginatedResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/AuditResource"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/user/{uuid}/history/export": {
+            "get": {
+                "tags": [
+                    "Auditable"
+                ],
+                "summary": "Eksport historii zmian użytkownika",
+                "operationId": "4282d6a0473c13da124f2badb95aba53",
+                "parameters": [
                     {
                         "name": "uuid",
                         "in": "path",
@@ -126,10 +369,237 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Plik do pobrania",
-                        "content": {
-                            "application/octet-stream": {}
+                        "description": "Plik do pobrania"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/patient/{uuid}/history/export": {
+            "get": {
+                "tags": [
+                    "Auditable"
+                ],
+                "summary": "Eksport historii zmian pacjenta",
+                "operationId": "0fa75b20e1e4e1b00693b9bf125c9aff",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
                         }
+                    },
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "xlsx",
+                                "csv",
+                                "ods"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Plik do pobrania"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/calendar/{uuid}/history/export": {
+            "get": {
+                "tags": [
+                    "Auditable"
+                ],
+                "summary": "Eksport historii zmian wydarzenia w kalendarzu",
+                "operationId": "95cc27a02c23ba51a017dbee78d5ff9c",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "xlsx",
+                                "csv",
+                                "ods"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Plik do pobrania"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/dental-examination/{uuid}/history/export": {
+            "get": {
+                "tags": [
+                    "Auditable"
+                ],
+                "summary": "Eksport historii zmian badania stomatologicznego",
+                "operationId": "3e1bcfcb922d265d8bde1e0300200c0a",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "xlsx",
+                                "csv",
+                                "ods"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Plik do pobrania"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/material/{uuid}/history/export": {
+            "get": {
+                "tags": [
+                    "Auditable"
+                ],
+                "summary": "Eksport historii zmian materiału",
+                "operationId": "065ea539fe1dc81af529b2463d39a108",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "xlsx",
+                                "csv",
+                                "ods"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Plik do pobrania"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/job-position/{uuid}/history/export": {
+            "get": {
+                "tags": [
+                    "Auditable"
+                ],
+                "summary": "Eksport historii zmian stanowiska",
+                "operationId": "169ad91fec166859b56f5206b0365ff0",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "xlsx",
+                                "csv",
+                                "ods"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Plik do pobrania"
                     },
                     "404": {
                         "description": "Nie znaleziono"

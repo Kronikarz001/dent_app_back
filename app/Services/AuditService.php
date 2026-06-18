@@ -4,12 +4,12 @@ namespace App\Services;
 
 use App\Enums\AuditableEventType;
 use App\Enums\AuditableType;
+use App\Exceptions\InvalidAuditableIdentifierException;
 use App\Exports\AuditExport;
 use App\Http\Requests\ExportRequest;
 use App\Models\Audit;
 use App\Repositories\AuditRepositoryInterface;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 use PhpOffice\PhpSpreadsheet\Exception;
@@ -150,7 +150,7 @@ readonly class AuditService implements AuditServiceInterface
         $type = AuditableType::tryFrom($resource);
 
         if ($type === null) {
-            throw new ModelNotFoundException("Unknown auditable resource [{$resource}].");
+            throw new InvalidAuditableIdentifierException("Unknown auditable resource [{$resource}].");
         }
 
         return $this->auditRepository->findAuditableOrFail($type->modelClass(), $uuid);
