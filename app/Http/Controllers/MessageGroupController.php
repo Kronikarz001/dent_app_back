@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Requests\MessageGroupStoreRequest;
 use App\Http\Requests\MessageGroupUpdateRequest;
 use App\Http\Resources\MessageGroupResource;
-use App\Http\Resources\MessageResource;
 use App\Models\MessageGroup;
 use App\Models\User;
 use App\Services\MessageGroupServiceInterface;
