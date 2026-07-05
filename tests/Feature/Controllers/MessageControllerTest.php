@@ -71,8 +71,7 @@ class MessageControllerTest extends TestCase
     public function testStoreFailsValidationWhenBothRecipientAndGroupProvided(): void
     {
         $recipient = User::factory()->create();
-        $message = Message::factory()->create();
-        $group = MessageGroup::factory()->create(['message_uuid' => $message->uuid]);
+        $group = MessageGroup::factory()->create();
 
         $response = $this->callApiWithLoggedUser()
             ->postJson(route('message.store'), [
@@ -109,7 +108,7 @@ class MessageControllerTest extends TestCase
     {
         $sender = User::factory()->create();
         $message = Message::factory()->create(['user_uuid' => $sender->uuid]);
-        $group = MessageGroup::factory()->create(['message_uuid' => $message->uuid]);
+        $group = MessageGroup::factory()->create();
         $message->update(['message_group_uuid' => $group->uuid]);
 
         $response = $this->callApiWithLoggedUser()

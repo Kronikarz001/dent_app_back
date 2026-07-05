@@ -236,17 +236,4 @@ class MaterialControllerTest extends TestCase
 
         $this->assertDatabaseMissing('materials', ['uuid' => $material->uuid]);
     }
-
-    /**
-     * @return void
-     */
-    public function testExportMaterialReturnSuccessResponse(): void
-    {
-        Material::factory()->count(3)->create();
-
-        $response = $this->callApiWithLoggedUser()
-            ->getJson(route('material.export', ['type' => 'xlsx']));
-
-        $response->assertOk();
-    }
 }

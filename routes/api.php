@@ -8,3 +8,4 @@ require __DIR__.'/api/calendar.php';
 require __DIR__.'/api/dental-examination.php';
 require __DIR__.'/api/material.php';
 require __DIR__.'/api/message.php';
+require __DIR__.'/api/announcement.php';

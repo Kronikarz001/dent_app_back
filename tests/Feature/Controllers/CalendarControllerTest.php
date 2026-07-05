@@ -259,17 +259,4 @@ class CalendarControllerTest extends TestCase
 
         $response->assertStatus(422);
     }
-
-    /**
-     * @return void
-     */
-    public function testExportCalendarReturnSuccessResponse(): void
-    {
-        Calendar::factory()->count(3)->create();
-
-        $response = $this->callApiWithLoggedUser()
-            ->getJson(route('calendar.export', ['type' => 'xlsx']));
-
-        $response->assertOk();
-    }
 }

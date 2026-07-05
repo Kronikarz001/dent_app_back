@@ -6,6 +6,8 @@ use App\Repositories\MessageGroupRepository;
 use App\Repositories\MessageGroupRepositoryInterface;
 use App\Repositories\MessageRepository;
 use App\Repositories\MessageRepositoryInterface;
+use App\Services\MessageGroupService;
+use App\Services\MessageGroupServiceInterface;
 use App\Services\MessageService;
 use App\Services\MessageServiceInterface;
 use Illuminate\Support\ServiceProvider;
@@ -23,5 +25,6 @@ class MessageServiceProvider extends ServiceProvider
         $this->app->bind(MessageRepositoryInterface::class, MessageRepository::class);
         $this->app->bind(MessageGroupRepositoryInterface::class, MessageGroupRepository::class);
         $this->app->bind(MessageServiceInterface::class, MessageService::class);
+        $this->app->bind(MessageGroupServiceInterface::class, MessageGroupService::class);
     }
 }

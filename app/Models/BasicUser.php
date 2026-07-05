@@ -163,4 +163,19 @@ abstract class BasicUser extends Authenticatable
     {
         return $this->morphToMany(Calendar::class, 'userable', 'calendar_users');
     }
+
+    /**
+     * @return BelongsToMany
+     */
+    public function messageGroups(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            MessageGroup::class,
+            'message_group_users',
+            'user_uuid',
+            'message_group_uuid',
+            'uuid',
+            'uuid'
+        )->withTimestamps();
+    }
 }

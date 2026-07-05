@@ -2,7 +2,6 @@
 
 namespace Database\Factories;
 
-use App\Models\Message;
 use App\Models\MessageGroup;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Carbon;
@@ -14,7 +13,9 @@ class MessageGroupFactory extends Factory
     public function definition(): array
     {
         return [
-            'message_uuid' => Message::factory(),
+            'name' => $this->faker->words(2, true),
+            'creator_uuid' => null,
+            'is_default' => false,
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
         ];

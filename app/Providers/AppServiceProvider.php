@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\Models\User;
+use App\Observers\UserObserver;
+use App\Providers\AppServiceProviders\AnnouncementServiceProvider;
 use App\Providers\AppServiceProviders\AuditServiceProvider;
 use App\Providers\AppServiceProviders\AuthServiceProvider;
 use App\Providers\AppServiceProviders\CalendarServiceProvider;
@@ -38,6 +41,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->register(DentalExaminationServiceProvider::class);
         $this->app->register(MaterialServiceProvider::class);
         $this->app->register(MessageServiceProvider::class);
+        $this->app->register(AnnouncementServiceProvider::class);
     }
 
     /**
@@ -49,5 +53,7 @@ class AppServiceProvider extends ServiceProvider
         $this->loadJsonTranslationsFrom(__DIR__.'/../lang');
         ini_set('upload_tmp_dir', storage_path('temp'));
         SpreadsheetFile::setUseUploadTempDirectory(true);
+
+        User::observe(UserObserver::class);
     }
 }

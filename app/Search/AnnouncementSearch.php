@@ -2,34 +2,34 @@
 
 namespace App\Search;
 
-use App\Models\MessageGroup;
+use App\Models\Announcement;
 use Illuminate\Database\Eloquent\Builder;
 
-class MessageGroupSearch extends Search
+class AnnouncementSearch extends Search
 {
     protected function modelClass(): string
     {
-        return MessageGroup::class;
+        return Announcement::class;
     }
 
     protected function prefix(): string
     {
-        return 'messageGroup';
+        return 'announcement';
     }
 
     protected function fillableSearchFields(): array
     {
         return [
-            'name',
-            'creator_uuid',
-            'is_default',
+            'title',
+            'user_uuid',
+            'published_at',
         ];
     }
 
     protected function fillableSortFields(): array
     {
         return [
-            'name',
+            'published_at',
             'created_at',
         ];
     }
@@ -37,29 +37,20 @@ class MessageGroupSearch extends Search
     protected function searchStringFields(): array
     {
         return [
-            'name',
+            'title',
+            'content',
         ];
     }
 
     protected function preFilter(Builder $query, array $params): void
     {
-        $forUser = $params['for_user'] ?? null;
-        unset($params['for_user']);
-
-        if ($forUser !== null) {
-            $query->whereHas('users', function (Builder $q) use ($forUser) {
-                $q->where('users.uuid', $forUser);
-            });
-        }
-
         $query->where($params);
     }
 
     protected function relationsShipLoad(): array
     {
         return [
-            'creator',
-            'users',
+            'author',
         ];
     }
 }

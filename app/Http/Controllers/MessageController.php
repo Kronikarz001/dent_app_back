@@ -54,7 +54,7 @@ class MessageController extends Controller
      */
     #[OA\Post(
         path: '/api/message',
-        summary: 'Wysyła wiadomość do konkretnej osoby, do grupy, lub jako nowy broadcast do wszystkich',
+        summary: 'Wysyła wiadomość do konkretnej osoby lub do grupy (wymagany dokładnie jeden cel)',
         security: [['sanctum' => []]],
         requestBody: new OA\RequestBody(
             required: true,
@@ -62,8 +62,8 @@ class MessageController extends Controller
                 required: ['message'],
                 properties: [
                     new OA\Property(property: 'message', type: 'string'),
-                    new OA\Property(property: 'recipient_uuid', type: 'string', format: 'uuid', nullable: true, description: 'Wiadomość bezpośrednia do tego użytkownika'),
-                    new OA\Property(property: 'message_group_uuid', type: 'string', format: 'uuid', nullable: true, description: 'Dopisanie do istniejącej grupy/konwersacji'),
+                    new OA\Property(property: 'recipient_uuid', type: 'string', format: 'uuid', nullable: true, description: 'Wiadomość bezpośrednia do użytkownika (wyklucza message_group_uuid)'),
+                    new OA\Property(property: 'message_group_uuid', type: 'string', format: 'uuid', nullable: true, description: 'Wiadomość do grupy (wyklucza recipient_uuid)'),
                 ]
             )
         ),

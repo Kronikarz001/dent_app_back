@@ -5,7 +5,6 @@ namespace Tests\Unit\Services;
 use App\Models\Message;
 use App\Models\MessageGroup;
 use App\Models\User;
-use App\Repositories\MessageGroupRepositoryInterface;
 use App\Repositories\MessageRepositoryInterface;
 use App\Services\MessageService;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -21,8 +20,6 @@ class MessageServiceTest extends TestCase
 {
     private MockInterface $messageRepository;
 
-    private MockInterface $messageGroupRepository;
-
     private MessageService $messageService;
 
     /**
@@ -33,8 +30,7 @@ class MessageServiceTest extends TestCase
         parent::setUp();
 
         $this->messageRepository = Mockery::mock(MessageRepositoryInterface::class);
-        $this->messageGroupRepository = Mockery::mock(MessageGroupRepositoryInterface::class);
-        $this->messageService = new MessageService($this->messageRepository, $this->messageGroupRepository);
+        $this->messageService = new MessageService($this->messageRepository);
     }
 
     /**
@@ -66,8 +62,6 @@ class MessageServiceTest extends TestCase
             ])
             ->andReturn($message);
 
-        $this->messageGroupRepository->shouldNotReceive('create');
-
         $result = $this->messageService->send(['message' => 'Hej', 'recipient_uuid' => $recipient->uuid]);
 
         $this->assertSame($message, $result);
@@ -80,7 +74,7 @@ class MessageServiceTest extends TestCase
     {
         $sender = User::factory()->make(['uuid' => 'sender-uuid']);
         Auth::setUser($sender);
-        $group = MessageGroup::factory()->make(['uuid' => 'group-uuid', 'message_uuid' => 'root-uuid']);
+        $group = MessageGroup::factory()->make(['uuid' => 'group-uuid']);
         $message = Message::factory()->make(['user_uuid' => 'sender-uuid']);
 
         $this->messageRepository
@@ -93,8 +87,6 @@ class MessageServiceTest extends TestCase
             ])
             ->andReturn($message);
 
-        $this->messageGroupRepository->shouldNotReceive('create');
-
         $result = $this->messageService->send(['message' => 'Odpowiedz', 'message_group_uuid' => $group->uuid]);
 
         $this->assertSame($message, $result);
@@ -103,35 +95,29 @@ class MessageServiceTest extends TestCase
     /**
      * @return void
      */
-    public function testSendWithoutRecipientCreatesBroadcastGroup(): void
+    public function testSendWithoutRecipientUsesDefaultGroup(): void
     {
         $sender = User::factory()->make(['uuid' => 'sender-uuid']);
         Auth::setUser($sender);
-        $rootMessage = Message::factory()->make(['uuid' => 'root-message-uuid', 'user_uuid' => 'sender-uuid']);
-        $group = MessageGroup::factory()->make(['uuid' => 'group-uuid', 'message_uuid' => $rootMessage->uuid]);
-        $finalMessage = Message::factory()->make(['user_uuid' => 'sender-uuid', 'message_group_uuid' => $group->uuid]);
+        $defaultGroup = MessageGroup::where('is_default', true)->firstOrFail();
+        $message = Message::factory()->make([
+            'user_uuid' => 'sender-uuid',
+            'message_group_uuid' => $defaultGroup->uuid,
+        ]);
 
         $this->messageRepository
             ->shouldReceive('create')
             ->once()
-            ->with(['user_uuid' => $sender->uuid, 'message' => 'Do wszystkich'])
-            ->andReturn($rootMessage);
-
-        $this->messageGroupRepository
-            ->shouldReceive('create')
-            ->once()
-            ->with(['message_uuid' => $rootMessage->uuid])
-            ->andReturn($group);
-
-        $this->messageRepository
-            ->shouldReceive('assignGroup')
-            ->once()
-            ->with($rootMessage, $group->uuid)
-            ->andReturn($finalMessage);
+            ->with([
+                'user_uuid' => $sender->uuid,
+                'message_group_uuid' => $defaultGroup->uuid,
+                'message' => 'Do wszystkich',
+            ])
+            ->andReturn($message);
 
         $result = $this->messageService->send(['message' => 'Do wszystkich']);
 
-        $this->assertSame($finalMessage, $result);
+        $this->assertSame($message, $result);
     }
 
     /**
@@ -139,14 +125,15 @@ class MessageServiceTest extends TestCase
      */
     public function testGetInboxFiltersByLoggedUser(): void
     {
-        $user = User::factory()->make(['uuid' => 'user-uuid']);
+        $user = User::factory()->create();
         Auth::setUser($user);
+        $userGroupUuids = $user->messageGroups()->pluck('message_groups.uuid')->toArray();
         $paginator = new LengthAwarePaginator([], 0, 15, 1);
 
         $this->messageRepository
             ->shouldReceive('findAllWithPagination')
             ->once()
-            ->with(['for_user' => $user->uuid])
+            ->with(['for_user' => $user->uuid, 'user_group_uuids' => $userGroupUuids])
             ->andReturn($paginator);
 
         $result = $this->messageService->getInbox();
@@ -159,7 +146,7 @@ class MessageServiceTest extends TestCase
      */
     public function testGetGroupMessagesFiltersByGroupUuid(): void
     {
-        $group = MessageGroup::factory()->make(['uuid' => 'group-uuid', 'message_uuid' => 'root-uuid']);
+        $group = MessageGroup::factory()->make(['uuid' => 'group-uuid']);
         $paginator = new LengthAwarePaginator([], 0, 15, 1);
 
         $this->messageRepository

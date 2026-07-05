@@ -63,11 +63,10 @@ class MessageServiceTest extends TestCase
 
         $message = $this->service->send(['message' => 'Do wszystkich']);
 
+        $defaultGroup = MessageGroup::where('is_default', true)->first();
+
         $this->assertNotNull($message->message_group_uuid);
-        $this->assertDatabaseHas(self::MESSAGE_GROUPS_TABLE, [
-            'uuid' => $message->message_group_uuid,
-            'message_uuid' => $message->uuid,
-        ]);
+        $this->assertSame($defaultGroup->uuid, $message->message_group_uuid);
     }
 
     /**

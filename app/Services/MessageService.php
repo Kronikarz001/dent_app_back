@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Models\Message;
 use App\Models\MessageGroup;
-use App\Repositories\MessageGroupRepositoryInterface;
 use App\Repositories\MessageRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
@@ -16,11 +15,9 @@ readonly class MessageService implements MessageServiceInterface
 {
     /**
      * @param MessageRepositoryInterface $messageRepository
-     * @param MessageGroupRepositoryInterface $messageGroupRepository
      */
     public function __construct(
         private MessageRepositoryInterface $messageRepository,
-        private MessageGroupRepositoryInterface $messageGroupRepository,
     ) {}
 
     /**
@@ -47,26 +44,13 @@ readonly class MessageService implements MessageServiceInterface
             ]);
         }
 
-        return $this->broadcast($sender->uuid, $data['message']);
-    }
+        $defaultGroup = MessageGroup::where('is_default', true)->first();
 
-    /**
-     * @param string $senderUuid
-     * @param string $message
-     * @return Message
-     */
-    private function broadcast(string $senderUuid, string $message): Message
-    {
-        $rootMessage = $this->messageRepository->create([
-            'user_uuid' => $senderUuid,
-            'message' => $message,
+        return $this->messageRepository->create([
+            'user_uuid' => $sender->uuid,
+            'message_group_uuid' => $defaultGroup->uuid,
+            'message' => $data['message'],
         ]);
-
-        $group = $this->messageGroupRepository->create([
-            'message_uuid' => $rootMessage->uuid,
-        ]);
-
-        return $this->messageRepository->assignGroup($rootMessage, $group->uuid);
     }
 
     /**
@@ -74,7 +58,13 @@ readonly class MessageService implements MessageServiceInterface
      */
     public function getInbox(): LengthAwarePaginator
     {
-        return $this->messageRepository->findAllWithPagination(['for_user' => Auth::id()]);
+        $user = Auth::user();
+        $userGroupUuids = $user->messageGroups()->pluck('message_groups.uuid')->toArray();
+
+        return $this->messageRepository->findAllWithPagination([
+            'for_user' => $user->uuid,
+            'user_group_uuids' => $userGroupUuids,
+        ]);
     }
 
     /**

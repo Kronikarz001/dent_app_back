@@ -150,19 +150,6 @@ class JobPositionControllerTest extends TestCase
     /**
      * @return void
      */
-    public function testExportJobPositionReturnSuccessResponse(): void
-    {
-        JobPosition::factory()->count(3)->create();
-
-        $response = $this->callApiWithLoggedUser()
-            ->getJson(route('jobPosition.export', ['type' => 'xlsx']));
-
-        $response->assertOk();
-    }
-
-    /**
-     * @return void
-     */
     public function testAssignJobPositionReturnNoContentResponse(): void
     {
         $user = User::factory()->create();

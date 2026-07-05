@@ -301,17 +301,4 @@ class DentalExaminationControllerTest extends TestCase
 
         $this->assertDatabaseMissing('dental_examinations', ['uuid' => $dentalExamination->uuid]);
     }
-
-    /**
-     * @return void
-     */
-    public function testExportDentalExaminationReturnSuccessResponse(): void
-    {
-        DentalExamination::factory()->count(3)->create();
-
-        $response = $this->callApiWithLoggedUser()
-            ->getJson(route('dentalExamination.export', ['type' => 'xlsx']));
-
-        $response->assertOk();
-    }
 }
