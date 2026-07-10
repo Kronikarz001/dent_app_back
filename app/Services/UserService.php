@@ -8,6 +8,7 @@ use App\Http\Requests\ExportRequest;
 use App\Models\User;
 use App\Repositories\UserRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Str;
 use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\Writer\Exception as WriterException;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -52,6 +53,7 @@ readonly class UserService implements UserServiceInterface
      */
     public function createUser(array $data): User
     {
+        $data['password'] = Str::password();
         return $this->userRepository->create($data);
     }
 
