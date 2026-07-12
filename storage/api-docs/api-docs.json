@@ -967,10 +967,36 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Link wysłany"
+                        "description": "Link do resetowania hasła został wysłany",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "We have emailed your password reset link."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "422": {
-                        "description": "Błąd walidacji"
+                        "description": "Błąd walidacji danych wejściowych lub nie udało się wysłać linku (np. przekroczono limit prób)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "This password reset token is invalid."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -1016,11 +1042,37 @@
                     }
                 },
                 "responses": {
-                    "204": {
-                        "description": "Hasło zmienione"
+                    "200": {
+                        "description": "Hasło zostało zmienione",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Your password has been reset."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "422": {
-                        "description": "Nieprawidłowy token lub dane"
+                        "description": "Błąd walidacji danych wejściowych lub nieprawidłowy/wygasły token",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "This password reset token is invalid."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 }
             }

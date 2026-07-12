@@ -54,6 +54,7 @@ readonly class UserService implements UserServiceInterface
     public function createUser(array $data): User
     {
         $data['password'] = Str::password();
+
         return $this->userRepository->create($data);
     }
 

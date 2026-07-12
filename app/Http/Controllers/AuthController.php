@@ -92,15 +92,25 @@ class AuthController extends Controller
         ),
         tags: ['Auth'],
         responses: [
-            new OA\Response(response: 200, description: 'Link wysłany'),
-            new OA\Response(response: 422, description: 'Błąd walidacji'),
+            new OA\Response(
+                response: 200,
+                description: 'Link do resetowania hasła został wysłany',
+                content: new OA\JsonContent(
+                    properties: [new OA\Property(property: 'message', type: 'string', example: 'We have emailed your password reset link.')]
+                )
+            ),
+            new OA\Response(
+                response: 422,
+                description: 'Błąd walidacji danych wejściowych lub nie udało się wysłać linku (np. przekroczono limit prób)',
+                content: new OA\JsonContent(
+                    properties: [new OA\Property(property: 'message', type: 'string', example: 'This password reset token is invalid.')]
+                )
+            ),
         ]
     )]
     public function forgotPassword(ForgotPasswordRequest $request): JsonResponse
     {
-        $this->authService->forgotPassword($request->all());
-
-        return new JsonResponse;
+        return $this->authService->forgotPassword($request->all());
     }
 
     /**
@@ -124,14 +134,24 @@ class AuthController extends Controller
         ),
         tags: ['Auth'],
         responses: [
-            new OA\Response(response: 204, description: 'Hasło zmienione'),
-            new OA\Response(response: 422, description: 'Nieprawidłowy token lub dane'),
+            new OA\Response(
+                response: 200,
+                description: 'Hasło zostało zmienione',
+                content: new OA\JsonContent(
+                    properties: [new OA\Property(property: 'message', type: 'string', example: 'Your password has been reset.')]
+                )
+            ),
+            new OA\Response(
+                response: 422,
+                description: 'Błąd walidacji danych wejściowych lub nieprawidłowy/wygasły token',
+                content: new OA\JsonContent(
+                    properties: [new OA\Property(property: 'message', type: 'string', example: 'This password reset token is invalid.')]
+                )
+            ),
         ]
     )]
     public function resetPassword(ResetPasswordRequest $request): JsonResponse
     {
-        $this->authService->resetPassword($request->all());
-
-        return new JsonResponse(null, 204);
+        return $this->authService->resetPassword($request->all());
     }
 }
