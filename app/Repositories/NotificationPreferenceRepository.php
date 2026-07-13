@@ -20,8 +20,6 @@ class NotificationPreferenceRepository
     ) {}
 
     /**
-     * Pobiera preferencje użytkownika zaindeksowane kluczem "type_uuid:channel_uuid".
-     *
      * @param string $userUuid
      * @return Collection
      */
@@ -34,8 +32,6 @@ class NotificationPreferenceRepository
     }
 
     /**
-     * Pobiera grupy powiadomień wraz z ich typami.
-     *
      * @return Collection
      */
     public function getGroupsWithTypes(): Collection
@@ -47,8 +43,6 @@ class NotificationPreferenceRepository
     }
 
     /**
-     * Pobiera kanały konfigurowalne przez użytkownika.
-     *
      * @return Collection
      */
     public function getConfigurableChannels(): Collection
@@ -60,8 +54,6 @@ class NotificationPreferenceRepository
     }
 
     /**
-     * Tworzy lub aktualizuje preferencję użytkownika.
-     *
      * @param string $userUuid
      * @param string $typeUuid
      * @param string $channelUuid

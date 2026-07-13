@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Carbon;
@@ -23,6 +24,7 @@ class Notification extends UuidModel
      * @var string[]
      */
     protected $fillable = [
+        'uuid',
         'type',
         'notification_type_uuid',
         'notifiable_type',
@@ -47,5 +49,43 @@ class Notification extends UuidModel
     public function notifiable(): MorphTo
     {
         return $this->morphTo();
+    }
+
+    /**
+     * @param Builder $query
+     * @return Builder
+     */
+    public function scopeRead(Builder $query): Builder
+    {
+        return $query->whereNotNull('read_at');
+    }
+
+    /**
+     * @param Builder $query
+     * @return Builder
+     */
+    public function scopeUnread(Builder $query): Builder
+    {
+        return $query->whereNull('read_at');
+    }
+
+    /**
+     * @return void
+     */
+    public function markAsRead(): void
+    {
+        if (is_null($this->read_at)) {
+            $this->forceFill(['read_at' => $this->freshTimestamp()])->save();
+        }
+    }
+
+    /**
+     * @return void
+     */
+    public function markAsUnread(): void
+    {
+        if (! is_null($this->read_at)) {
+            $this->forceFill(['read_at' => null])->save();
+        }
     }
 }

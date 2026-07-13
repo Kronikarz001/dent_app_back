@@ -60,8 +60,6 @@ readonly class NotificationService implements NotificationServiceInterface
     }
 
     /**
-     * Buduje strukturę preferencji powiadomień użytkownika pogrupowaną po grupach i typach.
-     *
      * @param string $userUuid
      * @return array
      */
@@ -113,10 +111,8 @@ readonly class NotificationService implements NotificationServiceInterface
     }
 
     /**
-     * Aktualizuje preferencje powiadomień użytkownika.
-     *
      * @param string $userUuid
-     * @param array $preferences tablica w formacie [['type_id' => '...', 'channel_id' => '...', 'enabled' => bool], ...]
+     * @param array $preferences
      * @return void
      */
     public function updateUserNotificationPreferences(string $userUuid, array $preferences): void
