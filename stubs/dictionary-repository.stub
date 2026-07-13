@@ -1,0 +1,29 @@
+<?php
+
+namespace {{ namespace }};
+
+use App\Repositories\DictionaryRepository;
+use App\Search\Dictionaries\{{ search }};
+use {{ modelFQN }};
+
+/**
+ * Summary of {{ class }}
+ */
+class {{ class }} extends DictionaryRepository
+{
+    /**
+     * @param {{ search }} $search
+     */
+    public function __construct(private readonly {{ search }} $search)
+    {
+        parent::__construct($this->search);
+    }
+
+    /**
+     * @return string
+     */
+    protected function getModelClass(): string
+    {
+        return {{ model }}::class;
+    }
+}

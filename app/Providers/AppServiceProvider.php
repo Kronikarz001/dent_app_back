@@ -9,10 +9,12 @@ use App\Providers\AppServiceProviders\AuditServiceProvider;
 use App\Providers\AppServiceProviders\AuthServiceProvider;
 use App\Providers\AppServiceProviders\CalendarServiceProvider;
 use App\Providers\AppServiceProviders\DentalExaminationServiceProvider;
+use App\Providers\AppServiceProviders\DictionaryServiceProvider;
 use App\Providers\AppServiceProviders\FileServiceProvider;
 use App\Providers\AppServiceProviders\JobPositionServiceProvider;
 use App\Providers\AppServiceProviders\MaterialServiceProvider;
 use App\Providers\AppServiceProviders\MessageServiceProvider;
+use App\Providers\AppServiceProviders\NotificationServiceProvider;
 use App\Providers\AppServiceProviders\PatientServiceProvider;
 use App\Providers\AppServiceProviders\SearchServiceProvider;
 use App\Providers\AppServiceProviders\UserServiceProvider;
@@ -42,6 +44,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->register(MaterialServiceProvider::class);
         $this->app->register(MessageServiceProvider::class);
         $this->app->register(AnnouncementServiceProvider::class);
+        $this->app->register(DictionaryServiceProvider::class);
+        $this->app->register(NotificationServiceProvider::class);
     }
 
     /**

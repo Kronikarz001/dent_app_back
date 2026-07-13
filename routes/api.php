@@ -9,3 +9,5 @@ require __DIR__.'/api/dental-examination.php';
 require __DIR__.'/api/material.php';
 require __DIR__.'/api/message.php';
 require __DIR__.'/api/announcement.php';
+require __DIR__.'/api/notification.php';
+require __DIR__.'/api/dictionaries.php';

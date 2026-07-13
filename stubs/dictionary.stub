@@ -1,0 +1,12 @@
+<?php
+
+namespace {{ namespace }};
+
+use App\Models\Dictionary;
+
+/**
+ * Summary of {{ class }}
+ */
+class {{ class }} extends Dictionary
+{
+}

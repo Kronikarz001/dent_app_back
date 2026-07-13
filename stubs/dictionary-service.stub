@@ -1,0 +1,62 @@
+<?php
+
+namespace {{ namespace }};
+
+use App\Models\Dictionaries\{{ model }};
+use App\Models\Dictionary;
+use App\Repositories\Dictionaries\{{ repository }};
+use App\Services\DictionaryServiceInterface;
+use Illuminate\Pagination\LengthAwarePaginator;
+
+/**
+ * Summary of {{ class }}
+ */
+class {{ class }}
+{
+    /**
+     * @param DictionaryServiceInterface $dictionaryService
+     * @param {{ repository }} $repository
+     */
+    public function __construct(
+        private readonly DictionaryServiceInterface $dictionaryService,
+        private readonly {{ repository }} $repository,
+    ) {
+    }
+
+    /**
+     * @param array $filters
+     * @return LengthAwarePaginator
+     */
+    public function list(array $filters = []): LengthAwarePaginator
+    {
+        return $this->repository->findAllWithPagination($filters);
+    }
+
+    /**
+     * @param array $data
+     * @return {{ model }}|Dictionary
+     */
+    public function create(array $data): {{ model }}|Dictionary
+    {
+        return $this->dictionaryService->createDictionary($this->repository, $data, {{ model }}::class);
+    }
+
+    /**
+     * @param {{ model }} $dictionary
+     * @param array $data
+     * @return {{ model }}|Dictionary
+     */
+    public function update({{ model }} $dictionary, array $data): {{ model }}|Dictionary
+    {
+        return $this->dictionaryService->updateDictionary($this->repository, $dictionary, $data);
+    }
+
+    /**
+     * @param {{ model }} $dictionary
+     * @return bool
+     */
+    public function delete({{ model }} $dictionary): bool
+    {
+        return $this->repository->delete($dictionary);
+    }
+}
