@@ -11,3 +11,4 @@ require __DIR__.'/api/message.php';
 require __DIR__.'/api/announcement.php';
 require __DIR__.'/api/notification.php';
 require __DIR__.'/api/dictionaries.php';
+require __DIR__.'/api/search.php';

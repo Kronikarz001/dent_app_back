@@ -5864,6 +5864,142 @@
                 ]
             }
         },
+        "/api/search": {
+            "get": {
+                "tags": [
+                    "Search"
+                ],
+                "summary": "Globalna szukajka po modułach z opcjonalnym filtrem modułów",
+                "operationId": "dd3e6c0246da94578414c41ba0bc227e",
+                "parameters": [
+                    {
+                        "name": "searchString",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "modules[]",
+                        "in": "query",
+                        "description": "Opcjonalny filtr modułów; brak = wszystkie moduły",
+                        "required": false,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    {
+                        "name": "perPage",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": -1
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/PaginatedResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "name": {
+                                                                "type": "string"
+                                                            },
+                                                            "description": {
+                                                                "type": "string",
+                                                                "nullable": true
+                                                            },
+                                                            "link": {
+                                                                "type": "string",
+                                                                "nullable": true
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/search/modules": {
+            "get": {
+                "tags": [
+                    "Search"
+                ],
+                "summary": "Zwraca listę modułów szukajki z polskimi nazwami dla filtra",
+                "operationId": "127a7dde9134067ae043633a036fff11",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "modules": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "value": {
+                                                        "type": "string"
+                                                    },
+                                                    "label": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/user": {
             "get": {
                 "tags": [
@@ -7529,6 +7665,10 @@
         {
             "name": "PatientFile",
             "description": "PatientFile"
+        },
+        {
+            "name": "Search",
+            "description": "Search"
         },
         {
             "name": "User",

@@ -4,6 +4,8 @@ namespace App\Providers\AppServiceProviders;
 
 use App\Repositories\SearchRepository;
 use App\Repositories\SearchRepositoryInterface;
+use App\Services\GlobalSearchService;
+use App\Services\GlobalSearchServiceInterface;
 use App\Services\SearchService;
 use App\Services\SearchServiceInterface;
 use Illuminate\Support\ServiceProvider;
@@ -20,5 +22,6 @@ class SearchServiceProvider extends ServiceProvider
     {
         $this->app->bind(SearchRepositoryInterface::class, SearchRepository::class);
         $this->app->bind(SearchServiceInterface::class, SearchService::class);
+        $this->app->bind(GlobalSearchServiceInterface::class, GlobalSearchService::class);
     }
 }
