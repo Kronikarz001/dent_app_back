@@ -2,15 +2,14 @@
 
 namespace App\Enums;
 
-use App\Search\AnnouncementSearch;
-use App\Search\CalendarSearch;
-use App\Search\DentalExaminationSearch;
-use App\Search\JobPositionSearch;
-use App\Search\MaterialSearch;
-use App\Search\MessageSearch;
-use App\Search\PatientSearch;
-use App\Search\UserSearch;
-use Illuminate\Database\Eloquent\Model;
+use App\Models\Announcement;
+use App\Models\Calendar;
+use App\Models\DentalExamination;
+use App\Models\JobPosition;
+use App\Models\Material;
+use App\Models\Message;
+use App\Models\Patient;
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 
@@ -48,54 +47,60 @@ enum SearchModuleType: string
     /**
      * @return class-string
      */
-    public function searchClass(): string
+    public function modelClass(): string
     {
         return match ($this) {
-            self::PATIENTS => PatientSearch::class,
-            self::USERS => UserSearch::class,
-            self::JOB_POSITIONS => JobPositionSearch::class,
-            self::MATERIALS => MaterialSearch::class,
-            self::DENTAL_EXAMINATIONS => DentalExaminationSearch::class,
-            self::MESSAGES => MessageSearch::class,
-            self::ANNOUNCEMENTS => AnnouncementSearch::class,
-            self::CALENDARS => CalendarSearch::class,
+            self::PATIENTS => Patient::class,
+            self::USERS => User::class,
+            self::JOB_POSITIONS => JobPosition::class,
+            self::MATERIALS => Material::class,
+            self::DENTAL_EXAMINATIONS => DentalExamination::class,
+            self::MESSAGES => Message::class,
+            self::ANNOUNCEMENTS => Announcement::class,
+            self::CALENDARS => Calendar::class,
         };
     }
 
     /**
-     * @param Model $model
      * @return string
      */
-    public function resolveName(Model $model): string
+    public function nameExpression(): string
     {
         return match ($this) {
-            self::PATIENTS, self::USERS => trim(($model->first_name ?? '').' '.($model->last_name ?? '')),
-            self::ANNOUNCEMENTS => (string) $model->title,
-            self::MESSAGES => (string) $model->message,
-            default => (string) $model->name,
+            self::PATIENTS, self::USERS => "concat_ws(' ', first_name, last_name)",
+            self::ANNOUNCEMENTS => 'title',
+            self::MESSAGES => 'message',
+            default => 'name',
         };
     }
 
     /**
-     * @param Model $model
-     * @return string|null
+     * @return string
      */
-    public function resolveDescription(Model $model): ?string
+    public function descriptionExpression(): string
     {
         return match ($this) {
-            self::PATIENTS, self::USERS => $model->email,
-            self::MATERIALS, self::DENTAL_EXAMINATIONS => $model->short_description ?? $model->description,
-            self::ANNOUNCEMENTS => $model->content,
-            self::CALENDARS => $model->description,
-            default => null,
+            self::PATIENTS, self::USERS => 'email',
+            self::MATERIALS, self::DENTAL_EXAMINATIONS => 'coalesce(short_description, description)',
+            self::ANNOUNCEMENTS => 'content',
+            self::CALENDARS => 'description',
+            default => 'null',
         };
     }
 
     /**
-     * @param Model $model
+     * @return bool
+     */
+    public function usesSoftDeletes(): bool
+    {
+        return $this === self::JOB_POSITIONS;
+    }
+
+    /**
+     * @param string $uuid
      * @return string|null
      */
-    public function showLink(Model $model): ?string
+    public function showLinkForUuid(string $uuid): ?string
     {
         $routeName = $this->resolveShowRouteName();
 
@@ -103,7 +108,7 @@ enum SearchModuleType: string
             return null;
         }
 
-        return route($routeName, [$model->uuid]);
+        return route($routeName, [$uuid]);
     }
 
     /**
