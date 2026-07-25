@@ -18,7 +18,7 @@ class CalendarFactory extends Factory
     protected $model = Calendar::class;
 
     /**
-     * @return array|mixed[]
+     * @return array
      */
     public function definition(): array
     {

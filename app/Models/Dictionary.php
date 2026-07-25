@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use App\Models\Scopes\DictionaryTypeScope;
 use App\Observers\DictionaryObserver;
+use App\Scopes\DictionaryTypeScope;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 
