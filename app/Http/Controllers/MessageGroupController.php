@@ -8,7 +8,6 @@ use App\Http\Resources\MessageGroupResource;
 use App\Models\MessageGroup;
 use App\Models\User;
 use App\Services\MessageGroupServiceInterface;
-use App\Services\MessageServiceInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Pagination\LengthAwarePaginator;
 use OpenApi\Attributes as OA;
@@ -20,11 +19,9 @@ class MessageGroupController extends Controller
 {
     /**
      * @param MessageGroupServiceInterface $messageGroupService
-     * @param MessageServiceInterface $messageService
      */
     public function __construct(
         private readonly MessageGroupServiceInterface $messageGroupService,
-        private readonly MessageServiceInterface $messageService,
     ) {}
 
     /**
@@ -282,6 +279,6 @@ class MessageGroupController extends Controller
     )]
     public function messages(MessageGroup $messageGroup): LengthAwarePaginator
     {
-        return $this->messageService->getGroupMessages($messageGroup);
+        return $this->messageGroupService->getGroupMessages($messageGroup);
     }
 }

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Message;
 use App\Models\MessageGroup;
+use App\Models\User;
 use App\Repositories\MessageRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
@@ -68,11 +69,25 @@ readonly class MessageService implements MessageServiceInterface
     }
 
     /**
-     * @param MessageGroup $messageGroup
+     * @param User $user
      * @return LengthAwarePaginator
      */
-    public function getGroupMessages(MessageGroup $messageGroup): LengthAwarePaginator
+    public function getAllMessageForUser(User $user): LengthAwarePaginator
     {
-        return $this->messageRepository->findAllWithPagination(['message_group_uuid' => $messageGroup->uuid]);
+        $userGroupUuids = $user->messageGroups()->pluck('message_groups.uuid')->toArray();
+
+        return $this->messageRepository->findAllWithPagination([
+            'for_user' => $user->uuid,
+            'user_group_uuids' => $userGroupUuids,
+        ]);
+    }
+
+    /**
+     * @param Message $message
+     * @return void
+     */
+    public function deleteMessage(Message $message): void
+    {
+        $this->messageRepository->delete($message);
     }
 }

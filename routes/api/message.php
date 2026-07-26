@@ -10,6 +10,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/message', [MessageController::class, 'store'])
         ->name('message.store');
 
+    Route::get('/message/user/{user}', [MessageController::class, 'indexAllForUser'])
+        ->name('message.indexAllForUser');
+
     Route::apiResource('/message/{message}/file', MessageFileController::class)
         ->names('messagefile');
     Route::get('/message/{message}/file-download/{file}', [MessageFileController::class, 'download'])

@@ -113,19 +113,32 @@ class MessageServiceTest extends TestCase
     /**
      * @return void
      */
-    public function testGetGroupMessagesReturnsOnlyMessagesFromThatGroup(): void
+    public function testGetAllMessageForUserIncludesPrivateAndGroupMessages(): void
     {
-        $sender = User::factory()->create();
-        Auth::setUser($sender);
-        $root = $this->service->send(['message' => 'Pierwsza']);
-        $reply = $this->service->send(['message' => 'Druga', 'message_group_uuid' => $root->message_group_uuid]);
-        $unrelated = Message::factory()->create(['user_uuid' => $sender->uuid]);
+        $target = User::factory()->create();
+        $other = User::factory()->create();
+        Auth::setUser($target);
+        $received = Message::factory()->create(['user_uuid' => $other->uuid, 'recipient_user_uuid' => $target->uuid]);
+        $broadcast = $this->service->send(['message' => 'Broadcast']);
+        $notForTarget = Message::factory()->create(['user_uuid' => $other->uuid, 'recipient_user_uuid' => $other->uuid]);
 
-        $result = $this->service->getGroupMessages($root->group);
+        $result = $this->service->getAllMessageForUser($target);
 
         $uuids = $result->getCollection()->pluck('uuid')->all();
-        $this->assertContains($root->uuid, $uuids);
-        $this->assertContains($reply->uuid, $uuids);
-        $this->assertNotContains($unrelated->uuid, $uuids);
+        $this->assertContains($received->uuid, $uuids);
+        $this->assertContains($broadcast->uuid, $uuids);
+        $this->assertNotContains($notForTarget->uuid, $uuids);
+    }
+
+    /**
+     * @return void
+     */
+    public function testDeleteMessageRemovesFromDatabase(): void
+    {
+        $message = Message::factory()->create();
+
+        $this->service->deleteMessage($message);
+
+        $this->assertDatabaseMissing(self::MESSAGES_TABLE, ['uuid' => $message->uuid]);
     }
 }

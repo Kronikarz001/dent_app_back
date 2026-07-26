@@ -144,19 +144,37 @@ class MessageServiceTest extends TestCase
     /**
      * @return void
      */
-    public function testGetGroupMessagesFiltersByGroupUuid(): void
+    public function testGetAllMessageForUserFiltersByGivenUser(): void
     {
-        $group = MessageGroup::factory()->make(['uuid' => 'group-uuid']);
+        $user = User::factory()->create();
+        $userGroupUuids = $user->messageGroups()->pluck('message_groups.uuid')->toArray();
         $paginator = new LengthAwarePaginator([], 0, 15, 1);
 
         $this->messageRepository
             ->shouldReceive('findAllWithPagination')
             ->once()
-            ->with(['message_group_uuid' => $group->uuid])
+            ->with(['for_user' => $user->uuid, 'user_group_uuids' => $userGroupUuids])
             ->andReturn($paginator);
 
-        $result = $this->messageService->getGroupMessages($group);
+        $result = $this->messageService->getAllMessageForUser($user);
 
         $this->assertSame($paginator, $result);
+    }
+
+    /**
+     * @return void
+     */
+    public function testDeleteMessageDelegatesToRepository(): void
+    {
+        $this->expectNotToPerformAssertions();
+        $message = Message::factory()->make(['uuid' => 'message-uuid']);
+
+        $this->messageRepository
+            ->shouldReceive('delete')
+            ->once()
+            ->with($message)
+            ->andReturn(true);
+
+        $this->messageService->deleteMessage($message);
     }
 }
