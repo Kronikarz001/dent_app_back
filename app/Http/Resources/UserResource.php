@@ -21,6 +21,7 @@ class UserResource extends BasicResource
             'job_positions' => JobPositionResource::collection($this->jobPositions),
             'avatar_path' => $this->avatar_path,
             'background_path' => $this->background_path,
+            'status' => $this->isOnline(),
         ]);
     }
 }

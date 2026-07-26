@@ -281,4 +281,28 @@ class MessageGroupController extends Controller
     {
         return $this->messageGroupService->getGroupMessages($messageGroup);
     }
+
+    /**
+     * @param MessageGroup $messageGroup
+     * @return JsonResponse
+     */
+    #[OA\Post(
+        path: '/api/message-group/{uuid}/read',
+        summary: 'Oznacza grupę jako przeczytaną przez zalogowanego użytkownika',
+        security: [['sanctum' => []]],
+        tags: ['MessageGroup'],
+        parameters: [
+            new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
+        ],
+        responses: [
+            new OA\Response(response: 204, description: 'Oznaczono'),
+            new OA\Response(response: 404, description: 'Nie znaleziono'),
+        ]
+    )]
+    public function markAsRead(MessageGroup $messageGroup): JsonResponse
+    {
+        $this->messageGroupService->markGroupAsRead($messageGroup);
+
+        return new JsonResponse(null, 204);
+    }
 }

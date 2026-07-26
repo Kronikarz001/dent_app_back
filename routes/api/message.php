@@ -10,8 +10,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/message', [MessageController::class, 'store'])
         ->name('message.store');
 
+    Route::get('/message/unread-count', [MessageController::class, 'unreadCount'])
+        ->name('message.unreadCount');
     Route::get('/message/user/{user}', [MessageController::class, 'indexAllForUser'])
         ->name('message.indexAllForUser');
+    Route::delete('/message/{message}', [MessageController::class, 'destroy'])
+        ->name('message.destroy');
+    Route::post('/message/{message}/read', [MessageController::class, 'markAsRead'])
+        ->name('message.markAsRead');
 
     Route::apiResource('/message/{message}/file', MessageFileController::class)
         ->names('messagefile');
@@ -34,4 +40,6 @@ Route::middleware('auth:sanctum')->group(function () {
         ->name('messageGroup.removeUser');
     Route::get('/message-group/{messageGroup}/messages', [MessageGroupController::class, 'messages'])
         ->name('messageGroup.messages');
+    Route::post('/message-group/{messageGroup}/read', [MessageGroupController::class, 'markAsRead'])
+        ->name('messageGroup.markAsRead');
 });

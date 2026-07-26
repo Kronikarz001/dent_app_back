@@ -3,6 +3,7 @@
 namespace Tests\Feature\Services;
 
 use App\Models\Message;
+use App\Models\MessageGroup;
 use App\Models\User;
 use App\Services\MessageGroupServiceInterface;
 use App\Services\MessageServiceInterface;
@@ -45,5 +46,21 @@ class MessageGroupServiceTest extends TestCase
         $this->assertContains($root->uuid, $uuids);
         $this->assertContains($reply->uuid, $uuids);
         $this->assertNotContains($unrelated->uuid, $uuids);
+    }
+
+    /**
+     * @return void
+     */
+    public function testMarkGroupAsReadCreatesReadRowsForGroupMessages(): void
+    {
+        $user = User::factory()->create();
+        $group = MessageGroup::factory()->create();
+        $group->users()->attach($user->uuid);
+        $message = Message::factory()->create(['message_group_uuid' => $group->uuid]);
+        Auth::setUser($user);
+
+        $this->groupService->markGroupAsRead($group);
+
+        $this->assertDatabaseHas('message_reads', ['message_uuid' => $message->uuid, 'user_uuid' => $user->uuid]);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\UserStatusType;
 use App\Traits\Auditable;
 use App\Traits\HasFile;
 use App\Traits\HasPhoneNumber;
@@ -29,6 +30,7 @@ use Laravel\Sanctum\PersonalAccessToken;
  * @property string|null $avatar_path
  * @property string|null $pwz_numer
  * @property string|null $remember_token
+ * @property string|null $status
  * @property Carbon|null $email_verified_at
  * @property Carbon|null $private_email_verified_at
  * @property-read Collection|JobPosition[] $jobPositions
@@ -60,6 +62,7 @@ abstract class BasicUser extends Authenticatable
         'is_active',
         'avatar_path',
         'pwz_numer',
+        'status',
     ];
 
     /**
@@ -84,6 +87,20 @@ abstract class BasicUser extends Authenticatable
         }
 
         return $accessToken->tokenable;
+    }
+
+    /**
+     * @return UserStatusType
+     */
+    public function isOnline(): UserStatusType
+    {
+        $expiration = config('sanctum.expiration');
+
+        $hasValidToken = $this->tokens()
+            ->when($expiration, fn ($query) => $query->where('created_at', '>', now()->subMinutes($expiration)))
+            ->exists();
+
+        return $hasValidToken ? UserStatusType::ACTIVE : UserStatusType::NON_ACTIVE;
     }
 
     /**

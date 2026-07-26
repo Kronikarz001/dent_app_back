@@ -117,4 +117,20 @@ class MessageControllerTest extends TestCase
         $response->assertOk();
         $response->assertJsonPath('data.0.uuid', $message->uuid);
     }
+
+    /**
+     * @return void
+     */
+    public function testUnreadCountReturnsNumberOfUnreadConversations(): void
+    {
+        $user = User::factory()->create();
+        $other = User::factory()->create();
+        Message::factory()->create(['user_uuid' => $other->uuid, 'recipient_user_uuid' => $user->uuid]);
+
+        $response = $this->callApiWithLoggedUser($user)
+            ->getJson(route('message.unreadCount'));
+
+        $response->assertOk();
+        $response->assertJsonPath('count', 1);
+    }
 }

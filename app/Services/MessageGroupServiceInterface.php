@@ -54,4 +54,10 @@ interface MessageGroupServiceInterface
      * @return void
      */
     public function removeUser(MessageGroup $group, User $user): void;
+
+    /**
+     * @param MessageGroup $group
+     * @return void
+     */
+    public function markGroupAsRead(MessageGroup $group): void;
 }

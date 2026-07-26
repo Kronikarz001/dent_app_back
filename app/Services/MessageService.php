@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Events\MessageSent;
 use App\Models\Message;
 use App\Models\MessageGroup;
 use App\Models\User;
@@ -30,28 +31,30 @@ readonly class MessageService implements MessageServiceInterface
         $sender = Auth::user();
 
         if (! empty($data['message_group_uuid'])) {
-            return $this->messageRepository->create([
+            $message = $this->messageRepository->create([
                 'user_uuid' => $sender->uuid,
                 'message_group_uuid' => $data['message_group_uuid'],
                 'message' => $data['message'],
             ]);
-        }
-
-        if (! empty($data['recipient_uuid'])) {
-            return $this->messageRepository->create([
+        } elseif (! empty($data['recipient_uuid'])) {
+            $message = $this->messageRepository->create([
                 'user_uuid' => $sender->uuid,
                 'recipient_user_uuid' => $data['recipient_uuid'],
                 'message' => $data['message'],
             ]);
+        } else {
+            $defaultGroup = MessageGroup::where('is_default', true)->first();
+
+            $message = $this->messageRepository->create([
+                'user_uuid' => $sender->uuid,
+                'message_group_uuid' => $defaultGroup->uuid,
+                'message' => $data['message'],
+            ]);
         }
 
-        $defaultGroup = MessageGroup::where('is_default', true)->first();
+        MessageSent::dispatch($message);
 
-        return $this->messageRepository->create([
-            'user_uuid' => $sender->uuid,
-            'message_group_uuid' => $defaultGroup->uuid,
-            'message' => $data['message'],
-        ]);
+        return $message;
     }
 
     /**
@@ -89,5 +92,26 @@ readonly class MessageService implements MessageServiceInterface
     public function deleteMessage(Message $message): void
     {
         $this->messageRepository->delete($message);
+    }
+
+    /**
+     * @param Message $message
+     * @return void
+     */
+    public function markAsRead(Message $message): void
+    {
+        if ($message->recipient_user_uuid !== Auth::user()->uuid) {
+            return;
+        }
+
+        $this->messageRepository->markAsReadBy($message, Auth::user()->uuid);
+    }
+
+    /**
+     * @return int
+     */
+    public function getUnreadConversationsCount(): int
+    {
+        return $this->messageRepository->countUnreadConversationsForUser(Auth::user());
     }
 }

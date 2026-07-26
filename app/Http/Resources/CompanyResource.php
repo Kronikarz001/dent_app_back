@@ -2,16 +2,21 @@
 
 namespace App\Http\Resources;
 
-use App\Models\Company;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
 
-/** @mixin Company */
-class CompanyResource extends JsonResource
+/**
+ * Summary of CompanyResource
+ */
+class CompanyResource extends BasicResource
 {
-    public function toArray(Request $request): array
+    /**
+     * @param Request $request
+     * @return array
+     */
+    public function toArray($request): array
     {
         return [
+            'uuid' => $this->uuid,
             'name' => $this->name,
             'regon' => $this->regon,
             'nip' => $this->nip,

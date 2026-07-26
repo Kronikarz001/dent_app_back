@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\Message;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -41,4 +42,17 @@ interface MessageRepositoryInterface extends BasicRepositoryInterface
      * @return Message
      */
     public function assignGroup(Message $message, string $groupUuid): Message;
+
+    /**
+     * @param Message $message
+     * @param string $userUuid
+     * @return void
+     */
+    public function markAsReadBy(Message $message, string $userUuid): void;
+
+    /**
+     * @param User $user
+     * @return int
+     */
+    public function countUnreadConversationsForUser(User $user): int;
 }

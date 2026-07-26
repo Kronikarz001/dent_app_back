@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Services;
 
+use App\Events\MessageSent;
 use App\Models\Message;
 use App\Models\MessageGroup;
 use App\Models\User;
@@ -9,6 +10,7 @@ use App\Services\MessageServiceInterface;
 use Illuminate\Foundation\Application;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
 /**
@@ -51,6 +53,21 @@ class MessageServiceTest extends TestCase
             'recipient_user_uuid' => $recipient->uuid,
             'message_group_uuid' => null,
         ]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testSendDispatchesMessageSentEvent(): void
+    {
+        Event::fake([MessageSent::class]);
+        $sender = User::factory()->create();
+        $recipient = User::factory()->create();
+        Auth::setUser($sender);
+
+        $message = $this->service->send(['message' => 'Hej', 'recipient_uuid' => $recipient->uuid]);
+
+        Event::assertDispatched(MessageSent::class, fn (MessageSent $event) => $event->message->uuid === $message->uuid);
     }
 
     /**
@@ -140,5 +157,56 @@ class MessageServiceTest extends TestCase
         $this->service->deleteMessage($message);
 
         $this->assertDatabaseMissing(self::MESSAGES_TABLE, ['uuid' => $message->uuid]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testMarkAsReadSetsIsReadWhenUserIsRecipient(): void
+    {
+        $recipient = User::factory()->create();
+        $sender = User::factory()->create();
+        Auth::setUser($recipient);
+        $message = Message::factory()->create(['user_uuid' => $sender->uuid, 'recipient_user_uuid' => $recipient->uuid]);
+
+        $this->service->markAsRead($message);
+
+        $this->assertDatabaseHas('message_reads', ['message_uuid' => $message->uuid, 'user_uuid' => $recipient->uuid]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testMessageUnreadAttributeReflectsReadStatusForCurrentUser(): void
+    {
+        $recipient = User::factory()->create();
+        $sender = User::factory()->create();
+        Auth::setUser($recipient);
+        $message = Message::factory()->create(['user_uuid' => $sender->uuid, 'recipient_user_uuid' => $recipient->uuid]);
+
+        $this->assertTrue($message->fresh()->unread);
+
+        $this->service->markAsRead($message);
+
+        $this->assertFalse($message->fresh()->unread);
+    }
+
+    /**
+     * @return void
+     */
+    public function testGetUnreadConversationsCountCountsOnlyUnreadConversations(): void
+    {
+        $me = User::factory()->create();
+        $otherUnread = User::factory()->create();
+        $otherRead = User::factory()->create();
+        Auth::setUser($me);
+
+        Message::factory()->create(['user_uuid' => $otherUnread->uuid, 'recipient_user_uuid' => $me->uuid]);
+        $readMessage = Message::factory()->create(['user_uuid' => $otherRead->uuid, 'recipient_user_uuid' => $me->uuid]);
+        $readMessage->readBy()->attach($me->uuid);
+
+        $count = $this->service->getUnreadConversationsCount();
+
+        $this->assertSame(1, $count);
     }
 }

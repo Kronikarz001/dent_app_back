@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Models\MessageGroup;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 
 /**
  * Summary of MessageGroupRepositoryInterface
@@ -54,4 +55,17 @@ interface MessageGroupRepositoryInterface extends BasicRepositoryInterface
      * @return int
      */
     public function getMembersCount(MessageGroup $group): int;
+
+    /**
+     * @param MessageGroup $group
+     * @param string $userUuid
+     * @return void
+     */
+    public function markAsRead(MessageGroup $group, string $userUuid): void;
+
+    /**
+     * @param string $userUuid
+     * @return Collection
+     */
+    public function findAllForUser(string $userUuid): Collection;
 }

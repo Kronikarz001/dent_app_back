@@ -3,8 +3,6 @@
 namespace App\Models;
 
 use App\Traits\Auditable;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 
@@ -26,9 +24,9 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $updated_at
  * @property Carbon|null $deleted_at
  */
-class Company extends Model
+class Company extends UuidModel
 {
-    use HasFactory, SoftDeletes, Auditable;
+    use Auditable, SoftDeletes;
 
     protected $fillable = [
         'name',
@@ -42,5 +40,4 @@ class Company extends Model
         'type_of_business',
         'form_of_ownership',
     ];
-
 }

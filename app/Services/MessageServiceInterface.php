@@ -33,4 +33,15 @@ interface MessageServiceInterface
      * @return void
      */
     public function deleteMessage(Message $message): void;
+
+    /**
+     * @param Message $message
+     * @return void
+     */
+    public function markAsRead(Message $message): void;
+
+    /**
+     * @return int
+     */
+    public function getUnreadConversationsCount(): int;
 }

@@ -95,6 +95,35 @@ class UserControllerTest extends TestCase
     /**
      * @return void
      */
+    public function testShowUserReturnsStatusNonActiveWithoutValidToken(): void
+    {
+        $target = User::factory()->create();
+
+        $response = $this->callApiWithLoggedUser()
+            ->getJson(route('user.show', ['user' => $target->uuid]));
+
+        $response->assertOk();
+        $response->assertJsonPath('status', 'NON_ACTIVE');
+    }
+
+    /**
+     * @return void
+     */
+    public function testShowUserReturnsStatusActiveWithFreshToken(): void
+    {
+        $target = User::factory()->create();
+        $target->createToken('token');
+
+        $response = $this->callApiWithLoggedUser()
+            ->getJson(route('user.show', ['user' => $target->uuid]));
+
+        $response->assertOk();
+        $response->assertJsonPath('status', 'ACTIVE');
+    }
+
+    /**
+     * @return void
+     */
     public function testStoreUserReturnCreatedResponse(): void
     {
         $response = $this->callApiWithLoggedUser()

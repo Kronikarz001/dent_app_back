@@ -7,6 +7,7 @@ use App\Http\Resources\MessageResource;
 use App\Models\Message;
 use App\Models\User;
 use App\Services\MessageServiceInterface;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Pagination\LengthAwarePaginator;
 use OpenApi\Attributes as OA;
 
@@ -139,5 +140,48 @@ class MessageController extends Controller
     public function destroy(Message $message): void
     {
         $this->messageService->deleteMessage($message);
+    }
+
+    /**
+     * @param Message $message
+     * @return void
+     */
+    #[OA\Post(
+        path: '/api/message/{message}/read',
+        summary: 'Oznacza prywatną wiadomość jako przeczytaną przez zalogowanego odbiorcę',
+        security: [['sanctum' => []]],
+        tags: ['Message'],
+        parameters: [
+            new OA\PathParameter(name: 'message', schema: new OA\Schema(type: 'string', format: 'uuid')),
+        ],
+        responses: [
+            new OA\Response(response: 204, description: 'Oznaczono'),
+            new OA\Response(response: 404, description: 'Nie znaleziono'),
+        ]
+    )]
+    public function markAsRead(Message $message): void
+    {
+        $this->messageService->markAsRead($message);
+    }
+
+    /**
+     * @return JsonResponse
+     */
+    #[OA\Get(
+        path: '/api/message/unread-count',
+        summary: 'Zwraca liczbę nieprzeczytanych konwersacji zalogowanego użytkownika (do badge\'a)',
+        security: [['sanctum' => []]],
+        tags: ['Message'],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'OK',
+                content: new OA\JsonContent(properties: [new OA\Property(property: 'count', type: 'integer')])
+            ),
+        ]
+    )]
+    public function unreadCount(): JsonResponse
+    {
+        return new JsonResponse(['count' => $this->messageService->getUnreadConversationsCount()]);
     }
 }

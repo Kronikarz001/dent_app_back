@@ -6,7 +6,10 @@ use App\Models\MessageGroup;
 use App\Search\MessageGroupSearch;
 use App\Search\Search;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Summary of MessageGroupRepository
@@ -108,5 +111,36 @@ class MessageGroupRepository extends SearchableRepository implements MessageGrou
     public function getMembersCount(MessageGroup $group): int
     {
         return $group->users()->count();
+    }
+
+    /**
+     * @param MessageGroup $group
+     * @param string $userUuid
+     * @return void
+     */
+    public function markAsRead(MessageGroup $group, string $userUuid): void
+    {
+        $now = now();
+        $rows = $group->messages()->pluck('uuid')->map(fn (string $messageUuid) => [
+            'message_uuid' => $messageUuid,
+            'user_uuid' => $userUuid,
+            'created_at' => $now,
+            'updated_at' => $now,
+        ]);
+
+        if ($rows->isNotEmpty()) {
+            DB::table('message_reads')->upsert($rows->all(), ['message_uuid', 'user_uuid'], ['updated_at']);
+        }
+    }
+
+    /**
+     * @param string $userUuid
+     * @return Collection
+     */
+    public function findAllForUser(string $userUuid): Collection
+    {
+        return MessageGroup::whereHas('users', function (Builder $query) use ($userUuid) {
+            $query->where('users.uuid', $userUuid);
+        })->with('users')->get();
     }
 }

@@ -9,6 +9,7 @@ use App\Repositories\MessageRepositoryInterface;
 use App\Services\MessageService;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Event;
 use Mockery;
 use Mockery\MockInterface;
 use Tests\TestCase;
@@ -29,6 +30,7 @@ class MessageServiceTest extends TestCase
     {
         parent::setUp();
 
+        Event::fake();
         $this->messageRepository = Mockery::mock(MessageRepositoryInterface::class);
         $this->messageService = new MessageService($this->messageRepository);
     }
@@ -144,6 +146,56 @@ class MessageServiceTest extends TestCase
     /**
      * @return void
      */
+    public function testDeleteMessageDelegatesToRepository(): void
+    {
+        $this->expectNotToPerformAssertions();
+        $message = Message::factory()->make(['uuid' => 'message-uuid']);
+
+        $this->messageRepository
+            ->shouldReceive('delete')
+            ->once()
+            ->with($message)
+            ->andReturn(true);
+
+        $this->messageService->deleteMessage($message);
+    }
+
+    /**
+     * @return void
+     */
+    public function testMarkAsReadUpdatesMessageWhenUserIsRecipient(): void
+    {
+        $this->expectNotToPerformAssertions();
+        $user = User::factory()->make(['uuid' => 'recipient-uuid']);
+        Auth::setUser($user);
+        $message = Message::factory()->make(['user_uuid' => 'sender-uuid', 'recipient_user_uuid' => 'recipient-uuid']);
+
+        $this->messageRepository
+            ->shouldReceive('markAsReadBy')
+            ->once()
+            ->with($message, 'recipient-uuid');
+
+        $this->messageService->markAsRead($message);
+    }
+
+    /**
+     * @return void
+     */
+    public function testMarkAsReadDoesNothingWhenUserIsNotRecipient(): void
+    {
+        $this->expectNotToPerformAssertions();
+        $user = User::factory()->make(['uuid' => 'someone-else-uuid']);
+        Auth::setUser($user);
+        $message = Message::factory()->make(['user_uuid' => 'sender-uuid', 'recipient_user_uuid' => 'recipient-uuid']);
+
+        $this->messageRepository->shouldNotReceive('markAsReadBy');
+
+        $this->messageService->markAsRead($message);
+    }
+
+    /**
+     * @return void
+     */
     public function testGetAllMessageForUserFiltersByGivenUser(): void
     {
         $user = User::factory()->create();
@@ -164,17 +216,19 @@ class MessageServiceTest extends TestCase
     /**
      * @return void
      */
-    public function testDeleteMessageDelegatesToRepository(): void
+    public function testGetUnreadConversationsCountDelegatesToRepositoryForAuthenticatedUser(): void
     {
-        $this->expectNotToPerformAssertions();
-        $message = Message::factory()->make(['uuid' => 'message-uuid']);
+        $user = User::factory()->make(['uuid' => 'me-uuid']);
+        Auth::setUser($user);
 
         $this->messageRepository
-            ->shouldReceive('delete')
+            ->shouldReceive('countUnreadConversationsForUser')
             ->once()
-            ->with($message)
-            ->andReturn(true);
+            ->with($user)
+            ->andReturn(3);
 
-        $this->messageService->deleteMessage($message);
+        $result = $this->messageService->getUnreadConversationsCount();
+
+        $this->assertSame(3, $result);
     }
 }

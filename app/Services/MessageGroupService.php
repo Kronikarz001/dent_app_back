@@ -99,4 +99,13 @@ readonly class MessageGroupService implements MessageGroupServiceInterface
     {
         $this->messageGroupRepository->removeUser($group, $user->uuid);
     }
+
+    /**
+     * @param MessageGroup $group
+     * @return void
+     */
+    public function markGroupAsRead(MessageGroup $group): void
+    {
+        $this->messageGroupRepository->markAsRead($group, Auth::user()->uuid);
+    }
 }
