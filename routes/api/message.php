@@ -12,8 +12,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/message/unread-count', [MessageController::class, 'unreadCount'])
         ->name('message.unreadCount');
-    Route::get('/message/user/{user}', [MessageController::class, 'indexAllForUser'])
-        ->name('message.indexAllForUser');
     Route::delete('/message/{message}', [MessageController::class, 'destroy'])
         ->name('message.destroy');
     Route::post('/message/{message}/read', [MessageController::class, 'markAsRead'])

@@ -3,6 +3,7 @@
 namespace Tests\Feature\Services;
 
 use App\Events\MessageSent;
+use App\Exceptions\MessageAccessDeniedException;
 use App\Models\Message;
 use App\Models\MessageGroup;
 use App\Models\User;
@@ -130,33 +131,30 @@ class MessageServiceTest extends TestCase
     /**
      * @return void
      */
-    public function testGetAllMessageForUserIncludesPrivateAndGroupMessages(): void
+    public function testDeleteMessageRemovesFromDatabase(): void
     {
-        $target = User::factory()->create();
-        $other = User::factory()->create();
-        Auth::setUser($target);
-        $received = Message::factory()->create(['user_uuid' => $other->uuid, 'recipient_user_uuid' => $target->uuid]);
-        $broadcast = $this->service->send(['message' => 'Broadcast']);
-        $notForTarget = Message::factory()->create(['user_uuid' => $other->uuid, 'recipient_user_uuid' => $other->uuid]);
+        $owner = User::factory()->create();
+        Auth::setUser($owner);
+        $message = Message::factory()->create(['user_uuid' => $owner->uuid]);
 
-        $result = $this->service->getAllMessageForUser($target);
+        $this->service->deleteMessage($message);
 
-        $uuids = $result->getCollection()->pluck('uuid')->all();
-        $this->assertContains($received->uuid, $uuids);
-        $this->assertContains($broadcast->uuid, $uuids);
-        $this->assertNotContains($notForTarget->uuid, $uuids);
+        $this->assertDatabaseMissing(self::MESSAGES_TABLE, ['uuid' => $message->uuid]);
     }
 
     /**
      * @return void
      */
-    public function testDeleteMessageRemovesFromDatabase(): void
+    public function testDeleteMessageThrowsWhenUserIsNotOwner(): void
     {
-        $message = Message::factory()->create();
+        $owner = User::factory()->create();
+        $other = User::factory()->create();
+        Auth::setUser($other);
+        $message = Message::factory()->create(['user_uuid' => $owner->uuid]);
+
+        $this->expectException(MessageAccessDeniedException::class);
 
         $this->service->deleteMessage($message);
-
-        $this->assertDatabaseMissing(self::MESSAGES_TABLE, ['uuid' => $message->uuid]);
     }
 
     /**
@@ -189,6 +187,40 @@ class MessageServiceTest extends TestCase
         $this->service->markAsRead($message);
 
         $this->assertFalse($message->fresh()->unread);
+    }
+
+    /**
+     * @return void
+     */
+    public function testMarkAsReadCreatesReadRowForGroupMessageWhenUserIsMember(): void
+    {
+        $member = User::factory()->create();
+        $sender = User::factory()->create();
+        $group = MessageGroup::factory()->create();
+        $group->users()->attach([$member->uuid, $sender->uuid]);
+        $message = Message::factory()->create(['user_uuid' => $sender->uuid, 'message_group_uuid' => $group->uuid]);
+        Auth::setUser($member);
+
+        $this->service->markAsRead($message);
+
+        $this->assertDatabaseHas('message_reads', ['message_uuid' => $message->uuid, 'user_uuid' => $member->uuid]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testMarkAsReadDoesNothingForGroupMessageWhenUserIsNotMember(): void
+    {
+        $outsider = User::factory()->create();
+        $sender = User::factory()->create();
+        $group = MessageGroup::factory()->create();
+        $group->users()->attach($sender->uuid);
+        $message = Message::factory()->create(['user_uuid' => $sender->uuid, 'message_group_uuid' => $group->uuid]);
+        Auth::setUser($outsider);
+
+        $this->service->markAsRead($message);
+
+        $this->assertDatabaseMissing('message_reads', ['message_uuid' => $message->uuid, 'user_uuid' => $outsider->uuid]);
     }
 
     /**

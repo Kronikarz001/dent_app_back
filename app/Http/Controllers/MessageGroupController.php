@@ -107,12 +107,13 @@ class MessageGroupController extends Controller
                     properties: [new OA\Property(property: 'data', ref: '#/components/schemas/MessageGroupResource')]
                 )
             ),
+            new OA\Response(response: 403, description: 'Nie jesteś członkiem tej grupy'),
             new OA\Response(response: 404, description: 'Nie znaleziono'),
         ]
     )]
     public function show(MessageGroup $messageGroup): MessageGroupResource
     {
-        return new MessageGroupResource($messageGroup->load(['creator', 'users']));
+        return new MessageGroupResource($this->messageGroupService->getGroup($messageGroup));
     }
 
     /**
@@ -145,15 +146,13 @@ class MessageGroupController extends Controller
                     properties: [new OA\Property(property: 'data', ref: '#/components/schemas/MessageGroupResource')]
                 )
             ),
-            new OA\Response(response: 403, description: 'Nie można edytować grupy domyślnej'),
+            new OA\Response(response: 403, description: 'Nie jesteś członkiem tej grupy lub próbujesz edytować grupę domyślną'),
             new OA\Response(response: 404, description: 'Nie znaleziono'),
             new OA\Response(response: 422, description: 'Błąd walidacji'),
         ]
     )]
     public function update(MessageGroup $messageGroup, MessageGroupUpdateRequest $request): MessageGroupResource
     {
-        abort_if($messageGroup->is_default, 403, 'Nie można edytować grupy domyślnej.');
-
         return new MessageGroupResource($this->messageGroupService->update($messageGroup, $request->validated()));
     }
 
@@ -171,14 +170,12 @@ class MessageGroupController extends Controller
         ],
         responses: [
             new OA\Response(response: 204, description: 'Usunięto'),
-            new OA\Response(response: 403, description: 'Nie można usunąć grupy domyślnej'),
+            new OA\Response(response: 403, description: 'Nie jesteś członkiem tej grupy lub próbujesz usunąć grupę domyślną'),
             new OA\Response(response: 404, description: 'Nie znaleziono'),
         ]
     )]
     public function destroy(MessageGroup $messageGroup): JsonResponse
     {
-        abort_if($messageGroup->is_default, 403, 'Nie można usunąć grupy domyślnej.');
-
         $this->messageGroupService->delete($messageGroup);
 
         return new JsonResponse(null, 204);
@@ -206,14 +203,12 @@ class MessageGroupController extends Controller
                     properties: [new OA\Property(property: 'data', ref: '#/components/schemas/MessageGroupResource')]
                 )
             ),
-            new OA\Response(response: 403, description: 'Nie można edytować grupy domyślnej'),
+            new OA\Response(response: 403, description: 'Nie jesteś członkiem tej grupy lub próbujesz edytować grupę domyślną'),
             new OA\Response(response: 404, description: 'Nie znaleziono'),
         ]
     )]
     public function addUser(MessageGroup $messageGroup, User $user): MessageGroupResource
     {
-        abort_if($messageGroup->is_default, 403, 'Nie można ręcznie edytować grupy domyślnej.');
-
         $this->messageGroupService->addUser($messageGroup, $user);
 
         return new MessageGroupResource($messageGroup->load(['creator', 'users']));
@@ -235,15 +230,12 @@ class MessageGroupController extends Controller
         ],
         responses: [
             new OA\Response(response: 204, description: 'Usunięto'),
-            new OA\Response(response: 403, description: 'Nie można edytować grupy domyślnej lub grupa miałaby tylko 1 członka'),
-            new OA\Response(response: 404, description: 'Nie znaleziono'),
+            new OA\Response(response: 403, description: 'Nie jesteś członkiem tej grupy, grupa jest domyślna, lub grupa miałaby mniej niż 2 członków'),
+            new OA\Response(response: 404, description: 'Nie znaleziono lub użytkownik nie jest członkiem grupy'),
         ]
     )]
     public function removeUser(MessageGroup $messageGroup, User $user): JsonResponse
     {
-        abort_if($messageGroup->is_default, 403, 'Nie można ręcznie edytować grupy domyślnej.');
-        abort_if($messageGroup->users()->count() <= 2, 403, 'Grupa musi mieć co najmniej 2 członków.');
-
         $this->messageGroupService->removeUser($messageGroup, $user);
 
         return new JsonResponse(null, 204);
@@ -274,6 +266,7 @@ class MessageGroupController extends Controller
                     ]
                 )
             ),
+            new OA\Response(response: 403, description: 'Nie jesteś członkiem tej grupy'),
             new OA\Response(response: 404, description: 'Nie znaleziono'),
         ]
     )]
@@ -296,6 +289,7 @@ class MessageGroupController extends Controller
         ],
         responses: [
             new OA\Response(response: 204, description: 'Oznaczono'),
+            new OA\Response(response: 403, description: 'Nie jesteś członkiem tej grupy'),
             new OA\Response(response: 404, description: 'Nie znaleziono'),
         ]
     )]

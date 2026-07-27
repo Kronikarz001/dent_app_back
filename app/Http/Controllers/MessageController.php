@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Requests\MessageRequest;
 use App\Http\Resources\MessageResource;
 use App\Models\Message;
-use App\Models\User;
 use App\Services\MessageServiceInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -52,39 +51,6 @@ class MessageController extends Controller
     }
 
     /**
-     * @param User $user
-     * @return LengthAwarePaginator
-     */
-    #[OA\Get(
-        path: '/api/message/user/{user}',
-        summary: 'Pobiera prywatne i grupowe wiadomości danego użytkownika',
-        security: [['sanctum' => []]],
-        tags: ['Message'],
-        parameters: [
-            new OA\PathParameter(name: 'user', schema: new OA\Schema(type: 'string', format: 'uuid')),
-        ],
-        responses: [
-            new OA\Response(
-                response: 200,
-                description: 'OK',
-                content: new OA\JsonContent(
-                    allOf: [
-                        new OA\Schema(ref: '#/components/schemas/PaginatedResponse'),
-                        new OA\Schema(properties: [
-                            new OA\Property(property: 'data', type: 'array', items: new OA\Items(ref: '#/components/schemas/MessageResource')),
-                        ]),
-                    ]
-                )
-            ),
-            new OA\Response(response: 404, description: 'Nie znaleziono'),
-        ]
-    )]
-    public function indexAllForUser(User $user): LengthAwarePaginator
-    {
-        return $this->messageService->getAllMessageForUser($user);
-    }
-
-    /**
      * @param MessageRequest $request
      * @return MessageResource
      */
@@ -122,7 +88,7 @@ class MessageController extends Controller
 
     /**
      * @param Message $message
-     * @return void
+     * @return JsonResponse
      */
     #[OA\Delete(
         path: '/api/message/{message}',
@@ -134,17 +100,20 @@ class MessageController extends Controller
         ],
         responses: [
             new OA\Response(response: 204, description: 'Usunięto'),
+            new OA\Response(response: 403, description: 'Można usuwać tylko własne wiadomości'),
             new OA\Response(response: 404, description: 'Nie znaleziono'),
         ]
     )]
-    public function destroy(Message $message): void
+    public function destroy(Message $message): JsonResponse
     {
         $this->messageService->deleteMessage($message);
+
+        return new JsonResponse(null, 204);
     }
 
     /**
      * @param Message $message
-     * @return void
+     * @return JsonResponse
      */
     #[OA\Post(
         path: '/api/message/{message}/read',
@@ -159,9 +128,11 @@ class MessageController extends Controller
             new OA\Response(response: 404, description: 'Nie znaleziono'),
         ]
     )]
-    public function markAsRead(Message $message): void
+    public function markAsRead(Message $message): JsonResponse
     {
         $this->messageService->markAsRead($message);
+
+        return new JsonResponse(null, 204);
     }
 
     /**

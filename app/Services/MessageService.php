@@ -3,9 +3,9 @@
 namespace App\Services;
 
 use App\Events\MessageSent;
+use App\Exceptions\MessageAccessDeniedException;
 use App\Models\Message;
 use App\Models\MessageGroup;
-use App\Models\User;
 use App\Repositories\MessageRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
@@ -72,25 +72,15 @@ readonly class MessageService implements MessageServiceInterface
     }
 
     /**
-     * @param User $user
-     * @return LengthAwarePaginator
-     */
-    public function getAllMessageForUser(User $user): LengthAwarePaginator
-    {
-        $userGroupUuids = $user->messageGroups()->pluck('message_groups.uuid')->toArray();
-
-        return $this->messageRepository->findAllWithPagination([
-            'for_user' => $user->uuid,
-            'user_group_uuids' => $userGroupUuids,
-        ]);
-    }
-
-    /**
      * @param Message $message
      * @return void
      */
     public function deleteMessage(Message $message): void
     {
+        if ($message->user_uuid !== Auth::id()) {
+            throw new MessageAccessDeniedException;
+        }
+
         $this->messageRepository->delete($message);
     }
 
@@ -100,11 +90,21 @@ readonly class MessageService implements MessageServiceInterface
      */
     public function markAsRead(Message $message): void
     {
-        if ($message->recipient_user_uuid !== Auth::user()->uuid) {
+        $userUuid = Auth::user()->uuid;
+
+        if ($message->message_group_uuid !== null) {
+            $isMember = $message->group()
+                ->whereHas('users', fn ($query) => $query->where('users.uuid', $userUuid))
+                ->exists();
+
+            if (! $isMember) {
+                return;
+            }
+        } elseif ($message->recipient_user_uuid !== $userUuid) {
             return;
         }
 
-        $this->messageRepository->markAsReadBy($message, Auth::user()->uuid);
+        $this->messageRepository->markAsReadBy($message, $userUuid);
     }
 
     /**

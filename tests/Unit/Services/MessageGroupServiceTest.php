@@ -3,10 +3,12 @@
 namespace Tests\Unit\Services;
 
 use App\Models\MessageGroup;
+use App\Models\User;
 use App\Repositories\MessageGroupRepositoryInterface;
 use App\Repositories\MessageRepositoryInterface;
 use App\Services\MessageGroupService;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Auth;
 use Mockery;
 use Mockery\MockInterface;
 use Tests\TestCase;
@@ -48,7 +50,10 @@ class MessageGroupServiceTest extends TestCase
      */
     public function testGetGroupMessagesFiltersByGroupUuid(): void
     {
-        $group = MessageGroup::factory()->make(['uuid' => 'group-uuid']);
+        $user = User::factory()->create();
+        Auth::setUser($user);
+        $group = MessageGroup::factory()->create();
+        $group->users()->attach($user->uuid);
         $paginator = new LengthAwarePaginator([], 0, 15, 1);
 
         $this->messageRepository

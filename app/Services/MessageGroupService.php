@@ -2,6 +2,10 @@
 
 namespace App\Services;
 
+use App\Exceptions\DefaultMessageGroupException;
+use App\Exceptions\MessageGroupAccessDeniedException;
+use App\Exceptions\MessageGroupMemberNotFoundException;
+use App\Exceptions\MessageGroupMinimumMembersException;
 use App\Models\MessageGroup;
 use App\Models\User;
 use App\Repositories\MessageGroupRepositoryInterface;
@@ -14,6 +18,8 @@ use Illuminate\Support\Facades\Auth;
  */
 readonly class MessageGroupService implements MessageGroupServiceInterface
 {
+    private const MINIMUM_MEMBERS = 2;
+
     /**
      * @param MessageGroupRepositoryInterface $messageGroupRepository
      * @param MessageRepositoryInterface $messageRepository
@@ -35,10 +41,23 @@ readonly class MessageGroupService implements MessageGroupServiceInterface
 
     /**
      * @param MessageGroup $group
+     * @return MessageGroup
+     */
+    public function getGroup(MessageGroup $group): MessageGroup
+    {
+        $this->assertMember($group);
+
+        return $group->load(['creator', 'users']);
+    }
+
+    /**
+     * @param MessageGroup $group
      * @return LengthAwarePaginator
      */
     public function getGroupMessages(MessageGroup $group): LengthAwarePaginator
     {
+        $this->assertMember($group);
+
         return $this->messageRepository->findAllWithPagination(['message_group_uuid' => $group->uuid]);
     }
 
@@ -68,6 +87,9 @@ readonly class MessageGroupService implements MessageGroupServiceInterface
      */
     public function update(MessageGroup $group, array $data): MessageGroup
     {
+        $this->assertMember($group);
+        $this->assertNotDefault($group, 'Nie można edytować grupy domyślnej.');
+
         return $this->messageGroupRepository->update($group, ['name' => $data['name']]);
     }
 
@@ -77,6 +99,9 @@ readonly class MessageGroupService implements MessageGroupServiceInterface
      */
     public function delete(MessageGroup $group): void
     {
+        $this->assertMember($group);
+        $this->assertNotDefault($group, 'Nie można usunąć grupy domyślnej.');
+
         $this->messageGroupRepository->delete($group);
     }
 
@@ -87,6 +112,9 @@ readonly class MessageGroupService implements MessageGroupServiceInterface
      */
     public function addUser(MessageGroup $group, User $user): void
     {
+        $this->assertMember($group);
+        $this->assertNotDefault($group, 'Nie można ręcznie edytować grupy domyślnej.');
+
         $this->messageGroupRepository->addUser($group, $user->uuid);
     }
 
@@ -97,6 +125,17 @@ readonly class MessageGroupService implements MessageGroupServiceInterface
      */
     public function removeUser(MessageGroup $group, User $user): void
     {
+        $this->assertMember($group);
+        $this->assertNotDefault($group, 'Nie można ręcznie edytować grupy domyślnej.');
+
+        if (! $group->users()->where('users.uuid', $user->uuid)->exists()) {
+            throw new MessageGroupMemberNotFoundException;
+        }
+
+        if ($this->messageGroupRepository->getMembersCount($group) <= self::MINIMUM_MEMBERS) {
+            throw new MessageGroupMinimumMembersException;
+        }
+
         $this->messageGroupRepository->removeUser($group, $user->uuid);
     }
 
@@ -106,6 +145,31 @@ readonly class MessageGroupService implements MessageGroupServiceInterface
      */
     public function markGroupAsRead(MessageGroup $group): void
     {
+        $this->assertMember($group);
+
         $this->messageGroupRepository->markAsRead($group, Auth::user()->uuid);
+    }
+
+    /**
+     * @param MessageGroup $group
+     * @return void
+     */
+    private function assertMember(MessageGroup $group): void
+    {
+        if (! $group->users()->where('users.uuid', Auth::user()->uuid)->exists()) {
+            throw new MessageGroupAccessDeniedException;
+        }
+    }
+
+    /**
+     * @param MessageGroup $group
+     * @param string $message
+     * @return void
+     */
+    private function assertNotDefault(MessageGroup $group, string $message): void
+    {
+        if ($group->is_default) {
+            throw new DefaultMessageGroupException($message);
+        }
     }
 }

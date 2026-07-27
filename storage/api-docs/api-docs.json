@@ -1885,6 +1885,309 @@
                 ]
             }
         },
+        "/api/company": {
+            "get": {
+                "tags": [
+                    "Company"
+                ],
+                "summary": "Lista firm (paginacja)",
+                "operationId": "3e0bffb951b3f31f83aadc004638122b",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/PaginatedResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/CompanyResource"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Company"
+                ],
+                "summary": "Tworzy nową firmę",
+                "operationId": "faf1545d2af89079ca55c4f9ed6ea302",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "regon",
+                                    "nip",
+                                    "address",
+                                    "province",
+                                    "district",
+                                    "municipality"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "regon": {
+                                        "type": "string"
+                                    },
+                                    "nip": {
+                                        "type": "string"
+                                    },
+                                    "address": {
+                                        "type": "string"
+                                    },
+                                    "province": {
+                                        "type": "string"
+                                    },
+                                    "district": {
+                                        "type": "string"
+                                    },
+                                    "municipality": {
+                                        "type": "string"
+                                    },
+                                    "business_form": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "type_of_business": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "form_of_ownership": {
+                                        "type": "string",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Utworzono",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/CompanyResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Błąd walidacji"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/company/{uuid}": {
+            "get": {
+                "tags": [
+                    "Company"
+                ],
+                "summary": "Pobiera jedną firmę",
+                "operationId": "752be961f20912abe203b188c15720d9",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/CompanyResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Company"
+                ],
+                "summary": "Aktualizuje firmę",
+                "operationId": "95f42e83ac5d43516d8ab466a30a286a",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "regon",
+                                    "nip",
+                                    "address",
+                                    "province",
+                                    "district",
+                                    "municipality"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "regon": {
+                                        "type": "string"
+                                    },
+                                    "nip": {
+                                        "type": "string"
+                                    },
+                                    "address": {
+                                        "type": "string"
+                                    },
+                                    "province": {
+                                        "type": "string"
+                                    },
+                                    "district": {
+                                        "type": "string"
+                                    },
+                                    "municipality": {
+                                        "type": "string"
+                                    },
+                                    "business_form": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "type_of_business": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "form_of_ownership": {
+                                        "type": "string",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/CompanyResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    },
+                    "422": {
+                        "description": "Błąd walidacji"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Company"
+                ],
+                "summary": "Usuwa firmę",
+                "operationId": "57d816daec4e9293b3441a1c942a3564",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Usunięto"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/dental-examination": {
             "get": {
                 "tags": [
@@ -4140,7 +4443,7 @@
                 "tags": [
                     "Message"
                 ],
-                "summary": "Wysyła wiadomość do konkretnej osoby lub do grupy (wymagany dokładnie jeden cel)",
+                "summary": "Wysyła wiadomość do konkretnej osoby lub do grupy",
                 "operationId": "ee15771b1dadd0efb04ebd263be4f168",
                 "requestBody": {
                     "required": true,
@@ -4190,6 +4493,106 @@
                     },
                     "422": {
                         "description": "Błąd walidacji"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/message/{message}": {
+            "delete": {
+                "tags": [
+                    "Message"
+                ],
+                "summary": "Usuwa wiadomość",
+                "operationId": "a0925e4c3804998cdd47ba8bd9f985a1",
+                "parameters": [
+                    {
+                        "name": "message",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Usunięto"
+                    },
+                    "403": {
+                        "description": "Można usuwać tylko własne wiadomości"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/message/{message}/read": {
+            "post": {
+                "tags": [
+                    "Message"
+                ],
+                "summary": "Oznacza prywatną wiadomość jako przeczytaną przez zalogowanego odbiorcę",
+                "operationId": "8c05cf3243cc37e8729b28eb9f4d670c",
+                "parameters": [
+                    {
+                        "name": "message",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Oznaczono"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/message/unread-count": {
+            "get": {
+                "tags": [
+                    "Message"
+                ],
+                "summary": "Zwraca liczbę nieprzeczytanych konwersacji zalogowanego użytkownika (do badge'a)",
+                "operationId": "f2defbf708d7a8be890cf56086437aa4",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "count": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -4658,6 +5061,9 @@
                             }
                         }
                     },
+                    "403": {
+                        "description": "Nie jesteś członkiem tej grupy"
+                    },
                     "404": {
                         "description": "Nie znaleziono"
                     }
@@ -4720,7 +5126,7 @@
                         }
                     },
                     "403": {
-                        "description": "Nie można edytować grupy domyślnej"
+                        "description": "Nie jesteś członkiem tej grupy lub próbujesz edytować grupę domyślną"
                     },
                     "404": {
                         "description": "Nie znaleziono"
@@ -4757,7 +5163,7 @@
                         "description": "Usunięto"
                     },
                     "403": {
-                        "description": "Nie można usunąć grupy domyślnej"
+                        "description": "Nie jesteś członkiem tej grupy lub próbujesz usunąć grupę domyślną"
                     },
                     "404": {
                         "description": "Nie znaleziono"
@@ -4814,7 +5220,7 @@
                         }
                     },
                     "403": {
-                        "description": "Nie można edytować grupy domyślnej"
+                        "description": "Nie jesteś członkiem tej grupy lub próbujesz edytować grupę domyślną"
                     },
                     "404": {
                         "description": "Nie znaleziono"
@@ -4857,10 +5263,10 @@
                         "description": "Usunięto"
                     },
                     "403": {
-                        "description": "Nie można edytować grupy domyślnej lub grupa miałaby tylko 1 członka"
+                        "description": "Nie jesteś członkiem tej grupy, grupa jest domyślna, lub grupa miałaby mniej niż 2 członków"
                     },
                     "404": {
-                        "description": "Nie znaleziono"
+                        "description": "Nie znaleziono lub użytkownik nie jest członkiem grupy"
                     }
                 },
                 "security": [
@@ -4913,6 +5319,45 @@
                                 }
                             }
                         }
+                    },
+                    "403": {
+                        "description": "Nie jesteś członkiem tej grupy"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/message-group/{uuid}/read": {
+            "post": {
+                "tags": [
+                    "MessageGroup"
+                ],
+                "summary": "Oznacza grupę jako przeczytaną przez zalogowanego użytkownika",
+                "operationId": "fb86b731480ef66ef436d85901af7afa",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Oznaczono"
+                    },
+                    "403": {
+                        "description": "Nie jesteś członkiem tej grupy"
                     },
                     "404": {
                         "description": "Nie znaleziono"
@@ -7059,6 +7504,14 @@
                             "$ref": "#/components/schemas/JobPositionResource"
                         }
                     },
+                    "status": {
+                        "description": "ACTIVE gdy użytkownik ma aktualnie ważny token",
+                        "type": "string",
+                        "enum": [
+                            "ACTIVE",
+                            "NON_ACTIVE"
+                        ]
+                    },
                     "created_at": {
                         "type": "string",
                         "format": "date-time"
@@ -7281,6 +7734,56 @@
                 },
                 "type": "object"
             },
+            "CompanyResource": {
+                "properties": {
+                    "uuid": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "regon": {
+                        "type": "string"
+                    },
+                    "nip": {
+                        "type": "string"
+                    },
+                    "address": {
+                        "type": "string"
+                    },
+                    "province": {
+                        "type": "string"
+                    },
+                    "district": {
+                        "type": "string"
+                    },
+                    "municipality": {
+                        "type": "string"
+                    },
+                    "business_form": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "type_of_business": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "form_of_ownership": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
             "MessageResource": {
                 "properties": {
                     "uuid": {
@@ -7304,6 +7807,10 @@
                     },
                     "message": {
                         "type": "string"
+                    },
+                    "unread": {
+                        "description": "Czy zalogowany użytkownik jeszcze nie przeczytał tej wiadomości",
+                        "type": "boolean"
                     },
                     "created_at": {
                         "type": "string",
@@ -7481,6 +7988,10 @@
         {
             "name": "CalendarFile",
             "description": "CalendarFile"
+        },
+        {
+            "name": "Company",
+            "description": "Company"
         },
         {
             "name": "DentalExamination",

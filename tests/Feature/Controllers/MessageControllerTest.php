@@ -86,6 +86,54 @@ class MessageControllerTest extends TestCase
     /**
      * @return void
      */
+    public function testStoreFailsValidationWhenSenderIsNotGroupMember(): void
+    {
+        $group = MessageGroup::factory()->create();
+
+        $response = $this->callApiWithLoggedUser()
+            ->postJson(route('message.store'), [
+                'message' => 'Hej',
+                'message_group_uuid' => $group->uuid,
+            ]);
+
+        $response->assertUnprocessable();
+        $response->assertJsonValidationErrors('message_group_uuid');
+    }
+
+    /**
+     * @return void
+     */
+    public function testDestroyRemovesOwnMessage(): void
+    {
+        $user = User::factory()->create();
+        $message = Message::factory()->create(['user_uuid' => $user->uuid]);
+
+        $response = $this->callApiWithLoggedUser($user)
+            ->deleteJson(route('message.destroy', ['message' => $message->uuid]));
+
+        $response->assertNoContent();
+        $this->assertDatabaseMissing('messages', ['uuid' => $message->uuid]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testDestroyForbiddenWhenNotOwner(): void
+    {
+        $owner = User::factory()->create();
+        $other = User::factory()->create();
+        $message = Message::factory()->create(['user_uuid' => $owner->uuid]);
+
+        $response = $this->callApiWithLoggedUser($other)
+            ->deleteJson(route('message.destroy', ['message' => $message->uuid]));
+
+        $response->assertForbidden();
+        $this->assertDatabaseHas('messages', ['uuid' => $message->uuid]);
+    }
+
+    /**
+     * @return void
+     */
     public function testIndexSearchStringFiltersInboxByMessageContent(): void
     {
         $user = User::factory()->create();
@@ -110,8 +158,9 @@ class MessageControllerTest extends TestCase
         $message = Message::factory()->create(['user_uuid' => $sender->uuid]);
         $group = MessageGroup::factory()->create();
         $message->update(['message_group_uuid' => $group->uuid]);
+        $group->users()->attach($sender->uuid);
 
-        $response = $this->callApiWithLoggedUser()
+        $response = $this->callApiWithLoggedUser($sender)
             ->getJson(route('messageGroup.messages', ['messageGroup' => $group->uuid]));
 
         $response->assertOk();

@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\Message;
-use App\Models\User;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 /**
@@ -15,12 +14,6 @@ interface MessageServiceInterface
      * @return LengthAwarePaginator
      */
     public function getInbox(): LengthAwarePaginator;
-
-    /**
-     * @param User $user
-     * @return LengthAwarePaginator
-     */
-    public function getAllMessageForUser(User $user): LengthAwarePaginator;
 
     /**
      * @param array $data

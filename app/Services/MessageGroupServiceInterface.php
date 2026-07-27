@@ -18,6 +18,12 @@ interface MessageGroupServiceInterface
 
     /**
      * @param MessageGroup $group
+     * @return MessageGroup
+     */
+    public function getGroup(MessageGroup $group): MessageGroup;
+
+    /**
+     * @param MessageGroup $group
      * @return LengthAwarePaginator
      */
     public function getGroupMessages(MessageGroup $group): LengthAwarePaginator;

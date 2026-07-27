@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Services;
 
+use App\Exceptions\MessageAccessDeniedException;
 use App\Models\Message;
 use App\Models\MessageGroup;
 use App\Models\User;
@@ -146,16 +147,34 @@ class MessageServiceTest extends TestCase
     /**
      * @return void
      */
-    public function testDeleteMessageDelegatesToRepository(): void
+    public function testDeleteMessageDelegatesToRepositoryWhenUserIsOwner(): void
     {
         $this->expectNotToPerformAssertions();
-        $message = Message::factory()->make(['uuid' => 'message-uuid']);
+        $owner = User::factory()->make(['uuid' => 'owner-uuid']);
+        Auth::setUser($owner);
+        $message = Message::factory()->make(['uuid' => 'message-uuid', 'user_uuid' => 'owner-uuid']);
 
         $this->messageRepository
             ->shouldReceive('delete')
             ->once()
             ->with($message)
             ->andReturn(true);
+
+        $this->messageService->deleteMessage($message);
+    }
+
+    /**
+     * @return void
+     */
+    public function testDeleteMessageThrowsWhenUserIsNotOwner(): void
+    {
+        $user = User::factory()->make(['uuid' => 'someone-else-uuid']);
+        Auth::setUser($user);
+        $message = Message::factory()->make(['uuid' => 'message-uuid', 'user_uuid' => 'owner-uuid']);
+
+        $this->messageRepository->shouldNotReceive('delete');
+
+        $this->expectException(MessageAccessDeniedException::class);
 
         $this->messageService->deleteMessage($message);
     }
@@ -191,26 +210,6 @@ class MessageServiceTest extends TestCase
         $this->messageRepository->shouldNotReceive('markAsReadBy');
 
         $this->messageService->markAsRead($message);
-    }
-
-    /**
-     * @return void
-     */
-    public function testGetAllMessageForUserFiltersByGivenUser(): void
-    {
-        $user = User::factory()->create();
-        $userGroupUuids = $user->messageGroups()->pluck('message_groups.uuid')->toArray();
-        $paginator = new LengthAwarePaginator([], 0, 15, 1);
-
-        $this->messageRepository
-            ->shouldReceive('findAllWithPagination')
-            ->once()
-            ->with(['for_user' => $user->uuid, 'user_group_uuids' => $userGroupUuids])
-            ->andReturn($paginator);
-
-        $result = $this->messageService->getAllMessageForUser($user);
-
-        $this->assertSame($paginator, $result);
     }
 
     /**

@@ -2,6 +2,10 @@
 
 namespace Tests\Feature\Services;
 
+use App\Exceptions\DefaultMessageGroupException;
+use App\Exceptions\MessageGroupAccessDeniedException;
+use App\Exceptions\MessageGroupMemberNotFoundException;
+use App\Exceptions\MessageGroupMinimumMembersException;
 use App\Models\Message;
 use App\Models\MessageGroup;
 use App\Models\User;
@@ -62,5 +66,112 @@ class MessageGroupServiceTest extends TestCase
         $this->groupService->markGroupAsRead($group);
 
         $this->assertDatabaseHas('message_reads', ['message_uuid' => $message->uuid, 'user_uuid' => $user->uuid]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testGetGroupThrowsWhenUserIsNotMember(): void
+    {
+        $outsider = User::factory()->create();
+        $group = MessageGroup::factory()->create();
+        Auth::setUser($outsider);
+
+        $this->expectException(MessageGroupAccessDeniedException::class);
+
+        $this->groupService->getGroup($group);
+    }
+
+    /**
+     * @return void
+     */
+    public function testUpdateThrowsWhenUserIsNotMember(): void
+    {
+        $outsider = User::factory()->create();
+        $group = MessageGroup::factory()->create();
+        Auth::setUser($outsider);
+
+        $this->expectException(MessageGroupAccessDeniedException::class);
+
+        $this->groupService->update($group, ['name' => 'Nowa nazwa']);
+    }
+
+    /**
+     * @return void
+     */
+    public function testUpdateThrowsWhenGroupIsDefault(): void
+    {
+        $member = User::factory()->create();
+        $group = MessageGroup::factory()->create(['is_default' => true]);
+        $group->users()->attach($member->uuid);
+        Auth::setUser($member);
+
+        $this->expectException(DefaultMessageGroupException::class);
+
+        $this->groupService->update($group, ['name' => 'Nowa nazwa']);
+    }
+
+    /**
+     * @return void
+     */
+    public function testRemoveUserThrowsWhenTargetIsNotMember(): void
+    {
+        $member = User::factory()->create();
+        $notMember = User::factory()->create();
+        $group = MessageGroup::factory()->create();
+        $group->users()->attach([$member->uuid, User::factory()->create()->uuid]);
+        Auth::setUser($member);
+
+        $this->expectException(MessageGroupMemberNotFoundException::class);
+
+        $this->groupService->removeUser($group, $notMember);
+    }
+
+    /**
+     * @return void
+     */
+    public function testRemoveUserThrowsWhenGroupWouldHaveTooFewMembers(): void
+    {
+        $member = User::factory()->create();
+        $other = User::factory()->create();
+        $group = MessageGroup::factory()->create();
+        $group->users()->attach([$member->uuid, $other->uuid]);
+        Auth::setUser($member);
+
+        $this->expectException(MessageGroupMinimumMembersException::class);
+
+        $this->groupService->removeUser($group, $other);
+    }
+
+    /**
+     * @return void
+     */
+    public function testRemoveUserDetachesWhenGroupStaysAboveMinimum(): void
+    {
+        $member = User::factory()->create();
+        $other = User::factory()->create();
+        $third = User::factory()->create();
+        $group = MessageGroup::factory()->create();
+        $group->users()->attach([$member->uuid, $other->uuid, $third->uuid]);
+        Auth::setUser($member);
+
+        $this->groupService->removeUser($group, $other);
+
+        $this->assertFalse($group->users()->where('users.uuid', $other->uuid)->exists());
+    }
+
+    /**
+     * @return void
+     */
+    public function testAddUserThrowsWhenRequesterIsNotMember(): void
+    {
+        $outsider = User::factory()->create();
+        $newUser = User::factory()->create();
+        $group = MessageGroup::factory()->create();
+        Auth::setUser($outsider);
+
+        $this->expectException(MessageGroupAccessDeniedException::class);
+
+        $this->groupService->addUser($group, $newUser);
     }
 }
