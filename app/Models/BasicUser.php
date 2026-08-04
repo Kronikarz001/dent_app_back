@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\UserStatusType;
+use App\Notifications\ResetPasswordNotification;
 use App\Traits\Auditable;
 use App\Traits\HasFile;
 use App\Traits\HasPhoneNumber;
@@ -188,6 +189,15 @@ abstract class BasicUser extends Authenticatable
     public function notifications(): MorphMany
     {
         return $this->morphMany(Notification::class, 'notifiable')->latest();
+    }
+
+    /**
+     * @param string $token
+     * @return void
+     */
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new ResetPasswordNotification($token));
     }
 
     /**

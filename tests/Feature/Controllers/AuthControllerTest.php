@@ -3,8 +3,8 @@
 namespace Tests\Feature\Controllers;
 
 use App\Models\User;
+use App\Notifications\ResetPasswordNotification;
 use Exception;
-use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
@@ -73,7 +73,7 @@ class AuthControllerTest extends TestCase
 
         $response->assertOk();
 
-        Notification::assertSentTo($user, ResetPassword::class);
+        Notification::assertSentTo($user, ResetPasswordNotification::class);
     }
 
     /**

@@ -5,9 +5,9 @@ namespace Tests\Unit\Services;
 use App\Exceptions\AuthenticationException;
 use App\Http\Requests\LoginRequest;
 use App\Models\User;
+use App\Notifications\ResetPasswordNotification;
 use App\Services\AuthService;
 use Exception;
-use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
@@ -101,7 +101,7 @@ class AuthServiceTest extends TestCase
 
         $this->authService->forgotPassword(['email' => $user->email]);
 
-        Notification::assertSentTo($user, ResetPassword::class);
+        Notification::assertSentTo($user, ResetPasswordNotification::class);
     }
 
     /**
