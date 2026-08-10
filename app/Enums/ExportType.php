@@ -5,7 +5,7 @@ namespace App\Enums;
 /**
  * Summary of ExportType
  */
-enum ExportType:string
+enum ExportType: string
 {
     case XLSX = 'xlsx';
     case PDF = 'pdf';

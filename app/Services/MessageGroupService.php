@@ -122,6 +122,7 @@ readonly class MessageGroupService implements MessageGroupServiceInterface
      * @param MessageGroup $group
      * @param User $user
      * @return void
+     *
      * @throws DefaultMessageGroupException
      * @throws MessageGroupAccessDeniedException
      * @throws MessageGroupMemberNotFoundException
