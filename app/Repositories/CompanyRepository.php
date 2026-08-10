@@ -80,4 +80,30 @@ class CompanyRepository extends SearchableRepository implements CompanyRepositor
     {
         return $model->delete();
     }
+
+    /**
+     * @param string $regon
+     * @param string|null $ignoreUuid
+     * @return bool
+     */
+    public function existsByRegon(string $regon, ?string $ignoreUuid = null): bool
+    {
+        return Company::query()
+            ->where('regon', $regon)
+            ->when($ignoreUuid, fn ($query) => $query->where('uuid', '!=', $ignoreUuid))
+            ->exists();
+    }
+
+    /**
+     * @param string $nip
+     * @param string|null $ignoreUuid
+     * @return bool
+     */
+    public function existsByNip(string $nip, ?string $ignoreUuid = null): bool
+    {
+        return Company::query()
+            ->where('nip', $nip)
+            ->when($ignoreUuid, fn ($query) => $query->where('uuid', '!=', $ignoreUuid))
+            ->exists();
+    }
 }

@@ -18,12 +18,24 @@ class ForgotPasswordRequest extends FormRequest
     }
 
     /**
-     * @return string[]
+     * @return array
      */
     public function rules(): array
     {
         return [
-            'email' => 'required|email|exists:users,email',
+            'email' => ['required', 'email', 'exists:users,email'],
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'email.required' => 'Adres e-mail jest wymagany.',
+            'email.email' => 'Adres e-mail musi być prawidłowy.',
+            'email.exists' => 'Nie znaleziono użytkownika o podanym adresie e-mail.',
         ];
     }
 }

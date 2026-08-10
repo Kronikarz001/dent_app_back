@@ -7,12 +7,20 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 /**
- * Summary of UserRequest
+ * Summary of UserUpdateRequest
  */
 class UserUpdateRequest extends FormRequest
 {
     /**
-     * @return array[]
+     * @return bool
+     */
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    /**
+     * @return array
      */
     public function rules(): array
     {
@@ -33,10 +41,24 @@ class UserUpdateRequest extends FormRequest
     }
 
     /**
-     * @return bool
+     * @return array<string, string>
      */
-    public function authorize(): bool
+    public function messages(): array
     {
-        return true;
+        return [
+            'first_name.string' => 'Imię musi być tekstem.',
+            'last_name.string' => 'Nazwisko musi być tekstem.',
+            'email.email' => 'Adres e-mail musi być prawidłowy.',
+            'email.unique' => 'Użytkownik o podanym adresie e-mail już istnieje.',
+            'password.confirmed' => 'Potwierdzenie hasła nie jest zgodne.',
+            'pesel.size' => 'PESEL musi mieć dokładnie 11 znaków.',
+            'pesel.unique' => 'Użytkownik o podanym numerze PESEL już istnieje.',
+            'private_email.email' => 'Prywatny adres e-mail musi być prawidłowy.',
+            'private_email.unique' => 'Użytkownik o podanym prywatnym adresie e-mail już istnieje.',
+            'is_active.boolean' => 'Pole is_active musi być wartością logiczną.',
+            'pwz_numer.string' => 'Numer PWZ musi być tekstem.',
+            'job_positions.array' => 'Pole job_positions musi być tablicą.',
+            'job_positions.*.exists' => 'Wybrane stanowisko nie istnieje.',
+        ];
     }
 }

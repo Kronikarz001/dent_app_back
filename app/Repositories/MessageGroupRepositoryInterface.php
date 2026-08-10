@@ -68,4 +68,11 @@ interface MessageGroupRepositoryInterface extends BasicRepositoryInterface
      * @return Collection
      */
     public function findAllForUser(string $userUuid): Collection;
+
+    /**
+     * @param MessageGroup $group
+     * @param string $userUuid
+     * @return bool
+     */
+    public function hasMember(MessageGroup $group, string $userUuid): bool;
 }

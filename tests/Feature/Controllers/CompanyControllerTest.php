@@ -62,7 +62,7 @@ class CompanyControllerTest extends TestCase
         $response = $this->callApiWithLoggedUser()
             ->postJson(route('company.store'), $data);
 
-        $response->assertUnprocessable();
+        $response->assertConflict();
     }
 
     /**

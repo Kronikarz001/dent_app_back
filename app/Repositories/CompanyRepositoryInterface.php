@@ -34,4 +34,18 @@ interface CompanyRepositoryInterface extends BasicRepositoryInterface
      * @return bool
      */
     public function delete(Model|Company $model): bool;
+
+    /**
+     * @param string $regon
+     * @param string|null $ignoreUuid
+     * @return bool
+     */
+    public function existsByRegon(string $regon, ?string $ignoreUuid = null): bool;
+
+    /**
+     * @param string $nip
+     * @param string|null $ignoreUuid
+     * @return bool
+     */
+    public function existsByNip(string $nip, ?string $ignoreUuid = null): bool;
 }

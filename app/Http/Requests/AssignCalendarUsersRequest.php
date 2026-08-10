@@ -29,4 +29,17 @@ class AssignCalendarUsersRequest extends FormRequest
     {
         return true;
     }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'users.array' => 'Pole users musi być tablicą.',
+            'users.*.exists' => 'Wybrany użytkownik nie istnieje.',
+            'patients.array' => 'Pole patients musi być tablicą.',
+            'patients.*.exists' => 'Wybrany pacjent nie istnieje.',
+        ];
+    }
 }

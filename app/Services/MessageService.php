@@ -4,8 +4,10 @@ namespace App\Services;
 
 use App\Events\MessageSent;
 use App\Exceptions\MessageAccessDeniedException;
+use App\Exceptions\MessageGroupAccessDeniedException;
 use App\Models\Message;
 use App\Models\MessageGroup;
+use App\Repositories\MessageGroupRepositoryInterface;
 use App\Repositories\MessageRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
@@ -17,9 +19,11 @@ readonly class MessageService implements MessageServiceInterface
 {
     /**
      * @param MessageRepositoryInterface $messageRepository
+     * @param MessageGroupRepositoryInterface $messageGroupRepository
      */
     public function __construct(
         private MessageRepositoryInterface $messageRepository,
+        private MessageGroupRepositoryInterface $messageGroupRepository,
     ) {}
 
     /**
@@ -31,6 +35,8 @@ readonly class MessageService implements MessageServiceInterface
         $sender = Auth::user();
 
         if (! empty($data['message_group_uuid'])) {
+            $this->assertSenderIsGroupMember($data['message_group_uuid'], $sender->uuid);
+
             $message = $this->messageRepository->create([
                 'user_uuid' => $sender->uuid,
                 'message_group_uuid' => $data['message_group_uuid'],
@@ -55,6 +61,20 @@ readonly class MessageService implements MessageServiceInterface
         MessageSent::dispatch($message);
 
         return $message;
+    }
+
+    /**
+     * @param string $messageGroupUuid
+     * @param string $senderUuid
+     * @return void
+     */
+    private function assertSenderIsGroupMember(string $messageGroupUuid, string $senderUuid): void
+    {
+        $group = $this->messageGroupRepository->findByUuid($messageGroupUuid);
+
+        if ($group === null || ! $this->messageGroupRepository->hasMember($group, $senderUuid)) {
+            throw new MessageGroupAccessDeniedException;
+        }
     }
 
     /**

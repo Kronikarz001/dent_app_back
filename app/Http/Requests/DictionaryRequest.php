@@ -29,4 +29,17 @@ class DictionaryRequest extends FormRequest
             'additional' => ['nullable'],
         ];
     }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'key.string' => 'Pole key musi być tekstem.',
+            'key.max' => 'Pole key może mieć maksymalnie 255 znaków.',
+            'value.string' => 'Pole value musi być tekstem.',
+            'value.max' => 'Pole value może mieć maksymalnie 512 znaków.',
+        ];
+    }
 }

@@ -86,7 +86,7 @@ class MessageControllerTest extends TestCase
     /**
      * @return void
      */
-    public function testStoreFailsValidationWhenSenderIsNotGroupMember(): void
+    public function testStoreFailsWhenSenderIsNotGroupMember(): void
     {
         $group = MessageGroup::factory()->create();
 
@@ -96,8 +96,7 @@ class MessageControllerTest extends TestCase
                 'message_group_uuid' => $group->uuid,
             ]);
 
-        $response->assertUnprocessable();
-        $response->assertJsonValidationErrors('message_group_uuid');
+        $response->assertForbidden();
     }
 
     /**

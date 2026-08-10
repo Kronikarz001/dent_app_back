@@ -29,10 +29,23 @@ class DataSortFilterRequest extends Request
     public function rules(): array
     {
         return [
-            'filters' => 'nullable|array',
-            'sorts' => 'nullable|array',
-            'page' => 'nullable|int',
-            'perPage' => 'nullable|int',
+            'filters' => ['nullable', 'array'],
+            'sorts' => ['nullable', 'array'],
+            'page' => ['nullable', 'int'],
+            'perPage' => ['nullable', 'int'],
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'filters.array' => 'Pole filters musi być tablicą.',
+            'sorts.array' => 'Pole sorts musi być tablicą.',
+            'page.int' => 'Pole page musi być liczbą całkowitą.',
+            'perPage.int' => 'Pole perPage musi być liczbą całkowitą.',
         ];
     }
 

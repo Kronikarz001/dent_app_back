@@ -26,4 +26,16 @@ class MessageGroupUpdateRequest extends FormRequest
     {
         return true;
     }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'name.required' => 'Nazwa grupy jest wymagana.',
+            'name.string' => 'Nazwa grupy musi być tekstem.',
+            'name.max' => 'Nazwa grupy może mieć maksymalnie 255 znaków.',
+        ];
+    }
 }

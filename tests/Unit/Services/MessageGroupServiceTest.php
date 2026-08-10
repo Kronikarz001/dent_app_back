@@ -56,6 +56,12 @@ class MessageGroupServiceTest extends TestCase
         $group->users()->attach($user->uuid);
         $paginator = new LengthAwarePaginator([], 0, 15, 1);
 
+        $this->messageGroupRepository
+            ->shouldReceive('hasMember')
+            ->once()
+            ->with($group, $user->uuid)
+            ->andReturn(true);
+
         $this->messageRepository
             ->shouldReceive('findAllWithPagination')
             ->once()

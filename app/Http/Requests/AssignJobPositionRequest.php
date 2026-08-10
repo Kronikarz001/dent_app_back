@@ -27,4 +27,17 @@ class AssignJobPositionRequest extends FormRequest
     {
         return true;
     }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'job_positions.required' => 'Pole job_positions jest wymagane.',
+            'job_positions.array' => 'Pole job_positions musi być tablicą.',
+            'job_positions.*.required' => 'Identyfikator stanowiska jest wymagany.',
+            'job_positions.*.exists' => 'Wybrane stanowisko nie istnieje.',
+        ];
+    }
 }

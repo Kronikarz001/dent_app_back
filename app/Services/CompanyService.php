@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Exceptions\DuplicateCompanyDataException;
 use App\Models\Company;
 use App\Repositories\CompanyRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -32,6 +33,8 @@ readonly class CompanyService implements CompanyServiceInterface
      */
     public function createCompany(array $data): Company
     {
+        $this->assertUniqueRegonAndNip($data);
+
         return $this->companyRepository->create($data);
     }
 
@@ -42,6 +45,8 @@ readonly class CompanyService implements CompanyServiceInterface
      */
     public function updateCompany(Company $company, array $data): Company
     {
+        $this->assertUniqueRegonAndNip($data, $company);
+
         return $this->companyRepository->update($company, $data);
     }
 
@@ -52,5 +57,21 @@ readonly class CompanyService implements CompanyServiceInterface
     public function deleteCompany(Company $company): void
     {
         $this->companyRepository->delete($company);
+    }
+
+    /**
+     * @param array $data
+     * @param Company|null $ignore
+     * @return void
+     */
+    private function assertUniqueRegonAndNip(array $data, ?Company $ignore = null): void
+    {
+        if (array_key_exists('regon', $data) && $this->companyRepository->existsByRegon($data['regon'], $ignore?->uuid)) {
+            throw new DuplicateCompanyDataException('Firma o podanym numerze REGON już istnieje.');
+        }
+
+        if (array_key_exists('nip', $data) && $this->companyRepository->existsByNip($data['nip'], $ignore?->uuid)) {
+            throw new DuplicateCompanyDataException('Firma o podanym numerze NIP już istnieje.');
+        }
     }
 }

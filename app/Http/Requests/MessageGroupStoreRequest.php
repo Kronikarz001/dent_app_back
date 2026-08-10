@@ -29,4 +29,22 @@ class MessageGroupStoreRequest extends FormRequest
     {
         return true;
     }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'name.required' => 'Nazwa grupy jest wymagana.',
+            'name.string' => 'Nazwa grupy musi być tekstem.',
+            'name.max' => 'Nazwa grupy może mieć maksymalnie 255 znaków.',
+            'user_uuids.required' => 'Lista uczestników jest wymagana.',
+            'user_uuids.array' => 'Pole user_uuids musi być tablicą.',
+            'user_uuids.min' => 'Grupa musi zawierać co najmniej jednego uczestnika.',
+            'user_uuids.*.required' => 'Identyfikator uczestnika jest wymagany.',
+            'user_uuids.*.exists' => 'Wybrany uczestnik nie istnieje.',
+            'user_uuids.*.not_in' => 'Nie możesz dodać samego siebie jako uczestnika.',
+        ];
+    }
 }

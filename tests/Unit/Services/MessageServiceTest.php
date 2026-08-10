@@ -3,9 +3,11 @@
 namespace Tests\Unit\Services;
 
 use App\Exceptions\MessageAccessDeniedException;
+use App\Exceptions\MessageGroupAccessDeniedException;
 use App\Models\Message;
 use App\Models\MessageGroup;
 use App\Models\User;
+use App\Repositories\MessageGroupRepositoryInterface;
 use App\Repositories\MessageRepositoryInterface;
 use App\Services\MessageService;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -22,6 +24,8 @@ class MessageServiceTest extends TestCase
 {
     private MockInterface $messageRepository;
 
+    private MockInterface $messageGroupRepository;
+
     private MessageService $messageService;
 
     /**
@@ -33,7 +37,8 @@ class MessageServiceTest extends TestCase
 
         Event::fake();
         $this->messageRepository = Mockery::mock(MessageRepositoryInterface::class);
-        $this->messageService = new MessageService($this->messageRepository);
+        $this->messageGroupRepository = Mockery::mock(MessageGroupRepositoryInterface::class);
+        $this->messageService = new MessageService($this->messageRepository, $this->messageGroupRepository);
     }
 
     /**
@@ -80,6 +85,18 @@ class MessageServiceTest extends TestCase
         $group = MessageGroup::factory()->make(['uuid' => 'group-uuid']);
         $message = Message::factory()->make(['user_uuid' => 'sender-uuid']);
 
+        $this->messageGroupRepository
+            ->shouldReceive('findByUuid')
+            ->once()
+            ->with($group->uuid)
+            ->andReturn($group);
+
+        $this->messageGroupRepository
+            ->shouldReceive('hasMember')
+            ->once()
+            ->with($group, $sender->uuid)
+            ->andReturn(true);
+
         $this->messageRepository
             ->shouldReceive('create')
             ->once()
@@ -93,6 +110,34 @@ class MessageServiceTest extends TestCase
         $result = $this->messageService->send(['message' => 'Odpowiedz', 'message_group_uuid' => $group->uuid]);
 
         $this->assertSame($message, $result);
+    }
+
+    /**
+     * @return void
+     */
+    public function testSendThrowsWhenSenderIsNotGroupMember(): void
+    {
+        $sender = User::factory()->make(['uuid' => 'sender-uuid']);
+        Auth::setUser($sender);
+        $group = MessageGroup::factory()->make(['uuid' => 'group-uuid']);
+
+        $this->messageGroupRepository
+            ->shouldReceive('findByUuid')
+            ->once()
+            ->with($group->uuid)
+            ->andReturn($group);
+
+        $this->messageGroupRepository
+            ->shouldReceive('hasMember')
+            ->once()
+            ->with($group, $sender->uuid)
+            ->andReturn(false);
+
+        $this->messageRepository->shouldNotReceive('create');
+
+        $this->expectException(MessageGroupAccessDeniedException::class);
+
+        $this->messageService->send(['message' => 'Odpowiedz', 'message_group_uuid' => $group->uuid]);
     }
 
     /**

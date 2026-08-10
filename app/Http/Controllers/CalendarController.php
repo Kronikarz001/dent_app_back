@@ -120,7 +120,7 @@ class CalendarController extends Controller
                     new OA\Property(property: 'end_date', type: 'string', format: 'date-time'),
                     new OA\Property(property: 'created_by', type: 'string', format: 'uuid', nullable: true),
                     new OA\Property(property: 'is_active', type: 'boolean'),
-                    new OA\Property(property: 'dental_examinations', type: 'array', nullable: true, items: new OA\Items(type: 'string', format: 'uuid')),
+                    new OA\Property(property: 'dental_examinations', type: 'array', items: new OA\Items(type: 'string', format: 'uuid'), nullable: true),
                 ]
             )
         ),

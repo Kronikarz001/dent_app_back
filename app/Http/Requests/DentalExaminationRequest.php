@@ -33,4 +33,22 @@ class DentalExaminationRequest extends FormRequest
     {
         return true;
     }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'name.required' => 'Nazwa jest wymagana.',
+            'name.string' => 'Nazwa musi być tekstem.',
+            'description.string' => 'Opis musi być tekstem.',
+            'short_description.string' => 'Krótki opis musi być tekstem.',
+            'price.integer' => 'Cena musi być liczbą całkowitą.',
+            'materials.array' => 'Pole materials musi być tablicą.',
+            'materials.*.exists' => 'Wybrany materiał nie istnieje.',
+            'calendars.array' => 'Pole calendars musi być tablicą.',
+            'calendars.*.exists' => 'Wybrany kalendarz nie istnieje.',
+        ];
+    }
 }

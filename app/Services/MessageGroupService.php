@@ -122,6 +122,10 @@ readonly class MessageGroupService implements MessageGroupServiceInterface
      * @param MessageGroup $group
      * @param User $user
      * @return void
+     * @throws DefaultMessageGroupException
+     * @throws MessageGroupAccessDeniedException
+     * @throws MessageGroupMemberNotFoundException
+     * @throws MessageGroupMinimumMembersException
      */
     public function removeUser(MessageGroup $group, User $user): void
     {
@@ -156,7 +160,7 @@ readonly class MessageGroupService implements MessageGroupServiceInterface
      */
     private function assertMember(MessageGroup $group): void
     {
-        if (! $group->users()->where('users.uuid', Auth::user()->uuid)->exists()) {
+        if (! $this->messageGroupRepository->hasMember($group, Auth::user()->uuid)) {
             throw new MessageGroupAccessDeniedException;
         }
     }

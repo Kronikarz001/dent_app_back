@@ -30,4 +30,19 @@ class LoginRequest extends FormRequest
             'password' => ['required', 'string', 'min:8'],
         ];
     }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'email.required' => 'Adres e-mail jest wymagany.',
+            'email.string' => 'Adres e-mail musi być tekstem.',
+            'email.email' => 'Adres e-mail musi być prawidłowy.',
+            'password.required' => 'Hasło jest wymagane.',
+            'password.string' => 'Hasło musi być tekstem.',
+            'password.min' => 'Hasło musi mieć co najmniej 8 znaków.',
+        ];
+    }
 }

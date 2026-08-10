@@ -3,7 +3,6 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 /**
  * Summary of CompanyRequest
@@ -11,14 +10,22 @@ use Illuminate\Validation\Rule;
 class CompanyRequest extends FormRequest
 {
     /**
+     * @return bool
+     */
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    /**
      * @return array
      */
     public function rules(): array
     {
         return [
             'name' => ['required'],
-            'regon' => ['required', Rule::unique('companies', 'regon')->ignore($this->route('company'))->whereNull('deleted_at')],
-            'nip' => ['required', Rule::unique('companies', 'nip')->ignore($this->route('company'))->whereNull('deleted_at')],
+            'regon' => ['required', 'string'],
+            'nip' => ['required', 'string'],
             'address' => ['required'],
             'province' => ['required'],
             'district' => ['required'],
@@ -30,10 +37,20 @@ class CompanyRequest extends FormRequest
     }
 
     /**
-     * @return bool
+     * @return array<string, string>
      */
-    public function authorize(): bool
+    public function messages(): array
     {
-        return true;
+        return [
+            'name.required' => 'Nazwa jest wymagana.',
+            'regon.required' => 'REGON jest wymagany.',
+            'regon.string' => 'REGON musi być tekstem.',
+            'nip.required' => 'NIP jest wymagany.',
+            'nip.string' => 'NIP musi być tekstem.',
+            'address.required' => 'Adres jest wymagany.',
+            'province.required' => 'Województwo jest wymagane.',
+            'district.required' => 'Powiat jest wymagany.',
+            'municipality.required' => 'Gmina jest wymagana.',
+        ];
     }
 }

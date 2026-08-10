@@ -26,9 +26,25 @@ class ResetPasswordRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'token' => 'required',
-            'email' => 'required|email|exists:users,email',
-            'password' => 'required|min:8|confirmed',
+            'token' => ['required'],
+            'email' => ['required', 'email', 'exists:users,email'],
+            'password' => ['required', 'min:8', 'confirmed'],
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'token.required' => 'Token jest wymagany.',
+            'email.required' => 'Adres e-mail jest wymagany.',
+            'email.email' => 'Adres e-mail musi być prawidłowy.',
+            'email.exists' => 'Nie znaleziono użytkownika o podanym adresie e-mail.',
+            'password.required' => 'Hasło jest wymagane.',
+            'password.min' => 'Hasło musi mieć co najmniej 8 znaków.',
+            'password.confirmed' => 'Potwierdzenie hasła nie jest zgodne.',
         ];
     }
 }

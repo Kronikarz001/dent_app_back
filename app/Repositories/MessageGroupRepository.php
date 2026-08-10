@@ -143,4 +143,14 @@ class MessageGroupRepository extends SearchableRepository implements MessageGrou
             $query->where('users.uuid', $userUuid);
         })->with('users')->get();
     }
+
+    /**
+     * @param MessageGroup $group
+     * @param string $userUuid
+     * @return bool
+     */
+    public function hasMember(MessageGroup $group, string $userUuid): bool
+    {
+        return $group->users()->where('users.uuid', $userUuid)->exists();
+    }
 }

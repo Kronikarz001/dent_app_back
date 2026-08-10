@@ -31,4 +31,20 @@ class MaterialRequest extends FormRequest
     {
         return true;
     }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'name.required' => 'Nazwa jest wymagana.',
+            'name.string' => 'Nazwa musi być tekstem.',
+            'description.string' => 'Opis musi być tekstem.',
+            'short_description.string' => 'Krótki opis musi być tekstem.',
+            'price.integer' => 'Cena musi być liczbą całkowitą.',
+            'dental_examinations.array' => 'Pole dental_examinations musi być tablicą.',
+            'dental_examinations.*.exists' => 'Wybrane badanie stomatologiczne nie istnieje.',
+        ];
+    }
 }

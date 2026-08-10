@@ -9,10 +9,18 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
 
 /**
- * Summary of JobPositionRequest
+ * Summary of PatientUpdateRequest
  */
 class PatientUpdateRequest extends FormRequest
 {
+    /**
+     * @return bool
+     */
+    public function authorize(): bool
+    {
+        return true;
+    }
+
     /**
      * @return array
      */
@@ -29,10 +37,20 @@ class PatientUpdateRequest extends FormRequest
     }
 
     /**
-     * @return bool
+     * @return array<string, string>
      */
-    public function authorize(): bool
+    public function messages(): array
     {
-        return true;
+        return [
+            'first_name.required' => 'Imię jest wymagane.',
+            'first_name.string' => 'Imię musi być tekstem.',
+            'last_name.required' => 'Nazwisko jest wymagane.',
+            'last_name.string' => 'Nazwisko musi być tekstem.',
+            'email.required' => 'Adres e-mail jest wymagany.',
+            'email.email' => 'Adres e-mail musi być prawidłowy.',
+            'email.unique' => 'Pacjent o podanym adresie e-mail już istnieje.',
+            'phone_numbers.array' => 'Pole phone_numbers musi być tablicą.',
+            'phone_numbers.type.enum' => 'Wybrany typ numeru telefonu jest nieprawidłowy.',
+        ];
     }
 }
