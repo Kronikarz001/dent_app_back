@@ -3,19 +3,19 @@
 namespace Database\Factories;
 
 use App\Enums\CalendarEventType;
-use App\Models\Calendar;
+use App\Models\EmployeeSchedule;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Carbon;
 
 /**
- * Summary of CalendarFactory
+ * Summary of EmployeeScheduleFactory
  */
-class CalendarFactory extends Factory
+class EmployeeScheduleFactory extends Factory
 {
     /**
      * @var string
      */
-    protected $model = Calendar::class;
+    protected $model = EmployeeSchedule::class;
 
     /**
      * @return array
@@ -25,11 +25,11 @@ class CalendarFactory extends Factory
         return [
             'name' => $this->faker->name(),
             'description' => $this->faker->text(),
-            'type' => $this->faker->randomElement(CalendarEventType::appointmentTypes())->value,
+            'type' => $this->faker->randomElement(CalendarEventType::employeeTypes())->value,
             'date' => Carbon::now()->toDateString(),
             'end_date' => null,
-            'start_time' => '09:00',
-            'end_time' => '09:30',
+            'start_time' => '08:00',
+            'end_time' => '16:00',
             'no_show' => false,
             'is_active' => $this->faker->boolean(),
             'created_at' => Carbon::now(),

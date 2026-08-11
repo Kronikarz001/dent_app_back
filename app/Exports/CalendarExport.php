@@ -33,8 +33,11 @@ final class CalendarExport extends Export
             'Nazwa',
             'Opis',
             'Typ',
-            'Data początku',
-            'Data końca',
+            'Data',
+            'Data zakończenia',
+            'Godzina rozpoczęcia',
+            'Godzina zakończenia',
+            'Nie przyszedł',
             'Aktywny',
         ];
     }
@@ -49,8 +52,11 @@ final class CalendarExport extends Export
             'name' => $row->name,
             'description' => $row->description,
             'type' => $row->type,
-            'start_date' => $row->start_date,
+            'date' => $row->date,
             'end_date' => $row->end_date,
+            'start_time' => $row->start_time,
+            'end_time' => $row->end_time,
+            'no_show' => $row->no_show ? 'Tak' : 'Nie',
             'is_active' => $row->is_active ? 'Tak' : 'Nie',
         ];
     }

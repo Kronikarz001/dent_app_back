@@ -49,6 +49,10 @@ readonly class CalendarService implements CalendarServiceInterface
      */
     public function createCalendar(array $data): Calendar
     {
+        if (! empty($data['no_show'])) {
+            $data['is_active'] = false;
+        }
+
         $calendar = $this->calendarRepository->create($data);
 
         if (array_key_exists('dental_examinations', $data)) {
@@ -65,6 +69,10 @@ readonly class CalendarService implements CalendarServiceInterface
      */
     public function updateCalendar(Calendar $calendar, array $data): Calendar
     {
+        if (! empty($data['no_show'])) {
+            $data['is_active'] = false;
+        }
+
         $calendar = $this->calendarRepository->update($calendar, $data);
 
         if (array_key_exists('dental_examinations', $data)) {

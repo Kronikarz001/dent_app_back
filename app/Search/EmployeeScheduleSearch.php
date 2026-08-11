@@ -2,20 +2,20 @@
 
 namespace App\Search;
 
-use App\Models\Calendar;
+use App\Models\EmployeeSchedule;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
- * Summary of CalendarSearch
+ * Summary of EmployeeScheduleSearch
  */
-class CalendarSearch extends Search
+class EmployeeScheduleSearch extends Search
 {
     /**
      * @return string
      */
     protected function modelClass(): string
     {
-        return Calendar::class;
+        return EmployeeSchedule::class;
     }
 
     /**
@@ -23,7 +23,7 @@ class CalendarSearch extends Search
      */
     protected function prefix(): string
     {
-        return 'calendar';
+        return 'employeeSchedule';
     }
 
     /**
@@ -39,7 +39,6 @@ class CalendarSearch extends Search
             'end_date',
             'start_time',
             'end_time',
-            'no_show',
             'is_active',
             'created_at',
         ];
@@ -91,8 +90,6 @@ class CalendarSearch extends Search
      */
     protected function relationsShipLoad(): array
     {
-        return [
-            'dentalExaminations',
-        ];
+        return [];
     }
 }

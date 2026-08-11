@@ -4,6 +4,7 @@ namespace Tests\Feature\Controllers;
 
 use App\Models\Calendar;
 use App\Models\DentalExamination;
+use App\Models\EmployeeSchedule;
 use App\Models\Patient;
 use App\Models\User;
 use Tests\TestCase;
@@ -23,6 +24,23 @@ class CalendarControllerTest extends TestCase
             ->getJson(route('calendar.index'));
 
         $response->assertOk();
+    }
+
+    /**
+     * @return void
+     */
+    public function testIndexDoesNotIncludeEmployeeScheduleEntries(): void
+    {
+        $appointment = Calendar::factory()->create();
+        $schedule = EmployeeSchedule::factory()->create();
+
+        $response = $this->callApiWithLoggedUser()
+            ->getJson(route('calendar.index'));
+
+        $response->assertOk();
+        $uuids = collect($response->json('data'))->pluck('uuid')->all();
+        $this->assertContains($appointment->uuid, $uuids);
+        $this->assertNotContains($schedule->uuid, $uuids);
     }
 
     /**
@@ -105,7 +123,7 @@ class CalendarControllerTest extends TestCase
             ->postJson(route('calendar.store'), [
                 'name' => 'Test',
                 'type' => 'EXAMINATION',
-                'end_date' => '2026-12-31 00:00:00',
+                'date' => '2026-12-31',
             ]);
 
         $response->assertCreated();
@@ -118,19 +136,82 @@ class CalendarControllerTest extends TestCase
     /**
      * @return void
      */
+    public function testStoreWithEmployeeTypeReturnsValidationError(): void
+    {
+        $response = $this->callApiWithLoggedUser()
+            ->postJson(route('calendar.store'), [
+                'name' => 'Test',
+                'type' => 'WORK',
+                'date' => '2026-12-31',
+            ]);
+
+        $response->assertStatus(422);
+    }
+
+    /**
+     * @return void
+     */
+    public function testStoreWithNoShowSetsCalendarInactive(): void
+    {
+        $response = $this->callApiWithLoggedUser()
+            ->postJson(route('calendar.store'), [
+                'name' => 'Test',
+                'type' => 'EXAMINATION',
+                'date' => '2026-12-31',
+                'is_active' => true,
+                'no_show' => true,
+            ]);
+
+        $response->assertCreated();
+
+        $this->assertDatabaseHas('calendars', [
+            'name' => 'Test',
+            'no_show' => true,
+            'is_active' => false,
+        ]);
+    }
+
+    /**
+     * @return void
+     */
     public function testUpdateCalendarReturnNoContentResponse(): void
     {
         $calendar = Calendar::factory()->create();
         $response = $this->callApiWithLoggedUser()
             ->putJson(route('calendar.update', ['calendar' => $calendar->uuid]), [
                 'name' => 'Updated',
-                'type' => 'WORK',
-                'end_date' => '2026-12-31 00:00:00',
+                'type' => 'OTHER',
+                'date' => '2026-12-31',
             ]);
         $response->assertNoContent();
 
         $this->assertDatabaseHas('calendars', [
             'name' => 'Updated',
+        ]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testUpdateCalendarWithNoShowSetsInactive(): void
+    {
+        $calendar = Calendar::factory()->create(['is_active' => true]);
+
+        $response = $this->callApiWithLoggedUser()
+            ->putJson(route('calendar.update', ['calendar' => $calendar->uuid]), [
+                'name' => $calendar->name,
+                'type' => 'EXAMINATION',
+                'date' => '2026-12-31',
+                'is_active' => true,
+                'no_show' => true,
+            ]);
+
+        $response->assertNoContent();
+
+        $this->assertDatabaseHas('calendars', [
+            'uuid' => $calendar->uuid,
+            'no_show' => true,
+            'is_active' => false,
         ]);
     }
 
@@ -145,7 +226,7 @@ class CalendarControllerTest extends TestCase
             ->postJson(route('calendar.store'), [
                 'name' => 'Test',
                 'type' => 'EXAMINATION',
-                'end_date' => '2026-12-31 00:00:00',
+                'date' => '2026-12-31',
                 'dental_examinations' => [$dentalExamination->uuid],
             ]);
 
@@ -167,7 +248,7 @@ class CalendarControllerTest extends TestCase
             ->postJson(route('calendar.store'), [
                 'name' => 'Test',
                 'type' => 'EXAMINATION',
-                'end_date' => '2026-12-31 00:00:00',
+                'date' => '2026-12-31',
                 'dental_examinations' => ['019e99cf-9ffe-70a8-9b4c-8b889d28eeff'],
             ]);
 
@@ -187,8 +268,8 @@ class CalendarControllerTest extends TestCase
         $response = $this->callApiWithLoggedUser()
             ->putJson(route('calendar.update', ['calendar' => $calendar->uuid]), [
                 'name' => $calendar->name,
-                'type' => 'WORK',
-                'end_date' => '2026-12-31 00:00:00',
+                'type' => 'OTHER',
+                'date' => '2026-12-31',
                 'dental_examinations' => [$newDentalExamination->uuid],
             ]);
 
