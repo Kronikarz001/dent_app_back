@@ -29,7 +29,7 @@ class JobPositionSeeder extends Seeder
      */
     private array $positions = [
         [
-            'name' => 'Stanowisko lekarza stomatologa',
+            'name' => JobPosition::DENTIST_NAME,
             'f_name' => 'Lekarka stomatolożka',
             'm_name' => 'Lekarz stomatolog',
         ],
