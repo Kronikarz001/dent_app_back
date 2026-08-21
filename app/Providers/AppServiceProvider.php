@@ -17,7 +17,12 @@ use App\Providers\AppServiceProviders\MaterialServiceProvider;
 use App\Providers\AppServiceProviders\MessageServiceProvider;
 use App\Providers\AppServiceProviders\NotificationServiceProvider;
 use App\Providers\AppServiceProviders\PatientServiceProvider;
+use App\Providers\AppServiceProviders\PermissionGroupServiceProvider;
+use App\Providers\AppServiceProviders\PermissionServiceProvider;
+use App\Providers\AppServiceProviders\RoleGroupServiceProvider;
+use App\Providers\AppServiceProviders\RoleServiceProvider;
 use App\Providers\AppServiceProviders\SearchServiceProvider;
+use App\Providers\AppServiceProviders\UserGroupServiceProvider;
 use App\Providers\AppServiceProviders\UserServiceProvider;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\ServiceProvider;
@@ -37,6 +42,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->register(AuthServiceProvider::class);
         $this->app->register(SearchServiceProvider::class);
         $this->app->register(UserServiceProvider::class);
+        $this->app->register(UserGroupServiceProvider::class);
         $this->app->register(PatientServiceProvider::class);
         $this->app->register(JobPositionServiceProvider::class);
         $this->app->register(CalendarServiceProvider::class);
@@ -48,6 +54,10 @@ class AppServiceProvider extends ServiceProvider
         $this->app->register(AnnouncementServiceProvider::class);
         $this->app->register(DictionaryServiceProvider::class);
         $this->app->register(NotificationServiceProvider::class);
+        $this->app->register(PermissionServiceProvider::class);
+        $this->app->register(PermissionGroupServiceProvider::class);
+        $this->app->register(RoleServiceProvider::class);
+        $this->app->register(RoleGroupServiceProvider::class);
     }
 
     /**

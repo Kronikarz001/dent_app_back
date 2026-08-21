@@ -9,6 +9,7 @@ use App\Http\Requests\UserUpdateRequest;
 use App\Http\Resources\LoggedUserResource;
 use App\Http\Resources\UserResource;
 use App\Models\User;
+use App\Services\PermissionServiceInterface;
 use App\Services\UserServiceInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -24,9 +25,11 @@ class UserController extends Controller
 {
     /**
      * @param UserServiceInterface $userService
+     * @param PermissionServiceInterface $permissionService
      */
     public function __construct(
-        private readonly UserServiceInterface $userService
+        private readonly UserServiceInterface $userService,
+        private readonly PermissionServiceInterface $permissionService,
     ) {}
 
     /**
@@ -103,11 +106,11 @@ class UserController extends Controller
     }
 
     /**
-     * @return LoggedUserResource
+     * @return JsonResponse
      */
     #[OA\Get(
         path: '/api/user/user-info',
-        summary: 'Dane zalogowanego użytkownika',
+        summary: 'Dane zalogowanego użytkownika wraz z jego uprawnieniami',
         security: [['sanctum' => []]],
         tags: ['User'],
         responses: [
@@ -115,14 +118,24 @@ class UserController extends Controller
                 response: 200,
                 description: 'OK',
                 content: new OA\JsonContent(
-                    properties: [new OA\Property(property: 'data', ref: '#/components/schemas/LoggedUserResource')]
+                    allOf: [
+                        new OA\Schema(ref: '#/components/schemas/LoggedUserResource'),
+                        new OA\Schema(properties: [
+                            new OA\Property(property: 'permissions', type: 'array', items: new OA\Items(type: 'string'), example: ['calendar.view', 'calendar.edit']),
+                        ]),
+                    ]
                 )
             ),
         ]
     )]
-    public function showLoggedUser(): LoggedUserResource
+    public function showLoggedUser(): JsonResponse
     {
-        return new LoggedUserResource($this->userService->getLoggedUser());
+        $user = $this->userService->getLoggedUser();
+
+        return new JsonResponse([
+            ...(new LoggedUserResource($user))->resolve(),
+            'permissions' => $this->permissionService->getUserPermissionNames($user),
+        ]);
     }
 
     /**

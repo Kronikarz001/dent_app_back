@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Controllers;
 
+use App\Models\Permission;
+use App\Models\PermissionAssignment;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
@@ -252,6 +254,48 @@ class UserControllerTest extends TestCase
             ->getJson(route('user.user-info'));
 
         $response->assertOk();
+    }
+
+    /**
+     * @return void
+     */
+    public function testShowLoggedUserIncludesAllPermissionsForAdmin(): void
+    {
+        Permission::factory()->create(['resource' => 'permtest-widget', 'type' => 'view']);
+
+        $response = $this->callApiWithLoggedUser()
+            ->getJson(route('user.user-info'));
+
+        $response->assertOk();
+        $this->assertContains('permtest-widget.view', $response->json('permissions'));
+    }
+
+    /**
+     * @return void
+     */
+    public function testShowLoggedUserIncludesOnlyGrantedPermissionsForNonAdmin(): void
+    {
+        $user = User::factory()->create(['is_admin' => false]);
+        $granted = Permission::factory()->create(['resource' => 'permtest-granted', 'type' => 'view']);
+        Permission::factory()->create(['resource' => 'permtest-notgranted', 'type' => 'view']);
+        $userInfoPermission = Permission::where(['resource' => 'user', 'type' => 'view'])->firstOrFail();
+
+        foreach ([$granted, $userInfoPermission] as $permission) {
+            PermissionAssignment::create([
+                'grantable_type' => Permission::class,
+                'grantable_id' => $permission->uuid,
+                'assignable_type' => User::class,
+                'assignable_id' => $user->uuid,
+            ]);
+        }
+
+        $response = $this->callApiWithLoggedUser($user)
+            ->getJson(route('user.user-info'));
+
+        $response->assertOk();
+        $permissions = $response->json('permissions');
+        $this->assertContains('permtest-granted.view', $permissions);
+        $this->assertNotContains('permtest-notgranted.view', $permissions);
     }
 
     /**

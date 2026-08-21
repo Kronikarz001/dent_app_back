@@ -12,3 +12,8 @@ require __DIR__.'/api/message.php';
 require __DIR__.'/api/announcement.php';
 require __DIR__.'/api/notification.php';
 require __DIR__.'/api/dictionaries.php';
+require __DIR__.'/api/permission.php';
+require __DIR__.'/api/permission-group.php';
+require __DIR__.'/api/user-group.php';
+require __DIR__.'/api/role.php';
+require __DIR__.'/api/role-group.php';
