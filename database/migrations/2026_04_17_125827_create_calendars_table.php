@@ -16,8 +16,11 @@ return new class extends Migration
             $table->string('name')->nullable();
             $table->string('description')->nullable();
             $table->string('type');
-            $table->timestamp('start_date')->nullable();
-            $table->timestamp('end_date')->nullable();
+            $table->date('date');
+            $table->date('end_date')->nullable();
+            $table->time('start_time')->nullable();
+            $table->time('end_time')->nullable();
+            $table->boolean('no_show')->default(false);
             $table->boolean('is_active')->default(false);
             $table->timestamps();
         });

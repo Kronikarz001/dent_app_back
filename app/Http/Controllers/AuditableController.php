@@ -88,6 +88,26 @@ class AuditableController extends Controller
         ]
     )]
     #[OA\Get(
+        path: '/api/employee-schedule/{uuid}/history',
+        summary: 'Historia zmian wydarzenia w kalendarzu pracowników',
+        security: [['sanctum' => []]],
+        tags: ['Auditable'],
+        parameters: [new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid'))],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'OK',
+                content: new OA\JsonContent(
+                    allOf: [
+                        new OA\Schema(ref: '#/components/schemas/PaginatedResponse'),
+                        new OA\Schema(properties: [new OA\Property(property: 'data', type: 'array', items: new OA\Items(ref: '#/components/schemas/AuditResource'))]),
+                    ]
+                )
+            ),
+            new OA\Response(response: 404, description: 'Nie znaleziono'),
+        ]
+    )]
+    #[OA\Get(
         path: '/api/dental-examination/{uuid}/history',
         summary: 'Historia zmian badania stomatologicznego',
         security: [['sanctum' => []]],
@@ -186,6 +206,17 @@ class AuditableController extends Controller
     #[OA\Get(
         path: '/api/calendar/{uuid}/history/export',
         summary: 'Eksport historii zmian wydarzenia w kalendarzu',
+        security: [['sanctum' => []]],
+        tags: ['Auditable'],
+        parameters: [
+            new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
+            new OA\QueryParameter(name: 'type', required: true, schema: new OA\Schema(type: 'string', enum: ['xlsx', 'csv', 'ods'])),
+        ],
+        responses: [new OA\Response(response: 200, description: 'Plik do pobrania'), new OA\Response(response: 404, description: 'Nie znaleziono')]
+    )]
+    #[OA\Get(
+        path: '/api/employee-schedule/{uuid}/history/export',
+        summary: 'Eksport historii zmian wydarzenia w kalendarzu pracowników',
         security: [['sanctum' => []]],
         tags: ['Auditable'],
         parameters: [
