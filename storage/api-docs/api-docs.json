@@ -3393,6 +3393,111 @@
                 ]
             }
         },
+        "/api/dentist": {
+            "get": {
+                "tags": [
+                    "Dentist"
+                ],
+                "summary": "Lista użytkowników ze stanowiskiem lekarza stomatologa (paginacja)",
+                "operationId": "113e11c75a369e1fc09e4e45111bd158",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/PaginatedResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/UserResource"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/dentist/selectlist": {
+            "get": {
+                "tags": [
+                    "Dentist"
+                ],
+                "summary": "Lista lekarzy stomatologów do selecta (uuid + name)",
+                "operationId": "c19b6be48790541072aa6183d53c3f3a",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/dentist/{uuid}": {
+            "get": {
+                "tags": [
+                    "Dentist"
+                ],
+                "summary": "Pobiera jednego lekarza stomatologa",
+                "operationId": "6df417a73c8c4c9e2e8e9796ee93d23f",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/UserResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/job-position": {
             "get": {
                 "tags": [
@@ -8517,6 +8622,10 @@
         {
             "name": "EmployeeSchedule",
             "description": "EmployeeSchedule"
+        },
+        {
+            "name": "Dentist",
+            "description": "Dentist"
         },
         {
             "name": "JobPosition",
