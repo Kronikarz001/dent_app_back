@@ -76,6 +76,35 @@ class CalendarServiceTest extends TestCase
     /**
      * @return void
      */
+    public function testCreateCalendarWithNoShowForcesInactive(): void
+    {
+        $data = array_merge(Calendar::factory()->make()->getAttributes(), [
+            'is_active' => true,
+            'no_show' => true,
+        ]);
+
+        $calendar = $this->service->createCalendar($data);
+
+        $this->assertTrue($calendar->no_show);
+        $this->assertFalse($calendar->is_active);
+    }
+
+    /**
+     * @return void
+     */
+    public function testUpdateCalendarWithNoShowForcesInactive(): void
+    {
+        $calendar = Calendar::factory()->create(['is_active' => true]);
+
+        $result = $this->service->updateCalendar($calendar, ['is_active' => true, 'no_show' => true]);
+
+        $this->assertTrue($result->no_show);
+        $this->assertFalse($result->is_active);
+    }
+
+    /**
+     * @return void
+     */
     public function testUpdateCalendarPersistsChangesToDatabase(): void
     {
         $calendar = Calendar::factory()->create();

@@ -2,20 +2,20 @@
 
 namespace App\Search;
 
-use App\Models\Calendar;
+use App\Models\Dentist;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
- * Summary of CalendarSearch
+ * Summary of DentistSearch
  */
-class CalendarSearch extends Search
+class DentistSearch extends Search
 {
     /**
      * @return string
      */
     protected function modelClass(): string
     {
-        return Calendar::class;
+        return Dentist::class;
     }
 
     /**
@@ -23,7 +23,7 @@ class CalendarSearch extends Search
      */
     protected function prefix(): string
     {
-        return 'calendar';
+        return 'dentist';
     }
 
     /**
@@ -32,16 +32,13 @@ class CalendarSearch extends Search
     protected function fillableSearchFields(): array
     {
         return [
-            'name',
-            'description',
-            'type',
-            'date',
-            'end_date',
-            'start_time',
-            'end_time',
-            'no_show',
+            'uuid',
+            'email',
+            'private_email',
+            'first_name',
+            'last_name',
+            'pesel',
             'is_active',
-            'created_at',
         ];
     }
 
@@ -51,15 +48,12 @@ class CalendarSearch extends Search
     protected function fillableSortFields(): array
     {
         return [
-            'name',
-            'description',
-            'type',
-            'date',
-            'end_date',
-            'start_time',
-            'end_time',
-            'is_active',
+            'first_name',
+            'last_name',
+            'email',
+            'private_email',
             'created_at',
+            'is_active',
         ];
     }
 
@@ -69,13 +63,12 @@ class CalendarSearch extends Search
     protected function searchStringFields(): array
     {
         return [
-            'name',
-            'description',
-            'type',
-            'date',
-            'end_date',
-            'is_active',
+            'first_name',
+            'last_name',
+            'email',
+            'private_email',
             'created_at',
+            'is_active',
         ];
     }
 
@@ -92,7 +85,8 @@ class CalendarSearch extends Search
     protected function relationsShipLoad(): array
     {
         return [
-            'dentalExaminations',
+            'phoneNumbers',
+            'jobPositions',
         ];
     }
 }

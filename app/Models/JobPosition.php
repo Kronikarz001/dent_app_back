@@ -29,6 +29,11 @@ class JobPosition extends UuidModel
     protected $table = 'job_positions';
 
     /**
+     * @var string
+     */
+    public const DENTIST_NAME = 'Stanowisko lekarza stomatologa';
+
+    /**
      * @var string[]
      */
     protected $fillable = [
