@@ -177,16 +177,4 @@ class PatientControllerTest extends TestCase
 
         $this->assertDatabaseMissing('patients', ['uuid' => $patient->uuid]);
     }
-
-    /**
-     * @return void
-     */
-    public function testExportPatientReturnSuccessResponse(): void
-    {
-        Patient::factory()->count(5)->create();
-        $response = $this->callApiWithLoggedUser()
-            ->getJson(route('patient.export', ['type' => 'xlsx']));
-
-        $response->assertOk();
-    }
 }

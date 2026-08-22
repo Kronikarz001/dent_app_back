@@ -6,6 +6,258 @@
         "version": "1.0.0"
     },
     "paths": {
+        "/api/announcement": {
+            "get": {
+                "tags": [
+                    "Announcement"
+                ],
+                "summary": "Pobiera listę ogłoszeń (jedno na dzień, dla wszystkich)",
+                "operationId": "3c19ddbd61e53cfd67bf34a679aff1bc",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/PaginatedResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/AnnouncementResource"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Announcement"
+                ],
+                "summary": "Tworzy nowe ogłoszenie (jedno na dany dzień)",
+                "operationId": "073f8bc8afaa696764e383a9fb659600",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "title",
+                                    "content",
+                                    "published_at"
+                                ],
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "example": "Spotkanie zespołu"
+                                    },
+                                    "content": {
+                                        "type": "string",
+                                        "example": "Spotkanie odbędzie się o 10:00."
+                                    },
+                                    "published_at": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2026-07-01"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Utworzono",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/AnnouncementResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Błąd walidacji (np. ogłoszenie na ten dzień już istnieje)"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/announcement/{uuid}": {
+            "get": {
+                "tags": [
+                    "Announcement"
+                ],
+                "summary": "Pobiera szczegóły ogłoszenia",
+                "operationId": "ef677031713a8295b7197aeae5f87029",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/AnnouncementResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Announcement"
+                ],
+                "summary": "Aktualizuje ogłoszenie",
+                "operationId": "7ed21e03321c727cd69f1577d4680f97",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "title",
+                                    "content",
+                                    "published_at"
+                                ],
+                                "properties": {
+                                    "title": {
+                                        "type": "string"
+                                    },
+                                    "content": {
+                                        "type": "string"
+                                    },
+                                    "published_at": {
+                                        "type": "string",
+                                        "format": "date"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/AnnouncementResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    },
+                    "422": {
+                        "description": "Błąd walidacji"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Announcement"
+                ],
+                "summary": "Usuwa ogłoszenie",
+                "operationId": "73a9586d1583cc65acb189dbf2e0dc7b",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Usunięto"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/user/{uuid}/history": {
             "get": {
                 "tags": [
@@ -123,6 +375,61 @@
                 ],
                 "summary": "Historia zmian wydarzenia w kalendarzu",
                 "operationId": "4eb7ab64eebfb24965ac5ba20a889650",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/PaginatedResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/AuditResource"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/employee-schedule/{uuid}/history": {
+            "get": {
+                "tags": [
+                    "Auditable"
+                ],
+                "summary": "Historia zmian wydarzenia w kalendarzu pracowników",
+                "operationId": "79cd894d060e8fc752ba383f06a2c53f",
                 "parameters": [
                     {
                         "name": "uuid",
@@ -474,6 +781,52 @@
                 ]
             }
         },
+        "/api/employee-schedule/{uuid}/history/export": {
+            "get": {
+                "tags": [
+                    "Auditable"
+                ],
+                "summary": "Eksport historii zmian wydarzenia w kalendarzu pracowników",
+                "operationId": "2f0f0a6bdcb2e640168196ce06727cc0",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "xlsx",
+                                "csv",
+                                "ods"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Plik do pobrania"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/dental-examination/{uuid}/history/export": {
             "get": {
                 "tags": [
@@ -715,10 +1068,36 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Link wysłany"
+                        "description": "Link do resetowania hasła został wysłany",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "We have emailed your password reset link."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "422": {
-                        "description": "Błąd walidacji"
+                        "description": "Błąd walidacji danych wejściowych lub nie udało się wysłać linku (np. przekroczono limit prób)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "This password reset token is invalid."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -764,11 +1143,37 @@
                     }
                 },
                 "responses": {
-                    "204": {
-                        "description": "Hasło zmienione"
+                    "200": {
+                        "description": "Hasło zostało zmienione",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Your password has been reset."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "422": {
-                        "description": "Nieprawidłowy token lub dane"
+                        "description": "Błąd walidacji danych wejściowych lub nieprawidłowy/wygasły token",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "This password reset token is invalid."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -826,7 +1231,7 @@
                             "schema": {
                                 "required": [
                                     "type",
-                                    "end_date"
+                                    "date"
                                 ],
                                 "properties": {
                                     "type": {
@@ -840,14 +1245,27 @@
                                         "type": "string",
                                         "nullable": true
                                     },
-                                    "start_date": {
+                                    "date": {
                                         "type": "string",
-                                        "format": "date-time",
-                                        "nullable": true
+                                        "format": "date"
                                     },
                                     "end_date": {
                                         "type": "string",
-                                        "format": "date-time"
+                                        "format": "date",
+                                        "nullable": true
+                                    },
+                                    "start_time": {
+                                        "type": "string",
+                                        "example": "09:00",
+                                        "nullable": true
+                                    },
+                                    "end_time": {
+                                        "type": "string",
+                                        "example": "09:30",
+                                        "nullable": true
+                                    },
+                                    "no_show": {
+                                        "type": "boolean"
                                     },
                                     "created_by": {
                                         "type": "string",
@@ -1572,6 +1990,309 @@
                                 }
                             }
                         }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/company": {
+            "get": {
+                "tags": [
+                    "Company"
+                ],
+                "summary": "Lista firm (paginacja)",
+                "operationId": "3e0bffb951b3f31f83aadc004638122b",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/PaginatedResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/CompanyResource"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Company"
+                ],
+                "summary": "Tworzy nową firmę",
+                "operationId": "faf1545d2af89079ca55c4f9ed6ea302",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "regon",
+                                    "nip",
+                                    "address",
+                                    "province",
+                                    "district",
+                                    "municipality"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "regon": {
+                                        "type": "string"
+                                    },
+                                    "nip": {
+                                        "type": "string"
+                                    },
+                                    "address": {
+                                        "type": "string"
+                                    },
+                                    "province": {
+                                        "type": "string"
+                                    },
+                                    "district": {
+                                        "type": "string"
+                                    },
+                                    "municipality": {
+                                        "type": "string"
+                                    },
+                                    "business_form": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "type_of_business": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "form_of_ownership": {
+                                        "type": "string",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Utworzono",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/CompanyResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Błąd walidacji"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/company/{uuid}": {
+            "get": {
+                "tags": [
+                    "Company"
+                ],
+                "summary": "Pobiera jedną firmę",
+                "operationId": "752be961f20912abe203b188c15720d9",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/CompanyResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Company"
+                ],
+                "summary": "Aktualizuje firmę",
+                "operationId": "95f42e83ac5d43516d8ab466a30a286a",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "regon",
+                                    "nip",
+                                    "address",
+                                    "province",
+                                    "district",
+                                    "municipality"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "regon": {
+                                        "type": "string"
+                                    },
+                                    "nip": {
+                                        "type": "string"
+                                    },
+                                    "address": {
+                                        "type": "string"
+                                    },
+                                    "province": {
+                                        "type": "string"
+                                    },
+                                    "district": {
+                                        "type": "string"
+                                    },
+                                    "municipality": {
+                                        "type": "string"
+                                    },
+                                    "business_form": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "type_of_business": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "form_of_ownership": {
+                                        "type": "string",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/CompanyResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    },
+                    "422": {
+                        "description": "Błąd walidacji"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Company"
+                ],
+                "summary": "Usuwa firmę",
+                "operationId": "57d816daec4e9293b3441a1c942a3564",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Usunięto"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
                     }
                 },
                 "security": [
@@ -2317,6 +3038,1097 @@
                 ]
             }
         },
+        "/api/dentist": {
+            "get": {
+                "tags": [
+                    "Dentist"
+                ],
+                "summary": "Lista użytkowników ze stanowiskiem lekarza stomatologa (paginacja)",
+                "operationId": "113e11c75a369e1fc09e4e45111bd158",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/PaginatedResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/UserResource"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/dentist/selectlist": {
+            "get": {
+                "tags": [
+                    "Dentist"
+                ],
+                "summary": "Lista lekarzy stomatologów do selecta (uuid + name)",
+                "operationId": "c19b6be48790541072aa6183d53c3f3a",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/dentist/{uuid}": {
+            "get": {
+                "tags": [
+                    "Dentist"
+                ],
+                "summary": "Pobiera jednego lekarza stomatologa",
+                "operationId": "6df417a73c8c4c9e2e8e9796ee93d23f",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/UserResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/department": {
+            "get": {
+                "tags": [
+                    "Department"
+                ],
+                "summary": "Lista działów (paginacja)",
+                "operationId": "7a06011e053731d42049a3c58fb89368",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/PaginatedResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/DepartmentResource"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Department"
+                ],
+                "summary": "Tworzy nowy dział",
+                "operationId": "da58b28d8e0121c8e1936706214acbfe",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Utworzono",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/DepartmentResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Błąd walidacji"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/department/selectlist": {
+            "get": {
+                "tags": [
+                    "Department"
+                ],
+                "summary": "Lista działów do selecta (uuid + name)",
+                "operationId": "eb31cac7f8b71bbb988e4620e3491a97",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/department/{uuid}": {
+            "get": {
+                "tags": [
+                    "Department"
+                ],
+                "summary": "Pobiera jeden dział",
+                "operationId": "3d0dba6f15c50431ff4fcc1b0fc9abee",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/DepartmentResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Department"
+                ],
+                "summary": "Aktualizuje dział",
+                "operationId": "95c7feefc96519d33f361e8e17cf22bb",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "Zaktualizowano"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    },
+                    "422": {
+                        "description": "Błąd walidacji"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Department"
+                ],
+                "summary": "Usuwa dział",
+                "operationId": "d38dbdf32ed6498bceb6fe578f5650dc",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Usunięto"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/department/{uuid}/roles": {
+            "patch": {
+                "tags": [
+                    "Department"
+                ],
+                "summary": "Przypisuje role do działu, zastępując poprzednią listę",
+                "operationId": "0957f65f306fcfe939ecdab601524137",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "roles": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "Przypisano"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    },
+                    "422": {
+                        "description": "Błąd walidacji"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/department/{uuid}/job-positions": {
+            "patch": {
+                "tags": [
+                    "Department"
+                ],
+                "summary": "Przypisuje stanowiska do działu, zastępując poprzednią listę",
+                "operationId": "aa2e2ccbdbc4b74ffb8e364e7a431395",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "job_positions": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "Przypisano"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    },
+                    "422": {
+                        "description": "Błąd walidacji"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/department/{uuid}/users": {
+            "patch": {
+                "tags": [
+                    "Department"
+                ],
+                "summary": "Przypisuje użytkowników bezpośrednio do działu (z flagą is_manager), zastępując poprzednią listę",
+                "operationId": "916e1244aed560f2ca9a0e4e9a5b6b65",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "users": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "uuid": {
+                                                    "type": "string",
+                                                    "format": "uuid"
+                                                },
+                                                "is_manager": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "Przypisano"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    },
+                    "422": {
+                        "description": "Błąd walidacji"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/department/{uuid}/permissions": {
+            "patch": {
+                "tags": [
+                    "Department"
+                ],
+                "summary": "Nadaje działowi uprawnienia lub grupy uprawnień (opcjonalnie czasowo)",
+                "operationId": "bb34cdcf8d93b6da3c0ce3f3d15d4410",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "permissions": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        }
+                                    },
+                                    "permission_groups": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        }
+                                    },
+                                    "expires_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "Nadano"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    },
+                    "422": {
+                        "description": "Błąd walidacji"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/department/{uuid}/delegate": {
+            "post": {
+                "tags": [
+                    "Department"
+                ],
+                "summary": "Kierownik działu przekazuje własne uprawnienie (lub grupę uprawnień) innej osobie z tego działu",
+                "operationId": "e0796f2f68449ed3f32704918e37c56f",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "user_uuid"
+                                ],
+                                "properties": {
+                                    "user_uuid": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "permission_uuid": {
+                                        "type": "string",
+                                        "format": "uuid",
+                                        "nullable": true
+                                    },
+                                    "permission_group_uuid": {
+                                        "type": "string",
+                                        "format": "uuid",
+                                        "nullable": true
+                                    },
+                                    "expires_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "Przekazano"
+                    },
+                    "403": {
+                        "description": "Brak uprawnień do przekazania lub brak statusu kierownika"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    },
+                    "422": {
+                        "description": "Błąd walidacji"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/department/{uuid}/managed-roles": {
+            "post": {
+                "tags": [
+                    "Department"
+                ],
+                "summary": "Kierownik działu tworzy nową rolę w ramach działu i nadaje jej uprawnienia (muszą być podzbiorem uprawnień działu)",
+                "operationId": "2984de2c166932371df16fc0a130ad92",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "permissions": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        }
+                                    },
+                                    "permission_groups": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Utworzono",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/RoleResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Brak statusu kierownika lub uprawnienie/grupa wykracza poza uprawnienia działu"
+                    },
+                    "422": {
+                        "description": "Błąd walidacji"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/employee-schedule": {
+            "get": {
+                "tags": [
+                    "EmployeeSchedule"
+                ],
+                "summary": "Lista wydarzeń w kalendarzu pracowników",
+                "operationId": "429553a48929df850ef4fd81678f81a7",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/PaginatedResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/EmployeeScheduleResource"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "EmployeeSchedule"
+                ],
+                "summary": "Tworzy nowe wydarzenie w kalendarzu pracowników",
+                "operationId": "05408215af1017ee423e6c8cc2527ccc",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "type",
+                                    "date"
+                                ],
+                                "properties": {
+                                    "type": {
+                                        "type": "string"
+                                    },
+                                    "name": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "date": {
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "end_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "nullable": true
+                                    },
+                                    "start_time": {
+                                        "type": "string",
+                                        "example": "09:00",
+                                        "nullable": true
+                                    },
+                                    "end_time": {
+                                        "type": "string",
+                                        "example": "17:00",
+                                        "nullable": true
+                                    },
+                                    "is_active": {
+                                        "type": "boolean"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Utworzono",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/EmployeeScheduleResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Błąd walidacji"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/employee-schedule/selectlist": {
+            "get": {
+                "tags": [
+                    "EmployeeSchedule"
+                ],
+                "summary": "Wydarzenia do selecta (uuid + name)",
+                "operationId": "fc457fe6f5ff5c61ce721cde4f2c9d68",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/employee-schedule/{uuid}": {
+            "get": {
+                "tags": [
+                    "EmployeeSchedule"
+                ],
+                "summary": "Pobiera jedno wydarzenie",
+                "operationId": "e405245c8ff8ef5cbea3afe7c7cdac42",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/EmployeeScheduleResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "EmployeeSchedule"
+                ],
+                "summary": "Aktualizuje wydarzenie w kalendarzu pracowników",
+                "operationId": "006098c231bc34ad2eaffb3496e3ad0b",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "type",
+                                    "date"
+                                ],
+                                "properties": {
+                                    "type": {
+                                        "type": "string"
+                                    },
+                                    "name": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "date": {
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "end_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "nullable": true
+                                    },
+                                    "start_time": {
+                                        "type": "string",
+                                        "example": "09:00",
+                                        "nullable": true
+                                    },
+                                    "end_time": {
+                                        "type": "string",
+                                        "example": "17:00",
+                                        "nullable": true
+                                    },
+                                    "is_active": {
+                                        "type": "boolean"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "Zaktualizowano"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    },
+                    "422": {
+                        "description": "Błąd walidacji"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "EmployeeSchedule"
+                ],
+                "summary": "Usuwa wydarzenie z kalendarza pracowników",
+                "operationId": "506e37f6fd79ff51a59a6dbc92bcf94e",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Usunięto"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/employee-schedule/{uuid}/users": {
+            "patch": {
+                "tags": [
+                    "EmployeeSchedule"
+                ],
+                "summary": "Przypisuje pracowników do wydarzenia, zastępując poprzednią listę",
+                "operationId": "87c6abcd9a80143996c74e3ba9df6403",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "users": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "Przypisano"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    },
+                    "422": {
+                        "description": "Błąd walidacji"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/job-position": {
             "get": {
                 "tags": [
@@ -2660,6 +4472,73 @@
                         "content": {
                             "application/octet-stream": {}
                         }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/job-position/{uuid}/permissions": {
+            "patch": {
+                "tags": [
+                    "JobPosition"
+                ],
+                "summary": "Nadaje stanowisku uprawnienia lub grupy uprawnień (opcjonalnie czasowo)",
+                "operationId": "68e345d61c2087ebf4b8cd88125c9fff",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "permissions": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        }
+                                    },
+                                    "permission_groups": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        }
+                                    },
+                                    "expires_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "Nadano"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    },
+                    "422": {
+                        "description": "Błąd walidacji"
                     }
                 },
                 "security": [
@@ -3836,7 +5715,7 @@
                 "tags": [
                     "Message"
                 ],
-                "summary": "Wysyła wiadomość do konkretnej osoby, do grupy, lub jako nowy broadcast do wszystkich",
+                "summary": "Wysyła wiadomość do konkretnej osoby lub do grupy",
                 "operationId": "ee15771b1dadd0efb04ebd263be4f168",
                 "requestBody": {
                     "required": true,
@@ -3851,13 +5730,13 @@
                                         "type": "string"
                                     },
                                     "recipient_uuid": {
-                                        "description": "Wiadomość bezpośrednia do tego użytkownika",
+                                        "description": "Wiadomość bezpośrednia do użytkownika (wyklucza message_group_uuid)",
                                         "type": "string",
                                         "format": "uuid",
                                         "nullable": true
                                     },
                                     "message_group_uuid": {
-                                        "description": "Dopisanie do istniejącej grupy/konwersacji",
+                                        "description": "Wiadomość do grupy (wyklucza recipient_uuid)",
                                         "type": "string",
                                         "format": "uuid",
                                         "nullable": true
@@ -3895,12 +5774,786 @@
                 ]
             }
         },
-        "/api/message-group/{uuid}/messages": {
+        "/api/message/{message}": {
+            "delete": {
+                "tags": [
+                    "Message"
+                ],
+                "summary": "Usuwa wiadomość",
+                "operationId": "a0925e4c3804998cdd47ba8bd9f985a1",
+                "parameters": [
+                    {
+                        "name": "message",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Usunięto"
+                    },
+                    "403": {
+                        "description": "Można usuwać tylko własne wiadomości"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/message/{message}/read": {
+            "post": {
+                "tags": [
+                    "Message"
+                ],
+                "summary": "Oznacza prywatną wiadomość jako przeczytaną przez zalogowanego odbiorcę",
+                "operationId": "8c05cf3243cc37e8729b28eb9f4d670c",
+                "parameters": [
+                    {
+                        "name": "message",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Oznaczono"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/message/unread-count": {
             "get": {
                 "tags": [
                     "Message"
                 ],
-                "summary": "Pobiera konwersację (wiadomości) należące do danej grupy",
+                "summary": "Zwraca liczbę nieprzeczytanych konwersacji zalogowanego użytkownika (do badge'a)",
+                "operationId": "f2defbf708d7a8be890cf56086437aa4",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "count": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/message/{message}/file": {
+            "get": {
+                "tags": [
+                    "MessageFile"
+                ],
+                "summary": "Lista plików załączonych do wiadomości",
+                "operationId": "d33136ccef01e1c16121b5fb49cc6aeb",
+                "parameters": [
+                    {
+                        "name": "message",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/PaginatedResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/FileResource"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "MessageFile"
+                ],
+                "summary": "Dodaje pliki do wiadomości",
+                "operationId": "884623d33ee3fc9f3857777d3d3adc2f",
+                "parameters": [
+                    {
+                        "name": "message",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "files[]"
+                                ],
+                                "properties": {
+                                    "files[]": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "binary"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/FileResource"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/message/{message}/file/{file}": {
+            "get": {
+                "tags": [
+                    "MessageFile"
+                ],
+                "summary": "Pobiera metadane pliku wiadomości",
+                "operationId": "5370e18785b2834ee593d680c7ff5fd5",
+                "parameters": [
+                    {
+                        "name": "message",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "file",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/FileResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "MessageFile"
+                ],
+                "summary": "Zmienia nazwę pliku wiadomości",
+                "operationId": "919fb8145ae810bee90ede24e18286dc",
+                "parameters": [
+                    {
+                        "name": "message",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "file",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "filename"
+                                ],
+                                "properties": {
+                                    "filename": {
+                                        "type": "string",
+                                        "example": "nowa_nazwa"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/FileResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Błąd walidacji"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "MessageFile"
+                ],
+                "summary": "Usuwa plik wiadomości",
+                "operationId": "77401e53e239e30ea755056b1239b0e6",
+                "parameters": [
+                    {
+                        "name": "message",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "file",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Usunięto"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/message/{message}/file-download/{file}": {
+            "get": {
+                "tags": [
+                    "MessageFile"
+                ],
+                "summary": "Pobiera zawartość pliku wiadomości",
+                "operationId": "22bb5aa912e78e6d8cfa5114f6f0a372",
+                "parameters": [
+                    {
+                        "name": "message",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "file",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/message-group": {
+            "get": {
+                "tags": [
+                    "MessageGroup"
+                ],
+                "summary": "Pobiera grupy wiadomości zalogowanego użytkownika",
+                "operationId": "46816d3660e66c06455f646596383a34",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/PaginatedResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/MessageGroupResource"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "MessageGroup"
+                ],
+                "summary": "Tworzy nową grupę wiadomości",
+                "operationId": "7660c6d988b2eab512b461f32cb6de30",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "user_uuids"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Zespół"
+                                    },
+                                    "user_uuids": {
+                                        "description": "Min. jeden użytkownik (inny niż twórca)",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Utworzono",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/MessageGroupResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Błąd walidacji"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/message-group/{uuid}": {
+            "get": {
+                "tags": [
+                    "MessageGroup"
+                ],
+                "summary": "Pobiera szczegóły grupy wiadomości wraz z członkami",
+                "operationId": "a3394ec2ea47284e2513012835d28d9a",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/MessageGroupResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Nie jesteś członkiem tej grupy"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "MessageGroup"
+                ],
+                "summary": "Zmienia nazwę grupy wiadomości",
+                "operationId": "01fe8881ff7bd09ae592672680fbc62b",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/MessageGroupResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Nie jesteś członkiem tej grupy lub próbujesz edytować grupę domyślną"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    },
+                    "422": {
+                        "description": "Błąd walidacji"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "MessageGroup"
+                ],
+                "summary": "Usuwa grupę wiadomości",
+                "operationId": "d929f9feabc7887af0aab0369127493e",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Usunięto"
+                    },
+                    "403": {
+                        "description": "Nie jesteś członkiem tej grupy lub próbujesz usunąć grupę domyślną"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/message-group/{uuid}/users/{userUuid}": {
+            "post": {
+                "tags": [
+                    "MessageGroup"
+                ],
+                "summary": "Dodaje użytkownika do grupy",
+                "operationId": "9487f5f9c39f44dfab52633df0230127",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "userUuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/MessageGroupResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Nie jesteś członkiem tej grupy lub próbujesz edytować grupę domyślną"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "MessageGroup"
+                ],
+                "summary": "Usuwa użytkownika z grupy (min. 2 członków musi pozostać)",
+                "operationId": "356f89b36a541153c2d8dfd8f49321ca",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "userUuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Usunięto"
+                    },
+                    "403": {
+                        "description": "Nie jesteś członkiem tej grupy, grupa jest domyślna, lub grupa miałaby mniej niż 2 członków"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono lub użytkownik nie jest członkiem grupy"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/message-group/{uuid}/messages": {
+            "get": {
+                "tags": [
+                    "MessageGroup"
+                ],
+                "summary": "Pobiera wiadomości należące do grupy wraz z załączonymi plikami",
                 "operationId": "6828cf755200692934d070834baf8c3c",
                 "parameters": [
                     {
@@ -3939,8 +6592,263 @@
                             }
                         }
                     },
+                    "403": {
+                        "description": "Nie jesteś członkiem tej grupy"
+                    },
                     "404": {
                         "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/message-group/{uuid}/read": {
+            "post": {
+                "tags": [
+                    "MessageGroup"
+                ],
+                "summary": "Oznacza grupę jako przeczytaną przez zalogowanego użytkownika",
+                "operationId": "fb86b731480ef66ef436d85901af7afa",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Oznaczono"
+                    },
+                    "403": {
+                        "description": "Nie jesteś członkiem tej grupy"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/notifications": {
+            "get": {
+                "tags": [
+                    "Notification"
+                ],
+                "summary": "Pobiera powiadomienia zalogowanego użytkownika wraz z licznikiem nieprzeczytanych",
+                "operationId": "911565ad9aff9ba7eded3f189509e578",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 15
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "notifications": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/NotificationResource"
+                                            }
+                                        },
+                                        "unread_count": {
+                                            "type": "integer"
+                                        },
+                                        "pagination": {
+                                            "type": "object",
+                                            "nullable": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/notifications/mark-as-read": {
+            "post": {
+                "tags": [
+                    "Notification"
+                ],
+                "summary": "Oznacza powiadomienie (lub wszystkie) jako przeczytane",
+                "operationId": "c263561c19978a12d6dad8e73311f19f",
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "notification_uuid": {
+                                        "type": "string",
+                                        "format": "uuid",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "unread_count": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/notifications/preferences": {
+            "get": {
+                "tags": [
+                    "Notification"
+                ],
+                "summary": "Pobiera ustawienia powiadomień zalogowanego użytkownika",
+                "operationId": "9f52c87d670175e1cc463192c788dce1",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "preferences": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Notification"
+                ],
+                "summary": "Aktualizuje ustawienia powiadomień zalogowanego użytkownika",
+                "operationId": "82e00beff9f0493d254585c0d8b0e356",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "preferences"
+                                ],
+                                "properties": {
+                                    "preferences": {
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "type_id",
+                                                "channel_id",
+                                                "enabled"
+                                            ],
+                                            "properties": {
+                                                "type_id": {
+                                                    "type": "string",
+                                                    "format": "uuid"
+                                                },
+                                                "channel_id": {
+                                                    "type": "string",
+                                                    "format": "uuid"
+                                                },
+                                                "enabled": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Błąd walidacji"
                     }
                 },
                 "security": [
@@ -4673,6 +7581,845 @@
                 ]
             }
         },
+        "/api/permission": {
+            "get": {
+                "tags": [
+                    "Permission"
+                ],
+                "summary": "Lista uprawnień (paginacja)",
+                "operationId": "2add787202b098b43e4515fc3e9b6279",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/PaginatedResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/PermissionResource"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/permission/selectlist": {
+            "get": {
+                "tags": [
+                    "Permission"
+                ],
+                "summary": "Lista uprawnień do selecta (uuid + name)",
+                "operationId": "004ca5dcee0179b940a18ebdeed51cd2",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/permission/{uuid}": {
+            "get": {
+                "tags": [
+                    "Permission"
+                ],
+                "summary": "Pobiera jedno uprawnienie",
+                "operationId": "d40b4e8cee617cd5353e30c6c8929e16",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/PermissionResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/permission-group": {
+            "get": {
+                "tags": [
+                    "PermissionGroup"
+                ],
+                "summary": "Lista grup uprawnień (paginacja)",
+                "operationId": "292e85f4ec9d30f20336abecd33a43a8",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/PaginatedResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/PermissionGroupResource"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "PermissionGroup"
+                ],
+                "summary": "Tworzy nową grupę uprawnień",
+                "operationId": "bc7a30a9af1e79396c9139c013105be5",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Utworzono",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/PermissionGroupResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Błąd walidacji"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/permission-group/selectlist": {
+            "get": {
+                "tags": [
+                    "PermissionGroup"
+                ],
+                "summary": "Lista grup uprawnień do selecta (uuid + name)",
+                "operationId": "9301d22eae782176e0cfbdf8e8db282e",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/permission-group/{uuid}": {
+            "get": {
+                "tags": [
+                    "PermissionGroup"
+                ],
+                "summary": "Pobiera jedną grupę uprawnień",
+                "operationId": "15a58db3c9416c5741dcb382f393f720",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/PermissionGroupResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "PermissionGroup"
+                ],
+                "summary": "Aktualizuje grupę uprawnień",
+                "operationId": "20a1a809d3c8329645a15eba1ac8f1e3",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "Zaktualizowano"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    },
+                    "422": {
+                        "description": "Błąd walidacji"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "PermissionGroup"
+                ],
+                "summary": "Usuwa grupę uprawnień",
+                "operationId": "a5491b127be3940a093c3d57ccfc2544",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Usunięto"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/permission-group/{uuid}/permissions": {
+            "patch": {
+                "tags": [
+                    "PermissionGroup"
+                ],
+                "summary": "Przypisuje uprawnienia do grupy, zastępując poprzednią listę",
+                "operationId": "253fb86d86f5ac0126abbffd71bb4e74",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "permissions": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "Przypisano"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    },
+                    "422": {
+                        "description": "Błąd walidacji"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/role": {
+            "get": {
+                "tags": [
+                    "Role"
+                ],
+                "summary": "Lista ról (paginacja)",
+                "operationId": "5382f1f8081ec0784c101b952835e6f7",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/PaginatedResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/RoleResource"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Role"
+                ],
+                "summary": "Tworzy nową rolę",
+                "operationId": "9520944bc105c406a9d07398b2ea3a17",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Utworzono",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/RoleResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Błąd walidacji"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/role/selectlist": {
+            "get": {
+                "tags": [
+                    "Role"
+                ],
+                "summary": "Lista ról do selecta (uuid + name)",
+                "operationId": "68b9df2c0b3a8ec7cfe96a3fc49ce2d5",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/role/{uuid}": {
+            "get": {
+                "tags": [
+                    "Role"
+                ],
+                "summary": "Pobiera jedną rolę",
+                "operationId": "74a4bbcef76669ff237579ef15c6cbd9",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/RoleResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Role"
+                ],
+                "summary": "Aktualizuje rolę",
+                "operationId": "2ac4f86f5aa93a3c83a4fe5ee96e7d57",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "Zaktualizowano"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    },
+                    "422": {
+                        "description": "Błąd walidacji"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Role"
+                ],
+                "summary": "Usuwa rolę",
+                "operationId": "5f95f5b33c7a3498c86ab2dc52e84bcb",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Usunięto"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/role/{uuid}/users": {
+            "patch": {
+                "tags": [
+                    "Role"
+                ],
+                "summary": "Przypisuje użytkowników do roli (z flagą is_manager), zastępując poprzednią listę",
+                "operationId": "074c3cb7aecd83e6f8c5960723fdbde7",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "users": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "uuid": {
+                                                    "type": "string",
+                                                    "format": "uuid"
+                                                },
+                                                "is_manager": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "Przypisano"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    },
+                    "422": {
+                        "description": "Błąd walidacji"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/role/{uuid}/permissions": {
+            "patch": {
+                "tags": [
+                    "Role"
+                ],
+                "summary": "Nadaje roli uprawnienia lub grupy uprawnień (opcjonalnie czasowo)",
+                "operationId": "4072b6405c1a3045ca2da674cbdd1804",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "permissions": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        }
+                                    },
+                                    "permission_groups": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        }
+                                    },
+                                    "expires_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "Nadano"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    },
+                    "422": {
+                        "description": "Błąd walidacji"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/role/{uuid}/delegate": {
+            "post": {
+                "tags": [
+                    "Role"
+                ],
+                "summary": "Kierownik roli przekazuje własne uprawnienie (lub grupę uprawnień) innej osobie z tej roli",
+                "operationId": "61d263bf4a85b254a0a2da0f2208d63e",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "user_uuid"
+                                ],
+                                "properties": {
+                                    "user_uuid": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "permission_uuid": {
+                                        "type": "string",
+                                        "format": "uuid",
+                                        "nullable": true
+                                    },
+                                    "permission_group_uuid": {
+                                        "type": "string",
+                                        "format": "uuid",
+                                        "nullable": true
+                                    },
+                                    "expires_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "Przekazano"
+                    },
+                    "403": {
+                        "description": "Brak uprawnień do przekazania lub brak statusu kierownika"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    },
+                    "422": {
+                        "description": "Błąd walidacji"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/user": {
             "get": {
                 "tags": [
@@ -5003,7 +8750,7 @@
                 "tags": [
                     "User"
                 ],
-                "summary": "Dane zalogowanego użytkownika",
+                "summary": "Dane zalogowanego użytkownika wraz z jego uprawnieniami",
                 "operationId": "a13dd5146a96ccd79606efb70263ccdb",
                 "responses": {
                     "200": {
@@ -5011,12 +8758,26 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "properties": {
-                                        "data": {
+                                    "allOf": [
+                                        {
                                             "$ref": "#/components/schemas/LoggedUserResource"
+                                        },
+                                        {
+                                            "properties": {
+                                                "permissions": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    },
+                                                    "example": [
+                                                        "calendar.view",
+                                                        "calendar.edit"
+                                                    ]
+                                                }
+                                            },
+                                            "type": "object"
                                         }
-                                    },
-                                    "type": "object"
+                                    ]
                                 }
                             }
                         }
@@ -5108,6 +8869,73 @@
                     },
                     "422": {
                         "description": "Nieprawidłowe obecne hasło lub błąd walidacji"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/user/{uuid}/permissions": {
+            "patch": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Nadaje użytkownikowi uprawnienia lub grupy uprawnień bezpośrednio (opcjonalnie czasowo)",
+                "operationId": "d792c1777507f3b7e83b512f6ec207cd",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "permissions": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        }
+                                    },
+                                    "permission_groups": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        }
+                                    },
+                                    "expires_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "Nadano"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    },
+                    "422": {
+                        "description": "Błąd walidacji"
                     }
                 },
                 "security": [
@@ -5737,6 +9565,509 @@
                     }
                 ]
             }
+        },
+        "/api/user-group": {
+            "get": {
+                "tags": [
+                    "UserGroup"
+                ],
+                "summary": "Lista grup użytkowników (paginacja)",
+                "operationId": "295750fcd676a70761b65c4fd787f25d",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/PaginatedResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/UserGroupResource"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "UserGroup"
+                ],
+                "summary": "Tworzy nową grupę użytkowników",
+                "operationId": "0cf1343662ca383d9d963127f017c676",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Utworzono",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/UserGroupResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Błąd walidacji"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/user-group/selectlist": {
+            "get": {
+                "tags": [
+                    "UserGroup"
+                ],
+                "summary": "Lista grup użytkowników do selecta (uuid + name)",
+                "operationId": "b42c820cddb72f752e044390b85d0acd",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/user-group/{uuid}": {
+            "get": {
+                "tags": [
+                    "UserGroup"
+                ],
+                "summary": "Pobiera jedną grupę użytkowników",
+                "operationId": "978147934db240980dc6ae916b46167d",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/UserGroupResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "UserGroup"
+                ],
+                "summary": "Aktualizuje grupę użytkowników",
+                "operationId": "6baf05455652da096bec32924b36e239",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "Zaktualizowano"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    },
+                    "422": {
+                        "description": "Błąd walidacji"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "UserGroup"
+                ],
+                "summary": "Usuwa grupę użytkowników",
+                "operationId": "04e72a235693639b8ecce5718a4a5875",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Usunięto"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/user-group/{uuid}/users": {
+            "patch": {
+                "tags": [
+                    "UserGroup"
+                ],
+                "summary": "Przypisuje użytkowników do grupy (z flagą is_manager), zastępując poprzednią listę",
+                "operationId": "aa375d4386f5299ecf9d74b8e5c91d22",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "users": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "uuid": {
+                                                    "type": "string",
+                                                    "format": "uuid"
+                                                },
+                                                "is_manager": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "Przypisano"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    },
+                    "422": {
+                        "description": "Błąd walidacji"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/user-group/{uuid}/permissions": {
+            "patch": {
+                "tags": [
+                    "UserGroup"
+                ],
+                "summary": "Nadaje grupie użytkowników uprawnienia lub grupy uprawnień (opcjonalnie czasowo)",
+                "operationId": "10fb0d789d1433d5434f6345145a36dc",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "permissions": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        }
+                                    },
+                                    "permission_groups": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        }
+                                    },
+                                    "expires_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "Nadano"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    },
+                    "422": {
+                        "description": "Błąd walidacji"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/user-group/{uuid}/managed-roles": {
+            "post": {
+                "tags": [
+                    "UserGroup"
+                ],
+                "summary": "Kierownik grupy użytkowników tworzy nową rolę w ramach grupy i nadaje jej uprawnienia (muszą być podzbiorem uprawnień grupy)",
+                "operationId": "aa13dbdd8f6a5609f664b4d2158b2de1",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "permissions": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        }
+                                    },
+                                    "permission_groups": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Utworzono",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/RoleResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Brak statusu kierownika lub uprawnienie/grupa wykracza poza uprawnienia grupy"
+                    },
+                    "422": {
+                        "description": "Błąd walidacji"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/user-group/{uuid}/job-positions": {
+            "patch": {
+                "tags": [
+                    "UserGroup"
+                ],
+                "summary": "Przypisuje stanowiska do grupy użytkowników, zastępując poprzednią listę",
+                "operationId": "3534b5c8765279698986cb0c184a0a60",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "job_positions": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "Przypisano"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    },
+                    "422": {
+                        "description": "Błąd walidacji"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
         }
     },
     "components": {
@@ -5854,17 +10185,27 @@
                         "type": "string",
                         "nullable": true
                     },
+                    "private_phone_number": {
+                        "type": "string",
+                        "nullable": true
+                    },
                     "phone_number": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/PhoneNumberResource"
-                        }
+                        "type": "string",
+                        "nullable": true
                     },
                     "job_positions": {
                         "type": "array",
                         "items": {
                             "$ref": "#/components/schemas/JobPositionResource"
                         }
+                    },
+                    "status": {
+                        "description": "ACTIVE gdy użytkownik ma aktualnie ważny token",
+                        "type": "string",
+                        "enum": [
+                            "ACTIVE",
+                            "NON_ACTIVE"
+                        ]
                     },
                     "created_at": {
                         "type": "string",
@@ -5905,11 +10246,13 @@
                         "type": "string",
                         "nullable": true
                     },
+                    "private_phone_number": {
+                        "type": "string",
+                        "nullable": true
+                    },
                     "phone_number": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/PhoneNumberResource"
-                        }
+                        "type": "string",
+                        "nullable": true
                     },
                     "job_positions": {
                         "type": "array",
@@ -5992,28 +10335,72 @@
                         "type": "string",
                         "nullable": true
                     },
-                    "ownerable_uuid": {
+                    "date": {
                         "type": "string",
-                        "format": "uuid",
-                        "nullable": true
-                    },
-                    "ownerable_type": {
-                        "type": "string",
-                        "nullable": true
-                    },
-                    "connected_calendar_uuid": {
-                        "type": "string",
-                        "format": "uuid",
-                        "nullable": true
-                    },
-                    "start_date": {
-                        "type": "string",
-                        "format": "date-time",
-                        "nullable": true
+                        "format": "date"
                     },
                     "end_date": {
                         "type": "string",
-                        "format": "date-time",
+                        "format": "date",
+                        "nullable": true
+                    },
+                    "start_time": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "end_time": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "no_show": {
+                        "type": "boolean"
+                    },
+                    "is_active": {
+                        "type": "boolean"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "EmployeeScheduleResource": {
+                "properties": {
+                    "uuid": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "type": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "description": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "date": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "end_date": {
+                        "type": "string",
+                        "format": "date",
+                        "nullable": true
+                    },
+                    "start_time": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "end_time": {
+                        "type": "string",
                         "nullable": true
                     },
                     "is_active": {
@@ -6086,6 +10473,56 @@
                 },
                 "type": "object"
             },
+            "CompanyResource": {
+                "properties": {
+                    "uuid": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "regon": {
+                        "type": "string"
+                    },
+                    "nip": {
+                        "type": "string"
+                    },
+                    "address": {
+                        "type": "string"
+                    },
+                    "province": {
+                        "type": "string"
+                    },
+                    "district": {
+                        "type": "string"
+                    },
+                    "municipality": {
+                        "type": "string"
+                    },
+                    "business_form": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "type_of_business": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "form_of_ownership": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
             "MessageResource": {
                 "properties": {
                     "uuid": {
@@ -6109,6 +10546,10 @@
                     },
                     "message": {
                         "type": "string"
+                    },
+                    "unread": {
+                        "description": "Czy zalogowany użytkownik jeszcze nie przeczytał tej wiadomości",
+                        "type": "boolean"
                     },
                     "created_at": {
                         "type": "string",
@@ -6156,6 +10597,222 @@
                     }
                 },
                 "type": "object"
+            },
+            "PermissionResource": {
+                "properties": {
+                    "uuid": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "resource": {
+                        "type": "string"
+                    },
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "view",
+                            "edit"
+                        ]
+                    },
+                    "name": {
+                        "description": "{resource}.{type}",
+                        "type": "string"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "PermissionGroupResource": {
+                "properties": {
+                    "uuid": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "permissions": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PermissionResource"
+                        }
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "UserGroupResource": {
+                "properties": {
+                    "uuid": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "RoleResource": {
+                "properties": {
+                    "uuid": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "DepartmentResource": {
+                "properties": {
+                    "uuid": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "AnnouncementResource": {
+                "properties": {
+                    "uuid": {
+                        "description": "Summary of AnnouncementResource",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "content": {
+                        "type": "string"
+                    },
+                    "published_at": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "author": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/UserResource"
+                            }
+                        ],
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "MessageGroupResource": {
+                "properties": {
+                    "uuid": {
+                        "description": "Summary of MessageGroupResource",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "is_default": {
+                        "type": "boolean"
+                    },
+                    "creator": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/UserResource"
+                            }
+                        ],
+                        "nullable": true
+                    },
+                    "users": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/UserResource"
+                        }
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "NotificationResource": {
+                "properties": {
+                    "uuid": {
+                        "description": "Summary of NotificationResource",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "title": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "message": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "url": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "type": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "read": {
+                        "type": "boolean"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
             }
         },
         "securitySchemes": {
@@ -6168,6 +10825,10 @@
         }
     },
     "tags": [
+        {
+            "name": "Announcement",
+            "description": "Announcement"
+        },
         {
             "name": "Auditable",
             "description": "Auditable"
@@ -6185,12 +10846,28 @@
             "description": "CalendarFile"
         },
         {
+            "name": "Company",
+            "description": "Company"
+        },
+        {
             "name": "DentalExamination",
             "description": "DentalExamination"
         },
         {
             "name": "DentalExaminationFile",
             "description": "DentalExaminationFile"
+        },
+        {
+            "name": "Dentist",
+            "description": "Dentist"
+        },
+        {
+            "name": "Department",
+            "description": "Department"
+        },
+        {
+            "name": "EmployeeSchedule",
+            "description": "EmployeeSchedule"
         },
         {
             "name": "JobPosition",
@@ -6213,6 +10890,18 @@
             "description": "Message"
         },
         {
+            "name": "MessageFile",
+            "description": "MessageFile"
+        },
+        {
+            "name": "MessageGroup",
+            "description": "MessageGroup"
+        },
+        {
+            "name": "Notification",
+            "description": "Notification"
+        },
+        {
             "name": "Patient",
             "description": "Patient"
         },
@@ -6221,12 +10910,28 @@
             "description": "PatientFile"
         },
         {
+            "name": "Permission",
+            "description": "Permission"
+        },
+        {
+            "name": "PermissionGroup",
+            "description": "PermissionGroup"
+        },
+        {
+            "name": "Role",
+            "description": "Role"
+        },
+        {
             "name": "User",
             "description": "User"
         },
         {
             "name": "UserFile",
             "description": "UserFile"
+        },
+        {
+            "name": "UserGroup",
+            "description": "UserGroup"
         }
     ]
 }

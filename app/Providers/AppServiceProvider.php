@@ -2,16 +2,29 @@
 
 namespace App\Providers;
 
+use App\Models\User;
+use App\Observers\UserObserver;
+use App\Providers\AppServiceProviders\AnnouncementServiceProvider;
 use App\Providers\AppServiceProviders\AuditServiceProvider;
 use App\Providers\AppServiceProviders\AuthServiceProvider;
 use App\Providers\AppServiceProviders\CalendarServiceProvider;
+use App\Providers\AppServiceProviders\CompanyServiceProvider;
 use App\Providers\AppServiceProviders\DentalExaminationServiceProvider;
+use App\Providers\AppServiceProviders\DentistServiceProvider;
+use App\Providers\AppServiceProviders\DepartmentServiceProvider;
+use App\Providers\AppServiceProviders\DictionaryServiceProvider;
+use App\Providers\AppServiceProviders\EmployeeScheduleServiceProvider;
 use App\Providers\AppServiceProviders\FileServiceProvider;
 use App\Providers\AppServiceProviders\JobPositionServiceProvider;
 use App\Providers\AppServiceProviders\MaterialServiceProvider;
 use App\Providers\AppServiceProviders\MessageServiceProvider;
+use App\Providers\AppServiceProviders\NotificationServiceProvider;
 use App\Providers\AppServiceProviders\PatientServiceProvider;
+use App\Providers\AppServiceProviders\PermissionGroupServiceProvider;
+use App\Providers\AppServiceProviders\PermissionServiceProvider;
+use App\Providers\AppServiceProviders\RoleServiceProvider;
 use App\Providers\AppServiceProviders\SearchServiceProvider;
+use App\Providers\AppServiceProviders\UserGroupServiceProvider;
 use App\Providers\AppServiceProviders\UserServiceProvider;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\ServiceProvider;
@@ -31,13 +44,24 @@ class AppServiceProvider extends ServiceProvider
         $this->app->register(AuthServiceProvider::class);
         $this->app->register(SearchServiceProvider::class);
         $this->app->register(UserServiceProvider::class);
+        $this->app->register(UserGroupServiceProvider::class);
         $this->app->register(PatientServiceProvider::class);
         $this->app->register(JobPositionServiceProvider::class);
+        $this->app->register(DentistServiceProvider::class);
         $this->app->register(CalendarServiceProvider::class);
+        $this->app->register(EmployeeScheduleServiceProvider::class);
+        $this->app->register(CompanyServiceProvider::class);
         $this->app->register(FileServiceProvider::class);
         $this->app->register(DentalExaminationServiceProvider::class);
         $this->app->register(MaterialServiceProvider::class);
         $this->app->register(MessageServiceProvider::class);
+        $this->app->register(AnnouncementServiceProvider::class);
+        $this->app->register(DictionaryServiceProvider::class);
+        $this->app->register(NotificationServiceProvider::class);
+        $this->app->register(PermissionServiceProvider::class);
+        $this->app->register(PermissionGroupServiceProvider::class);
+        $this->app->register(RoleServiceProvider::class);
+        $this->app->register(DepartmentServiceProvider::class);
     }
 
     /**
@@ -49,5 +73,7 @@ class AppServiceProvider extends ServiceProvider
         $this->loadJsonTranslationsFrom(__DIR__.'/../lang');
         ini_set('upload_tmp_dir', storage_path('temp'));
         SpreadsheetFile::setUseUploadTempDirectory(true);
+
+        User::observe(UserObserver::class);
     }
 }

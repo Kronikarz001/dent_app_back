@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Controllers;
 
+use App\Models\Permission;
+use App\Models\PermissionAssignment;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
@@ -95,6 +97,35 @@ class UserControllerTest extends TestCase
     /**
      * @return void
      */
+    public function testShowUserReturnsStatusNonActiveWithoutValidToken(): void
+    {
+        $target = User::factory()->create();
+
+        $response = $this->callApiWithLoggedUser()
+            ->getJson(route('user.show', ['user' => $target->uuid]));
+
+        $response->assertOk();
+        $response->assertJsonPath('status', 'NON_ACTIVE');
+    }
+
+    /**
+     * @return void
+     */
+    public function testShowUserReturnsStatusActiveWithFreshToken(): void
+    {
+        $target = User::factory()->create();
+        $target->createToken('token');
+
+        $response = $this->callApiWithLoggedUser()
+            ->getJson(route('user.show', ['user' => $target->uuid]));
+
+        $response->assertOk();
+        $response->assertJsonPath('status', 'ACTIVE');
+    }
+
+    /**
+     * @return void
+     */
     public function testStoreUserReturnCreatedResponse(): void
     {
         $response = $this->callApiWithLoggedUser()
@@ -167,6 +198,26 @@ class UserControllerTest extends TestCase
     /**
      * @return void
      */
+    public function testShowUserReturnsPrivateAndWorkPhoneNumbers(): void
+    {
+        $user = User::factory()->create();
+        $this->callApiWithLoggedUser()
+            ->putJson(route('user.update', ['user' => $user->uuid]), [
+                'private_phone_number' => '48500100200',
+                'phone_number' => '48600200300',
+            ]);
+
+        $response = $this->callApiWithLoggedUser()
+            ->getJson(route('user.show', ['user' => $user->uuid]));
+
+        $response->assertOk();
+        $response->assertJsonPath('private_phone_number', '48500100200');
+        $response->assertJsonPath('phone_number', '48600200300');
+    }
+
+    /**
+     * @return void
+     */
     public function testUpdateUserRejectsInvalidPhoneNumber(): void
     {
         $user = User::factory()->create();
@@ -208,14 +259,43 @@ class UserControllerTest extends TestCase
     /**
      * @return void
      */
-    public function testExportUserReturnSuccessResponse(): void
+    public function testShowLoggedUserIncludesAllPermissionsForAdmin(): void
     {
-        User::factory()->count(3)->create();
+        Permission::factory()->create(['resource' => 'permtest-widget', 'type' => 'view']);
 
         $response = $this->callApiWithLoggedUser()
-            ->getJson(route('user.export', ['type' => 'xlsx']));
+            ->getJson(route('user.user-info'));
 
         $response->assertOk();
+        $this->assertContains('permtest-widget.view', $response->json('permissions'));
+    }
+
+    /**
+     * @return void
+     */
+    public function testShowLoggedUserIncludesOnlyGrantedPermissionsForNonAdmin(): void
+    {
+        $user = User::factory()->create(['is_admin' => false]);
+        $granted = Permission::factory()->create(['resource' => 'permtest-granted', 'type' => 'view']);
+        Permission::factory()->create(['resource' => 'permtest-notgranted', 'type' => 'view']);
+        $userInfoPermission = Permission::where(['resource' => 'user', 'type' => 'view'])->firstOrFail();
+
+        foreach ([$granted, $userInfoPermission] as $permission) {
+            PermissionAssignment::create([
+                'grantable_type' => Permission::class,
+                'grantable_id' => $permission->uuid,
+                'assignable_type' => User::class,
+                'assignable_id' => $user->uuid,
+            ]);
+        }
+
+        $response = $this->callApiWithLoggedUser($user)
+            ->getJson(route('user.user-info'));
+
+        $response->assertOk();
+        $permissions = $response->json('permissions');
+        $this->assertContains('permtest-granted.view', $permissions);
+        $this->assertNotContains('permtest-notgranted.view', $permissions);
     }
 
     /**
@@ -266,5 +346,27 @@ class UserControllerTest extends TestCase
         ]);
 
         $response->assertUnauthorized();
+    }
+
+    /**
+     * @return void
+     */
+    public function testAssignPermissionsCreatesDirectGrant(): void
+    {
+        $target = User::factory()->create();
+        $permission = Permission::factory()->create();
+
+        $this->callApiWithLoggedUser()
+            ->patchJson(route('user.assignPermissions', ['user' => $target->uuid]), [
+                'permissions' => [$permission->uuid],
+            ])
+            ->assertNoContent();
+
+        $this->assertDatabaseHas('permission_assignments', [
+            'grantable_type' => Permission::class,
+            'grantable_id' => $permission->uuid,
+            'assignable_type' => User::class,
+            'assignable_id' => $target->uuid,
+        ]);
     }
 }

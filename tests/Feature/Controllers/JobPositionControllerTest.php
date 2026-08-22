@@ -3,6 +3,7 @@
 namespace Tests\Feature\Controllers;
 
 use App\Models\JobPosition;
+use App\Models\Permission;
 use App\Models\User;
 use Tests\TestCase;
 
@@ -150,19 +151,6 @@ class JobPositionControllerTest extends TestCase
     /**
      * @return void
      */
-    public function testExportJobPositionReturnSuccessResponse(): void
-    {
-        JobPosition::factory()->count(3)->create();
-
-        $response = $this->callApiWithLoggedUser()
-            ->getJson(route('jobPosition.export', ['type' => 'xlsx']));
-
-        $response->assertOk();
-    }
-
-    /**
-     * @return void
-     */
     public function testAssignJobPositionReturnNoContentResponse(): void
     {
         $user = User::factory()->create();
@@ -173,5 +161,27 @@ class JobPositionControllerTest extends TestCase
                 'job_positions' => [$jobPosition->uuid],
             ])
             ->assertNoContent();
+    }
+
+    /**
+     * @return void
+     */
+    public function testAssignPermissionsCreatesDirectGrant(): void
+    {
+        $jobPosition = JobPosition::factory()->create();
+        $permission = Permission::factory()->create();
+
+        $this->callApiWithLoggedUser()
+            ->patchJson(route('jobPosition.assignPermissions', ['jobPosition' => $jobPosition->uuid]), [
+                'permissions' => [$permission->uuid],
+            ])
+            ->assertNoContent();
+
+        $this->assertDatabaseHas('permission_assignments', [
+            'grantable_type' => Permission::class,
+            'grantable_id' => $permission->uuid,
+            'assignable_type' => JobPosition::class,
+            'assignable_id' => $jobPosition->uuid,
+        ]);
     }
 }

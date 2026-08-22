@@ -1,0 +1,20 @@
+<?php
+
+namespace {{ namespace }};
+
+use App\Search\DictionarySearch;
+use {{ modelFQN }};
+
+/**
+ * Summary of {{ class }}
+ */
+class {{ class }} extends DictionarySearch
+{
+    /**
+     * @return string
+     */
+    protected function modelClass(): string
+    {
+        return {{ model }}::class;
+    }
+}

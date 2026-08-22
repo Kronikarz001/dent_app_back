@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\UserStatusType;
+use App\Notifications\ResetPasswordNotification;
 use App\Traits\Auditable;
 use App\Traits\HasFile;
 use App\Traits\HasPhoneNumber;
@@ -10,6 +12,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -28,10 +31,16 @@ use Laravel\Sanctum\PersonalAccessToken;
  * @property string|null $avatar_path
  * @property string|null $pwz_numer
  * @property string|null $remember_token
+ * @property string|null $status
+ * @property bool $is_admin
+ * @property bool $is_superuser
  * @property Carbon|null $email_verified_at
  * @property Carbon|null $private_email_verified_at
  * @property-read Collection|JobPosition[] $jobPositions
  * @property-read Collection|PhoneNumber[] $phoneNumbers
+ * @property-read Collection|UserGroup[] $userGroups
+ * @property-read Collection|Role[] $roles
+ * @property-read Collection|Department[] $departments
  */
 abstract class BasicUser extends Authenticatable
 {
@@ -57,8 +66,11 @@ abstract class BasicUser extends Authenticatable
         'password',
         'pesel',
         'is_active',
+        'is_admin',
+        'is_superuser',
         'avatar_path',
         'pwz_numer',
+        'status',
     ];
 
     /**
@@ -86,6 +98,20 @@ abstract class BasicUser extends Authenticatable
     }
 
     /**
+     * @return UserStatusType
+     */
+    public function isOnline(): UserStatusType
+    {
+        $expiration = config('sanctum.expiration');
+
+        $hasValidToken = $this->tokens()
+            ->when($expiration, fn ($query) => $query->where('created_at', '>', now()->subMinutes($expiration)))
+            ->exists();
+
+        return $hasValidToken ? UserStatusType::ACTIVE : UserStatusType::NON_ACTIVE;
+    }
+
+    /**
      * @return array<string, string>
      */
     protected function casts(): array
@@ -94,6 +120,8 @@ abstract class BasicUser extends Authenticatable
             'email_verified_at' => 'datetime',
             'private_email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_admin' => 'boolean',
+            'is_superuser' => 'boolean',
         ];
     }
 
@@ -162,5 +190,82 @@ abstract class BasicUser extends Authenticatable
     public function calendars(): MorphToMany
     {
         return $this->morphToMany(Calendar::class, 'userable', 'calendar_users');
+    }
+
+    /**
+     * @return MorphMany
+     */
+    public function notifications(): MorphMany
+    {
+        return $this->morphMany(Notification::class, 'notifiable')->latest();
+    }
+
+    /**
+     * @param string $token
+     * @return void
+     */
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new ResetPasswordNotification($token));
+    }
+
+    /**
+     * @return BelongsToMany
+     */
+    public function messageGroups(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            MessageGroup::class,
+            'message_group_users',
+            'user_uuid',
+            'message_group_uuid',
+            'uuid',
+            'uuid'
+        )->withTimestamps();
+    }
+
+    /**
+     * @return BelongsToMany
+     */
+    public function userGroups(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            UserGroup::class,
+            'user_group_user',
+            'user_uuid',
+            'user_group_uuid',
+            'uuid',
+            'uuid'
+        )->withPivot('is_manager');
+    }
+
+    /**
+     * @return BelongsToMany
+     */
+    public function roles(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Role::class,
+            'role_user',
+            'user_uuid',
+            'role_uuid',
+            'uuid',
+            'uuid'
+        )->withPivot('is_manager');
+    }
+
+    /**
+     * @return BelongsToMany
+     */
+    public function departments(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Department::class,
+            'department_user',
+            'user_uuid',
+            'department_uuid',
+            'uuid',
+            'uuid'
+        )->withPivot('is_manager');
     }
 }

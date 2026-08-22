@@ -26,4 +26,15 @@ class PhotoStoreRequest extends FormRequest
     {
         return true;
     }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'file.required' => 'Plik jest wymagany.',
+            'file.file' => 'Przesłany element musi być plikiem.',
+        ];
+    }
 }

@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\Message;
-use App\Models\MessageGroup;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 /**
@@ -12,19 +11,30 @@ use Illuminate\Pagination\LengthAwarePaginator;
 interface MessageServiceInterface
 {
     /**
+     * @return LengthAwarePaginator
+     */
+    public function getInbox(): LengthAwarePaginator;
+
+    /**
      * @param array $data
      * @return Message
      */
     public function send(array $data): Message;
 
     /**
-     * @return LengthAwarePaginator
+     * @param Message $message
+     * @return void
      */
-    public function getInbox(): LengthAwarePaginator;
+    public function deleteMessage(Message $message): void;
 
     /**
-     * @param MessageGroup $messageGroup
-     * @return LengthAwarePaginator
+     * @param Message $message
+     * @return void
      */
-    public function getGroupMessages(MessageGroup $messageGroup): LengthAwarePaginator;
+    public function markAsRead(Message $message): void;
+
+    /**
+     * @return int
+     */
+    public function getUnreadConversationsCount(): int;
 }

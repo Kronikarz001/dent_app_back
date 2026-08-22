@@ -6,6 +6,7 @@ use App\Exceptions\FileableTypeException;
 use App\Models\DentalExamination;
 use App\Models\JobPosition;
 use App\Models\Material;
+use App\Models\Message;
 use App\Models\Patient;
 use App\Models\User;
 use App\Models\UserAvatar;
@@ -23,6 +24,7 @@ enum FileableType: string
     case USER_BACKGROUND = UserBackground::class;
     case DENTAL_EXAMINATION = DentalExamination::class;
     case MATERIAL = Material::class;
+    case MESSAGE = Message::class;
 
     /**
      * @param string $name
@@ -54,6 +56,7 @@ enum FileableType: string
             self::USER_BACKGROUND => 'user_background',
             self::DENTAL_EXAMINATION => 'dental_examination',
             self::MATERIAL => 'material',
+            self::MESSAGE => 'message',
         };
     }
 }

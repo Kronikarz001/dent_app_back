@@ -111,16 +111,19 @@ class CalendarController extends Controller
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
-                required: ['type', 'end_date'],
+                required: ['type', 'date'],
                 properties: [
                     new OA\Property(property: 'type', type: 'string'),
                     new OA\Property(property: 'name', type: 'string', nullable: true),
                     new OA\Property(property: 'description', type: 'string', nullable: true),
-                    new OA\Property(property: 'start_date', type: 'string', format: 'date-time', nullable: true),
-                    new OA\Property(property: 'end_date', type: 'string', format: 'date-time'),
+                    new OA\Property(property: 'date', type: 'string', format: 'date'),
+                    new OA\Property(property: 'end_date', type: 'string', format: 'date', nullable: true),
+                    new OA\Property(property: 'start_time', type: 'string', example: '09:00', nullable: true),
+                    new OA\Property(property: 'end_time', type: 'string', example: '09:30', nullable: true),
+                    new OA\Property(property: 'no_show', type: 'boolean'),
                     new OA\Property(property: 'created_by', type: 'string', format: 'uuid', nullable: true),
                     new OA\Property(property: 'is_active', type: 'boolean'),
-                    new OA\Property(property: 'dental_examinations', type: 'array', nullable: true, items: new OA\Items(type: 'string', format: 'uuid')),
+                    new OA\Property(property: 'dental_examinations', type: 'array', items: new OA\Items(type: 'string', format: 'uuid'), nullable: true),
                 ]
             )
         ),

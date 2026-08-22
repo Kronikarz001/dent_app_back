@@ -3,8 +3,8 @@
 namespace Tests\Feature\Controllers;
 
 use App\Models\User;
+use App\Notifications\ResetPasswordNotification;
 use Exception;
-use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
@@ -73,13 +73,13 @@ class AuthControllerTest extends TestCase
 
         $response->assertOk();
 
-        Notification::assertSentTo($user, ResetPassword::class);
+        Notification::assertSentTo($user, ResetPasswordNotification::class);
     }
 
     /**
      * @return void
      */
-    public function testResetPasswordReturnNoContentResponse(): void
+    public function testResetPasswordReturnSuccessResponse(): void
     {
         $user = User::factory()->create();
         $token = app('auth.password.broker')->createToken($user);
@@ -91,6 +91,23 @@ class AuthControllerTest extends TestCase
             'password_confirmation' => 'NewPassword123!',
         ]);
 
-        $response->assertNoContent();
+        $response->assertOk();
+    }
+
+    /**
+     * @return void
+     */
+    public function testResetPasswordWithInvalidTokenReturnsUnprocessableResponse(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->postJson(route('user.reset_password'), [
+            'token' => 'invalid-token',
+            'email' => $user->email,
+            'password' => 'NewPassword123!',
+            'password_confirmation' => 'NewPassword123!',
+        ]);
+
+        $response->assertUnprocessable();
     }
 }

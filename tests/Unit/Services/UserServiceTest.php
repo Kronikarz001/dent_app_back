@@ -104,7 +104,7 @@ class UserServiceTest extends TestCase
     /**
      * @return void
      */
-    public function testCreateUserPassesDataUnchangedToRepository(): void
+    public function testCreateUserGeneratesRandomPasswordAndPassesRestOfDataUnchanged(): void
     {
         $data = ['name' => 'Jan', 'email' => 'jan@example.com', 'password' => 'plain'];
         $newUser = User::factory()->make(['id' => 1]);
@@ -112,7 +112,17 @@ class UserServiceTest extends TestCase
         $this->userRepository
             ->shouldReceive('create')
             ->once()
-            ->with($data)
+            ->with(Mockery::on(function (array $passedData) {
+                $this->assertSame('Jan', $passedData['name']);
+                $this->assertSame('jan@example.com', $passedData['email']);
+                $this->assertNotSame('plain', $passedData['password']);
+                $this->assertSame(32, strlen($passedData['password']));
+                $this->assertMatchesRegularExpression('/[a-zA-Z]/', $passedData['password']);
+                $this->assertMatchesRegularExpression('/[0-9]/', $passedData['password']);
+                $this->assertMatchesRegularExpression('/[^a-zA-Z0-9]/', $passedData['password']);
+
+                return true;
+            }))
             ->andReturn($newUser);
 
         $result = $this->userService->createUser($data);

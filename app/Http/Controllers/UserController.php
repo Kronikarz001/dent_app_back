@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AssignPermissionsRequest;
 use App\Http\Requests\EditPasswordRequest;
 use App\Http\Requests\ExportRequest;
 use App\Http\Requests\UserStoreRequest;
@@ -9,6 +10,7 @@ use App\Http\Requests\UserUpdateRequest;
 use App\Http\Resources\LoggedUserResource;
 use App\Http\Resources\UserResource;
 use App\Models\User;
+use App\Services\PermissionServiceInterface;
 use App\Services\UserServiceInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -24,9 +26,11 @@ class UserController extends Controller
 {
     /**
      * @param UserServiceInterface $userService
+     * @param PermissionServiceInterface $permissionService
      */
     public function __construct(
-        private readonly UserServiceInterface $userService
+        private readonly UserServiceInterface $userService,
+        private readonly PermissionServiceInterface $permissionService,
     ) {}
 
     /**
@@ -103,11 +107,11 @@ class UserController extends Controller
     }
 
     /**
-     * @return LoggedUserResource
+     * @return JsonResponse
      */
     #[OA\Get(
         path: '/api/user/user-info',
-        summary: 'Dane zalogowanego użytkownika',
+        summary: 'Dane zalogowanego użytkownika wraz z jego uprawnieniami',
         security: [['sanctum' => []]],
         tags: ['User'],
         responses: [
@@ -115,14 +119,24 @@ class UserController extends Controller
                 response: 200,
                 description: 'OK',
                 content: new OA\JsonContent(
-                    properties: [new OA\Property(property: 'data', ref: '#/components/schemas/LoggedUserResource')]
+                    allOf: [
+                        new OA\Schema(ref: '#/components/schemas/LoggedUserResource'),
+                        new OA\Schema(properties: [
+                            new OA\Property(property: 'permissions', type: 'array', items: new OA\Items(type: 'string'), example: ['calendar.view', 'calendar.edit']),
+                        ]),
+                    ]
                 )
             ),
         ]
     )]
-    public function showLoggedUser(): LoggedUserResource
+    public function showLoggedUser(): JsonResponse
     {
-        return new LoggedUserResource($this->userService->getLoggedUser());
+        $user = $this->userService->getLoggedUser();
+
+        return new JsonResponse([
+            ...(new LoggedUserResource($user))->resolve(),
+            'permissions' => $this->permissionService->getUserPermissionNames($user),
+        ]);
     }
 
     /**
@@ -287,6 +301,42 @@ class UserController extends Controller
     public function editPassword(EditPasswordRequest $request): JsonResponse
     {
         $this->userService->editPassword($this->userService->getLoggedUser(), $request->all());
+
+        return new JsonResponse(null, 204);
+    }
+
+    /**
+     * @param User $user
+     * @param AssignPermissionsRequest $request
+     * @return JsonResponse
+     */
+    #[OA\Patch(
+        path: '/api/user/{uuid}/permissions',
+        summary: 'Nadaje użytkownikowi uprawnienia lub grupy uprawnień bezpośrednio (opcjonalnie czasowo)',
+        security: [['sanctum' => []]],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                properties: [
+                    new OA\Property(property: 'permissions', type: 'array', items: new OA\Items(type: 'string', format: 'uuid')),
+                    new OA\Property(property: 'permission_groups', type: 'array', items: new OA\Items(type: 'string', format: 'uuid')),
+                    new OA\Property(property: 'expires_at', type: 'string', format: 'date-time', nullable: true),
+                ]
+            )
+        ),
+        tags: ['User'],
+        parameters: [
+            new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
+        ],
+        responses: [
+            new OA\Response(response: 204, description: 'Nadano'),
+            new OA\Response(response: 404, description: 'Nie znaleziono'),
+            new OA\Response(response: 422, description: 'Błąd walidacji'),
+        ]
+    )]
+    public function assignPermissions(User $user, AssignPermissionsRequest $request): JsonResponse
+    {
+        $this->userService->assignPermissions($user, $request->all());
 
         return new JsonResponse(null, 204);
     }

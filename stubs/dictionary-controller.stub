@@ -1,0 +1,130 @@
+<?php
+
+namespace {{ namespace }};
+
+use App\Http\Controllers\Controller;
+use App\Http\Requests\DictionaryRequest;
+use App\Models\Dictionaries\{{ model }};
+use App\Services\Dictionaries\{{ service }};
+use Illuminate\Http\JsonResponse;
+use Illuminate\Pagination\LengthAwarePaginator;
+use OpenApi\Attributes as OA;
+
+/**
+ * Summary of {{ class }}
+ */
+class {{ class }} extends Controller
+{
+    /**
+     * @param {{ service }} $service
+     */
+    public function __construct(private readonly {{ service }} $service)
+    {
+    }
+
+    /**
+     * @return LengthAwarePaginator
+     */
+    #[OA\Get(
+        path: '/api/dictionaries/{{ routeSlug }}',
+        summary: 'Pobiera listę pozycji słownika {{ model }}',
+        security: [['sanctum' => []]],
+        tags: ['Dictionaries'],
+        responses: [
+            new OA\Response(response: 200, description: 'OK'),
+        ]
+    )]
+    public function index(): LengthAwarePaginator
+    {
+        return $this->service->list();
+    }
+
+    /**
+     * @param DictionaryRequest $request
+     * @return {{ model }}
+     */
+    #[OA\Post(
+        path: '/api/dictionaries/{{ routeSlug }}',
+        summary: 'Tworzy pozycję słownika {{ model }}',
+        security: [['sanctum' => []]],
+        tags: ['Dictionaries'],
+        responses: [
+            new OA\Response(response: 201, description: 'Utworzono'),
+            new OA\Response(response: 422, description: 'Błąd walidacji'),
+        ]
+    )]
+    public function store(DictionaryRequest $request): {{ model }}
+    {
+        return $this->service->create($request->all());
+    }
+
+    /**
+     * @param {{ model }} $dictionary
+     * @return {{ model }}
+     */
+    #[OA\Get(
+        path: '/api/dictionaries/{{ routeSlug }}/{uuid}',
+        summary: 'Pobiera pozycję słownika {{ model }}',
+        security: [['sanctum' => []]],
+        tags: ['Dictionaries'],
+        parameters: [
+            new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'OK'),
+            new OA\Response(response: 404, description: 'Nie znaleziono'),
+        ]
+    )]
+    public function show({{ model }} $dictionary): {{ model }}
+    {
+        return $dictionary;
+    }
+
+    /**
+     * @param DictionaryRequest $request
+     * @param {{ model }} $dictionary
+     * @return {{ model }}
+     */
+    #[OA\Put(
+        path: '/api/dictionaries/{{ routeSlug }}/{uuid}',
+        summary: 'Aktualizuje pozycję słownika {{ model }}',
+        security: [['sanctum' => []]],
+        tags: ['Dictionaries'],
+        parameters: [
+            new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'OK'),
+            new OA\Response(response: 404, description: 'Nie znaleziono'),
+            new OA\Response(response: 422, description: 'Błąd walidacji'),
+        ]
+    )]
+    public function update(DictionaryRequest $request, {{ model }} $dictionary): {{ model }}
+    {
+        return $this->service->update($dictionary, $request->all());
+    }
+
+    /**
+     * @param {{ model }} $dictionary
+     * @return JsonResponse
+     */
+    #[OA\Delete(
+        path: '/api/dictionaries/{{ routeSlug }}/{uuid}',
+        summary: 'Usuwa pozycję słownika {{ model }}',
+        security: [['sanctum' => []]],
+        tags: ['Dictionaries'],
+        parameters: [
+            new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
+        ],
+        responses: [
+            new OA\Response(response: 204, description: 'Usunięto'),
+            new OA\Response(response: 404, description: 'Nie znaleziono'),
+        ]
+    )]
+    public function destroy({{ model }} $dictionary): JsonResponse
+    {
+        $this->service->delete($dictionary);
+
+        return response()->json([], 204);
+    }
+}

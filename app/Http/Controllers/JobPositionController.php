@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\AssignJobPositionRequest;
+use App\Http\Requests\AssignPermissionsRequest;
 use App\Http\Requests\ExportRequest;
 use App\Http\Requests\JobPositionRequest;
 use App\Http\Resources\JobPositionResource;
@@ -255,5 +256,41 @@ class JobPositionController extends Controller
     public function export(ExportRequest $request): BinaryFileResponse
     {
         return $this->jobPositionService->export($request);
+    }
+
+    /**
+     * @param JobPosition $jobPosition
+     * @param AssignPermissionsRequest $request
+     * @return JsonResponse
+     */
+    #[OA\Patch(
+        path: '/api/job-position/{uuid}/permissions',
+        summary: 'Nadaje stanowisku uprawnienia lub grupy uprawnień (opcjonalnie czasowo)',
+        security: [['sanctum' => []]],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                properties: [
+                    new OA\Property(property: 'permissions', type: 'array', items: new OA\Items(type: 'string', format: 'uuid')),
+                    new OA\Property(property: 'permission_groups', type: 'array', items: new OA\Items(type: 'string', format: 'uuid')),
+                    new OA\Property(property: 'expires_at', type: 'string', format: 'date-time', nullable: true),
+                ]
+            )
+        ),
+        tags: ['JobPosition'],
+        parameters: [
+            new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
+        ],
+        responses: [
+            new OA\Response(response: 204, description: 'Nadano'),
+            new OA\Response(response: 404, description: 'Nie znaleziono'),
+            new OA\Response(response: 422, description: 'Błąd walidacji'),
+        ]
+    )]
+    public function assignPermissions(JobPosition $jobPosition, AssignPermissionsRequest $request): JsonResponse
+    {
+        $this->jobPositionService->assignPermissions($jobPosition, $request->all());
+
+        return new JsonResponse(null, 204);
     }
 }

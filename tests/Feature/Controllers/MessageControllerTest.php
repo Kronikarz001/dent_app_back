@@ -71,8 +71,7 @@ class MessageControllerTest extends TestCase
     public function testStoreFailsValidationWhenBothRecipientAndGroupProvided(): void
     {
         $recipient = User::factory()->create();
-        $message = Message::factory()->create();
-        $group = MessageGroup::factory()->create(['message_uuid' => $message->uuid]);
+        $group = MessageGroup::factory()->create();
 
         $response = $this->callApiWithLoggedUser()
             ->postJson(route('message.store'), [
@@ -82,6 +81,53 @@ class MessageControllerTest extends TestCase
             ]);
 
         $response->assertUnprocessable();
+    }
+
+    /**
+     * @return void
+     */
+    public function testStoreFailsWhenSenderIsNotGroupMember(): void
+    {
+        $group = MessageGroup::factory()->create();
+
+        $response = $this->callApiWithLoggedUser()
+            ->postJson(route('message.store'), [
+                'message' => 'Hej',
+                'message_group_uuid' => $group->uuid,
+            ]);
+
+        $response->assertForbidden();
+    }
+
+    /**
+     * @return void
+     */
+    public function testDestroyRemovesOwnMessage(): void
+    {
+        $user = User::factory()->create();
+        $message = Message::factory()->create(['user_uuid' => $user->uuid]);
+
+        $response = $this->callApiWithLoggedUser($user)
+            ->deleteJson(route('message.destroy', ['message' => $message->uuid]));
+
+        $response->assertNoContent();
+        $this->assertDatabaseMissing('messages', ['uuid' => $message->uuid]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testDestroyForbiddenWhenNotOwner(): void
+    {
+        $owner = User::factory()->create();
+        $other = User::factory()->create();
+        $message = Message::factory()->create(['user_uuid' => $owner->uuid]);
+
+        $response = $this->callApiWithLoggedUser($other)
+            ->deleteJson(route('message.destroy', ['message' => $message->uuid]));
+
+        $response->assertForbidden();
+        $this->assertDatabaseHas('messages', ['uuid' => $message->uuid]);
     }
 
     /**
@@ -109,13 +155,30 @@ class MessageControllerTest extends TestCase
     {
         $sender = User::factory()->create();
         $message = Message::factory()->create(['user_uuid' => $sender->uuid]);
-        $group = MessageGroup::factory()->create(['message_uuid' => $message->uuid]);
+        $group = MessageGroup::factory()->create();
         $message->update(['message_group_uuid' => $group->uuid]);
+        $group->users()->attach($sender->uuid);
 
-        $response = $this->callApiWithLoggedUser()
+        $response = $this->callApiWithLoggedUser($sender)
             ->getJson(route('messageGroup.messages', ['messageGroup' => $group->uuid]));
 
         $response->assertOk();
         $response->assertJsonPath('data.0.uuid', $message->uuid);
+    }
+
+    /**
+     * @return void
+     */
+    public function testUnreadCountReturnsNumberOfUnreadConversations(): void
+    {
+        $user = User::factory()->create();
+        $other = User::factory()->create();
+        Message::factory()->create(['user_uuid' => $other->uuid, 'recipient_user_uuid' => $user->uuid]);
+
+        $response = $this->callApiWithLoggedUser($user)
+            ->getJson(route('message.unreadCount'));
+
+        $response->assertOk();
+        $response->assertJsonPath('count', 1);
     }
 }

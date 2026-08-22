@@ -57,8 +57,10 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: 'pwz_numer', type: 'string', nullable: true),
         new OA\Property(property: 'avatar_path', type: 'string', nullable: true),
         new OA\Property(property: 'background_path', type: 'string', nullable: true),
-        new OA\Property(property: 'phone_number', type: 'array', items: new OA\Items(ref: '#/components/schemas/PhoneNumberResource')),
+        new OA\Property(property: 'private_phone_number', type: 'string', nullable: true),
+        new OA\Property(property: 'phone_number', type: 'string', nullable: true),
         new OA\Property(property: 'job_positions', type: 'array', items: new OA\Items(ref: '#/components/schemas/JobPositionResource')),
+        new OA\Property(property: 'status', type: 'string', enum: ['ACTIVE', 'NON_ACTIVE'], description: 'ACTIVE gdy użytkownik ma aktualnie ważny token'),
         new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
     ]
 )]
@@ -73,7 +75,8 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: 'is_active', type: 'boolean'),
         new OA\Property(property: 'pwz_numer', type: 'string', nullable: true),
         new OA\Property(property: 'avatar_path', type: 'string', nullable: true),
-        new OA\Property(property: 'phone_number', type: 'array', items: new OA\Items(ref: '#/components/schemas/PhoneNumberResource')),
+        new OA\Property(property: 'private_phone_number', type: 'string', nullable: true),
+        new OA\Property(property: 'phone_number', type: 'string', nullable: true),
         new OA\Property(property: 'job_positions', type: 'array', items: new OA\Items(ref: '#/components/schemas/JobPositionResource')),
         new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
     ]
@@ -106,11 +109,27 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: 'type', type: 'string'),
         new OA\Property(property: 'name', type: 'string', nullable: true),
         new OA\Property(property: 'description', type: 'string', nullable: true),
-        new OA\Property(property: 'ownerable_uuid', type: 'string', format: 'uuid', nullable: true),
-        new OA\Property(property: 'ownerable_type', type: 'string', nullable: true),
-        new OA\Property(property: 'connected_calendar_uuid', type: 'string', format: 'uuid', nullable: true),
-        new OA\Property(property: 'start_date', type: 'string', format: 'date-time', nullable: true),
-        new OA\Property(property: 'end_date', type: 'string', format: 'date-time', nullable: true),
+        new OA\Property(property: 'date', type: 'string', format: 'date'),
+        new OA\Property(property: 'end_date', type: 'string', format: 'date', nullable: true),
+        new OA\Property(property: 'start_time', type: 'string', nullable: true),
+        new OA\Property(property: 'end_time', type: 'string', nullable: true),
+        new OA\Property(property: 'no_show', type: 'boolean'),
+        new OA\Property(property: 'is_active', type: 'boolean'),
+        new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
+        new OA\Property(property: 'updated_at', type: 'string', format: 'date-time'),
+    ]
+)]
+#[OA\Schema(
+    schema: 'EmployeeScheduleResource',
+    properties: [
+        new OA\Property(property: 'uuid', type: 'string', format: 'uuid'),
+        new OA\Property(property: 'type', type: 'string'),
+        new OA\Property(property: 'name', type: 'string', nullable: true),
+        new OA\Property(property: 'description', type: 'string', nullable: true),
+        new OA\Property(property: 'date', type: 'string', format: 'date'),
+        new OA\Property(property: 'end_date', type: 'string', format: 'date', nullable: true),
+        new OA\Property(property: 'start_time', type: 'string', nullable: true),
+        new OA\Property(property: 'end_time', type: 'string', nullable: true),
         new OA\Property(property: 'is_active', type: 'boolean'),
         new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
         new OA\Property(property: 'updated_at', type: 'string', format: 'date-time'),
@@ -139,6 +158,24 @@ use OpenApi\Attributes as OA;
     ]
 )]
 #[OA\Schema(
+    schema: 'CompanyResource',
+    properties: [
+        new OA\Property(property: 'uuid', type: 'string', format: 'uuid'),
+        new OA\Property(property: 'name', type: 'string'),
+        new OA\Property(property: 'regon', type: 'string'),
+        new OA\Property(property: 'nip', type: 'string'),
+        new OA\Property(property: 'address', type: 'string'),
+        new OA\Property(property: 'province', type: 'string'),
+        new OA\Property(property: 'district', type: 'string'),
+        new OA\Property(property: 'municipality', type: 'string'),
+        new OA\Property(property: 'business_form', type: 'string', nullable: true),
+        new OA\Property(property: 'type_of_business', type: 'string', nullable: true),
+        new OA\Property(property: 'form_of_ownership', type: 'string', nullable: true),
+        new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
+        new OA\Property(property: 'updated_at', type: 'string', format: 'date-time'),
+    ]
+)]
+#[OA\Schema(
     schema: 'MessageResource',
     properties: [
         new OA\Property(property: 'uuid', type: 'string', format: 'uuid'),
@@ -146,6 +183,7 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: 'recipient_user_uuid', type: 'string', format: 'uuid', nullable: true),
         new OA\Property(property: 'message_group_uuid', type: 'string', format: 'uuid', nullable: true),
         new OA\Property(property: 'message', type: 'string'),
+        new OA\Property(property: 'unread', type: 'boolean', description: 'Czy zalogowany użytkownik jeszcze nie przeczytał tej wiadomości'),
         new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
     ]
 )]
@@ -160,6 +198,54 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: 'change_from', type: 'object', nullable: true),
         new OA\Property(property: 'change_to', type: 'object', nullable: true),
         new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
+    ]
+)]
+#[OA\Schema(
+    schema: 'PermissionResource',
+    properties: [
+        new OA\Property(property: 'uuid', type: 'string', format: 'uuid'),
+        new OA\Property(property: 'resource', type: 'string'),
+        new OA\Property(property: 'type', type: 'string', enum: ['view', 'edit']),
+        new OA\Property(property: 'name', type: 'string', description: '{resource}.{type}'),
+        new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
+        new OA\Property(property: 'updated_at', type: 'string', format: 'date-time'),
+    ]
+)]
+#[OA\Schema(
+    schema: 'PermissionGroupResource',
+    properties: [
+        new OA\Property(property: 'uuid', type: 'string', format: 'uuid'),
+        new OA\Property(property: 'name', type: 'string'),
+        new OA\Property(property: 'permissions', type: 'array', items: new OA\Items(ref: '#/components/schemas/PermissionResource')),
+        new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
+        new OA\Property(property: 'updated_at', type: 'string', format: 'date-time'),
+    ]
+)]
+#[OA\Schema(
+    schema: 'UserGroupResource',
+    properties: [
+        new OA\Property(property: 'uuid', type: 'string', format: 'uuid'),
+        new OA\Property(property: 'name', type: 'string'),
+        new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
+        new OA\Property(property: 'updated_at', type: 'string', format: 'date-time'),
+    ]
+)]
+#[OA\Schema(
+    schema: 'RoleResource',
+    properties: [
+        new OA\Property(property: 'uuid', type: 'string', format: 'uuid'),
+        new OA\Property(property: 'name', type: 'string'),
+        new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
+        new OA\Property(property: 'updated_at', type: 'string', format: 'date-time'),
+    ]
+)]
+#[OA\Schema(
+    schema: 'DepartmentResource',
+    properties: [
+        new OA\Property(property: 'uuid', type: 'string', format: 'uuid'),
+        new OA\Property(property: 'name', type: 'string'),
+        new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
+        new OA\Property(property: 'updated_at', type: 'string', format: 'date-time'),
     ]
 )]
 abstract class Controller

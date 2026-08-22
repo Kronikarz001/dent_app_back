@@ -5,72 +5,61 @@ namespace App\Search;
 use App\Models\MessageGroup;
 use Illuminate\Database\Eloquent\Builder;
 
-/**
- * Summary of MessageGroupSearch
- */
 class MessageGroupSearch extends Search
 {
-    /**
-     * @return string
-     */
     protected function modelClass(): string
     {
         return MessageGroup::class;
     }
 
-    /**
-     * @return string
-     */
     protected function prefix(): string
     {
         return 'messageGroup';
     }
 
-    /**
-     * @return string[]
-     */
     protected function fillableSearchFields(): array
     {
         return [
-            'message_uuid',
+            'name',
+            'creator_uuid',
+            'is_default',
         ];
     }
 
-    /**
-     * @return string[]
-     */
     protected function fillableSortFields(): array
     {
         return [
+            'name',
             'created_at',
         ];
     }
 
-    /**
-     * @return string[]
-     */
     protected function searchStringFields(): array
     {
-        return [];
+        return [
+            'name',
+        ];
     }
 
-    /**
-     * @param Builder $query
-     * @param array $params
-     * @return void
-     */
     protected function preFilter(Builder $query, array $params): void
     {
+        $forUser = $params['for_user'] ?? null;
+        unset($params['for_user']);
+
+        if ($forUser !== null) {
+            $query->whereHas('users', function (Builder $q) use ($forUser) {
+                $q->where('users.uuid', $forUser);
+            });
+        }
+
         $query->where($params);
     }
 
-    /**
-     * @return string[]
-     */
     protected function relationsShipLoad(): array
     {
         return [
-            'rootMessage',
+            'creator',
+            'users',
         ];
     }
 }

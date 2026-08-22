@@ -2,18 +2,37 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\CalendarEventType;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rules\Enum;
 
+/**
+ * Summary of CalendarRequest
+ */
 class CalendarRequest extends FormRequest
 {
+    /**
+     * @return bool
+     */
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    /**
+     * @return array
+     */
     public function rules(): array
     {
         return [
-            'type' => ['required'],
+            'type' => ['required', (new Enum(CalendarEventType::class))->only(CalendarEventType::appointmentTypes())],
             'name' => ['nullable'],
             'description' => ['nullable'],
-            'start_date' => ['nullable', 'date'],
-            'end_date' => ['required', 'date'],
+            'date' => ['required', 'date'],
+            'end_date' => ['nullable', 'date'],
+            'start_time' => ['nullable', 'date_format:H:i'],
+            'end_time' => ['nullable', 'date_format:H:i'],
+            'no_show' => ['boolean'],
             'created_by' => ['nullable', 'exists:users,uuid'],
             'is_active' => ['boolean'],
             'dental_examinations' => ['nullable', 'array'],
@@ -21,8 +40,24 @@ class CalendarRequest extends FormRequest
         ];
     }
 
-    public function authorize(): bool
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
     {
-        return true;
+        return [
+            'type.required' => 'Typ jest wymagany.',
+            'type.enum' => 'Wybrany typ jest nieprawidłowy.',
+            'date.required' => 'Data jest wymagana.',
+            'date.date' => 'Data musi być prawidłową datą.',
+            'end_date.date' => 'Data zakończenia musi być prawidłową datą.',
+            'start_time.date_format' => 'Godzina rozpoczęcia musi być w formacie GG:MM.',
+            'end_time.date_format' => 'Godzina zakończenia musi być w formacie GG:MM.',
+            'no_show.boolean' => 'Pole no_show musi być wartością logiczną.',
+            'created_by.exists' => 'Wybrany użytkownik nie istnieje.',
+            'is_active.boolean' => 'Pole is_active musi być wartością logiczną.',
+            'dental_examinations.array' => 'Pole dental_examinations musi być tablicą.',
+            'dental_examinations.*.exists' => 'Wybrane badanie stomatologiczne nie istnieje.',
+        ];
     }
 }

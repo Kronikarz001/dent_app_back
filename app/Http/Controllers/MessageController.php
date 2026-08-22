@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\MessageRequest;
 use App\Http\Resources\MessageResource;
+use App\Models\Message;
 use App\Services\MessageServiceInterface;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Pagination\LengthAwarePaginator;
 use OpenApi\Attributes as OA;
 
@@ -54,7 +56,7 @@ class MessageController extends Controller
      */
     #[OA\Post(
         path: '/api/message',
-        summary: 'Wysyła wiadomość do konkretnej osoby, do grupy, lub jako nowy broadcast do wszystkich',
+        summary: 'Wysyła wiadomość do konkretnej osoby lub do grupy',
         security: [['sanctum' => []]],
         requestBody: new OA\RequestBody(
             required: true,
@@ -62,8 +64,8 @@ class MessageController extends Controller
                 required: ['message'],
                 properties: [
                     new OA\Property(property: 'message', type: 'string'),
-                    new OA\Property(property: 'recipient_uuid', type: 'string', format: 'uuid', nullable: true, description: 'Wiadomość bezpośrednia do tego użytkownika'),
-                    new OA\Property(property: 'message_group_uuid', type: 'string', format: 'uuid', nullable: true, description: 'Dopisanie do istniejącej grupy/konwersacji'),
+                    new OA\Property(property: 'recipient_uuid', description: 'Wiadomość bezpośrednia do użytkownika (wyklucza message_group_uuid)', type: 'string', format: 'uuid', nullable: true),
+                    new OA\Property(property: 'message_group_uuid', description: 'Wiadomość do grupy (wyklucza recipient_uuid)', type: 'string', format: 'uuid', nullable: true),
                 ]
             )
         ),
@@ -82,5 +84,75 @@ class MessageController extends Controller
     public function store(MessageRequest $request): MessageResource
     {
         return new MessageResource($this->messageService->send($request->all()));
+    }
+
+    /**
+     * @param Message $message
+     * @return JsonResponse
+     */
+    #[OA\Delete(
+        path: '/api/message/{message}',
+        summary: 'Usuwa wiadomość',
+        security: [['sanctum' => []]],
+        tags: ['Message'],
+        parameters: [
+            new OA\PathParameter(name: 'message', schema: new OA\Schema(type: 'string', format: 'uuid')),
+        ],
+        responses: [
+            new OA\Response(response: 204, description: 'Usunięto'),
+            new OA\Response(response: 403, description: 'Można usuwać tylko własne wiadomości'),
+            new OA\Response(response: 404, description: 'Nie znaleziono'),
+        ]
+    )]
+    public function destroy(Message $message): JsonResponse
+    {
+        $this->messageService->deleteMessage($message);
+
+        return new JsonResponse(null, 204);
+    }
+
+    /**
+     * @param Message $message
+     * @return JsonResponse
+     */
+    #[OA\Post(
+        path: '/api/message/{message}/read',
+        summary: 'Oznacza prywatną wiadomość jako przeczytaną przez zalogowanego odbiorcę',
+        security: [['sanctum' => []]],
+        tags: ['Message'],
+        parameters: [
+            new OA\PathParameter(name: 'message', schema: new OA\Schema(type: 'string', format: 'uuid')),
+        ],
+        responses: [
+            new OA\Response(response: 204, description: 'Oznaczono'),
+            new OA\Response(response: 404, description: 'Nie znaleziono'),
+        ]
+    )]
+    public function markAsRead(Message $message): JsonResponse
+    {
+        $this->messageService->markAsRead($message);
+
+        return new JsonResponse(null, 204);
+    }
+
+    /**
+     * @return JsonResponse
+     */
+    #[OA\Get(
+        path: '/api/message/unread-count',
+        summary: 'Zwraca liczbę nieprzeczytanych konwersacji zalogowanego użytkownika (do badge\'a)',
+        security: [['sanctum' => []]],
+        tags: ['Message'],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'OK',
+                content: new OA\JsonContent(properties: [new OA\Property(property: 'count', type: 'integer')])
+            ),
+        ]
+    )]
+    public function unreadCount(): JsonResponse
+    {
+        return new JsonResponse(['count' => $this->messageService->getUnreadConversationsCount()]);
     }
 }

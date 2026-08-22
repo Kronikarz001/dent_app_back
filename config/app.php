@@ -56,6 +56,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Frontend URL
+    |--------------------------------------------------------------------------
+    |
+    | This URL is used to build links sent to users (e.g. the password reset
+    | link in the forgot-password email) that point to the frontend client.
+    |
+    */
+
+    'frontend_url' => env('FRONTEND_URL', 'http://localhost:3000/'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Timezone
     |--------------------------------------------------------------------------
     |

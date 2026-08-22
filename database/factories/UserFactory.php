@@ -35,6 +35,7 @@ class UserFactory extends Factory
             'private_email' => fake()->unique()->safeEmail(),
             'private_email_verified_at' => now(),
             'is_active' => true,
+            'is_admin' => true,
         ];
     }
 

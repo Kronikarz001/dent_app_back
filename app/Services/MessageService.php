@@ -2,6 +2,9 @@
 
 namespace App\Services;
 
+use App\Events\MessageSent;
+use App\Exceptions\MessageAccessDeniedException;
+use App\Exceptions\MessageGroupAccessDeniedException;
 use App\Models\Message;
 use App\Models\MessageGroup;
 use App\Repositories\MessageGroupRepositoryInterface;
@@ -32,41 +35,46 @@ readonly class MessageService implements MessageServiceInterface
         $sender = Auth::user();
 
         if (! empty($data['message_group_uuid'])) {
-            return $this->messageRepository->create([
+            $this->assertSenderIsGroupMember($data['message_group_uuid'], $sender->uuid);
+
+            $message = $this->messageRepository->create([
                 'user_uuid' => $sender->uuid,
                 'message_group_uuid' => $data['message_group_uuid'],
                 'message' => $data['message'],
             ]);
-        }
-
-        if (! empty($data['recipient_uuid'])) {
-            return $this->messageRepository->create([
+        } elseif (! empty($data['recipient_uuid'])) {
+            $message = $this->messageRepository->create([
                 'user_uuid' => $sender->uuid,
                 'recipient_user_uuid' => $data['recipient_uuid'],
                 'message' => $data['message'],
             ]);
+        } else {
+            $defaultGroup = MessageGroup::where('is_default', true)->first();
+
+            $message = $this->messageRepository->create([
+                'user_uuid' => $sender->uuid,
+                'message_group_uuid' => $defaultGroup->uuid,
+                'message' => $data['message'],
+            ]);
         }
 
-        return $this->broadcast($sender->uuid, $data['message']);
+        MessageSent::dispatch($message);
+
+        return $message;
     }
 
     /**
+     * @param string $messageGroupUuid
      * @param string $senderUuid
-     * @param string $message
-     * @return Message
+     * @return void
      */
-    private function broadcast(string $senderUuid, string $message): Message
+    private function assertSenderIsGroupMember(string $messageGroupUuid, string $senderUuid): void
     {
-        $rootMessage = $this->messageRepository->create([
-            'user_uuid' => $senderUuid,
-            'message' => $message,
-        ]);
+        $group = $this->messageGroupRepository->findByUuid($messageGroupUuid);
 
-        $group = $this->messageGroupRepository->create([
-            'message_uuid' => $rootMessage->uuid,
-        ]);
-
-        return $this->messageRepository->assignGroup($rootMessage, $group->uuid);
+        if ($group === null || ! $this->messageGroupRepository->hasMember($group, $senderUuid)) {
+            throw new MessageGroupAccessDeniedException;
+        }
     }
 
     /**
@@ -74,15 +82,56 @@ readonly class MessageService implements MessageServiceInterface
      */
     public function getInbox(): LengthAwarePaginator
     {
-        return $this->messageRepository->findAllWithPagination(['for_user' => Auth::id()]);
+        $user = Auth::user();
+        $userGroupUuids = $user->messageGroups()->pluck('message_groups.uuid')->toArray();
+
+        return $this->messageRepository->findAllWithPagination([
+            'for_user' => $user->uuid,
+            'user_group_uuids' => $userGroupUuids,
+        ]);
     }
 
     /**
-     * @param MessageGroup $messageGroup
-     * @return LengthAwarePaginator
+     * @param Message $message
+     * @return void
      */
-    public function getGroupMessages(MessageGroup $messageGroup): LengthAwarePaginator
+    public function deleteMessage(Message $message): void
     {
-        return $this->messageRepository->findAllWithPagination(['message_group_uuid' => $messageGroup->uuid]);
+        if ($message->user_uuid !== Auth::id()) {
+            throw new MessageAccessDeniedException;
+        }
+
+        $this->messageRepository->delete($message);
+    }
+
+    /**
+     * @param Message $message
+     * @return void
+     */
+    public function markAsRead(Message $message): void
+    {
+        $userUuid = Auth::user()->uuid;
+
+        if ($message->message_group_uuid !== null) {
+            $isMember = $message->group()
+                ->whereHas('users', fn ($query) => $query->where('users.uuid', $userUuid))
+                ->exists();
+
+            if (! $isMember) {
+                return;
+            }
+        } elseif ($message->recipient_user_uuid !== $userUuid) {
+            return;
+        }
+
+        $this->messageRepository->markAsReadBy($message, $userUuid);
+    }
+
+    /**
+     * @return int
+     */
+    public function getUnreadConversationsCount(): int
+    {
+        return $this->messageRepository->countUnreadConversationsForUser(Auth::user());
     }
 }
