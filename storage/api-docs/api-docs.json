@@ -423,6 +423,61 @@
                 ]
             }
         },
+        "/api/employee-schedule/{uuid}/history": {
+            "get": {
+                "tags": [
+                    "Auditable"
+                ],
+                "summary": "Historia zmian wydarzenia w kalendarzu pracowników",
+                "operationId": "79cd894d060e8fc752ba383f06a2c53f",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/PaginatedResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/AuditResource"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/dental-examination/{uuid}/history": {
             "get": {
                 "tags": [
@@ -687,6 +742,52 @@
                 ],
                 "summary": "Eksport historii zmian wydarzenia w kalendarzu",
                 "operationId": "95cc27a02c23ba51a017dbee78d5ff9c",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "xlsx",
+                                "csv",
+                                "ods"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Plik do pobrania"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/employee-schedule/{uuid}/history/export": {
+            "get": {
+                "tags": [
+                    "Auditable"
+                ],
+                "summary": "Eksport historii zmian wydarzenia w kalendarzu pracowników",
+                "operationId": "2f0f0a6bdcb2e640168196ce06727cc0",
                 "parameters": [
                     {
                         "name": "uuid",
@@ -1130,7 +1231,7 @@
                             "schema": {
                                 "required": [
                                     "type",
-                                    "end_date"
+                                    "date"
                                 ],
                                 "properties": {
                                     "type": {
@@ -1144,14 +1245,27 @@
                                         "type": "string",
                                         "nullable": true
                                     },
-                                    "start_date": {
+                                    "date": {
                                         "type": "string",
-                                        "format": "date-time",
-                                        "nullable": true
+                                        "format": "date"
                                     },
                                     "end_date": {
                                         "type": "string",
-                                        "format": "date-time"
+                                        "format": "date",
+                                        "nullable": true
+                                    },
+                                    "start_time": {
+                                        "type": "string",
+                                        "example": "09:00",
+                                        "nullable": true
+                                    },
+                                    "end_time": {
+                                        "type": "string",
+                                        "example": "09:30",
+                                        "nullable": true
+                                    },
+                                    "no_show": {
+                                        "type": "boolean"
                                     },
                                     "created_by": {
                                         "type": "string",
@@ -2915,6 +3029,361 @@
                                 }
                             }
                         }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/employee-schedule": {
+            "get": {
+                "tags": [
+                    "EmployeeSchedule"
+                ],
+                "summary": "Lista wydarzeń w kalendarzu pracowników",
+                "operationId": "429553a48929df850ef4fd81678f81a7",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/PaginatedResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/EmployeeScheduleResource"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "EmployeeSchedule"
+                ],
+                "summary": "Tworzy nowe wydarzenie w kalendarzu pracowników",
+                "operationId": "05408215af1017ee423e6c8cc2527ccc",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "type",
+                                    "date"
+                                ],
+                                "properties": {
+                                    "type": {
+                                        "type": "string"
+                                    },
+                                    "name": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "date": {
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "end_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "nullable": true
+                                    },
+                                    "start_time": {
+                                        "type": "string",
+                                        "example": "09:00",
+                                        "nullable": true
+                                    },
+                                    "end_time": {
+                                        "type": "string",
+                                        "example": "17:00",
+                                        "nullable": true
+                                    },
+                                    "is_active": {
+                                        "type": "boolean"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Utworzono",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/EmployeeScheduleResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Błąd walidacji"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/employee-schedule/selectlist": {
+            "get": {
+                "tags": [
+                    "EmployeeSchedule"
+                ],
+                "summary": "Wydarzenia do selecta (uuid + name)",
+                "operationId": "fc457fe6f5ff5c61ce721cde4f2c9d68",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/employee-schedule/{uuid}": {
+            "get": {
+                "tags": [
+                    "EmployeeSchedule"
+                ],
+                "summary": "Pobiera jedno wydarzenie",
+                "operationId": "e405245c8ff8ef5cbea3afe7c7cdac42",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/EmployeeScheduleResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "EmployeeSchedule"
+                ],
+                "summary": "Aktualizuje wydarzenie w kalendarzu pracowników",
+                "operationId": "006098c231bc34ad2eaffb3496e3ad0b",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "type",
+                                    "date"
+                                ],
+                                "properties": {
+                                    "type": {
+                                        "type": "string"
+                                    },
+                                    "name": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "date": {
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "end_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "nullable": true
+                                    },
+                                    "start_time": {
+                                        "type": "string",
+                                        "example": "09:00",
+                                        "nullable": true
+                                    },
+                                    "end_time": {
+                                        "type": "string",
+                                        "example": "17:00",
+                                        "nullable": true
+                                    },
+                                    "is_active": {
+                                        "type": "boolean"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "Zaktualizowano"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    },
+                    "422": {
+                        "description": "Błąd walidacji"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "EmployeeSchedule"
+                ],
+                "summary": "Usuwa wydarzenie z kalendarza pracowników",
+                "operationId": "506e37f6fd79ff51a59a6dbc92bcf94e",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Usunięto"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/employee-schedule/{uuid}/users": {
+            "patch": {
+                "tags": [
+                    "EmployeeSchedule"
+                ],
+                "summary": "Przypisuje pracowników do wydarzenia, zastępując poprzednią listę",
+                "operationId": "87c6abcd9a80143996c74e3ba9df6403",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "users": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "Przypisano"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    },
+                    "422": {
+                        "description": "Błąd walidacji"
                     }
                 },
                 "security": [
@@ -7745,28 +8214,72 @@
                         "type": "string",
                         "nullable": true
                     },
-                    "ownerable_uuid": {
+                    "date": {
                         "type": "string",
-                        "format": "uuid",
-                        "nullable": true
-                    },
-                    "ownerable_type": {
-                        "type": "string",
-                        "nullable": true
-                    },
-                    "connected_calendar_uuid": {
-                        "type": "string",
-                        "format": "uuid",
-                        "nullable": true
-                    },
-                    "start_date": {
-                        "type": "string",
-                        "format": "date-time",
-                        "nullable": true
+                        "format": "date"
                     },
                     "end_date": {
                         "type": "string",
-                        "format": "date-time",
+                        "format": "date",
+                        "nullable": true
+                    },
+                    "start_time": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "end_time": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "no_show": {
+                        "type": "boolean"
+                    },
+                    "is_active": {
+                        "type": "boolean"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "EmployeeScheduleResource": {
+                "properties": {
+                    "uuid": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "type": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "description": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "date": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "end_date": {
+                        "type": "string",
+                        "format": "date",
+                        "nullable": true
+                    },
+                    "start_time": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "end_time": {
+                        "type": "string",
                         "nullable": true
                     },
                     "is_active": {
@@ -8105,6 +8618,10 @@
         {
             "name": "DentalExaminationFile",
             "description": "DentalExaminationFile"
+        },
+        {
+            "name": "EmployeeSchedule",
+            "description": "EmployeeSchedule"
         },
         {
             "name": "Dentist",

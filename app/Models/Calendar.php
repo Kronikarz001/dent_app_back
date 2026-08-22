@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use App\Enums\CalendarEventType;
 use App\Traits\Auditable;
 use App\Traits\HasFile;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
@@ -18,8 +20,11 @@ class Calendar extends UuidModel
         'name',
         'description',
         'type',
-        'start_date',
+        'date',
         'end_date',
+        'start_time',
+        'end_time',
+        'no_show',
         'is_active',
     ];
 
@@ -29,12 +34,24 @@ class Calendar extends UuidModel
     protected function casts(): array
     {
         return [
-            'ownerable_uuid' => 'string',
-            'connected_calendar_uuid' => 'string',
-            'start_date' => 'timestamp',
-            'end_date' => 'timestamp',
+            'date' => 'date',
+            'end_date' => 'date',
+            'no_show' => 'boolean',
             'is_active' => 'boolean',
         ];
+    }
+
+    /**
+     * @return void
+     */
+    protected static function booted(): void
+    {
+        static::addGlobalScope('appointmentType', function (Builder $query) {
+            $query->whereIn($query->getModel()->getTable().'.type', array_map(
+                fn (CalendarEventType $type) => $type->value,
+                CalendarEventType::appointmentTypes()
+            ));
+        });
     }
 
     /**
@@ -42,7 +59,7 @@ class Calendar extends UuidModel
      */
     public function users(): MorphToMany
     {
-        return $this->morphedByMany(User::class, 'userable', 'calendar_users');
+        return $this->morphedByMany(User::class, 'userable', 'calendar_users', 'calendar_uuid');
     }
 
     /**
@@ -50,7 +67,7 @@ class Calendar extends UuidModel
      */
     public function patients(): MorphToMany
     {
-        return $this->morphedByMany(Patient::class, 'userable', 'calendar_users');
+        return $this->morphedByMany(Patient::class, 'userable', 'calendar_users', 'calendar_uuid');
     }
 
     /**

@@ -7,9 +7,9 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Enum;
 
 /**
- * Summary of CalendarRequest
+ * Summary of EmployeeScheduleRequest
  */
-class CalendarRequest extends FormRequest
+class EmployeeScheduleRequest extends FormRequest
 {
     /**
      * @return bool
@@ -25,18 +25,14 @@ class CalendarRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'type' => ['required', (new Enum(CalendarEventType::class))->only(CalendarEventType::appointmentTypes())],
+            'type' => ['required', (new Enum(CalendarEventType::class))->only(CalendarEventType::employeeTypes())],
             'name' => ['nullable'],
             'description' => ['nullable'],
             'date' => ['required', 'date'],
             'end_date' => ['nullable', 'date'],
             'start_time' => ['nullable', 'date_format:H:i'],
             'end_time' => ['nullable', 'date_format:H:i'],
-            'no_show' => ['boolean'],
-            'created_by' => ['nullable', 'exists:users,uuid'],
             'is_active' => ['boolean'],
-            'dental_examinations' => ['nullable', 'array'],
-            'dental_examinations.*' => ['string', 'exists:dental_examinations,uuid'],
         ];
     }
 
@@ -53,11 +49,7 @@ class CalendarRequest extends FormRequest
             'end_date.date' => 'Data zakończenia musi być prawidłową datą.',
             'start_time.date_format' => 'Godzina rozpoczęcia musi być w formacie GG:MM.',
             'end_time.date_format' => 'Godzina zakończenia musi być w formacie GG:MM.',
-            'no_show.boolean' => 'Pole no_show musi być wartością logiczną.',
-            'created_by.exists' => 'Wybrany użytkownik nie istnieje.',
             'is_active.boolean' => 'Pole is_active musi być wartością logiczną.',
-            'dental_examinations.array' => 'Pole dental_examinations musi być tablicą.',
-            'dental_examinations.*.exists' => 'Wybrane badanie stomatologiczne nie istnieje.',
         ];
     }
 }

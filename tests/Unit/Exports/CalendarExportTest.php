@@ -21,8 +21,11 @@ final class CalendarExportTest extends UnitTestCase
             'Nazwa',
             'Opis',
             'Typ',
-            'Data początku',
-            'Data końca',
+            'Data',
+            'Data zakończenia',
+            'Godzina rozpoczęcia',
+            'Godzina zakończenia',
+            'Nie przyszedł',
             'Aktywny',
         ];
         $this->assertEquals($expected, $export->headings());
@@ -37,8 +40,11 @@ final class CalendarExportTest extends UnitTestCase
             'name' => 'Wizyta',
             'description' => 'Opis wizyty',
             'type' => 'EXAMINATION',
-            'start_date' => '2026-01-01 10:00:00',
-            'end_date' => '2026-01-02 10:00:00',
+            'date' => '2026-01-01',
+            'end_date' => '2026-01-02',
+            'start_time' => '10:00',
+            'end_time' => '10:30',
+            'no_show' => false,
             'is_active' => true,
         ]);
 
@@ -49,8 +55,11 @@ final class CalendarExportTest extends UnitTestCase
             'name' => 'Wizyta',
             'description' => 'Opis wizyty',
             'type' => 'EXAMINATION',
-            'start_date' => $calendar->start_date,
+            'date' => $calendar->date,
             'end_date' => $calendar->end_date,
+            'start_time' => $calendar->start_time,
+            'end_time' => $calendar->end_time,
+            'no_show' => 'Nie',
             'is_active' => 'Tak',
         ], $result);
     }
