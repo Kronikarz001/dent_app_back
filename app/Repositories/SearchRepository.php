@@ -5,6 +5,7 @@ namespace App\Repositories;
 use Closure;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Pagination\LengthAwarePaginator as LengthAwarePaginatorImpl;
 
 /**
  * Summary of SearchRepository
@@ -240,6 +241,12 @@ class SearchRepository implements SearchRepositoryInterface
      */
     public function paginate(Builder $query, int $perPage): LengthAwarePaginator
     {
+        if ($perPage < 0) {
+            $items = $query->get();
+
+            return new LengthAwarePaginatorImpl($items, $items->count(), max($items->count(), 1));
+        }
+
         return $query->paginate($perPage);
     }
 }
