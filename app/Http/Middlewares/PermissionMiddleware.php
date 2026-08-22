@@ -27,7 +27,9 @@ class PermissionMiddleware
     private const ALWAYS_ALLOWED = [
         'auth.logout',
         'role.delegate',
-        'role-group.delegate',
+        'department.delegate',
+        'department.createRole',
+        'user-group.createRole',
     ];
 
     /**

@@ -28,7 +28,9 @@ class RegisterPermissionAdminRoutePermissionsSeederTest extends TestCase
         $this->assertDatabaseHas('permission_routes', ['route_name' => 'role.index', 'resource' => 'role']);
         $this->assertDatabaseHas('permission_routes', ['route_name' => 'user-group.assignUsers', 'resource' => 'user-group']);
         $this->assertDatabaseMissing('permission_routes', ['route_name' => 'role.delegate']);
-        $this->assertDatabaseMissing('permission_routes', ['route_name' => 'role-group.delegate']);
+        $this->assertDatabaseMissing('permission_routes', ['route_name' => 'department.delegate']);
+        $this->assertDatabaseMissing('permission_routes', ['route_name' => 'department.createRole']);
+        $this->assertDatabaseMissing('permission_routes', ['route_name' => 'user-group.createRole']);
 
         $method = (new ReflectionClass($seeder))->getMethod('resourceRoutes');
         $method->setAccessible(true);

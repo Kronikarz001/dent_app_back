@@ -5,9 +5,13 @@ namespace App\Services;
 use App\Exports\JobPositionExport;
 use App\Http\Requests\ExportRequest;
 use App\Models\JobPosition;
+use App\Models\Permission;
+use App\Models\PermissionAssignment;
+use App\Models\PermissionGroup;
 use App\Models\User;
 use App\Repositories\JobPositionRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Auth;
 use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\Writer\Exception as WriterException;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -92,5 +96,41 @@ readonly class JobPositionService implements JobPositionServiceInterface
     public function export(ExportRequest $request): BinaryFileResponse
     {
         return $this->exportService->export($request, new JobPositionExport($this->getJobPositions()->getCollection()), JobPosition::getModel());
+    }
+
+    /**
+     * @param JobPosition $jobPosition
+     * @param array $data
+     * @return void
+     */
+    public function assignPermissions(JobPosition $jobPosition, array $data): void
+    {
+        foreach ($data['permissions'] ?? [] as $permissionUuid) {
+            $this->grant(Permission::class, $permissionUuid, $jobPosition, $data['expires_at'] ?? null);
+        }
+
+        foreach ($data['permission_groups'] ?? [] as $permissionGroupUuid) {
+            $this->grant(PermissionGroup::class, $permissionGroupUuid, $jobPosition, $data['expires_at'] ?? null);
+        }
+    }
+
+    /**
+     * @param string $grantableType
+     * @param string $grantableUuid
+     * @param JobPosition $jobPosition
+     * @param string|null $expiresAt
+     * @return void
+     */
+    private function grant(string $grantableType, string $grantableUuid, JobPosition $jobPosition, ?string $expiresAt): void
+    {
+        PermissionAssignment::firstOrCreate([
+            'grantable_type' => $grantableType,
+            'grantable_id' => $grantableUuid,
+            'assignable_type' => JobPosition::class,
+            'assignable_id' => $jobPosition->uuid,
+        ], [
+            'expires_at' => $expiresAt,
+            'granted_by' => Auth::id(),
+        ]);
     }
 }

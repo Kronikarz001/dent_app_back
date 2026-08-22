@@ -11,15 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('role_group_user', function (Blueprint $table) {
-            $table->uuid('role_group_uuid');
+        Schema::create('department_user', function (Blueprint $table) {
+            $table->uuid('department_uuid');
             $table->uuid('user_uuid');
             $table->boolean('is_manager')->default(false);
 
-            $table->primary(['role_group_uuid', 'user_uuid']);
+            $table->primary(['department_uuid', 'user_uuid']);
 
-            $table->foreign('role_group_uuid')
-                ->references('uuid')->on('role_groups')
+            $table->foreign('department_uuid')
+                ->references('uuid')->on('departments')
                 ->cascadeOnDelete();
 
             $table->foreign('user_uuid')
@@ -33,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('role_group_user');
+        Schema::dropIfExists('department_user');
     }
 };

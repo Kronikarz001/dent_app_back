@@ -5,9 +5,9 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
- * Summary of AssignUserGroupUsersRequest
+ * Summary of AssignDepartmentRolesRequest
  */
-class AssignUserGroupUsersRequest extends FormRequest
+class AssignDepartmentRolesRequest extends FormRequest
 {
     /**
      * @return bool
@@ -23,8 +23,8 @@ class AssignUserGroupUsersRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'users' => ['nullable', 'array'],
-            'users.*' => ['string', 'exists:users,uuid'],
+            'roles' => ['nullable', 'array'],
+            'roles.*' => ['string', 'exists:roles,uuid'],
         ];
     }
 
@@ -34,8 +34,8 @@ class AssignUserGroupUsersRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'users.array' => 'Pole users musi być tablicą.',
-            'users.*.exists' => 'Wybrany użytkownik nie istnieje.',
+            'roles.array' => 'Pole roles musi być tablicą.',
+            'roles.*.exists' => 'Wybrana rola nie istnieje.',
         ];
     }
 }

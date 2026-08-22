@@ -6,9 +6,9 @@ use App\Traits\Auditable;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
- * Summary of RoleGroup
+ * Summary of Department
  */
-class RoleGroup extends UuidModel
+class Department extends UuidModel
 {
     use Auditable;
 
@@ -23,8 +23,8 @@ class RoleGroup extends UuidModel
     {
         return $this->belongsToMany(
             Role::class,
-            'role_group_role',
-            'role_group_uuid',
+            'department_role',
+            'department_uuid',
             'role_uuid',
             'uuid',
             'uuid'
@@ -38,11 +38,26 @@ class RoleGroup extends UuidModel
     {
         return $this->belongsToMany(
             User::class,
-            'role_group_user',
-            'role_group_uuid',
+            'department_user',
+            'department_uuid',
             'user_uuid',
             'uuid',
             'uuid'
         )->withPivot('is_manager');
+    }
+
+    /**
+     * @return BelongsToMany
+     */
+    public function jobPositions(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            JobPosition::class,
+            'department_job_position',
+            'department_uuid',
+            'job_position_uuid',
+            'uuid',
+            'uuid'
+        );
     }
 }

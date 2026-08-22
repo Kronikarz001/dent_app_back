@@ -2,38 +2,41 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AssignDepartmentRolesRequest;
+use App\Http\Requests\AssignJobPositionsRequest;
 use App\Http\Requests\AssignManagedUsersRequest;
 use App\Http\Requests\AssignPermissionsRequest;
-use App\Http\Requests\AssignRoleGroupRolesRequest;
+use App\Http\Requests\CreateManagedRoleRequest;
 use App\Http\Requests\DelegatePermissionRequest;
-use App\Http\Requests\RoleGroupRequest;
-use App\Http\Resources\RoleGroupResource;
-use App\Models\RoleGroup;
-use App\Services\RoleGroupServiceInterface;
+use App\Http\Requests\DepartmentRequest;
+use App\Http\Resources\DepartmentResource;
+use App\Http\Resources\RoleResource;
+use App\Models\Department;
+use App\Services\DepartmentServiceInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Pagination\LengthAwarePaginator;
 use OpenApi\Attributes as OA;
 
 /**
- * Summary of RoleGroupController
+ * Summary of DepartmentController
  */
-class RoleGroupController extends Controller
+class DepartmentController extends Controller
 {
     /**
-     * @param RoleGroupServiceInterface $roleGroupService
+     * @param DepartmentServiceInterface $departmentService
      */
     public function __construct(
-        private readonly RoleGroupServiceInterface $roleGroupService
+        private readonly DepartmentServiceInterface $departmentService
     ) {}
 
     /**
      * @return LengthAwarePaginator
      */
     #[OA\Get(
-        path: '/api/role-group',
-        summary: 'Lista grup ról (paginacja)',
+        path: '/api/department',
+        summary: 'Lista działów (paginacja)',
         security: [['sanctum' => []]],
-        tags: ['RoleGroup'],
+        tags: ['Department'],
         responses: [
             new OA\Response(
                 response: 200,
@@ -42,7 +45,7 @@ class RoleGroupController extends Controller
                     allOf: [
                         new OA\Schema(ref: '#/components/schemas/PaginatedResponse'),
                         new OA\Schema(properties: [
-                            new OA\Property(property: 'data', type: 'array', items: new OA\Items(ref: '#/components/schemas/RoleGroupResource')),
+                            new OA\Property(property: 'data', type: 'array', items: new OA\Items(ref: '#/components/schemas/DepartmentResource')),
                         ]),
                     ]
                 )
@@ -51,35 +54,35 @@ class RoleGroupController extends Controller
     )]
     public function index(): LengthAwarePaginator
     {
-        return $this->roleGroupService->getRoleGroups();
+        return $this->departmentService->getDepartments();
     }
 
     /**
      * @return LengthAwarePaginator
      */
     #[OA\Get(
-        path: '/api/role-group/selectlist',
-        summary: 'Lista grup ról do selecta (uuid + name)',
+        path: '/api/department/selectlist',
+        summary: 'Lista działów do selecta (uuid + name)',
         security: [['sanctum' => []]],
-        tags: ['RoleGroup'],
+        tags: ['Department'],
         responses: [
             new OA\Response(response: 200, description: 'OK'),
         ]
     )]
     public function selectList(): LengthAwarePaginator
     {
-        return $this->roleGroupService->getRoleGroupsList();
+        return $this->departmentService->getDepartmentsList();
     }
 
     /**
-     * @param RoleGroup $roleGroup
-     * @return RoleGroupResource
+     * @param Department $department
+     * @return DepartmentResource
      */
     #[OA\Get(
-        path: '/api/role-group/{uuid}',
-        summary: 'Pobiera jedną grupę ról',
+        path: '/api/department/{uuid}',
+        summary: 'Pobiera jeden dział',
         security: [['sanctum' => []]],
-        tags: ['RoleGroup'],
+        tags: ['Department'],
         parameters: [
             new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
         ],
@@ -88,24 +91,24 @@ class RoleGroupController extends Controller
                 response: 200,
                 description: 'OK',
                 content: new OA\JsonContent(
-                    properties: [new OA\Property(property: 'data', ref: '#/components/schemas/RoleGroupResource')]
+                    properties: [new OA\Property(property: 'data', ref: '#/components/schemas/DepartmentResource')]
                 )
             ),
             new OA\Response(response: 404, description: 'Nie znaleziono'),
         ]
     )]
-    public function show(RoleGroup $roleGroup): RoleGroupResource
+    public function show(Department $department): DepartmentResource
     {
-        return new RoleGroupResource($roleGroup->load('roles'));
+        return new DepartmentResource($department->load('roles'));
     }
 
     /**
-     * @param RoleGroupRequest $request
-     * @return RoleGroupResource
+     * @param DepartmentRequest $request
+     * @return DepartmentResource
      */
     #[OA\Post(
-        path: '/api/role-group',
-        summary: 'Tworzy nową grupę ról',
+        path: '/api/department',
+        summary: 'Tworzy nowy dział',
         security: [['sanctum' => []]],
         requestBody: new OA\RequestBody(
             required: true,
@@ -116,31 +119,31 @@ class RoleGroupController extends Controller
                 ]
             )
         ),
-        tags: ['RoleGroup'],
+        tags: ['Department'],
         responses: [
             new OA\Response(
                 response: 201,
                 description: 'Utworzono',
                 content: new OA\JsonContent(
-                    properties: [new OA\Property(property: 'data', ref: '#/components/schemas/RoleGroupResource')]
+                    properties: [new OA\Property(property: 'data', ref: '#/components/schemas/DepartmentResource')]
                 )
             ),
             new OA\Response(response: 422, description: 'Błąd walidacji'),
         ]
     )]
-    public function store(RoleGroupRequest $request): RoleGroupResource
+    public function store(DepartmentRequest $request): DepartmentResource
     {
-        return new RoleGroupResource($this->roleGroupService->createRoleGroup($request->all()));
+        return new DepartmentResource($this->departmentService->createDepartment($request->all()));
     }
 
     /**
-     * @param RoleGroup $roleGroup
-     * @param RoleGroupRequest $request
+     * @param Department $department
+     * @param DepartmentRequest $request
      * @return JsonResponse
      */
     #[OA\Put(
-        path: '/api/role-group/{uuid}',
-        summary: 'Aktualizuje grupę ról',
+        path: '/api/department/{uuid}',
+        summary: 'Aktualizuje dział',
         security: [['sanctum' => []]],
         requestBody: new OA\RequestBody(
             required: true,
@@ -151,7 +154,7 @@ class RoleGroupController extends Controller
                 ]
             )
         ),
-        tags: ['RoleGroup'],
+        tags: ['Department'],
         parameters: [
             new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
         ],
@@ -161,22 +164,22 @@ class RoleGroupController extends Controller
             new OA\Response(response: 422, description: 'Błąd walidacji'),
         ]
     )]
-    public function update(RoleGroup $roleGroup, RoleGroupRequest $request): JsonResponse
+    public function update(Department $department, DepartmentRequest $request): JsonResponse
     {
-        $this->roleGroupService->updateRoleGroup($roleGroup, $request->all());
+        $this->departmentService->updateDepartment($department, $request->all());
 
         return new JsonResponse(null, 204);
     }
 
     /**
-     * @param RoleGroup $roleGroup
+     * @param Department $department
      * @return JsonResponse
      */
     #[OA\Delete(
-        path: '/api/role-group/{uuid}',
-        summary: 'Usuwa grupę ról',
+        path: '/api/department/{uuid}',
+        summary: 'Usuwa dział',
         security: [['sanctum' => []]],
-        tags: ['RoleGroup'],
+        tags: ['Department'],
         parameters: [
             new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
         ],
@@ -185,21 +188,21 @@ class RoleGroupController extends Controller
             new OA\Response(response: 404, description: 'Nie znaleziono'),
         ]
     )]
-    public function destroy(RoleGroup $roleGroup): JsonResponse
+    public function destroy(Department $department): JsonResponse
     {
-        $this->roleGroupService->deleteRoleGroup($roleGroup);
+        $this->departmentService->deleteDepartment($department);
 
         return new JsonResponse(null, 204);
     }
 
     /**
-     * @param RoleGroup $roleGroup
-     * @param AssignRoleGroupRolesRequest $request
+     * @param Department $department
+     * @param AssignDepartmentRolesRequest $request
      * @return JsonResponse
      */
     #[OA\Patch(
-        path: '/api/role-group/{uuid}/roles',
-        summary: 'Przypisuje role do grupy, zastępując poprzednią listę',
+        path: '/api/department/{uuid}/roles',
+        summary: 'Przypisuje role do działu, zastępując poprzednią listę',
         security: [['sanctum' => []]],
         requestBody: new OA\RequestBody(
             required: true,
@@ -209,7 +212,7 @@ class RoleGroupController extends Controller
                 ]
             )
         ),
-        tags: ['RoleGroup'],
+        tags: ['Department'],
         parameters: [
             new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
         ],
@@ -219,21 +222,55 @@ class RoleGroupController extends Controller
             new OA\Response(response: 422, description: 'Błąd walidacji'),
         ]
     )]
-    public function assignRoles(RoleGroup $roleGroup, AssignRoleGroupRolesRequest $request): JsonResponse
+    public function assignRoles(Department $department, AssignDepartmentRolesRequest $request): JsonResponse
     {
-        $this->roleGroupService->assignRoles($roleGroup, $request->all());
+        $this->departmentService->assignRoles($department, $request->all());
 
         return new JsonResponse(null, 204);
     }
 
     /**
-     * @param RoleGroup $roleGroup
+     * @param Department $department
+     * @param AssignJobPositionsRequest $request
+     * @return JsonResponse
+     */
+    #[OA\Patch(
+        path: '/api/department/{uuid}/job-positions',
+        summary: 'Przypisuje stanowiska do działu, zastępując poprzednią listę',
+        security: [['sanctum' => []]],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                properties: [
+                    new OA\Property(property: 'job_positions', type: 'array', items: new OA\Items(type: 'string', format: 'uuid')),
+                ]
+            )
+        ),
+        tags: ['Department'],
+        parameters: [
+            new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
+        ],
+        responses: [
+            new OA\Response(response: 204, description: 'Przypisano'),
+            new OA\Response(response: 404, description: 'Nie znaleziono'),
+            new OA\Response(response: 422, description: 'Błąd walidacji'),
+        ]
+    )]
+    public function assignJobPositions(Department $department, AssignJobPositionsRequest $request): JsonResponse
+    {
+        $this->departmentService->assignJobPositions($department, $request->all());
+
+        return new JsonResponse(null, 204);
+    }
+
+    /**
+     * @param Department $department
      * @param AssignManagedUsersRequest $request
      * @return JsonResponse
      */
     #[OA\Patch(
-        path: '/api/role-group/{uuid}/users',
-        summary: 'Przypisuje użytkowników bezpośrednio do grupy ról (z flagą is_manager), zastępując poprzednią listę',
+        path: '/api/department/{uuid}/users',
+        summary: 'Przypisuje użytkowników bezpośrednio do działu (z flagą is_manager), zastępując poprzednią listę',
         security: [['sanctum' => []]],
         requestBody: new OA\RequestBody(
             required: true,
@@ -248,7 +285,7 @@ class RoleGroupController extends Controller
                 ]
             )
         ),
-        tags: ['RoleGroup'],
+        tags: ['Department'],
         parameters: [
             new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
         ],
@@ -258,21 +295,21 @@ class RoleGroupController extends Controller
             new OA\Response(response: 422, description: 'Błąd walidacji'),
         ]
     )]
-    public function assignUsers(RoleGroup $roleGroup, AssignManagedUsersRequest $request): JsonResponse
+    public function assignUsers(Department $department, AssignManagedUsersRequest $request): JsonResponse
     {
-        $this->roleGroupService->assignUsers($roleGroup, $request->all());
+        $this->departmentService->assignUsers($department, $request->all());
 
         return new JsonResponse(null, 204);
     }
 
     /**
-     * @param RoleGroup $roleGroup
+     * @param Department $department
      * @param AssignPermissionsRequest $request
      * @return JsonResponse
      */
     #[OA\Patch(
-        path: '/api/role-group/{uuid}/permissions',
-        summary: 'Nadaje grupie ról uprawnienia lub grupy uprawnień (opcjonalnie czasowo)',
+        path: '/api/department/{uuid}/permissions',
+        summary: 'Nadaje działowi uprawnienia lub grupy uprawnień (opcjonalnie czasowo)',
         security: [['sanctum' => []]],
         requestBody: new OA\RequestBody(
             required: true,
@@ -284,7 +321,7 @@ class RoleGroupController extends Controller
                 ]
             )
         ),
-        tags: ['RoleGroup'],
+        tags: ['Department'],
         parameters: [
             new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
         ],
@@ -294,21 +331,21 @@ class RoleGroupController extends Controller
             new OA\Response(response: 422, description: 'Błąd walidacji'),
         ]
     )]
-    public function assignPermissions(RoleGroup $roleGroup, AssignPermissionsRequest $request): JsonResponse
+    public function assignPermissions(Department $department, AssignPermissionsRequest $request): JsonResponse
     {
-        $this->roleGroupService->assignPermissions($roleGroup, $request->all());
+        $this->departmentService->assignPermissions($department, $request->all());
 
         return new JsonResponse(null, 204);
     }
 
     /**
-     * @param RoleGroup $roleGroup
+     * @param Department $department
      * @param DelegatePermissionRequest $request
      * @return JsonResponse
      */
     #[OA\Post(
-        path: '/api/role-group/{uuid}/delegate',
-        summary: 'Kierownik grupy ról przekazuje własne uprawnienie (lub grupę uprawnień) innej osobie z tej grupy',
+        path: '/api/department/{uuid}/delegate',
+        summary: 'Kierownik działu przekazuje własne uprawnienie (lub grupę uprawnień) innej osobie z tego działu',
         security: [['sanctum' => []]],
         requestBody: new OA\RequestBody(
             required: true,
@@ -322,7 +359,7 @@ class RoleGroupController extends Controller
                 ]
             )
         ),
-        tags: ['RoleGroup'],
+        tags: ['Department'],
         parameters: [
             new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
         ],
@@ -333,10 +370,51 @@ class RoleGroupController extends Controller
             new OA\Response(response: 422, description: 'Błąd walidacji'),
         ]
     )]
-    public function delegate(RoleGroup $roleGroup, DelegatePermissionRequest $request): JsonResponse
+    public function delegate(Department $department, DelegatePermissionRequest $request): JsonResponse
     {
-        $this->roleGroupService->delegate($roleGroup, $request->all());
+        $this->departmentService->delegate($department, $request->all());
 
         return new JsonResponse(null, 204);
+    }
+
+    /**
+     * @param Department $department
+     * @param CreateManagedRoleRequest $request
+     * @return RoleResource
+     */
+    #[OA\Post(
+        path: '/api/department/{uuid}/managed-roles',
+        summary: 'Kierownik działu tworzy nową rolę w ramach działu i nadaje jej uprawnienia (muszą być podzbiorem uprawnień działu)',
+        security: [['sanctum' => []]],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ['name'],
+                properties: [
+                    new OA\Property(property: 'name', type: 'string'),
+                    new OA\Property(property: 'permissions', type: 'array', items: new OA\Items(type: 'string', format: 'uuid')),
+                    new OA\Property(property: 'permission_groups', type: 'array', items: new OA\Items(type: 'string', format: 'uuid')),
+                ]
+            )
+        ),
+        tags: ['Department'],
+        parameters: [
+            new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
+        ],
+        responses: [
+            new OA\Response(
+                response: 201,
+                description: 'Utworzono',
+                content: new OA\JsonContent(
+                    properties: [new OA\Property(property: 'data', ref: '#/components/schemas/RoleResource')]
+                )
+            ),
+            new OA\Response(response: 403, description: 'Brak statusu kierownika lub uprawnienie/grupa wykracza poza uprawnienia działu'),
+            new OA\Response(response: 422, description: 'Błąd walidacji'),
+        ]
+    )]
+    public function createRole(Department $department, CreateManagedRoleRequest $request): RoleResource
+    {
+        return new RoleResource($this->departmentService->createManagedRole($department, $request->all()));
     }
 }

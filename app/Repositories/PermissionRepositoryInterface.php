@@ -45,4 +45,20 @@ interface PermissionRepositoryInterface extends BasicRepositoryInterface
      * @return string[]
      */
     public function getUserPermissionNames(User $user): array;
+
+    /**
+     * @param string $assignableType
+     * @param string $assignableUuid
+     * @param Permission $permission
+     * @return bool
+     */
+    public function hasContainerPermissionGrant(string $assignableType, string $assignableUuid, Permission $permission): bool;
+
+    /**
+     * @param string $assignableType
+     * @param string $assignableUuid
+     * @param PermissionGroup $group
+     * @return bool
+     */
+    public function hasContainerGroupGrant(string $assignableType, string $assignableUuid, PermissionGroup $group): bool;
 }

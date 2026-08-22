@@ -15,6 +15,8 @@ Route::middleware('auth:sanctum')->group(function () {
         ->name('jobPosition.history.export');
     Route::patch('/user/{user}/jobposition', [JobPositionController::class, 'assignJobPosition'])
         ->name('user.jobPosition.assignJobPosition');
+    Route::patch('/job-position/{jobPosition}/permissions', [JobPositionController::class, 'assignPermissions'])
+        ->name('jobPosition.assignPermissions');
     Route::get('/job-position/selectlist', [JobPositionController::class, 'selectList'])
         ->name('jobPosition.selectList');
     Route::apiResource('/job-position', JobPositionController::class)

@@ -3,16 +3,18 @@
 namespace App\Repositories;
 
 use App\Enums\PermissionType;
+use App\Models\Department;
+use App\Models\JobPosition;
 use App\Models\Permission;
 use App\Models\PermissionAssignment;
 use App\Models\PermissionGroup;
 use App\Models\Role;
-use App\Models\RoleGroup;
 use App\Models\User;
 use App\Models\UserGroup;
 use App\Search\PermissionSearch;
 use App\Search\Search;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Collection;
 
 /**
@@ -100,6 +102,44 @@ class PermissionRepository extends SearchableRepository implements PermissionRep
     }
 
     /**
+     * @param string $assignableType
+     * @param string $assignableUuid
+     * @param Permission $permission
+     * @return bool
+     */
+    public function hasContainerPermissionGrant(string $assignableType, string $assignableUuid, Permission $permission): bool
+    {
+        $groupUuids = $permission->permissionGroups()->pluck('permission_groups.uuid');
+
+        return PermissionAssignment::query()
+            ->notExpired()
+            ->where('assignable_type', $assignableType)
+            ->where('assignable_id', $assignableUuid)
+            ->where(function (Builder $query) use ($permission, $groupUuids) {
+                $query->where(fn (Builder $q) => $q->where('grantable_type', Permission::class)->where('grantable_id', $permission->uuid))
+                    ->orWhere(fn (Builder $q) => $q->where('grantable_type', PermissionGroup::class)->whereIn('grantable_id', $groupUuids));
+            })
+            ->exists();
+    }
+
+    /**
+     * @param string $assignableType
+     * @param string $assignableUuid
+     * @param PermissionGroup $group
+     * @return bool
+     */
+    public function hasContainerGroupGrant(string $assignableType, string $assignableUuid, PermissionGroup $group): bool
+    {
+        return PermissionAssignment::query()
+            ->notExpired()
+            ->where('assignable_type', $assignableType)
+            ->where('assignable_id', $assignableUuid)
+            ->where('grantable_type', PermissionGroup::class)
+            ->where('grantable_id', $group->uuid)
+            ->exists();
+    }
+
+    /**
      * @param User $user
      * @return string[]
      */
@@ -131,33 +171,46 @@ class PermissionRepository extends SearchableRepository implements PermissionRep
      */
     private function assignableReachableQuery(User $user): Builder
     {
-        $userGroupUuids = $user->userGroups()->pluck('user_groups.uuid');
         $roleUuids = $user->roles()->pluck('roles.uuid');
-        $roleGroupUuids = $this->roleGroupUuidsForUser($user, $roleUuids);
+        $jobPositionUuids = $user->jobPositions()->pluck('job_positions.uuid');
+        $userGroupUuids = $this->containerUuidsFor(UserGroup::class, $user->userGroups(), $roleUuids, $jobPositionUuids);
+        $departmentUuids = $this->containerUuidsFor(Department::class, $user->departments(), $roleUuids, $jobPositionUuids);
 
         return PermissionAssignment::query()
             ->notExpired()
-            ->where(function (Builder $query) use ($user, $userGroupUuids, $roleUuids, $roleGroupUuids) {
+            ->where(function (Builder $query) use ($user, $userGroupUuids, $roleUuids, $jobPositionUuids, $departmentUuids) {
                 $query->where(fn (Builder $q) => $q->where('assignable_type', User::class)->where('assignable_id', $user->uuid))
                     ->orWhere(fn (Builder $q) => $q->where('assignable_type', UserGroup::class)->whereIn('assignable_id', $userGroupUuids))
                     ->orWhere(fn (Builder $q) => $q->where('assignable_type', Role::class)->whereIn('assignable_id', $roleUuids))
-                    ->orWhere(fn (Builder $q) => $q->where('assignable_type', RoleGroup::class)->whereIn('assignable_id', $roleGroupUuids));
+                    ->orWhere(fn (Builder $q) => $q->where('assignable_type', JobPosition::class)->whereIn('assignable_id', $jobPositionUuids))
+                    ->orWhere(fn (Builder $q) => $q->where('assignable_type', Department::class)->whereIn('assignable_id', $departmentUuids));
             });
     }
 
     /**
-     * @param User $user
+     * Reachable Department/UserGroup uuids for a user: directly joined, or
+     * via a Role/JobPosition the user holds that is attached to the container
+     * (Role and JobPosition sit at the same level and both propagate
+     * container grants to their members).
+     *
+     * @param class-string $containerClass
+     * @param BelongsToMany $directRelation
      * @param Collection $roleUuids
+     * @param Collection $jobPositionUuids
      * @return Collection
      */
-    private function roleGroupUuidsForUser(User $user, Collection $roleUuids): Collection
+    private function containerUuidsFor(string $containerClass, BelongsToMany $directRelation, Collection $roleUuids, Collection $jobPositionUuids): Collection
     {
-        $directUuids = $user->roleGroups()->pluck('role_groups.uuid');
+        $directUuids = $directRelation->pluck($directRelation->getModel()->getTable().'.uuid');
 
-        $viaRolesUuids = RoleGroup::query()
+        $viaRolesUuids = $containerClass::query()
             ->whereHas('roles', fn (Builder $query) => $query->whereIn('roles.uuid', $roleUuids))
             ->pluck('uuid');
 
-        return $directUuids->merge($viaRolesUuids)->unique();
+        $viaJobPositionsUuids = $containerClass::query()
+            ->whereHas('jobPositions', fn (Builder $query) => $query->whereIn('job_positions.uuid', $jobPositionUuids))
+            ->pluck('uuid');
+
+        return $directUuids->merge($viaRolesUuids)->merge($viaJobPositionsUuids)->unique();
     }
 }

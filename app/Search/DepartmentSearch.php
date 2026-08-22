@@ -2,20 +2,20 @@
 
 namespace App\Search;
 
-use App\Models\RoleGroup;
+use App\Models\Department;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
- * Summary of RoleGroupSearch
+ * Summary of DepartmentSearch
  */
-class RoleGroupSearch extends Search
+class DepartmentSearch extends Search
 {
     /**
      * @return string
      */
     protected function modelClass(): string
     {
-        return RoleGroup::class;
+        return Department::class;
     }
 
     /**
@@ -23,7 +23,7 @@ class RoleGroupSearch extends Search
      */
     protected function prefix(): string
     {
-        return 'roleGroup';
+        return 'department';
     }
 
     /**

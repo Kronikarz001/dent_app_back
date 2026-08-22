@@ -33,13 +33,14 @@ use Laravel\Sanctum\PersonalAccessToken;
  * @property string|null $remember_token
  * @property string|null $status
  * @property bool $is_admin
+ * @property bool $is_superuser
  * @property Carbon|null $email_verified_at
  * @property Carbon|null $private_email_verified_at
  * @property-read Collection|JobPosition[] $jobPositions
  * @property-read Collection|PhoneNumber[] $phoneNumbers
  * @property-read Collection|UserGroup[] $userGroups
  * @property-read Collection|Role[] $roles
- * @property-read Collection|RoleGroup[] $roleGroups
+ * @property-read Collection|Department[] $departments
  */
 abstract class BasicUser extends Authenticatable
 {
@@ -66,6 +67,7 @@ abstract class BasicUser extends Authenticatable
         'pesel',
         'is_active',
         'is_admin',
+        'is_superuser',
         'avatar_path',
         'pwz_numer',
         'status',
@@ -119,6 +121,7 @@ abstract class BasicUser extends Authenticatable
             'private_email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_admin' => 'boolean',
+            'is_superuser' => 'boolean',
         ];
     }
 
@@ -233,7 +236,7 @@ abstract class BasicUser extends Authenticatable
             'user_group_uuid',
             'uuid',
             'uuid'
-        );
+        )->withPivot('is_manager');
     }
 
     /**
@@ -254,13 +257,13 @@ abstract class BasicUser extends Authenticatable
     /**
      * @return BelongsToMany
      */
-    public function roleGroups(): BelongsToMany
+    public function departments(): BelongsToMany
     {
         return $this->belongsToMany(
-            RoleGroup::class,
-            'role_group_user',
+            Department::class,
+            'department_user',
             'user_uuid',
-            'role_group_uuid',
+            'department_uuid',
             'uuid',
             'uuid'
         )->withPivot('is_manager');

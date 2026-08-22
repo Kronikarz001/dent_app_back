@@ -9,11 +9,12 @@ use Illuminate\Database\Seeder;
  * Summary of RegisterPermissionAdminRoutePermissionsSeeder
  *
  * Rejestruje route'y samego systemu uprawnień (permission/permission-group/
- * user-group/role/role-group) pod ten sam mechanizm view/edit. `role.delegate`
- * i `role-group.delegate` są celowo pominięte — te dwie trasy mają własną,
- * bespoke autoryzację w RoleService/RoleGroupService::delegate() (status
- * kierownika + posiadanie delegowanego uprawnienia) i są zawsze dostępne dla
- * zalogowanego użytkownika (patrz PermissionMiddleware::ALWAYS_ALLOWED).
+ * user-group/role/department) pod ten sam mechanizm view/edit. `role.delegate`,
+ * `department.delegate`, `department.createRole`, `user-group.createRole` są
+ * celowo pominięte — te trasy mają własną, bespoke autoryzację w
+ * RoleService/DepartmentService/UserGroupService (status kierownika +
+ * posiadanie/nieprzekraczanie delegowanych/nadawanych uprawnień) i są zawsze
+ * dostępne dla zalogowanego użytkownika (patrz PermissionMiddleware::ALWAYS_ALLOWED).
  */
 class RegisterPermissionAdminRoutePermissionsSeeder extends Seeder
 {
@@ -48,6 +49,7 @@ class RegisterPermissionAdminRoutePermissionsSeeder extends Seeder
                 'user-group.destroy',
                 'user-group.assignUsers',
                 'user-group.assignPermissions',
+                'user-group.assignJobPositions',
             ],
             'role' => [
                 'role.index',
@@ -59,16 +61,17 @@ class RegisterPermissionAdminRoutePermissionsSeeder extends Seeder
                 'role.assignUsers',
                 'role.assignPermissions',
             ],
-            'role-group' => [
-                'role-group.index',
-                'role-group.store',
-                'role-group.selectList',
-                'role-group.show',
-                'role-group.update',
-                'role-group.destroy',
-                'role-group.assignRoles',
-                'role-group.assignUsers',
-                'role-group.assignPermissions',
+            'department' => [
+                'department.index',
+                'department.store',
+                'department.selectList',
+                'department.show',
+                'department.update',
+                'department.destroy',
+                'department.assignRoles',
+                'department.assignJobPositions',
+                'department.assignUsers',
+                'department.assignPermissions',
             ],
         ];
     }

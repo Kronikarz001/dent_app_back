@@ -240,7 +240,7 @@ use OpenApi\Attributes as OA;
     ]
 )]
 #[OA\Schema(
-    schema: 'RoleGroupResource',
+    schema: 'DepartmentResource',
     properties: [
         new OA\Property(property: 'uuid', type: 'string', format: 'uuid'),
         new OA\Property(property: 'name', type: 'string'),

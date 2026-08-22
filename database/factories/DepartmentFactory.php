@@ -2,18 +2,18 @@
 
 namespace Database\Factories;
 
-use App\Models\RoleGroup;
+use App\Models\Department;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * Summary of RoleGroupFactory
+ * Summary of DepartmentFactory
  */
-class RoleGroupFactory extends Factory
+class DepartmentFactory extends Factory
 {
     /**
      * @var string
      */
-    protected $model = RoleGroup::class;
+    protected $model = Department::class;
 
     /**
      * @return array

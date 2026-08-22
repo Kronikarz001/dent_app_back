@@ -2,8 +2,11 @@
 
 namespace Tests\Feature\Controllers;
 
+use App\Models\JobPosition;
 use App\Models\Permission;
+use App\Models\PermissionAssignment;
 use App\Models\PermissionGroup;
+use App\Models\Role;
 use App\Models\User;
 use App\Models\UserGroup;
 use Tests\TestCase;
@@ -75,7 +78,9 @@ class UserGroupControllerTest extends TestCase
         $user = User::factory()->create();
 
         $this->callApiWithLoggedUser()
-            ->patchJson(route('user-group.assignUsers', ['userGroup' => $group->uuid]), ['users' => [$user->uuid]])
+            ->patchJson(route('user-group.assignUsers', ['userGroup' => $group->uuid]), [
+                'users' => [['uuid' => $user->uuid, 'is_manager' => false]],
+            ])
             ->assertNoContent();
 
         $this->assertDatabaseHas('user_group_user', [
@@ -127,5 +132,76 @@ class UserGroupControllerTest extends TestCase
             'assignable_type' => UserGroup::class,
             'assignable_id' => $group->uuid,
         ]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testCreateRoleAllowsManagerToCreateRoleWithinGroupPermissions(): void
+    {
+        $group = UserGroup::factory()->create();
+        $manager = User::factory()->create();
+        $group->users()->attach($manager->uuid, ['is_manager' => true]);
+
+        $permission = Permission::factory()->create();
+        PermissionAssignment::create([
+            'grantable_type' => Permission::class,
+            'grantable_id' => $permission->uuid,
+            'assignable_type' => UserGroup::class,
+            'assignable_id' => $group->uuid,
+        ]);
+
+        $response = $this->callApiWithLoggedUser($manager)
+            ->postJson(route('user-group.createRole', ['userGroup' => $group->uuid]), [
+                'name' => 'Recepcjonistka',
+                'permissions' => [$permission->uuid],
+            ]);
+
+        $response->assertCreated();
+
+        $role = Role::query()->where('name', 'Recepcjonistka')->firstOrFail();
+        $this->assertDatabaseHas('user_group_role', ['user_group_uuid' => $group->uuid, 'role_uuid' => $role->uuid]);
+        $this->assertDatabaseHas('permission_assignments', [
+            'grantable_type' => Permission::class,
+            'grantable_id' => $permission->uuid,
+            'assignable_type' => Role::class,
+            'assignable_id' => $role->uuid,
+            'granted_by' => $manager->uuid,
+        ]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testCreateRoleForbiddenWhenPermissionExceedsGroupGrants(): void
+    {
+        $group = UserGroup::factory()->create();
+        $manager = User::factory()->create();
+        $group->users()->attach($manager->uuid, ['is_manager' => true]);
+
+        $permission = Permission::factory()->create();
+
+        $response = $this->callApiWithLoggedUser($manager)
+            ->postJson(route('user-group.createRole', ['userGroup' => $group->uuid]), [
+                'name' => 'Recepcjonistka',
+                'permissions' => [$permission->uuid],
+            ]);
+
+        $response->assertStatus(403);
+    }
+
+    /**
+     * @return void
+     */
+    public function testAssignJobPositionsSyncsJobPositions(): void
+    {
+        $group = UserGroup::factory()->create();
+        $jobPosition = JobPosition::factory()->create();
+
+        $this->callApiWithLoggedUser()
+            ->patchJson(route('user-group.assignJobPositions', ['userGroup' => $group->uuid]), ['job_positions' => [$jobPosition->uuid]])
+            ->assertNoContent();
+
+        $this->assertDatabaseHas('user_group_job_position', ['user_group_uuid' => $group->uuid, 'job_position_uuid' => $jobPosition->uuid]);
     }
 }

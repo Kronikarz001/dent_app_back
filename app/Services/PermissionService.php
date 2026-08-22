@@ -76,4 +76,26 @@ readonly class PermissionService implements PermissionServiceInterface
     {
         return $this->permissionRepository->getUserPermissionNames($user);
     }
+
+    /**
+     * @param string $assignableType
+     * @param string $assignableUuid
+     * @param Permission $permission
+     * @return bool
+     */
+    public function hasContainerPermissionGrant(string $assignableType, string $assignableUuid, Permission $permission): bool
+    {
+        return $this->permissionRepository->hasContainerPermissionGrant($assignableType, $assignableUuid, $permission);
+    }
+
+    /**
+     * @param string $assignableType
+     * @param string $assignableUuid
+     * @param PermissionGroup $group
+     * @return bool
+     */
+    public function hasContainerGroupGrant(string $assignableType, string $assignableUuid, PermissionGroup $group): bool
+    {
+        return $this->permissionRepository->hasContainerGroupGrant($assignableType, $assignableUuid, $group);
+    }
 }

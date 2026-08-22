@@ -18,4 +18,4 @@ require __DIR__.'/api/permission.php';
 require __DIR__.'/api/permission-group.php';
 require __DIR__.'/api/user-group.php';
 require __DIR__.'/api/role.php';
-require __DIR__.'/api/role-group.php';
+require __DIR__.'/api/department.php';

@@ -34,13 +34,28 @@ class Role extends UuidModel
     /**
      * @return BelongsToMany
      */
-    public function roleGroups(): BelongsToMany
+    public function departments(): BelongsToMany
     {
         return $this->belongsToMany(
-            RoleGroup::class,
-            'role_group_role',
+            Department::class,
+            'department_role',
             'role_uuid',
-            'role_group_uuid',
+            'department_uuid',
+            'uuid',
+            'uuid'
+        );
+    }
+
+    /**
+     * @return BelongsToMany
+     */
+    public function userGroups(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            UserGroup::class,
+            'user_group_role',
+            'role_uuid',
+            'user_group_uuid',
             'uuid',
             'uuid'
         );

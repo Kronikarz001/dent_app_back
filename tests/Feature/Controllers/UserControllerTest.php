@@ -347,4 +347,26 @@ class UserControllerTest extends TestCase
 
         $response->assertUnauthorized();
     }
+
+    /**
+     * @return void
+     */
+    public function testAssignPermissionsCreatesDirectGrant(): void
+    {
+        $target = User::factory()->create();
+        $permission = Permission::factory()->create();
+
+        $this->callApiWithLoggedUser()
+            ->patchJson(route('user.assignPermissions', ['user' => $target->uuid]), [
+                'permissions' => [$permission->uuid],
+            ])
+            ->assertNoContent();
+
+        $this->assertDatabaseHas('permission_assignments', [
+            'grantable_type' => Permission::class,
+            'grantable_id' => $permission->uuid,
+            'assignable_type' => User::class,
+            'assignable_id' => $target->uuid,
+        ]);
+    }
 }

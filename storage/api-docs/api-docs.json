@@ -3038,6 +3038,742 @@
                 ]
             }
         },
+        "/api/dentist": {
+            "get": {
+                "tags": [
+                    "Dentist"
+                ],
+                "summary": "Lista użytkowników ze stanowiskiem lekarza stomatologa (paginacja)",
+                "operationId": "113e11c75a369e1fc09e4e45111bd158",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/PaginatedResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/UserResource"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/dentist/selectlist": {
+            "get": {
+                "tags": [
+                    "Dentist"
+                ],
+                "summary": "Lista lekarzy stomatologów do selecta (uuid + name)",
+                "operationId": "c19b6be48790541072aa6183d53c3f3a",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/dentist/{uuid}": {
+            "get": {
+                "tags": [
+                    "Dentist"
+                ],
+                "summary": "Pobiera jednego lekarza stomatologa",
+                "operationId": "6df417a73c8c4c9e2e8e9796ee93d23f",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/UserResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/department": {
+            "get": {
+                "tags": [
+                    "Department"
+                ],
+                "summary": "Lista działów (paginacja)",
+                "operationId": "7a06011e053731d42049a3c58fb89368",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/PaginatedResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/DepartmentResource"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Department"
+                ],
+                "summary": "Tworzy nowy dział",
+                "operationId": "da58b28d8e0121c8e1936706214acbfe",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Utworzono",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/DepartmentResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Błąd walidacji"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/department/selectlist": {
+            "get": {
+                "tags": [
+                    "Department"
+                ],
+                "summary": "Lista działów do selecta (uuid + name)",
+                "operationId": "eb31cac7f8b71bbb988e4620e3491a97",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/department/{uuid}": {
+            "get": {
+                "tags": [
+                    "Department"
+                ],
+                "summary": "Pobiera jeden dział",
+                "operationId": "3d0dba6f15c50431ff4fcc1b0fc9abee",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/DepartmentResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Department"
+                ],
+                "summary": "Aktualizuje dział",
+                "operationId": "95c7feefc96519d33f361e8e17cf22bb",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "Zaktualizowano"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    },
+                    "422": {
+                        "description": "Błąd walidacji"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Department"
+                ],
+                "summary": "Usuwa dział",
+                "operationId": "d38dbdf32ed6498bceb6fe578f5650dc",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Usunięto"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/department/{uuid}/roles": {
+            "patch": {
+                "tags": [
+                    "Department"
+                ],
+                "summary": "Przypisuje role do działu, zastępując poprzednią listę",
+                "operationId": "0957f65f306fcfe939ecdab601524137",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "roles": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "Przypisano"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    },
+                    "422": {
+                        "description": "Błąd walidacji"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/department/{uuid}/job-positions": {
+            "patch": {
+                "tags": [
+                    "Department"
+                ],
+                "summary": "Przypisuje stanowiska do działu, zastępując poprzednią listę",
+                "operationId": "aa2e2ccbdbc4b74ffb8e364e7a431395",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "job_positions": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "Przypisano"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    },
+                    "422": {
+                        "description": "Błąd walidacji"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/department/{uuid}/users": {
+            "patch": {
+                "tags": [
+                    "Department"
+                ],
+                "summary": "Przypisuje użytkowników bezpośrednio do działu (z flagą is_manager), zastępując poprzednią listę",
+                "operationId": "916e1244aed560f2ca9a0e4e9a5b6b65",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "users": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "uuid": {
+                                                    "type": "string",
+                                                    "format": "uuid"
+                                                },
+                                                "is_manager": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "Przypisano"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    },
+                    "422": {
+                        "description": "Błąd walidacji"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/department/{uuid}/permissions": {
+            "patch": {
+                "tags": [
+                    "Department"
+                ],
+                "summary": "Nadaje działowi uprawnienia lub grupy uprawnień (opcjonalnie czasowo)",
+                "operationId": "bb34cdcf8d93b6da3c0ce3f3d15d4410",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "permissions": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        }
+                                    },
+                                    "permission_groups": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        }
+                                    },
+                                    "expires_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "Nadano"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    },
+                    "422": {
+                        "description": "Błąd walidacji"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/department/{uuid}/delegate": {
+            "post": {
+                "tags": [
+                    "Department"
+                ],
+                "summary": "Kierownik działu przekazuje własne uprawnienie (lub grupę uprawnień) innej osobie z tego działu",
+                "operationId": "e0796f2f68449ed3f32704918e37c56f",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "user_uuid"
+                                ],
+                                "properties": {
+                                    "user_uuid": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "permission_uuid": {
+                                        "type": "string",
+                                        "format": "uuid",
+                                        "nullable": true
+                                    },
+                                    "permission_group_uuid": {
+                                        "type": "string",
+                                        "format": "uuid",
+                                        "nullable": true
+                                    },
+                                    "expires_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "Przekazano"
+                    },
+                    "403": {
+                        "description": "Brak uprawnień do przekazania lub brak statusu kierownika"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    },
+                    "422": {
+                        "description": "Błąd walidacji"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/department/{uuid}/managed-roles": {
+            "post": {
+                "tags": [
+                    "Department"
+                ],
+                "summary": "Kierownik działu tworzy nową rolę w ramach działu i nadaje jej uprawnienia (muszą być podzbiorem uprawnień działu)",
+                "operationId": "2984de2c166932371df16fc0a130ad92",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "permissions": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        }
+                                    },
+                                    "permission_groups": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Utworzono",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/RoleResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Brak statusu kierownika lub uprawnienie/grupa wykracza poza uprawnienia działu"
+                    },
+                    "422": {
+                        "description": "Błąd walidacji"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/employee-schedule": {
             "get": {
                 "tags": [
@@ -3393,111 +4129,6 @@
                 ]
             }
         },
-        "/api/dentist": {
-            "get": {
-                "tags": [
-                    "Dentist"
-                ],
-                "summary": "Lista użytkowników ze stanowiskiem lekarza stomatologa (paginacja)",
-                "operationId": "113e11c75a369e1fc09e4e45111bd158",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "allOf": [
-                                        {
-                                            "$ref": "#/components/schemas/PaginatedResponse"
-                                        },
-                                        {
-                                            "properties": {
-                                                "data": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "$ref": "#/components/schemas/UserResource"
-                                                    }
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    ]
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
-        "/api/dentist/selectlist": {
-            "get": {
-                "tags": [
-                    "Dentist"
-                ],
-                "summary": "Lista lekarzy stomatologów do selecta (uuid + name)",
-                "operationId": "c19b6be48790541072aa6183d53c3f3a",
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
-        "/api/dentist/{uuid}": {
-            "get": {
-                "tags": [
-                    "Dentist"
-                ],
-                "summary": "Pobiera jednego lekarza stomatologa",
-                "operationId": "6df417a73c8c4c9e2e8e9796ee93d23f",
-                "parameters": [
-                    {
-                        "name": "uuid",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "format": "uuid"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/components/schemas/UserResource"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Nie znaleziono"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
         "/api/job-position": {
             "get": {
                 "tags": [
@@ -3841,6 +4472,73 @@
                         "content": {
                             "application/octet-stream": {}
                         }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/job-position/{uuid}/permissions": {
+            "patch": {
+                "tags": [
+                    "JobPosition"
+                ],
+                "summary": "Nadaje stanowisku uprawnienia lub grupy uprawnień (opcjonalnie czasowo)",
+                "operationId": "68e345d61c2087ebf4b8cd88125c9fff",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "permissions": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        }
+                                    },
+                                    "permission_groups": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        }
+                                    },
+                                    "expires_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "Nadano"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    },
+                    "422": {
+                        "description": "Błąd walidacji"
                     }
                 },
                 "security": [
@@ -7722,502 +8420,6 @@
                 ]
             }
         },
-        "/api/role-group": {
-            "get": {
-                "tags": [
-                    "RoleGroup"
-                ],
-                "summary": "Lista grup ról (paginacja)",
-                "operationId": "05c534c1aedce0015818deae1debd4a1",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "allOf": [
-                                        {
-                                            "$ref": "#/components/schemas/PaginatedResponse"
-                                        },
-                                        {
-                                            "properties": {
-                                                "data": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "$ref": "#/components/schemas/RoleGroupResource"
-                                                    }
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    ]
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            },
-            "post": {
-                "tags": [
-                    "RoleGroup"
-                ],
-                "summary": "Tworzy nową grupę ról",
-                "operationId": "450db9d153ce02f575a39e092026b30b",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "name"
-                                ],
-                                "properties": {
-                                    "name": {
-                                        "type": "string"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": "Utworzono",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/components/schemas/RoleGroupResource"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Błąd walidacji"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
-        "/api/role-group/selectlist": {
-            "get": {
-                "tags": [
-                    "RoleGroup"
-                ],
-                "summary": "Lista grup ról do selecta (uuid + name)",
-                "operationId": "8f8931dcd3fba2be77e04906531b505e",
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
-        "/api/role-group/{uuid}": {
-            "get": {
-                "tags": [
-                    "RoleGroup"
-                ],
-                "summary": "Pobiera jedną grupę ról",
-                "operationId": "f0f195e3f4ad90fd1fc1015060470161",
-                "parameters": [
-                    {
-                        "name": "uuid",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "format": "uuid"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/components/schemas/RoleGroupResource"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Nie znaleziono"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            },
-            "put": {
-                "tags": [
-                    "RoleGroup"
-                ],
-                "summary": "Aktualizuje grupę ról",
-                "operationId": "1c0768e5fca2d3c5482be8ad1e5e474d",
-                "parameters": [
-                    {
-                        "name": "uuid",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "format": "uuid"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "name"
-                                ],
-                                "properties": {
-                                    "name": {
-                                        "type": "string"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "204": {
-                        "description": "Zaktualizowano"
-                    },
-                    "404": {
-                        "description": "Nie znaleziono"
-                    },
-                    "422": {
-                        "description": "Błąd walidacji"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            },
-            "delete": {
-                "tags": [
-                    "RoleGroup"
-                ],
-                "summary": "Usuwa grupę ról",
-                "operationId": "55b857739cb9eb840eabc5d03a2d674b",
-                "parameters": [
-                    {
-                        "name": "uuid",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "format": "uuid"
-                        }
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "Usunięto"
-                    },
-                    "404": {
-                        "description": "Nie znaleziono"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
-        "/api/role-group/{uuid}/roles": {
-            "patch": {
-                "tags": [
-                    "RoleGroup"
-                ],
-                "summary": "Przypisuje role do grupy, zastępując poprzednią listę",
-                "operationId": "0f1bbc1ce581f74622950397053f1c15",
-                "parameters": [
-                    {
-                        "name": "uuid",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "format": "uuid"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "properties": {
-                                    "roles": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string",
-                                            "format": "uuid"
-                                        }
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "204": {
-                        "description": "Przypisano"
-                    },
-                    "404": {
-                        "description": "Nie znaleziono"
-                    },
-                    "422": {
-                        "description": "Błąd walidacji"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
-        "/api/role-group/{uuid}/users": {
-            "patch": {
-                "tags": [
-                    "RoleGroup"
-                ],
-                "summary": "Przypisuje użytkowników bezpośrednio do grupy ról (z flagą is_manager), zastępując poprzednią listę",
-                "operationId": "ee943b98c3a94d968546bbc90141f913",
-                "parameters": [
-                    {
-                        "name": "uuid",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "format": "uuid"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "properties": {
-                                    "users": {
-                                        "type": "array",
-                                        "items": {
-                                            "properties": {
-                                                "uuid": {
-                                                    "type": "string",
-                                                    "format": "uuid"
-                                                },
-                                                "is_manager": {
-                                                    "type": "boolean"
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "204": {
-                        "description": "Przypisano"
-                    },
-                    "404": {
-                        "description": "Nie znaleziono"
-                    },
-                    "422": {
-                        "description": "Błąd walidacji"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
-        "/api/role-group/{uuid}/permissions": {
-            "patch": {
-                "tags": [
-                    "RoleGroup"
-                ],
-                "summary": "Nadaje grupie ról uprawnienia lub grupy uprawnień (opcjonalnie czasowo)",
-                "operationId": "6d73cd3804fc7ad73a1065758f59ef38",
-                "parameters": [
-                    {
-                        "name": "uuid",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "format": "uuid"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "properties": {
-                                    "permissions": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string",
-                                            "format": "uuid"
-                                        }
-                                    },
-                                    "permission_groups": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string",
-                                            "format": "uuid"
-                                        }
-                                    },
-                                    "expires_at": {
-                                        "type": "string",
-                                        "format": "date-time",
-                                        "nullable": true
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "204": {
-                        "description": "Nadano"
-                    },
-                    "404": {
-                        "description": "Nie znaleziono"
-                    },
-                    "422": {
-                        "description": "Błąd walidacji"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
-        "/api/role-group/{uuid}/delegate": {
-            "post": {
-                "tags": [
-                    "RoleGroup"
-                ],
-                "summary": "Kierownik grupy ról przekazuje własne uprawnienie (lub grupę uprawnień) innej osobie z tej grupy",
-                "operationId": "1b075111bde8cf9c94139e3af0ea40d5",
-                "parameters": [
-                    {
-                        "name": "uuid",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "format": "uuid"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "user_uuid"
-                                ],
-                                "properties": {
-                                    "user_uuid": {
-                                        "type": "string",
-                                        "format": "uuid"
-                                    },
-                                    "permission_uuid": {
-                                        "type": "string",
-                                        "format": "uuid",
-                                        "nullable": true
-                                    },
-                                    "permission_group_uuid": {
-                                        "type": "string",
-                                        "format": "uuid",
-                                        "nullable": true
-                                    },
-                                    "expires_at": {
-                                        "type": "string",
-                                        "format": "date-time",
-                                        "nullable": true
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "204": {
-                        "description": "Przekazano"
-                    },
-                    "403": {
-                        "description": "Brak uprawnień do przekazania lub brak statusu kierownika"
-                    },
-                    "404": {
-                        "description": "Nie znaleziono"
-                    },
-                    "422": {
-                        "description": "Błąd walidacji"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
         "/api/user": {
             "get": {
                 "tags": [
@@ -8667,6 +8869,73 @@
                     },
                     "422": {
                         "description": "Nieprawidłowe obecne hasło lub błąd walidacji"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/user/{uuid}/permissions": {
+            "patch": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Nadaje użytkownikowi uprawnienia lub grupy uprawnień bezpośrednio (opcjonalnie czasowo)",
+                "operationId": "d792c1777507f3b7e83b512f6ec207cd",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "permissions": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        }
+                                    },
+                                    "permission_groups": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        }
+                                    },
+                                    "expires_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "Nadano"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    },
+                    "422": {
+                        "description": "Błąd walidacji"
                     }
                 },
                 "security": [
@@ -9540,7 +9809,7 @@
                 "tags": [
                     "UserGroup"
                 ],
-                "summary": "Przypisuje użytkowników do grupy, zastępując poprzednią listę",
+                "summary": "Przypisuje użytkowników do grupy (z flagą is_manager), zastępując poprzednią listę",
                 "operationId": "aa375d4386f5299ecf9d74b8e5c91d22",
                 "parameters": [
                     {
@@ -9562,8 +9831,16 @@
                                     "users": {
                                         "type": "array",
                                         "items": {
-                                            "type": "string",
-                                            "format": "uuid"
+                                            "properties": {
+                                                "uuid": {
+                                                    "type": "string",
+                                                    "format": "uuid"
+                                                },
+                                                "is_manager": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "type": "object"
                                         }
                                     }
                                 },
@@ -9642,6 +9919,141 @@
                 "responses": {
                     "204": {
                         "description": "Nadano"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    },
+                    "422": {
+                        "description": "Błąd walidacji"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/user-group/{uuid}/managed-roles": {
+            "post": {
+                "tags": [
+                    "UserGroup"
+                ],
+                "summary": "Kierownik grupy użytkowników tworzy nową rolę w ramach grupy i nadaje jej uprawnienia (muszą być podzbiorem uprawnień grupy)",
+                "operationId": "aa13dbdd8f6a5609f664b4d2158b2de1",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "permissions": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        }
+                                    },
+                                    "permission_groups": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Utworzono",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/RoleResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Brak statusu kierownika lub uprawnienie/grupa wykracza poza uprawnienia grupy"
+                    },
+                    "422": {
+                        "description": "Błąd walidacji"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/user-group/{uuid}/job-positions": {
+            "patch": {
+                "tags": [
+                    "UserGroup"
+                ],
+                "summary": "Przypisuje stanowiska do grupy użytkowników, zastępując poprzednią listę",
+                "operationId": "3534b5c8765279698986cb0c184a0a60",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "job_positions": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "Przypisano"
                     },
                     "404": {
                         "description": "Nie znaleziono"
@@ -10283,7 +10695,7 @@
                 },
                 "type": "object"
             },
-            "RoleGroupResource": {
+            "DepartmentResource": {
                 "properties": {
                     "uuid": {
                         "type": "string",
@@ -10446,12 +10858,16 @@
             "description": "DentalExaminationFile"
         },
         {
-            "name": "EmployeeSchedule",
-            "description": "EmployeeSchedule"
-        },
-        {
             "name": "Dentist",
             "description": "Dentist"
+        },
+        {
+            "name": "Department",
+            "description": "Department"
+        },
+        {
+            "name": "EmployeeSchedule",
+            "description": "EmployeeSchedule"
         },
         {
             "name": "JobPosition",
@@ -10504,10 +10920,6 @@
         {
             "name": "Role",
             "description": "Role"
-        },
-        {
-            "name": "RoleGroup",
-            "description": "RoleGroup"
         },
         {
             "name": "User",

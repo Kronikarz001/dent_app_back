@@ -28,6 +28,36 @@ class UserGroup extends UuidModel
             'user_uuid',
             'uuid',
             'uuid'
+        )->withPivot('is_manager');
+    }
+
+    /**
+     * @return BelongsToMany
+     */
+    public function roles(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Role::class,
+            'user_group_role',
+            'user_group_uuid',
+            'role_uuid',
+            'uuid',
+            'uuid'
+        );
+    }
+
+    /**
+     * @return BelongsToMany
+     */
+    public function jobPositions(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            JobPosition::class,
+            'user_group_job_position',
+            'user_group_uuid',
+            'job_position_uuid',
+            'uuid',
+            'uuid'
         );
     }
 }

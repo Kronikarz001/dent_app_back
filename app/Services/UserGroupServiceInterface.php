@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Role;
 use App\Models\UserGroup;
 use Illuminate\Pagination\LengthAwarePaginator;
 
@@ -52,4 +53,18 @@ interface UserGroupServiceInterface
      * @return void
      */
     public function assignPermissions(UserGroup $group, array $data): void;
+
+    /**
+     * @param UserGroup $group
+     * @param array $data
+     * @return void
+     */
+    public function assignJobPositions(UserGroup $group, array $data): void;
+
+    /**
+     * @param UserGroup $group
+     * @param array $data
+     * @return Role
+     */
+    public function createManagedRole(UserGroup $group, array $data): Role;
 }

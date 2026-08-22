@@ -11,6 +11,7 @@ use App\Providers\AppServiceProviders\CalendarServiceProvider;
 use App\Providers\AppServiceProviders\CompanyServiceProvider;
 use App\Providers\AppServiceProviders\DentalExaminationServiceProvider;
 use App\Providers\AppServiceProviders\DentistServiceProvider;
+use App\Providers\AppServiceProviders\DepartmentServiceProvider;
 use App\Providers\AppServiceProviders\DictionaryServiceProvider;
 use App\Providers\AppServiceProviders\EmployeeScheduleServiceProvider;
 use App\Providers\AppServiceProviders\FileServiceProvider;
@@ -21,7 +22,6 @@ use App\Providers\AppServiceProviders\NotificationServiceProvider;
 use App\Providers\AppServiceProviders\PatientServiceProvider;
 use App\Providers\AppServiceProviders\PermissionGroupServiceProvider;
 use App\Providers\AppServiceProviders\PermissionServiceProvider;
-use App\Providers\AppServiceProviders\RoleGroupServiceProvider;
 use App\Providers\AppServiceProviders\RoleServiceProvider;
 use App\Providers\AppServiceProviders\SearchServiceProvider;
 use App\Providers\AppServiceProviders\UserGroupServiceProvider;
@@ -61,7 +61,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->register(PermissionServiceProvider::class);
         $this->app->register(PermissionGroupServiceProvider::class);
         $this->app->register(RoleServiceProvider::class);
-        $this->app->register(RoleGroupServiceProvider::class);
+        $this->app->register(DepartmentServiceProvider::class);
     }
 
     /**
