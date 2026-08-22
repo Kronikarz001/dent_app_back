@@ -49,4 +49,34 @@ class JobPosition extends UuidModel
     {
         return $this->BelongsToMany(User::class, 'users_job_positions', 'job_position_uuid', 'user_uuid');
     }
+
+    /**
+     * @return BelongsToMany
+     */
+    public function departments(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Department::class,
+            'department_job_position',
+            'job_position_uuid',
+            'department_uuid',
+            'uuid',
+            'uuid'
+        );
+    }
+
+    /**
+     * @return BelongsToMany
+     */
+    public function userGroups(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            UserGroup::class,
+            'user_group_job_position',
+            'job_position_uuid',
+            'user_group_uuid',
+            'uuid',
+            'uuid'
+        );
+    }
 }

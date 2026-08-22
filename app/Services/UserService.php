@@ -5,9 +5,13 @@ namespace App\Services;
 use App\Enums\PhoneNumberType;
 use App\Exports\UserExport;
 use App\Http\Requests\ExportRequest;
+use App\Models\Permission;
+use App\Models\PermissionAssignment;
+use App\Models\PermissionGroup;
 use App\Models\User;
 use App\Repositories\UserRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\Writer\Exception as WriterException;
@@ -150,5 +154,41 @@ readonly class UserService implements UserServiceInterface
     public function export(ExportRequest $request): BinaryFileResponse
     {
         return $this->exportService->export($request, new UserExport($this->getUsers()->getCollection()), User::getModel());
+    }
+
+    /**
+     * @param User $user
+     * @param array $data
+     * @return void
+     */
+    public function assignPermissions(User $user, array $data): void
+    {
+        foreach ($data['permissions'] ?? [] as $permissionUuid) {
+            $this->grant(Permission::class, $permissionUuid, $user, $data['expires_at'] ?? null);
+        }
+
+        foreach ($data['permission_groups'] ?? [] as $permissionGroupUuid) {
+            $this->grant(PermissionGroup::class, $permissionGroupUuid, $user, $data['expires_at'] ?? null);
+        }
+    }
+
+    /**
+     * @param string $grantableType
+     * @param string $grantableUuid
+     * @param User $user
+     * @param string|null $expiresAt
+     * @return void
+     */
+    private function grant(string $grantableType, string $grantableUuid, User $user, ?string $expiresAt): void
+    {
+        PermissionAssignment::firstOrCreate([
+            'grantable_type' => $grantableType,
+            'grantable_id' => $grantableUuid,
+            'assignable_type' => User::class,
+            'assignable_id' => $user->uuid,
+        ], [
+            'expires_at' => $expiresAt,
+            'granted_by' => Auth::id(),
+        ]);
     }
 }

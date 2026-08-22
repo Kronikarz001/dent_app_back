@@ -19,6 +19,8 @@ Route::middleware('auth:sanctum')->group(function () {
         ->name('user.selectList');
     Route::patch('/user/edit-password', [UserController::class, 'editPassword'])
         ->name('user.edit_password');
+    Route::patch('/user/{user}/permissions', [UserController::class, 'assignPermissions'])
+        ->name('user.assignPermissions');
     Route::apiResource('/user', UserController::class)
         ->names('user');
 

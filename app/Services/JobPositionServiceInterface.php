@@ -59,4 +59,11 @@ interface JobPositionServiceInterface
      * @throws WriterException
      */
     public function export(ExportRequest $request): BinaryFileResponse;
+
+    /**
+     * @param JobPosition $jobPosition
+     * @param array $data
+     * @return void
+     */
+    public function assignPermissions(JobPosition $jobPosition, array $data): void;
 }

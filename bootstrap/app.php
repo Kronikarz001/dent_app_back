@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Middlewares\PermissionMiddleware;
+use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -16,6 +18,8 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->redirectGuestsTo(fn () => null);
+        $middleware->api(append: [PermissionMiddleware::class]);
+        $middleware->appendToPriorityList(Authenticate::class, PermissionMiddleware::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(fn () => true);

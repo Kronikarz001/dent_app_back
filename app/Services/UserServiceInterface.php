@@ -75,4 +75,11 @@ interface UserServiceInterface
      * @throws WriterException
      */
     public function export(ExportRequest $request): BinaryFileResponse;
+
+    /**
+     * @param User $user
+     * @param array $data
+     * @return void
+     */
+    public function assignPermissions(User $user, array $data): void;
 }
