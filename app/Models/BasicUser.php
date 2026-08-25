@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\URL;
 use Laravel\Sanctum\HasApiTokens;
 use Laravel\Sanctum\PersonalAccessToken;
 
@@ -148,7 +149,7 @@ abstract class BasicUser extends Authenticatable
             return null;
         }
 
-        return route('userfile.avatar-download', ['user' => $this->uuid, 'file' => $file->uuid]);
+        return URL::temporarySignedRoute('userfile.avatar-download-signed', now()->addMinutes(60), ['user' => $this->uuid, 'file' => $file->uuid]);
     }
 
     /**
@@ -166,7 +167,7 @@ abstract class BasicUser extends Authenticatable
             return null;
         }
 
-        return route('userfile.background-download', ['user' => $this->uuid, 'file' => $file->uuid]);
+        return URL::temporarySignedRoute('userfile.background-download-signed', now()->addMinutes(60), ['user' => $this->uuid, 'file' => $file->uuid]);
     }
 
     /**

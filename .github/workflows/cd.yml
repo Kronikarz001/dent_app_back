@@ -1,0 +1,50 @@
+name: DentApp CD
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+env:
+  PHP_BIN: /usr/local/php84-fpm/bin/php
+  COMPOSER_BIN: /usr/bin/composer
+
+jobs:
+  deploy:
+    name: Deploy to production
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install sshpass
+        run: sudo apt-get update && sudo apt-get install -y sshpass
+
+      - name: Sync application code
+        env:
+          SSHPASS: ${{ secrets.SSH_PASSWORD }}
+        run: |
+          rsync -az --no-perms --no-owner --no-group \
+            -e "sshpass -e ssh -p ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=accept-new" \
+            --exclude='.git/' --exclude='.github/' --exclude='.env' --exclude='.env.*' \
+            --exclude='storage/' --exclude='vendor/' --exclude='node_modules/' \
+            --exclude='.idea/' --exclude='.DS_Store' --exclude='docker/' \
+            --exclude='Dockerfile' --exclude='docker-compose*.yml' --exclude='tests/' \
+            ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.DEPLOY_PATH }}/
+
+      - name: Install dependencies and refresh the app on the server
+        env:
+          SSHPASS: ${{ secrets.SSH_PASSWORD }}
+        run: |
+          sshpass -e ssh -p ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=accept-new \
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
+            "cd ${{ secrets.DEPLOY_PATH }} && \
+             $PHP_BIN $COMPOSER_BIN install --no-dev --optimize-autoloader --no-interaction && \
+             $PHP_BIN artisan migrate --force && \
+             $PHP_BIN artisan config:cache && \
+             $PHP_BIN artisan route:cache && \
+             $PHP_BIN artisan optimize"
+
+      - name: Reset opcache
+        run: curl -sf https://dentapp.com.pl/_reset_opcache.php || true

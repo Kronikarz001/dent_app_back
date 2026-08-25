@@ -74,6 +74,27 @@ class PhoneNumberServiceTest extends TestCase
     /**
      * @return void
      */
+    public function testAssignPhonesUpdatesNumberForSameOwnerAndType(): void
+    {
+        $user = User::factory()->create();
+        $phones = [['number' => '500100200', 'type' => PhoneNumberType::WORK->value]];
+        $this->service->assignPhone($user, $phones);
+
+        $updated = [['number' => '600200300', 'type' => PhoneNumberType::WORK->value]];
+        $this->service->assignPhone($user, $updated);
+
+        $this->assertDatabaseHas(self::PHONE_NUMBERS_TABLE, [
+            'phoneable_uuid' => $user->uuid,
+            'type' => PhoneNumberType::WORK->value,
+            'number' => '600200300',
+        ]);
+        $this->assertDatabaseMissing(self::PHONE_NUMBERS_TABLE, ['number' => '500100200']);
+        $this->assertSame(1, PhoneNumber::where('phoneable_uuid', $user->uuid)->where('type', PhoneNumberType::WORK->value)->count());
+    }
+
+    /**
+     * @return void
+     */
     public function testAssignPhonesWithEmptyArrayDoesNothing(): void
     {
         $user = User::factory()->create();

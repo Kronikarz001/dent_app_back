@@ -41,3 +41,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user/{user}/file-background-download/{file}', [UserFileController::class, 'backgroundDownload'])
         ->name('userfile.background-download');
 });
+
+Route::middleware('signed')->group(function () {
+    Route::get('/user/{user}/file-avatar-download/{file}/signed', [UserFileController::class, 'avatarDownload'])
+        ->name('userfile.avatar-download-signed');
+    Route::get('/user/{user}/file-background-download/{file}/signed', [UserFileController::class, 'backgroundDownload'])
+        ->name('userfile.background-download-signed');
+});

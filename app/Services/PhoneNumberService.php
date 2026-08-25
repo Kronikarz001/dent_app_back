@@ -20,6 +20,17 @@ class PhoneNumberService implements PhoneNumberServiceInterface
         $modelClass = get_class($model);
 
         foreach ($phones as $phone) {
+            $existing = PhoneNumber::where('phoneable_type', $modelClass)
+                ->where('phoneable_uuid', $model->uuid)
+                ->where('type', $phone['type'])
+                ->first();
+
+            if ($existing) {
+                $existing->update(['number' => $phone['number']]);
+
+                continue;
+            }
+
             PhoneNumber::updateOrCreate(
                 ['number' => $phone['number']],
                 [
