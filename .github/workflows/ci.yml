@@ -29,9 +29,28 @@ jobs:
     name: Testy PHPUnit/Pest
     runs-on: ubuntu-latest
 
+    # MySQL, not Postgres — produkcja (shared hosting) działa na MySQL, więc CI
+    # musi testować na tym samym silniku, inaczej różnice (np. ILIKE, case
+    # sensitivity) przechodzą CI i psują się dopiero na produkcji.
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          MYSQL_DATABASE: dent_db_back_test
+          MYSQL_USER: ${{ secrets.DB_USERNAME }}
+          MYSQL_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
     env:
       DB_HOST: 127.0.0.1
-      DB_PORT: 5432
+      DB_PORT: 3306
       DB_DATABASE: dent_db_back_test
       DB_USERNAME: ${{ secrets.DB_USERNAME }}
       DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
@@ -40,16 +59,10 @@ jobs:
       - uses: actions/checkout@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-      - uses: ikalnytskyi/action-setup-postgres@v7
-        with:
-          username: ${{ secrets.DB_USERNAME }}
-          password: ${{ secrets.DB_PASSWORD }}
-          database: dent_db_back_test
-          port: 5432
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.4'
-          extensions: mbstring, pdo_pgsql, pgsql
+          extensions: mbstring, pdo_mysql
       - run: composer install --prefer-dist --no-progress
       - run: cp .env.testing.example .env.testing
       - run: php artisan key:generate --env=testing

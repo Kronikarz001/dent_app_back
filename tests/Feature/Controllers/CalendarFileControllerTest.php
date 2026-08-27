@@ -43,10 +43,6 @@ class CalendarFileControllerTest extends TestCase
     }
 
     /**
-     * Files are tagged with the model's actual morph class (Calendar), so they do
-     * show up in index() despite store() passing FileableType::JOB_POSITION (which
-     * only affects the storage directory prefix, see testStoreUploadsFileAndPersistsRecord).
-     *
      * @return void
      */
     public function testFilesUploadedViaStoreAreReturnedByIndex(): void
@@ -90,7 +86,7 @@ class CalendarFileControllerTest extends TestCase
         ]);
 
         $file = File::query()->where('fileable_id', $calendar->uuid)->first();
-        $this->assertStringStartsWith('job_position/', $file->path);
+        $this->assertStringStartsWith('calendar/', $file->path);
     }
 
     /**
@@ -127,6 +123,24 @@ class CalendarFileControllerTest extends TestCase
     /**
      * @return void
      */
+    public function testShowRejectsFileBelongingToAnotherCalendar(): void
+    {
+        $ownCalendar = Calendar::factory()->create();
+        $otherCalendar = Calendar::factory()->create();
+        $foreignFile = File::factory()->create([
+            'fileable_type' => Calendar::class,
+            'fileable_id' => $otherCalendar->uuid,
+        ]);
+
+        $response = $this->callApiWithLoggedUser()
+            ->getJson(route('calendarfile.show', ['calendar' => $ownCalendar->uuid, 'file' => $foreignFile->uuid]));
+
+        $response->assertNotFound();
+    }
+
+    /**
+     * @return void
+     */
     public function testDownloadReturnsOriginalFileContent(): void
     {
         $calendar = Calendar::factory()->create();
@@ -156,7 +170,7 @@ class CalendarFileControllerTest extends TestCase
         $file = File::factory()->create([
             'fileable_type' => Calendar::class,
             'fileable_id' => $calendar->uuid,
-            'path' => 'job_position/does/not/exist.pdf',
+            'path' => 'calendar/does/not/exist.pdf',
         ]);
 
         $response = $this->callApiWithLoggedUser()

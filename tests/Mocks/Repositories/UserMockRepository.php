@@ -92,28 +92,10 @@ class UserMockRepository implements UserRepositoryInterface
     }
 
     /**
-     * @param string $token
-     * @return User|null
-     */
-    public function getUserByToken(string $token): ?User
-    {
-        return null;
-    }
-
-    /**
      * @return User
      */
     public function getLoggedUser(): User
     {
         return Auth::user();
-    }
-
-    /**
-     * @param string $userUuid
-     * @return User
-     */
-    public function getUserInformation(string $userUuid): User
-    {
-        return new User;
     }
 }

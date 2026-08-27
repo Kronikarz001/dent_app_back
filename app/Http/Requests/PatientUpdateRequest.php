@@ -31,8 +31,8 @@ class PatientUpdateRequest extends FormRequest
             'last_name' => ['required', 'string'],
             'email' => ['required', 'email', Rule::unique('patients', 'email')->ignore($this->route('patient'))],
             'phone_numbers' => ['nullable', 'array'],
-            'phone_numbers.number' => ['string', new PhoneNumberRule],
-            'phone_numbers.type' => ['string', new Enum(PhoneNumberType::class)],
+            'phone_numbers.*.number' => ['required', 'string', new PhoneNumberRule],
+            'phone_numbers.*.type' => ['required', 'string', new Enum(PhoneNumberType::class)],
         ];
     }
 
@@ -50,7 +50,9 @@ class PatientUpdateRequest extends FormRequest
             'email.email' => 'Adres e-mail musi być prawidłowy.',
             'email.unique' => 'Pacjent o podanym adresie e-mail już istnieje.',
             'phone_numbers.array' => 'Pole phone_numbers musi być tablicą.',
-            'phone_numbers.type.enum' => 'Wybrany typ numeru telefonu jest nieprawidłowy.',
+            'phone_numbers.*.number.required' => 'Numer telefonu jest wymagany.',
+            'phone_numbers.*.type.required' => 'Typ numeru telefonu jest wymagany.',
+            'phone_numbers.*.type.enum' => 'Wybrany typ numeru telefonu jest nieprawidłowy.',
         ];
     }
 }

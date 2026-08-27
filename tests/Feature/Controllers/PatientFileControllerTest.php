@@ -46,6 +46,24 @@ class PatientFileControllerTest extends TestCase
     /**
      * @return void
      */
+    public function testShowRejectsFileBelongingToAnotherPatient(): void
+    {
+        $ownPatient = Patient::factory()->create();
+        $otherPatient = Patient::factory()->create();
+        $foreignFile = File::factory()->create([
+            'fileable_type' => FileableType::PATIENT->value,
+            'fileable_id' => $otherPatient->uuid,
+        ]);
+
+        $response = $this->callApiWithLoggedUser()
+            ->getJson(route('patientfile.show', ['patient' => $ownPatient->uuid, 'file' => $foreignFile->uuid]));
+
+        $response->assertNotFound();
+    }
+
+    /**
+     * @return void
+     */
     public function testStoreUploadsFileAndPersistsRecord(): void
     {
         $patient = Patient::factory()->create();

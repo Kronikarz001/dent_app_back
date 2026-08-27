@@ -2,10 +2,12 @@
 
 namespace App\Services;
 
+use App\Exceptions\ScheduleConflictException;
 use App\Exports\CalendarExport;
 use App\Http\Requests\ExportRequest;
 use App\Models\Calendar;
 use App\Repositories\CalendarRepositoryInterface;
+use App\Services\Concerns\DetectsScheduleConflicts;
 use Illuminate\Pagination\LengthAwarePaginator;
 use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\Writer\Exception as WriterException;
@@ -16,6 +18,8 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
  */
 readonly class CalendarService implements CalendarServiceInterface
 {
+    use DetectsScheduleConflicts;
+
     /**
      * @param CalendarRepositoryInterface $calendarRepository
      * @param ExportServiceInterface $exportService
@@ -95,9 +99,13 @@ readonly class CalendarService implements CalendarServiceInterface
      * @param Calendar $calendar
      * @param array $data
      * @return void
+     *
+     * @throws ScheduleConflictException
      */
     public function assignUsers(Calendar $calendar, array $data): void
     {
+        $this->assertNoScheduleConflicts($calendar, $data['users'] ?? [], $data['patients'] ?? []);
+
         $this->auditService->recordSync($calendar, 'users', $calendar->users()->sync($data['users'] ?? []));
         $this->auditService->recordSync($calendar, 'patients', $calendar->patients()->sync($data['patients'] ?? []));
     }

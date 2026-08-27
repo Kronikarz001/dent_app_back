@@ -15,18 +15,21 @@ class MessageSentTest extends TestCase
     /**
      * @return void
      */
-    public function testBroadcastOnPrivateMessageUsesRecipientUserChannel(): void
+    public function testBroadcastOnPrivateMessageUsesRecipientAndSenderUserChannels(): void
     {
         $message = Message::factory()->make([
+            'user_uuid' => 'sender-uuid',
             'recipient_user_uuid' => 'recipient-uuid',
             'message_group_uuid' => null,
         ]);
 
         $channels = (new MessageSent($message))->broadcastOn();
 
-        $this->assertCount(1, $channels);
-        $this->assertInstanceOf(PrivateChannel::class, $channels[0]);
-        $this->assertSame('private-App.Models.User.recipient-uuid', $channels[0]->name);
+        $this->assertCount(2, $channels);
+        $this->assertContainsOnlyInstancesOf(PrivateChannel::class, $channels);
+        $channelNames = array_map(fn (PrivateChannel $channel) => $channel->name, $channels);
+        $this->assertContains('private-App.Models.User.recipient-uuid', $channelNames);
+        $this->assertContains('private-App.Models.User.sender-uuid', $channelNames);
     }
 
     /**

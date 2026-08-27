@@ -117,6 +117,8 @@ class DentalExaminationFileController extends Controller
     )]
     public function show(DentalExamination $dentalExamination, File $file): FileResource
     {
+        $this->assertFileBelongsTo($file, $dentalExamination);
+
         return new FileResource($file);
     }
 
@@ -136,6 +138,8 @@ class DentalExaminationFileController extends Controller
     )]
     public function download(DentalExamination $dentalExamination, File $file): JsonResponse
     {
+        $this->assertFileBelongsTo($file, $dentalExamination);
+
         return new JsonResponse($this->fileService->getFile($file));
     }
 
@@ -171,6 +175,8 @@ class DentalExaminationFileController extends Controller
     )]
     public function update(DentalExamination $dentalExamination, File $file, FileUpdateRequest $request): FileResource
     {
+        $this->assertFileBelongsTo($file, $dentalExamination);
+
         return new FileResource(
             $this->fileService->updateFileName($file, $request->input('filename'))
         );
@@ -192,6 +198,8 @@ class DentalExaminationFileController extends Controller
     )]
     public function destroy(DentalExamination $dentalExamination, File $file): JsonResponse
     {
+        $this->assertFileBelongsTo($file, $dentalExamination);
+
         $this->fileService->deleteFile($file);
 
         return new JsonResponse(null, 204);
@@ -230,6 +238,8 @@ class DentalExaminationFileController extends Controller
     )]
     public function storeNewVersion(DentalExamination $dentalExamination, File $file, FileStoreRequest $request): AnonymousResourceCollection
     {
+        $this->assertFileBelongsTo($file, $dentalExamination);
+
         return FileResource::collection(
             $this->fileService->createNewVersionFile(
                 $file,

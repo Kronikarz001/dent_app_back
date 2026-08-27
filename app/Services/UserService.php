@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\PhoneNumberType;
+use App\Exceptions\PermissionDeniedException;
 use App\Exports\UserExport;
 use App\Http\Requests\ExportRequest;
 use App\Models\Permission;
@@ -27,12 +28,14 @@ readonly class UserService implements UserServiceInterface
      * @param ExportServiceInterface $exportService
      * @param PhoneNumberServiceInterface $phoneNumberService
      * @param JobPositionServiceInterface $jobPositionService
+     * @param PermissionServiceInterface $permissionService
      */
     public function __construct(
         private UserRepositoryInterface $userRepository,
         private ExportServiceInterface $exportService,
         private PhoneNumberServiceInterface $phoneNumberService,
-        private JobPositionServiceInterface $jobPositionService
+        private JobPositionServiceInterface $jobPositionService,
+        private PermissionServiceInterface $permissionService,
     ) {}
 
     /**
@@ -119,24 +122,6 @@ readonly class UserService implements UserServiceInterface
     }
 
     /**
-     * @param User $user
-     * @return User
-     */
-    public function getUserInformation(User $user): User
-    {
-        return $this->userRepository->getUserInformation($user->uuid);
-    }
-
-    /**
-     * @param string $token
-     * @return User|null
-     */
-    public function getUserByToken(string $token): ?User
-    {
-        return $this->userRepository->getUserByToken($token);
-    }
-
-    /**
      * @return User
      */
     public function getLoggedUser(): User
@@ -160,15 +145,32 @@ readonly class UserService implements UserServiceInterface
      * @param User $user
      * @param array $data
      * @return void
+     *
+     * @throws PermissionDeniedException
      */
     public function assignPermissions(User $user, array $data): void
     {
+        /** @var User $actingUser */
+        $actingUser = Auth::user();
+
         foreach ($data['permissions'] ?? [] as $permissionUuid) {
-            $this->grant(Permission::class, $permissionUuid, $user, $data['expires_at'] ?? null);
+            $permission = Permission::where('uuid', $permissionUuid)->firstOrFail();
+
+            if (! $actingUser->is_admin && ! $this->permissionService->hasPermissionGrant($actingUser, $permission)) {
+                throw new PermissionDeniedException('Nie posiadasz tego uprawnienia, nie możesz go nadać.');
+            }
+
+            $this->grant(Permission::class, $permission->uuid, $user, $data['expires_at'] ?? null);
         }
 
         foreach ($data['permission_groups'] ?? [] as $permissionGroupUuid) {
-            $this->grant(PermissionGroup::class, $permissionGroupUuid, $user, $data['expires_at'] ?? null);
+            $group = PermissionGroup::where('uuid', $permissionGroupUuid)->firstOrFail();
+
+            if (! $actingUser->is_admin && ! $this->permissionService->hasGroupGrant($actingUser, $group)) {
+                throw new PermissionDeniedException('Nie posiadasz tej grupy uprawnień, nie możesz jej nadać.');
+            }
+
+            $this->grant(PermissionGroup::class, $group->uuid, $user, $data['expires_at'] ?? null);
         }
     }
 

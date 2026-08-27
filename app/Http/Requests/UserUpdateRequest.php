@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\PeselRule;
 use App\Rules\PhoneNumberRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -29,7 +30,7 @@ class UserUpdateRequest extends FormRequest
             'last_name' => ['nullable', 'string'],
             'email' => ['nullable', 'email', Rule::unique('users', 'email')->ignore($this->route('user'))],
             'password' => ['nullable', 'string', 'confirmed'],
-            'pesel' => ['nullable', 'string', 'size:11', Rule::unique('users', 'pesel')->ignore($this->route('user'))],
+            'pesel' => ['nullable', 'string', new PeselRule, Rule::unique('users', 'pesel')->ignore($this->route('user'))],
             'private_email' => ['nullable', 'email', Rule::unique('users', 'private_email')->ignore($this->route('user'))],
             'private_phone_number' => ['nullable', 'string', new PhoneNumberRule],
             'phone_number' => ['nullable', 'string', new PhoneNumberRule],
@@ -51,7 +52,6 @@ class UserUpdateRequest extends FormRequest
             'email.email' => 'Adres e-mail musi być prawidłowy.',
             'email.unique' => 'Użytkownik o podanym adresie e-mail już istnieje.',
             'password.confirmed' => 'Potwierdzenie hasła nie jest zgodne.',
-            'pesel.size' => 'PESEL musi mieć dokładnie 11 znaków.',
             'pesel.unique' => 'Użytkownik o podanym numerze PESEL już istnieje.',
             'private_email.email' => 'Prywatny adres e-mail musi być prawidłowy.',
             'private_email.unique' => 'Użytkownik o podanym prywatnym adresie e-mail już istnieje.',

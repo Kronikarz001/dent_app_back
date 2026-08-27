@@ -340,4 +340,72 @@ class CalendarControllerTest extends TestCase
 
         $response->assertStatus(422);
     }
+
+    /**
+     * @return void
+     */
+    public function testAssignUsersRejectsOverlappingAppointmentForSameDentist(): void
+    {
+        $dentist = User::factory()->create();
+        $existing = Calendar::factory()->create([
+            'date' => '2030-01-10',
+            'start_time' => '09:00',
+            'end_time' => '09:30',
+            'is_active' => true,
+        ]);
+        $existing->users()->attach($dentist->uuid);
+
+        $newCalendar = Calendar::factory()->create([
+            'date' => '2030-01-10',
+            'start_time' => '09:15',
+            'end_time' => '09:45',
+            'is_active' => true,
+        ]);
+
+        $response = $this->callApiWithLoggedUser()
+            ->patchJson(route('calendar.assignUsers', ['calendar' => $newCalendar->uuid]), [
+                'users' => [$dentist->uuid],
+            ]);
+
+        $response->assertStatus(409);
+        $this->assertDatabaseMissing('calendar_users', [
+            'calendar_uuid' => $newCalendar->uuid,
+            'userable_id' => $dentist->uuid,
+            'userable_type' => User::class,
+        ]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testAssignUsersAllowsNonOverlappingAppointmentForSameDentist(): void
+    {
+        $dentist = User::factory()->create();
+        $existing = Calendar::factory()->create([
+            'date' => '2030-01-10',
+            'start_time' => '09:00',
+            'end_time' => '09:30',
+            'is_active' => true,
+        ]);
+        $existing->users()->attach($dentist->uuid);
+
+        $newCalendar = Calendar::factory()->create([
+            'date' => '2030-01-10',
+            'start_time' => '09:30',
+            'end_time' => '10:00',
+            'is_active' => true,
+        ]);
+
+        $this->callApiWithLoggedUser()
+            ->patchJson(route('calendar.assignUsers', ['calendar' => $newCalendar->uuid]), [
+                'users' => [$dentist->uuid],
+            ])
+            ->assertNoContent();
+
+        $this->assertDatabaseHas('calendar_users', [
+            'calendar_uuid' => $newCalendar->uuid,
+            'userable_id' => $dentist->uuid,
+            'userable_type' => User::class,
+        ]);
+    }
 }

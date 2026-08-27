@@ -13,6 +13,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -188,24 +189,29 @@ readonly class FileService implements FileServiceInterface
         $path = $this->makeFilePath($newUuid, $type, $rootUuid);
         $this->saveFileToDisk($upload, $path);
 
-        $newFile = $this->fileRepository->create([
-            'uuid' => $newUuid,
-            'filename' => pathinfo($upload->getClientOriginalName(), PATHINFO_FILENAME),
-            'fileable_type' => $model->getMorphClass(),
-            'fileable_id' => $model->uuid,
-            'extension' => $upload->getClientOriginalExtension(),
-            'size' => $upload->getSize(),
-            'mimetype' => $upload->getMimeType(),
-            'path' => $path,
-            'file_uuid' => null,
-            'is_latest' => true,
-        ]);
+        // Creating the new "latest" row and demoting the previous one must
+        // not be observable half-done — otherwise a crash in between leaves
+        // two rows with is_latest=true for the same file lineage.
+        return DB::transaction(function () use ($newUuid, $upload, $model, $path, $parentFile) {
+            $newFile = $this->fileRepository->create([
+                'uuid' => $newUuid,
+                'filename' => pathinfo($upload->getClientOriginalName(), PATHINFO_FILENAME),
+                'fileable_type' => $model->getMorphClass(),
+                'fileable_id' => $model->uuid,
+                'extension' => $upload->getClientOriginalExtension(),
+                'size' => $upload->getSize(),
+                'mimetype' => $upload->getMimeType(),
+                'path' => $path,
+                'file_uuid' => null,
+                'is_latest' => true,
+            ]);
 
-        if ($parentFile) {
-            $this->updateAllPreviousVersions($newFile, $parentFile);
-        }
+            if ($parentFile) {
+                $this->updateAllPreviousVersions($newFile, $parentFile);
+            }
 
-        return $newFile;
+            return $newFile;
+        });
     }
 
     /**

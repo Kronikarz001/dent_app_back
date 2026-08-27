@@ -102,6 +102,24 @@ class JobPositionFileControllerTest extends TestCase
     /**
      * @return void
      */
+    public function testShowRejectsFileBelongingToAnotherJobPosition(): void
+    {
+        $ownJobPosition = JobPosition::factory()->create();
+        $otherJobPosition = JobPosition::factory()->create();
+        $foreignFile = File::factory()->create([
+            'fileable_type' => FileableType::JOB_POSITION->value,
+            'fileable_id' => $otherJobPosition->uuid,
+        ]);
+
+        $response = $this->callApiWithLoggedUser()
+            ->getJson(route('jobpositionfile.show', ['jobPosition' => $ownJobPosition->uuid, 'file' => $foreignFile->uuid]));
+
+        $response->assertNotFound();
+    }
+
+    /**
+     * @return void
+     */
     public function testDownloadReturnsOriginalFileContent(): void
     {
         $jobPosition = JobPosition::factory()->create();

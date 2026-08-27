@@ -97,6 +97,21 @@ class UserControllerTest extends TestCase
     /**
      * @return void
      */
+    public function testShowUserDoesNotExposeAdminFlagsOfOtherUser(): void
+    {
+        $target = User::factory()->create(['is_admin' => true, 'is_superuser' => true]);
+
+        $response = $this->callApiWithLoggedUser()
+            ->getJson(route('user.show', ['user' => $target->uuid]));
+
+        $response->assertOk();
+        $response->assertJsonMissingPath('is_admin');
+        $response->assertJsonMissingPath('is_superuser');
+    }
+
+    /**
+     * @return void
+     */
     public function testShowUserReturnsStatusNonActiveWithoutValidToken(): void
     {
         $target = User::factory()->create();
@@ -134,7 +149,7 @@ class UserControllerTest extends TestCase
                 'last_name' => 'User',
                 'email' => 'example@mail',
                 'private_email' => 'example_private@mail',
-                'pesel' => '12345678901',
+                'pesel' => '44051401359',
                 'password' => 'password',
                 'password_confirmation' => 'password',
             ]);
@@ -157,7 +172,7 @@ class UserControllerTest extends TestCase
                 'first_name' => 'Updated',
                 'last_name' => 'User',
                 'email' => 'example_updated@mail',
-                'pesel' => '12345678901',
+                'pesel' => '44051401359',
             ]);
         $response->assertNoContent();
 
@@ -365,6 +380,40 @@ class UserControllerTest extends TestCase
         $this->assertDatabaseHas('permission_assignments', [
             'grantable_type' => Permission::class,
             'grantable_id' => $permission->uuid,
+            'assignable_type' => User::class,
+            'assignable_id' => $target->uuid,
+        ]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testAssignPermissionsForbiddenWhenActingUserLacksGrant(): void
+    {
+        $actingUser = User::factory()->create(['is_admin' => false]);
+        $target = User::factory()->create();
+
+        // acting user may manage users (passes the route/resource check),
+        // but does not personally hold the "role" permission it is trying to grant
+        $ownResourcePermission = Permission::where('resource', 'user')->where('type', 'edit')->firstOrFail();
+        PermissionAssignment::create([
+            'grantable_type' => Permission::class,
+            'grantable_id' => $ownResourcePermission->uuid,
+            'assignable_type' => User::class,
+            'assignable_id' => $actingUser->uuid,
+        ]);
+
+        $unownedPermission = Permission::where('resource', 'role')->where('type', 'edit')->firstOrFail();
+
+        $response = $this->callApiWithLoggedUser($actingUser)
+            ->patchJson(route('user.assignPermissions', ['user' => $target->uuid]), [
+                'permissions' => [$unownedPermission->uuid],
+            ]);
+
+        $response->assertStatus(403);
+        $this->assertDatabaseMissing('permission_assignments', [
+            'grantable_type' => Permission::class,
+            'grantable_id' => $unownedPermission->uuid,
             'assignable_type' => User::class,
             'assignable_id' => $target->uuid,
         ]);

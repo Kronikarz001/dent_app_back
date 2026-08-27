@@ -100,6 +100,38 @@ class RoleControllerTest extends TestCase
     /**
      * @return void
      */
+    public function testAssignPermissionsForbiddenWhenActingUserLacksGrant(): void
+    {
+        $actingUser = User::factory()->create(['is_admin' => false]);
+        $role = Role::factory()->create();
+
+        $ownResourcePermission = Permission::where('resource', 'role')->where('type', 'edit')->firstOrFail();
+        PermissionAssignment::create([
+            'grantable_type' => Permission::class,
+            'grantable_id' => $ownResourcePermission->uuid,
+            'assignable_type' => User::class,
+            'assignable_id' => $actingUser->uuid,
+        ]);
+
+        $unownedPermission = Permission::where('resource', 'user')->where('type', 'edit')->firstOrFail();
+
+        $response = $this->callApiWithLoggedUser($actingUser)
+            ->patchJson(route('role.assignPermissions', ['role' => $role->uuid]), [
+                'permissions' => [$unownedPermission->uuid],
+            ]);
+
+        $response->assertStatus(403);
+        $this->assertDatabaseMissing('permission_assignments', [
+            'grantable_type' => Permission::class,
+            'grantable_id' => $unownedPermission->uuid,
+            'assignable_type' => Role::class,
+            'assignable_id' => $role->uuid,
+        ]);
+    }
+
+    /**
+     * @return void
+     */
     public function testDelegateAllowsManagerToShareOwnPermissionWithRoleMember(): void
     {
         $role = Role::factory()->create();

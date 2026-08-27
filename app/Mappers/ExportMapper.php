@@ -14,6 +14,7 @@ class ExportMapper implements MapperInterface
      */
     private const EXTENSION_MAP = [
         'xlsx' => ExcelTypes::XLSX,
+        'xls' => ExcelTypes::XLS,
         'csv' => ExcelTypes::CSV,
         'pdf' => ExcelTypes::MPDF,
     ];

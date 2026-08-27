@@ -106,7 +106,7 @@ class PatientControllerTest extends TestCase
                 'first_name' => 'Jan',
                 'last_name' => 'Kowalski',
                 'email' => 'jan@example.com',
-                'pesel' => '12345678901',
+                'pesel' => '44051401359',
             ]);
 
         $response->assertCreated();
@@ -128,7 +128,7 @@ class PatientControllerTest extends TestCase
                 'first_name' => 'Jan',
                 'last_name' => 'Kowalski',
                 'email' => 'jan@example.com',
-                'pesel' => '12345678901',
+                'pesel' => '44051401359',
             ]);
 
         $response->assertCreated();
@@ -141,6 +141,116 @@ class PatientControllerTest extends TestCase
         $this->assertSame(AuditableEventType::CREATE, $audit->type);
         $this->assertSame($actor->uuid, $audit->user_uuid);
         $this->assertSame('jan@example.com', $audit->change_to['email']);
+    }
+
+    /**
+     * @return void
+     */
+    public function testStorePatientWithDuplicateEmailReturnsValidationError(): void
+    {
+        Patient::factory()->create(['email' => 'jan@example.com']);
+
+        $response = $this->callApiWithLoggedUser()
+            ->postJson(route('patient.store'), [
+                'first_name' => 'Jan',
+                'last_name' => 'Kowalski',
+                'email' => 'jan@example.com',
+                'pesel' => '99010112342',
+            ]);
+
+        $response->assertStatus(422);
+    }
+
+    /**
+     * @return void
+     */
+    public function testStorePatientWithDuplicatePeselReturnsValidationError(): void
+    {
+        Patient::factory()->create(['pesel' => '44051401359']);
+
+        $response = $this->callApiWithLoggedUser()
+            ->postJson(route('patient.store'), [
+                'first_name' => 'Jan',
+                'last_name' => 'Kowalski',
+                'email' => 'inny@example.com',
+                'pesel' => '44051401359',
+            ]);
+
+        $response->assertStatus(422);
+    }
+
+    /**
+     * @return void
+     */
+    public function testStorePatientWithMissingRequiredFieldsReturnsValidationError(): void
+    {
+        $response = $this->callApiWithLoggedUser()
+            ->postJson(route('patient.store'), []);
+
+        $response->assertStatus(422);
+    }
+
+    /**
+     * @return void
+     */
+    public function testUpdatePatientAssignsPhoneNumbers(): void
+    {
+        $patient = Patient::factory()->create();
+
+        $response = $this->callApiWithLoggedUser()
+            ->putJson(route('patient.update', ['patient' => $patient->uuid]), [
+                'first_name' => $patient->first_name,
+                'last_name' => $patient->last_name,
+                'email' => $patient->email,
+                'phone_numbers' => [
+                    ['number' => '48500100200', 'type' => 'PRIVATE'],
+                ],
+            ]);
+
+        $response->assertNoContent();
+        $this->assertDatabaseHas('phone_numbers', [
+            'phoneable_type' => Patient::class,
+            'phoneable_uuid' => $patient->uuid,
+            'number' => '48500100200',
+        ]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testUpdatePatientWithInvalidPhoneNumberReturnsValidationError(): void
+    {
+        $patient = Patient::factory()->create();
+
+        $response = $this->callApiWithLoggedUser()
+            ->putJson(route('patient.update', ['patient' => $patient->uuid]), [
+                'first_name' => $patient->first_name,
+                'last_name' => $patient->last_name,
+                'email' => $patient->email,
+                'phone_numbers' => [
+                    ['number' => 'not-a-phone-number', 'type' => 'PRIVATE'],
+                ],
+            ]);
+
+        $response->assertStatus(422);
+    }
+
+    /**
+     * @return void
+     */
+    public function testUpdatePatientWithDuplicateEmailReturnsValidationError(): void
+    {
+        Patient::factory()->create(['email' => 'taken@example.com']);
+        $patient = Patient::factory()->create();
+
+        $response = $this->callApiWithLoggedUser()
+            ->putJson(route('patient.update', ['patient' => $patient->uuid]), [
+                'first_name' => $patient->first_name,
+                'last_name' => $patient->last_name,
+                'email' => 'taken@example.com',
+            ]);
+
+        $response->assertStatus(422);
     }
 
     /**

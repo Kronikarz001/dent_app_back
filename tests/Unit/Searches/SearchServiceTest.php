@@ -2,7 +2,9 @@
 
 namespace Tests\Unit\Searches;
 
+use App\Models\File;
 use App\Repositories\SearchRepositoryInterface;
+use App\Search\SearchConfig;
 use App\Services\SearchService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -426,5 +428,88 @@ class SearchServiceTest extends TestCase
         $this->repo->shouldReceive('orderBy')->once()->with($query, 'job_positions_count', 'desc');
 
         $this->service->applyDirectSort($query, 'job_positions_count', 'desc', ['job_positions_count'], ['jobPositions']);
+    }
+
+    /**
+     * @return void
+     */
+    public function testApplyRelationSortSkipsColumnHiddenOnRelatedModel(): void
+    {
+        $query = File::query();
+
+        $this->repo->shouldNotReceive('leftJoin');
+        $this->repo->shouldNotReceive('orderBy');
+
+        // "user" is a loaded/legitimate relation on File, but "password" is
+        // hidden on the related User model — must not become sortable via
+        // ?sort=user.password (would leak the password hash ordering).
+        $this->service->applyRelationSort($query, 'user.password', 'asc');
+    }
+
+    /**
+     * @return void
+     */
+    public function testApplyRelationSortAppliesOrderByForAllowedColumn(): void
+    {
+        $query = File::query();
+
+        $this->repo->shouldReceive('leftJoin')->once();
+        $this->repo->shouldReceive('orderBy')->once()->with(Mockery::any(), 'user_sort.first_name', 'asc');
+
+        $this->service->applyRelationSort($query, 'user.first_name', 'asc');
+    }
+
+    /**
+     * @return void
+     */
+    public function testApplyRelationSortDoesNothingForUnknownRelation(): void
+    {
+        $query = File::query();
+
+        $this->repo->shouldNotReceive('leftJoin');
+        $this->repo->shouldNotReceive('orderBy');
+
+        $this->service->applyRelationSort($query, 'notARealRelation.someField', 'asc');
+    }
+
+    /**
+     * @return void
+     */
+    public function testApplyFiltersSkipsColumnHiddenOnRelatedModel(): void
+    {
+        $query = File::query();
+        $config = new SearchConfig(
+            fillableSearchFields: [],
+            jsonSearchableFields: [],
+            loadedRelations: ['user'],
+            recursiveRelations: [],
+        );
+
+        $this->repo->shouldNotReceive('whereHas');
+        $this->repo->shouldNotReceive('orWhereHas');
+
+        $this->service->applyFilters($query, ['user.password' => 'x'], 'files', $config);
+    }
+
+    /**
+     * @return void
+     */
+    public function testApplySearchStringUsesLikeOperatorMatchingConnectionDriver(): void
+    {
+        $query = File::query();
+        // ILIKE is PostgreSQL-only syntax; every other driver (MySQL on
+        // production, SQLite in this test run) must get plain LIKE instead.
+        $expectedOperator = $query->getConnection()->getDriverName() === 'pgsql' ? 'ILIKE' : 'LIKE';
+
+        $this->repo->shouldReceive('whereGroup')
+            ->once()
+            ->with($query, Mockery::type('Closure'))
+            ->andReturnUsing(fn ($q, $callback) => $callback($q));
+
+        $this->repo->shouldReceive('orWhereOp')
+            ->once()
+            ->with(Mockery::any(), 'files.filename', $expectedOperator, '%term%');
+
+        $this->service->applySearchString($query, 'term', ['filename'], 'files');
     }
 }

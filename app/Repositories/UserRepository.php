@@ -61,28 +61,10 @@ class UserRepository extends SearchableRepository implements UserRepositoryInter
     }
 
     /**
-     * @param string $token
-     * @return User|null
-     */
-    public function getUserByToken(string $token): ?User
-    {
-        return User::whereToken($token);
-    }
-
-    /**
      * @return User
      */
     public function getLoggedUser(): User
     {
         return Auth::user();
-    }
-
-    /**
-     * @param string $userUuid
-     * @return User
-     */
-    public function getUserInformation(string $userUuid): User
-    {
-        return User::find($userUuid);
     }
 }

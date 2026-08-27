@@ -16,15 +16,6 @@ use Illuminate\Support\Facades\Password;
 readonly class AuthService implements AuthServiceInterface
 {
     /**
-     * @param UserServiceInterface $userService
-     * @param UserRouteCacheService $userRouteCacheService
-     */
-    public function __construct(
-        private UserServiceInterface $userService,
-        private UserRouteCacheService $userRouteCacheService
-    ) {}
-
-    /**
      * @param LoginRequest $request
      * @return JsonResponse
      */
@@ -54,7 +45,6 @@ readonly class AuthService implements AuthServiceInterface
         }
 
         $user->currentAccessToken()->delete();
-        $this->userRouteCacheService->delete($user);
     }
 
     /**
@@ -92,25 +82,6 @@ readonly class AuthService implements AuthServiceInterface
         }
 
         return new JsonResponse(['message' => __($status)], 422);
-    }
-
-    /**
-     * @param string|null $token
-     * @return void
-     */
-    public function authenticate(?string $token): void
-    {
-        if (is_null($token)) {
-            throw new AuthenticationException;
-        }
-
-        $user = $this->userService->getUserByToken($token);
-
-        if (is_null($user)) {
-            throw new AuthenticationException;
-        }
-
-        Auth::setUser($user);
     }
 
     /**

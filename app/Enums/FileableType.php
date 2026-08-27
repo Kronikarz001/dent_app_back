@@ -3,6 +3,7 @@
 namespace App\Enums;
 
 use App\Exceptions\FileableTypeException;
+use App\Models\Calendar;
 use App\Models\DentalExamination;
 use App\Models\JobPosition;
 use App\Models\Material;
@@ -25,6 +26,7 @@ enum FileableType: string
     case DENTAL_EXAMINATION = DentalExamination::class;
     case MATERIAL = Material::class;
     case MESSAGE = Message::class;
+    case CALENDAR = Calendar::class;
 
     /**
      * @param string $name
@@ -57,6 +59,7 @@ enum FileableType: string
             self::DENTAL_EXAMINATION => 'dental_examination',
             self::MATERIAL => 'material',
             self::MESSAGE => 'message',
+            self::CALENDAR => 'calendar',
         };
     }
 }

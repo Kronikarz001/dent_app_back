@@ -102,6 +102,24 @@ class DentalExaminationFileControllerTest extends TestCase
     /**
      * @return void
      */
+    public function testShowRejectsFileBelongingToAnotherDentalExamination(): void
+    {
+        $ownExamination = DentalExamination::factory()->create();
+        $otherExamination = DentalExamination::factory()->create();
+        $foreignFile = File::factory()->create([
+            'fileable_type' => FileableType::DENTAL_EXAMINATION->value,
+            'fileable_id' => $otherExamination->uuid,
+        ]);
+
+        $response = $this->callApiWithLoggedUser()
+            ->getJson(route('dentalexaminationfile.show', ['dentalExamination' => $ownExamination->uuid, 'file' => $foreignFile->uuid]));
+
+        $response->assertNotFound();
+    }
+
+    /**
+     * @return void
+     */
     public function testDownloadReturnsOriginalFileContent(): void
     {
         $dentalExamination = DentalExamination::factory()->create();

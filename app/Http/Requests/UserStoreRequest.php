@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\PeselRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
@@ -26,7 +27,7 @@ class UserStoreRequest extends FormRequest
             'first_name' => ['required', 'string'],
             'last_name' => ['required', 'string'],
             'email' => ['nullable', 'email', 'unique:users,email'],
-            'pesel' => ['required', 'string', 'size:11', 'unique:users,pesel'],
+            'pesel' => ['required', 'string', new PeselRule, 'unique:users,pesel'],
             'private_email' => ['required', 'email', 'unique:users,private_email'],
             'pwz_numer' => ['nullable', 'string'],
         ];
@@ -46,7 +47,6 @@ class UserStoreRequest extends FormRequest
             'email.unique' => 'Użytkownik o podanym adresie e-mail już istnieje.',
             'pesel.required' => 'PESEL jest wymagany.',
             'pesel.string' => 'PESEL musi być tekstem.',
-            'pesel.size' => 'PESEL musi mieć dokładnie 11 znaków.',
             'pesel.unique' => 'Użytkownik o podanym numerze PESEL już istnieje.',
             'private_email.required' => 'Prywatny adres e-mail jest wymagany.',
             'private_email.email' => 'Prywatny adres e-mail musi być prawidłowy.',

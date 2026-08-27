@@ -115,6 +115,8 @@ class UserFileController extends Controller
     )]
     public function show(User $user, File $file): FileResource
     {
+        $this->assertFileBelongsTo($file, $user);
+
         return new FileResource($file);
     }
 
@@ -134,6 +136,8 @@ class UserFileController extends Controller
     )]
     public function download(User $user, File $file): JsonResponse
     {
+        $this->assertFileBelongsTo($file, $user);
+
         return new JsonResponse($this->fileService->getFile($file));
     }
 
@@ -169,6 +173,8 @@ class UserFileController extends Controller
     )]
     public function update(User $user, File $file, FileUpdateRequest $request): FileResource
     {
+        $this->assertFileBelongsTo($file, $user);
+
         return new FileResource(
             $this->fileService->updateFileName($file, $request->input('filename'))
         );
@@ -190,6 +196,8 @@ class UserFileController extends Controller
     )]
     public function destroy(User $user, File $file): JsonResponse
     {
+        $this->assertFileBelongsTo($file, $user);
+
         $this->fileService->deleteFile($file);
 
         return new JsonResponse(null, 204);
@@ -228,6 +236,8 @@ class UserFileController extends Controller
     )]
     public function storeNewVersion(User $user, File $file, FileStoreRequest $request): AnonymousResourceCollection
     {
+        $this->assertFileBelongsTo($file, $user);
+
         return FileResource::collection(
             $this->fileService->createNewVersionFile(
                 $file,
@@ -293,6 +303,8 @@ class UserFileController extends Controller
     )]
     public function avatarDownload(User $user, File $file): Response
     {
+        $this->assertFileBelongsTo($file, UserAvatar::findOrFail($user->uuid));
+
         return response($this->fileService->getPhotoFile($file), 200, ['Content-Type' => $file->mimetype]);
     }
 
@@ -352,6 +364,8 @@ class UserFileController extends Controller
     )]
     public function backgroundDownload(User $user, File $file): Response
     {
+        $this->assertFileBelongsTo($file, UserBackground::findOrFail($user->uuid));
+
         return response($this->fileService->getPhotoFile($file), 200, ['Content-Type' => $file->mimetype]);
     }
 }

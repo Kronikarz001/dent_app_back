@@ -77,38 +77,4 @@ class AuthServiceTest extends TestCase
 
         $this->assertDatabaseMissing(self::TOKENS_TABLE, ['id' => $token->accessToken->id]);
     }
-
-    /**
-     * @return void
-     */
-    public function testAuthenticateSetsUserFromValidToken(): void
-    {
-        $user = User::factory()->create();
-        $plain = $user->createToken('test')->plainTextToken;
-        $tokenValue = explode('|', $plain)[1];
-
-        $this->service->authenticate($tokenValue);
-
-        $this->assertSame($user->uuid, Auth::user()->uuid);
-    }
-
-    /**
-     * @return void
-     */
-    public function testAuthenticateThrowsExceptionForInvalidToken(): void
-    {
-        $this->expectException(AuthenticationException::class);
-
-        $this->service->authenticate('invalid-token');
-    }
-
-    /**
-     * @return void
-     */
-    public function testAuthenticateThrowsExceptionForNullToken(): void
-    {
-        $this->expectException(AuthenticationException::class);
-
-        $this->service->authenticate(null);
-    }
 }

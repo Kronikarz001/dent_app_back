@@ -1,3 +1,6 @@
+# Local development only. Production runs on shared hosting (PHP-FPM +
+# MySQL, no Docker/Postgres) and is deployed via .github/workflows/cd.yml
+# (rsync + SSH), entirely independent of this file.
 services:
   dent_app_back_nginx:
     image: nginx:alpine
@@ -64,9 +67,9 @@ services:
     container_name: dent_app_back_db
     restart: unless-stopped
     environment:
-      POSTGRES_DB: dent_db_back
-      POSTGRES_USER: pskudlik
-      POSTGRES_PASSWORD: Troll001#
+      POSTGRES_DB: ${DB_DATABASE:-dent_db_back}
+      POSTGRES_USER: ${DB_USERNAME:-pskudlik}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-Troll001#}
     volumes:
       - dbdata:/var/lib/postgresql/data
     ports:

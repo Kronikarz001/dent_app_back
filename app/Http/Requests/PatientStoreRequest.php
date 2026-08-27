@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\PeselRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
@@ -26,7 +27,7 @@ class PatientStoreRequest extends FormRequest
             'first_name' => ['required', 'string'],
             'last_name' => ['required', 'string'],
             'email' => ['required', 'email', 'unique:patients,email'],
-            'pesel' => ['required', 'string', 'size:11', 'unique:patients,pesel'],
+            'pesel' => ['required', 'string', new PeselRule, 'unique:patients,pesel'],
         ];
     }
 
@@ -45,7 +46,6 @@ class PatientStoreRequest extends FormRequest
             'email.unique' => 'Pacjent o podanym adresie e-mail już istnieje.',
             'pesel.required' => 'PESEL jest wymagany.',
             'pesel.string' => 'PESEL musi być tekstem.',
-            'pesel.size' => 'PESEL musi mieć dokładnie 11 znaków.',
             'pesel.unique' => 'Pacjent o podanym numerze PESEL już istnieje.',
         ];
     }

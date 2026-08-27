@@ -36,19 +36,7 @@ interface UserRepositoryInterface extends BasicRepositoryInterface
     public function delete(Model|User $model): bool;
 
     /**
-     * @param string $token
-     * @return User|null
-     */
-    public function getUserByToken(string $token): ?User;
-
-    /**
      * @return User
      */
     public function getLoggedUser(): User;
-
-    /**
-     * @param string $userUuid
-     * @return User
-     */
-    public function getUserInformation(string $userUuid): User;
 }
