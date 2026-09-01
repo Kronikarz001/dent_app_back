@@ -6,6 +6,7 @@ use App\Dto\FileDto;
 use App\Enums\FileableType;
 use App\Exceptions\FileUploadException;
 use App\Models\File;
+use App\Models\UserAvatar;
 use App\Repositories\FileRepositoryInterface;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Database\Eloquent\Model;
@@ -180,13 +181,19 @@ readonly class FileService implements FileServiceInterface
     private function processSingleFile(UploadedFile $upload, FileableType $type, Model $model, ?File $parentFile = null): File
     {
         $newUuid = Str::uuid()->toString();
-        $rootUuid = $parentFile
-            ? ($this->getRootUuidFromPath($parentFile->path, $type)
-                ?? $this->fileRepository->getRootUuid($parentFile->fileable_type, $parentFile->fileable_id))
-            : $newUuid;
 
-        $path = $this->makeFilePath($newUuid, $type, $rootUuid);
-        $this->saveFileToDisk($upload, $path);
+        if ($type === FileableType::USER_AVATAR) {
+            $path = $this->makeAvatarPath($newUuid, $upload);
+        } else {
+            $rootUuid = $parentFile
+                ? ($this->getRootUuidFromPath($parentFile->path, $type)
+                    ?? $this->fileRepository->getRootUuid($parentFile->fileable_type, $parentFile->fileable_id))
+                : $newUuid;
+
+            $path = $this->makeFilePath($newUuid, $type, $rootUuid);
+        }
+
+        $this->saveFileToDisk($upload, $path, $type);
 
         $newFile = $this->fileRepository->create([
             'uuid' => $newUuid,
@@ -211,17 +218,36 @@ readonly class FileService implements FileServiceInterface
     /**
      * @param UploadedFile $file
      * @param string $path
+     * @param FileableType $type
      * @return void
      *
      * @throws FileUploadException
      */
-    private function saveFileToDisk(UploadedFile $file, string $path): void
+    private function saveFileToDisk(UploadedFile $file, string $path, FileableType $type): void
     {
+        if ($type === FileableType::USER_AVATAR) {
+            if (! Storage::disk('public')->put($path, $file->get())) {
+                throw new FileUploadException("Error uploading file to {$path}");
+            }
+
+            return;
+        }
+
         $encrypted = Crypt::encrypt($file->getContent());
 
         if (! Storage::disk('files')->put($path, $encrypted)) {
             throw new FileUploadException("Error uploading file to {$path}");
         }
+    }
+
+    /**
+     * @param string $uuid
+     * @param UploadedFile $upload
+     * @return string
+     */
+    private function makeAvatarPath(string $uuid, UploadedFile $upload): string
+    {
+        return "avatar/{$uuid}.{$upload->getClientOriginalExtension()}";
     }
 
     /**
@@ -256,11 +282,13 @@ readonly class FileService implements FileServiceInterface
      */
     private function deletePhysicalFile(File $file): void
     {
-        if (! Storage::disk('files')->exists($file->path)) {
+        $disk = $file->fileable_type === UserAvatar::class ? 'public' : 'files';
+
+        if (! Storage::disk($disk)->exists($file->path)) {
             throw new FileNotFoundException($file->path);
         }
 
-        Storage::disk('files')->delete($file->path);
+        Storage::disk($disk)->delete($file->path);
     }
 
     /**
@@ -307,5 +335,16 @@ readonly class FileService implements FileServiceInterface
                 'is_latest' => true,
             ]
         );
+    }
+
+    /**
+     * @param Model $model
+     * @return void
+     *
+     * @throws FileNotFoundException
+     */
+    public function deleteAvatar(Model $model): void
+    {
+        $this->getAllFilesWithoutPagination($model)->each(fn (File $file) => $this->deleteFile($file));
     }
 }

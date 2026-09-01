@@ -5,7 +5,6 @@ namespace Tests\Unit\Services;
 use App\Http\Requests\ExportRequest;
 use App\Models\JobPosition;
 use App\Repositories\JobPositionRepositoryInterface;
-use App\Services\AuditServiceInterface;
 use App\Services\ExportServiceInterface;
 use App\Services\JobPositionService;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -34,7 +33,7 @@ class JobPositionServiceTest extends TestCase
 
         $this->jobPositionRepository = Mockery::mock(JobPositionRepositoryInterface::class);
         $this->exportService = Mockery::mock(ExportServiceInterface::class);
-        $this->jobPositionService = new JobPositionService($this->jobPositionRepository, $this->exportService, Mockery::mock(AuditServiceInterface::class));
+        $this->jobPositionService = new JobPositionService($this->jobPositionRepository, $this->exportService);
     }
 
     /**

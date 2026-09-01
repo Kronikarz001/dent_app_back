@@ -28,7 +28,11 @@ class UserStoreRequest extends FormRequest
             'email' => ['nullable', 'email', 'unique:users,email'],
             'pesel' => ['required', 'string', 'size:11', 'unique:users,pesel'],
             'private_email' => ['required', 'email', 'unique:users,private_email'],
-            'pwz_numer' => ['nullable', 'string'],
+            'street' => ['nullable', 'string'],
+            'house_number' => ['nullable', 'string'],
+            'apartment_number' => ['nullable', 'string'],
+            'postal_code' => ['nullable', 'string'],
+            'city' => ['nullable', 'string'],
         ];
     }
 
@@ -51,7 +55,11 @@ class UserStoreRequest extends FormRequest
             'private_email.required' => 'Prywatny adres e-mail jest wymagany.',
             'private_email.email' => 'Prywatny adres e-mail musi być prawidłowy.',
             'private_email.unique' => 'Użytkownik o podanym prywatnym adresie e-mail już istnieje.',
-            'pwz_numer.string' => 'Numer PWZ musi być tekstem.',
+            'street.string' => 'Pole street musi być tekstem.',
+            'house_number.string' => 'Pole house_number musi być tekstem.',
+            'apartment_number.string' => 'Pole apartment_number musi być tekstem.',
+            'postal_code.string' => 'Pole postal_code musi być tekstem.',
+            'city.string' => 'Pole city musi być tekstem.',
         ];
     }
 }

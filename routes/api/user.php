@@ -33,8 +33,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/user/{user}/avatar', [UserFileController::class, 'storeAvatar'])
         ->name('userfile.avatar-store');
-    Route::get('/user/{user}/file-avatar-download/{file}', [UserFileController::class, 'avatarDownload'])
-        ->name('userfile.avatar-download');
+    Route::delete('/user/{user}/avatar', [UserFileController::class, 'destroyAvatar'])
+        ->name('userfile.avatar-destroy');
 
     Route::post('/user/{user}/background', [UserFileController::class, 'storeBackground'])
         ->name('userfile.background-store');

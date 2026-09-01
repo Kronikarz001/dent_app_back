@@ -34,9 +34,12 @@ class UserUpdateRequest extends FormRequest
             'private_phone_number' => ['nullable', 'string', new PhoneNumberRule],
             'phone_number' => ['nullable', 'string', new PhoneNumberRule],
             'is_active' => ['nullable', 'boolean'],
-            'pwz_numer' => ['nullable', 'string'],
-            'job_positions' => ['nullable', 'array'],
-            'job_positions.*' => ['string', 'exists:job_positions,uuid'],
+            'job_position_uuid' => ['nullable', 'string', 'exists:job_positions,uuid'],
+            'street' => ['nullable', 'string'],
+            'house_number' => ['nullable', 'string'],
+            'apartment_number' => ['nullable', 'string'],
+            'postal_code' => ['nullable', 'string'],
+            'city' => ['nullable', 'string'],
         ];
     }
 
@@ -56,9 +59,12 @@ class UserUpdateRequest extends FormRequest
             'private_email.email' => 'Prywatny adres e-mail musi być prawidłowy.',
             'private_email.unique' => 'Użytkownik o podanym prywatnym adresie e-mail już istnieje.',
             'is_active.boolean' => 'Pole is_active musi być wartością logiczną.',
-            'pwz_numer.string' => 'Numer PWZ musi być tekstem.',
-            'job_positions.array' => 'Pole job_positions musi być tablicą.',
-            'job_positions.*.exists' => 'Wybrane stanowisko nie istnieje.',
+            'job_position_uuid.exists' => 'Wybrane stanowisko nie istnieje.',
+            'street.string' => 'Pole street musi być tekstem.',
+            'house_number.string' => 'Pole house_number musi być tekstem.',
+            'apartment_number.string' => 'Pole apartment_number musi być tekstem.',
+            'postal_code.string' => 'Pole postal_code musi być tekstem.',
+            'city.string' => 'Pole city musi być tekstem.',
         ];
     }
 }

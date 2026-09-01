@@ -78,4 +78,10 @@ interface FileServiceInterface
      * @throws FileNotFoundException
      */
     public function getPhotoFile(File $file): string;
+
+    /**
+     * @param Model $model
+     * @return void
+     */
+    public function deleteAvatar(Model $model): void;
 }

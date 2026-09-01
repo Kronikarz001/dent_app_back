@@ -159,7 +159,11 @@ class UserController extends Controller
                     new OA\Property(property: 'private_email', type: 'string', format: 'email'),
                     new OA\Property(property: 'password', type: 'string', format: 'password'),
                     new OA\Property(property: 'password_confirmation', type: 'string', format: 'password'),
-                    new OA\Property(property: 'pwz_numer', type: 'string', nullable: true),
+                    new OA\Property(property: 'street', type: 'string', nullable: true),
+                    new OA\Property(property: 'house_number', type: 'string', nullable: true),
+                    new OA\Property(property: 'apartment_number', type: 'string', nullable: true),
+                    new OA\Property(property: 'postal_code', type: 'string', nullable: true),
+                    new OA\Property(property: 'city', type: 'string', nullable: true),
                 ]
             )
         ),
@@ -203,8 +207,12 @@ class UserController extends Controller
                     new OA\Property(property: 'private_phone_number', type: 'string', nullable: true, example: '48500100200'),
                     new OA\Property(property: 'phone_number', type: 'string', nullable: true, example: '48500100200'),
                     new OA\Property(property: 'is_active', type: 'boolean', nullable: true),
-                    new OA\Property(property: 'pwz_numer', type: 'string', nullable: true),
-                    new OA\Property(property: 'job_positions', type: 'array', nullable: true, items: new OA\Items(type: 'string', format: 'uuid')),
+                    new OA\Property(property: 'job_position_uuid', type: 'string', format: 'uuid', nullable: true),
+                    new OA\Property(property: 'street', type: 'string', nullable: true),
+                    new OA\Property(property: 'house_number', type: 'string', nullable: true),
+                    new OA\Property(property: 'apartment_number', type: 'string', nullable: true),
+                    new OA\Property(property: 'postal_code', type: 'string', nullable: true),
+                    new OA\Property(property: 'city', type: 'string', nullable: true),
                 ]
             )
         ),

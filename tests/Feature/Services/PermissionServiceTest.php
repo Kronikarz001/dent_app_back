@@ -172,7 +172,7 @@ class PermissionServiceTest extends TestCase
     {
         $user = User::factory()->create();
         $jobPosition = JobPosition::factory()->create();
-        $jobPosition->user()->attach($user->uuid);
+        $user->update(['job_position_uuid' => $jobPosition->uuid]);
         $permission = Permission::factory()->create(['resource' => 'permtest-job-position', 'type' => PermissionType::VIEW->value]);
 
         $this->grant(Permission::class, $permission->uuid, JobPosition::class, $jobPosition->uuid);
@@ -187,7 +187,7 @@ class PermissionServiceTest extends TestCase
     {
         $user = User::factory()->create();
         $jobPosition = JobPosition::factory()->create();
-        $jobPosition->user()->attach($user->uuid);
+        $user->update(['job_position_uuid' => $jobPosition->uuid]);
         $department = Department::factory()->create();
         $department->jobPositions()->attach($jobPosition->uuid);
         $permission = Permission::factory()->create(['resource' => 'permtest-dept-jobpos', 'type' => PermissionType::VIEW->value]);
@@ -221,7 +221,7 @@ class PermissionServiceTest extends TestCase
     {
         $user = User::factory()->create();
         $jobPosition = JobPosition::factory()->create();
-        $jobPosition->user()->attach($user->uuid);
+        $user->update(['job_position_uuid' => $jobPosition->uuid]);
         $userGroup = UserGroup::factory()->create();
         $userGroup->jobPositions()->attach($jobPosition->uuid);
         $permission = Permission::factory()->create(['resource' => 'permtest-ug-jobpos', 'type' => PermissionType::VIEW->value]);
