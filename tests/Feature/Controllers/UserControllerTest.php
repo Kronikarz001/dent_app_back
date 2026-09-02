@@ -201,6 +201,22 @@ class UserControllerTest extends TestCase
     /**
      * @return void
      */
+    public function testUpdateUserReturnsConflictWhenPeselAlreadyTaken(): void
+    {
+        User::factory()->create(['pesel' => '12345678901']);
+        $user = User::factory()->create();
+
+        $response = $this->callApiWithLoggedUser()
+            ->putJson(route('user.update', ['user' => $user->uuid]), [
+                'pesel' => '12345678901',
+            ]);
+
+        $response->assertStatus(409);
+    }
+
+    /**
+     * @return void
+     */
     public function testUpdateUserAssignsPrivateAndWorkPhoneNumbers(): void
     {
         $user = User::factory()->create();

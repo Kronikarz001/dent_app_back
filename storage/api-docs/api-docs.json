@@ -8729,6 +8729,9 @@
                     "404": {
                         "description": "Nie znaleziono"
                     },
+                    "409": {
+                        "description": "Konflikt - adres e-mail, prywatny adres e-mail lub PESEL już zajęty"
+                    },
                     "422": {
                         "description": "Błąd walidacji"
                     }

@@ -223,6 +223,7 @@ class UserController extends Controller
         responses: [
             new OA\Response(response: 204, description: 'Zaktualizowano'),
             new OA\Response(response: 404, description: 'Nie znaleziono'),
+            new OA\Response(response: 409, description: 'Konflikt - adres e-mail, prywatny adres e-mail lub PESEL już zajęty'),
             new OA\Response(response: 422, description: 'Błąd walidacji'),
         ]
     )]

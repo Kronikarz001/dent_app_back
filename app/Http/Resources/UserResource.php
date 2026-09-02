@@ -19,7 +19,7 @@ class UserResource extends BasicResource
             'pesel' => $this->pesel,
             'private_phone_number' => $this->phoneNumbers->firstWhere('type', PhoneNumberType::PRIVATE->value)?->number,
             'phone_number' => $this->phoneNumbers->firstWhere('type', PhoneNumberType::WORK->value)?->number,
-            'job_position' => $this->jobPosition ? new JobPositionResource($this->jobPosition) : null,
+            'job_position' => new JobPositionResource($this->jobPosition),
             'avatar_path' => $this->avatar_path,
             'background_path' => $this->background_path,
             'street' => $this->street,

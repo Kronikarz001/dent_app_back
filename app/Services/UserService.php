@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\PhoneNumberType;
+use App\Exceptions\DuplicateUserDataException;
 use App\Exports\UserExport;
 use App\Http\Requests\ExportRequest;
 use App\Models\Permission;
@@ -67,6 +68,8 @@ readonly class UserService implements UserServiceInterface
      */
     public function updateUser(User $user, array $data): User
     {
+        $this->assertUniqueEmailPrivateEmailAndPesel($data, $user);
+
         if (array_key_exists('private_phone_number', $data)) {
             $this->phoneNumberService->assignPhone($user, [
                 ['type' => PhoneNumberType::PRIVATE->value, 'number' => $data['private_phone_number']],
@@ -163,6 +166,26 @@ readonly class UserService implements UserServiceInterface
 
         foreach ($data['permission_groups'] ?? [] as $permissionGroupUuid) {
             $this->grant(PermissionGroup::class, $permissionGroupUuid, $user, $data['expires_at'] ?? null);
+        }
+    }
+
+    /**
+     * @param array $data
+     * @param User $ignore
+     * @return void
+     */
+    private function assertUniqueEmailPrivateEmailAndPesel(array $data, User $ignore): void
+    {
+        if (! empty($data['email']) && $this->userRepository->existsByEmail($data['email'], $ignore->uuid)) {
+            throw new DuplicateUserDataException('Użytkownik o podanym adresie e-mail już istnieje.');
+        }
+
+        if (! empty($data['private_email']) && $this->userRepository->existsByPrivateEmail($data['private_email'], $ignore->uuid)) {
+            throw new DuplicateUserDataException('Użytkownik o podanym prywatnym adresie e-mail już istnieje.');
+        }
+
+        if (! empty($data['pesel']) && $this->userRepository->existsByPesel($data['pesel'], $ignore->uuid)) {
+            throw new DuplicateUserDataException('Użytkownik o podanym numerze PESEL już istnieje.');
         }
     }
 

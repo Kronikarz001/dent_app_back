@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Services;
 
+use App\Exceptions\DuplicateUserDataException;
 use App\Models\User;
 use App\Repositories\UserRepositoryInterface;
 use App\Services\ExportServiceInterface;
@@ -148,6 +149,46 @@ class UserServiceTest extends TestCase
 
         $this->assertInstanceOf(User::class, $result);
         $this->assertSame($updatedUser, $result);
+    }
+
+    /**
+     * @return void
+     */
+    public function testUpdateUserThrowsWhenEmailAlreadyTakenByAnotherUser(): void
+    {
+        $user = User::factory()->make(['uuid' => 'user-uuid']);
+
+        $this->userRepository
+            ->shouldReceive('existsByEmail')
+            ->once()
+            ->with('taken@example.com', 'user-uuid')
+            ->andReturnTrue();
+
+        $this->userRepository->shouldNotReceive('update');
+
+        $this->expectException(DuplicateUserDataException::class);
+
+        $this->userService->updateUser($user, ['email' => 'taken@example.com']);
+    }
+
+    /**
+     * @return void
+     */
+    public function testUpdateUserThrowsWhenPeselAlreadyTakenByAnotherUser(): void
+    {
+        $user = User::factory()->make(['uuid' => 'user-uuid']);
+
+        $this->userRepository
+            ->shouldReceive('existsByPesel')
+            ->once()
+            ->with('12345678901', 'user-uuid')
+            ->andReturnTrue();
+
+        $this->userRepository->shouldNotReceive('update');
+
+        $this->expectException(DuplicateUserDataException::class);
+
+        $this->userService->updateUser($user, ['pesel' => '12345678901']);
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\ZipCodeRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
@@ -31,7 +32,7 @@ class UserStoreRequest extends FormRequest
             'street' => ['nullable', 'string'],
             'house_number' => ['nullable', 'string'],
             'apartment_number' => ['nullable', 'string'],
-            'postal_code' => ['nullable', 'string'],
+            'postal_code' => ['nullable', 'string', new ZipCodeRule],
             'city' => ['nullable', 'string'],
         ];
     }
