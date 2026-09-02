@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests;
 
-use App\Rules\PeselRule;
+use App\Rules\ZipCodeRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
@@ -27,9 +27,13 @@ class UserStoreRequest extends FormRequest
             'first_name' => ['required', 'string'],
             'last_name' => ['required', 'string'],
             'email' => ['nullable', 'email', 'unique:users,email'],
-            'pesel' => ['required', 'string', new PeselRule, 'unique:users,pesel'],
+            'pesel' => ['required', 'string', 'size:11', 'unique:users,pesel'],
             'private_email' => ['required', 'email', 'unique:users,private_email'],
-            'pwz_numer' => ['nullable', 'string'],
+            'street' => ['nullable', 'string'],
+            'house_number' => ['nullable', 'string'],
+            'apartment_number' => ['nullable', 'string'],
+            'postal_code' => ['nullable', 'string', new ZipCodeRule],
+            'city' => ['nullable', 'string'],
         ];
     }
 
@@ -47,11 +51,16 @@ class UserStoreRequest extends FormRequest
             'email.unique' => 'Użytkownik o podanym adresie e-mail już istnieje.',
             'pesel.required' => 'PESEL jest wymagany.',
             'pesel.string' => 'PESEL musi być tekstem.',
+            'pesel.size' => 'PESEL musi mieć dokładnie 11 znaków.',
             'pesel.unique' => 'Użytkownik o podanym numerze PESEL już istnieje.',
             'private_email.required' => 'Prywatny adres e-mail jest wymagany.',
             'private_email.email' => 'Prywatny adres e-mail musi być prawidłowy.',
             'private_email.unique' => 'Użytkownik o podanym prywatnym adresie e-mail już istnieje.',
-            'pwz_numer.string' => 'Numer PWZ musi być tekstem.',
+            'street.string' => 'Pole street musi być tekstem.',
+            'house_number.string' => 'Pole house_number musi być tekstem.',
+            'apartment_number.string' => 'Pole apartment_number musi być tekstem.',
+            'postal_code.string' => 'Pole postal_code musi być tekstem.',
+            'city.string' => 'Pole city musi być tekstem.',
         ];
     }
 }

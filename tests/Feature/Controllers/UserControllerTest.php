@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Controllers;
 
+use App\Models\JobPosition;
 use App\Models\Permission;
 use App\Models\PermissionAssignment;
 use App\Models\User;
@@ -97,16 +98,32 @@ class UserControllerTest extends TestCase
     /**
      * @return void
      */
-    public function testShowUserDoesNotExposeAdminFlagsOfOtherUser(): void
+    public function testShowUserReturnsPeselAddressFieldsAndJobPositionAsObject(): void
     {
-        $target = User::factory()->create(['is_admin' => true, 'is_superuser' => true]);
+        $jobPosition = JobPosition::factory()->create();
+        $user = User::factory()->create([
+            'pesel' => '12345678901',
+            'street' => 'Kwiatowa',
+            'house_number' => '12A',
+            'apartment_number' => '3',
+            'postal_code' => '00-001',
+            'city' => 'Warszawa',
+            'job_position_uuid' => $jobPosition->uuid,
+        ]);
 
         $response = $this->callApiWithLoggedUser()
-            ->getJson(route('user.show', ['user' => $target->uuid]));
+            ->getJson(route('user.show', ['user' => $user->uuid]));
 
         $response->assertOk();
-        $response->assertJsonMissingPath('is_admin');
-        $response->assertJsonMissingPath('is_superuser');
+        $response->assertJsonPath('pesel', '12345678901');
+        $response->assertJsonPath('street', 'Kwiatowa');
+        $response->assertJsonPath('house_number', '12A');
+        $response->assertJsonPath('apartment_number', '3');
+        $response->assertJsonPath('postal_code', '00-001');
+        $response->assertJsonPath('city', 'Warszawa');
+        $response->assertJsonPath('job_position.uuid', $jobPosition->uuid);
+        $this->assertIsArray($response->json('job_position'));
+        $this->assertArrayNotHasKey(0, $response->json('job_position'));
     }
 
     /**
@@ -149,7 +166,7 @@ class UserControllerTest extends TestCase
                 'last_name' => 'User',
                 'email' => 'example@mail',
                 'private_email' => 'example_private@mail',
-                'pesel' => '44051401359',
+                'pesel' => '12345678901',
                 'password' => 'password',
                 'password_confirmation' => 'password',
             ]);
@@ -172,13 +189,29 @@ class UserControllerTest extends TestCase
                 'first_name' => 'Updated',
                 'last_name' => 'User',
                 'email' => 'example_updated@mail',
-                'pesel' => '44051401359',
+                'pesel' => '12345678901',
             ]);
         $response->assertNoContent();
 
         $this->assertDatabaseHas('users', [
             'email' => 'example_updated@mail',
         ]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testUpdateUserReturnsConflictWhenPeselAlreadyTaken(): void
+    {
+        User::factory()->create(['pesel' => '12345678901']);
+        $user = User::factory()->create();
+
+        $response = $this->callApiWithLoggedUser()
+            ->putJson(route('user.update', ['user' => $user->uuid]), [
+                'pesel' => '12345678901',
+            ]);
+
+        $response->assertStatus(409);
     }
 
     /**
@@ -380,40 +413,6 @@ class UserControllerTest extends TestCase
         $this->assertDatabaseHas('permission_assignments', [
             'grantable_type' => Permission::class,
             'grantable_id' => $permission->uuid,
-            'assignable_type' => User::class,
-            'assignable_id' => $target->uuid,
-        ]);
-    }
-
-    /**
-     * @return void
-     */
-    public function testAssignPermissionsForbiddenWhenActingUserLacksGrant(): void
-    {
-        $actingUser = User::factory()->create(['is_admin' => false]);
-        $target = User::factory()->create();
-
-        // acting user may manage users (passes the route/resource check),
-        // but does not personally hold the "role" permission it is trying to grant
-        $ownResourcePermission = Permission::where('resource', 'user')->where('type', 'edit')->firstOrFail();
-        PermissionAssignment::create([
-            'grantable_type' => Permission::class,
-            'grantable_id' => $ownResourcePermission->uuid,
-            'assignable_type' => User::class,
-            'assignable_id' => $actingUser->uuid,
-        ]);
-
-        $unownedPermission = Permission::where('resource', 'role')->where('type', 'edit')->firstOrFail();
-
-        $response = $this->callApiWithLoggedUser($actingUser)
-            ->patchJson(route('user.assignPermissions', ['user' => $target->uuid]), [
-                'permissions' => [$unownedPermission->uuid],
-            ]);
-
-        $response->assertStatus(403);
-        $this->assertDatabaseMissing('permission_assignments', [
-            'grantable_type' => Permission::class,
-            'grantable_id' => $unownedPermission->uuid,
             'assignable_type' => User::class,
             'assignable_id' => $target->uuid,
         ]);

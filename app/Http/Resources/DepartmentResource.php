@@ -14,7 +14,7 @@ class DepartmentResource extends JsonResource
         return [
             'uuid' => $this->uuid,
             'name' => $this->name,
-            'roles' => RoleResource::collection($this->whenLoaded('roles')),
+            'roles' => RoleResource::collection($this->roles),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

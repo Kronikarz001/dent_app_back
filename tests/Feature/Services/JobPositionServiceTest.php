@@ -21,7 +21,7 @@ class JobPositionServiceTest extends TestCase
 
     protected const JOB_POSITIONS_TABLE = 'job_positions';
 
-    protected const USERS_JOB_POSITIONS_TABLE = 'users_job_positions';
+    protected const USERS_TABLE = 'users';
 
     /**
      * @return void
@@ -98,15 +98,15 @@ class JobPositionServiceTest extends TestCase
     /**
      * @return void
      */
-    public function testAssignJobPositionAttachesPositionToUser(): void
+    public function testAssignJobPositionSetsPositionOnUser(): void
     {
         $user = User::factory()->create();
         $jobPosition = JobPosition::factory()->create();
 
-        $this->service->assignJobPosition($user, ['job_positions' => [$jobPosition->uuid]]);
+        $this->service->assignJobPosition($user, ['job_position_uuid' => $jobPosition->uuid]);
 
-        $this->assertDatabaseHas(self::USERS_JOB_POSITIONS_TABLE, [
-            'user_uuid' => $user->uuid,
+        $this->assertDatabaseHas(self::USERS_TABLE, [
+            'uuid' => $user->uuid,
             'job_position_uuid' => $jobPosition->uuid,
         ]);
     }
@@ -114,15 +114,16 @@ class JobPositionServiceTest extends TestCase
     /**
      * @return void
      */
-    public function testAssignJobPositionDoesNotDuplicateExistingAssignment(): void
+    public function testAssignJobPositionReplacesExistingAssignment(): void
     {
         $user = User::factory()->create();
-        $jobPosition = JobPosition::factory()->create();
-        $user->jobPositions()->attach($jobPosition->uuid);
+        $firstJobPosition = JobPosition::factory()->create();
+        $secondJobPosition = JobPosition::factory()->create();
+        $user->update(['job_position_uuid' => $firstJobPosition->uuid]);
 
-        $this->service->assignJobPosition($user, ['job_positions' => [$jobPosition->uuid]]);
+        $this->service->assignJobPosition($user, ['job_position_uuid' => $secondJobPosition->uuid]);
 
-        $this->assertSame(1, $user->jobPositions()->count());
+        $this->assertSame($secondJobPosition->uuid, $user->fresh()->job_position_uuid);
     }
 
     /**
@@ -136,7 +137,7 @@ class JobPositionServiceTest extends TestCase
         $user = User::factory()->create();
         $jobPosition = JobPosition::factory()->create();
 
-        $this->service->assignJobPosition($user, ['job_positions' => [$jobPosition->uuid]]);
+        $this->service->assignJobPosition($user, ['job_position_uuid' => $jobPosition->uuid]);
 
         $audit = Audit::query()
             ->where('auditable_id', $user->uuid)
@@ -145,6 +146,6 @@ class JobPositionServiceTest extends TestCase
 
         $this->assertNotNull($audit);
         $this->assertSame($actor->uuid, $audit->user_uuid);
-        $this->assertSame(['job_positions' => [$jobPosition->uuid]], $audit->change_to);
+        $this->assertSame(['job_position_uuid' => $jobPosition->uuid], $audit->change_to);
     }
 }

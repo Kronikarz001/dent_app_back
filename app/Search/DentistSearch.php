@@ -86,7 +86,7 @@ class DentistSearch extends Search
     {
         return [
             'phoneNumbers',
-            'jobPositions',
+            'jobPosition',
         ];
     }
 }

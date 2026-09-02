@@ -3,6 +3,7 @@
 namespace Tests\Feature\Services;
 
 use App\Enums\PhoneNumberType;
+use App\Exceptions\DuplicateUserDataException;
 use App\Models\User;
 use App\Services\UserServiceInterface;
 use Illuminate\Foundation\Application;
@@ -88,6 +89,31 @@ class UserServiceTest extends TestCase
 
         $this->assertInstanceOf(User::class, $result);
         $this->assertDatabaseHas(self::USERS_TABLE, ['uuid' => $user->uuid, 'first_name' => 'Zmienione']);
+    }
+
+    /**
+     * @return void
+     */
+    public function testUpdateUserThrowsWhenPrivateEmailAlreadyTakenByAnotherUser(): void
+    {
+        User::factory()->create(['private_email' => 'taken@example.com']);
+        $user = User::factory()->create();
+
+        $this->expectException(DuplicateUserDataException::class);
+
+        $this->service->updateUser($user, ['private_email' => 'taken@example.com']);
+    }
+
+    /**
+     * @return void
+     */
+    public function testUpdateUserAllowsKeepingOwnEmailUnchanged(): void
+    {
+        $user = User::factory()->create(['email' => 'own@example.com']);
+
+        $result = $this->service->updateUser($user, ['email' => 'own@example.com']);
+
+        $this->assertSame('own@example.com', $result->email);
     }
 
     /**

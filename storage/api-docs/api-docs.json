@@ -4391,7 +4391,7 @@
                 "tags": [
                     "JobPosition"
                 ],
-                "summary": "Przypisuje stanowiska do użytkownika",
+                "summary": "Przypisuje stanowisko do użytkownika",
                 "operationId": "6ba433211ed6e85c38f9bb59cee48a6a",
                 "parameters": [
                     {
@@ -4410,15 +4410,12 @@
                         "application/json": {
                             "schema": {
                                 "required": [
-                                    "job_positions"
+                                    "job_position_uuid"
                                 ],
                                 "properties": {
-                                    "job_positions": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string",
-                                            "format": "uuid"
-                                        }
+                                    "job_position_uuid": {
+                                        "type": "string",
+                                        "format": "uuid"
                                     }
                                 },
                                 "type": "object"
@@ -8509,7 +8506,23 @@
                                         "type": "string",
                                         "format": "password"
                                     },
-                                    "pwz_numer": {
+                                    "street": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "house_number": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "apartment_number": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "postal_code": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "city": {
                                         "type": "string",
                                         "nullable": true
                                     }
@@ -8678,16 +8691,29 @@
                                         "type": "boolean",
                                         "nullable": true
                                     },
-                                    "pwz_numer": {
+                                    "job_position_uuid": {
+                                        "type": "string",
+                                        "format": "uuid",
+                                        "nullable": true
+                                    },
+                                    "street": {
                                         "type": "string",
                                         "nullable": true
                                     },
-                                    "job_positions": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string",
-                                            "format": "uuid"
-                                        },
+                                    "house_number": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "apartment_number": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "postal_code": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "city": {
+                                        "type": "string",
                                         "nullable": true
                                     }
                                 },
@@ -8702,6 +8728,9 @@
                     },
                     "404": {
                         "description": "Nie znaleziono"
+                    },
+                    "409": {
+                        "description": "Konflikt - adres e-mail, prywatny adres e-mail lub PESEL już zajęty"
                     },
                     "422": {
                         "description": "Błąd walidacji"
@@ -9410,15 +9439,13 @@
                         "sanctum": []
                     }
                 ]
-            }
-        },
-        "/api/user/{user}/file-avatar-download/{file}": {
-            "get": {
+            },
+            "delete": {
                 "tags": [
                     "UserFile"
                 ],
-                "summary": "Pobiera avatar użytkownika (obraz binarny)",
-                "operationId": "0ed64b28db898cc7ff42862e2df94efa",
+                "summary": "Usuwa avatar użytkownika",
+                "operationId": "0a9c9751ea4fb1f2485952b27fcff663",
                 "parameters": [
                     {
                         "name": "user",
@@ -9428,23 +9455,11 @@
                             "type": "string",
                             "format": "uuid"
                         }
-                    },
-                    {
-                        "name": "file",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "format": "uuid"
-                        }
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "Obraz",
-                        "content": {
-                            "image/*": {}
-                        }
+                    "204": {
+                        "description": "Usunięto"
                     },
                     "404": {
                         "description": "Nie znaleziono"
@@ -10170,12 +10185,12 @@
                         "type": "string",
                         "format": "email"
                     },
-                    "is_active": {
-                        "type": "boolean"
-                    },
-                    "pwz_numer": {
+                    "pesel": {
                         "type": "string",
                         "nullable": true
+                    },
+                    "is_active": {
+                        "type": "boolean"
                     },
                     "avatar_path": {
                         "type": "string",
@@ -10193,11 +10208,33 @@
                         "type": "string",
                         "nullable": true
                     },
-                    "job_positions": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/JobPositionResource"
-                        }
+                    "job_position": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/JobPositionResource"
+                            }
+                        ],
+                        "nullable": true
+                    },
+                    "street": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "house_number": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "apartment_number": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "postal_code": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "city": {
+                        "type": "string",
+                        "nullable": true
                     },
                     "status": {
                         "description": "ACTIVE gdy użytkownik ma aktualnie ważny token",
@@ -10235,12 +10272,12 @@
                         "type": "string",
                         "format": "email"
                     },
-                    "is_active": {
-                        "type": "boolean"
-                    },
-                    "pwz_numer": {
+                    "pesel": {
                         "type": "string",
                         "nullable": true
+                    },
+                    "is_active": {
+                        "type": "boolean"
                     },
                     "avatar_path": {
                         "type": "string",
@@ -10254,11 +10291,33 @@
                         "type": "string",
                         "nullable": true
                     },
-                    "job_positions": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/JobPositionResource"
-                        }
+                    "job_position": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/JobPositionResource"
+                            }
+                        ],
+                        "nullable": true
+                    },
+                    "street": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "house_number": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "apartment_number": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "postal_code": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "city": {
+                        "type": "string",
+                        "nullable": true
                     },
                     "created_at": {
                         "type": "string",

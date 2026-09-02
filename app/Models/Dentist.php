@@ -15,7 +15,7 @@ class Dentist extends User
     protected static function booted(): void
     {
         static::addGlobalScope('dentist', function (Builder $query) {
-            $query->whereHas('jobPositions', function (Builder $q) {
+            $query->whereHas('jobPosition', function (Builder $q) {
                 $q->where('name', JobPosition::DENTIST_NAME);
             });
         });

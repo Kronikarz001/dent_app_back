@@ -2,11 +2,10 @@
 
 namespace Tests\Unit\Services;
 
+use App\Exceptions\DuplicateUserDataException;
 use App\Models\User;
 use App\Repositories\UserRepositoryInterface;
 use App\Services\ExportServiceInterface;
-use App\Services\JobPositionServiceInterface;
-use App\Services\PermissionServiceInterface;
 use App\Services\PhoneNumberServiceInterface;
 use App\Services\UserService;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -33,9 +32,7 @@ class UserServiceTest extends TestCase
         $this->userRepository = Mockery::mock(UserRepositoryInterface::class);
         $exportService = Mockery::mock(ExportServiceInterface::class);
         $phoneNumberService = Mockery::mock(PhoneNumberServiceInterface::class);
-        $jobPositionService = Mockery::mock(JobPositionServiceInterface::class);
-        $permissionService = Mockery::mock(PermissionServiceInterface::class);
-        $this->userService = new UserService($this->userRepository, $exportService, $phoneNumberService, $jobPositionService, $permissionService);
+        $this->userService = new UserService($this->userRepository, $exportService, $phoneNumberService);
     }
 
     /**
@@ -152,6 +149,46 @@ class UserServiceTest extends TestCase
 
         $this->assertInstanceOf(User::class, $result);
         $this->assertSame($updatedUser, $result);
+    }
+
+    /**
+     * @return void
+     */
+    public function testUpdateUserThrowsWhenEmailAlreadyTakenByAnotherUser(): void
+    {
+        $user = User::factory()->make(['uuid' => 'user-uuid']);
+
+        $this->userRepository
+            ->shouldReceive('existsByEmail')
+            ->once()
+            ->with('taken@example.com', 'user-uuid')
+            ->andReturnTrue();
+
+        $this->userRepository->shouldNotReceive('update');
+
+        $this->expectException(DuplicateUserDataException::class);
+
+        $this->userService->updateUser($user, ['email' => 'taken@example.com']);
+    }
+
+    /**
+     * @return void
+     */
+    public function testUpdateUserThrowsWhenPeselAlreadyTakenByAnotherUser(): void
+    {
+        $user = User::factory()->make(['uuid' => 'user-uuid']);
+
+        $this->userRepository
+            ->shouldReceive('existsByPesel')
+            ->once()
+            ->with('12345678901', 'user-uuid')
+            ->andReturnTrue();
+
+        $this->userRepository->shouldNotReceive('update');
+
+        $this->expectException(DuplicateUserDataException::class);
+
+        $this->userService->updateUser($user, ['pesel' => '12345678901']);
     }
 
     /**
@@ -276,6 +313,63 @@ class UserServiceTest extends TestCase
 
         $this->assertInstanceOf(User::class, $result);
         $this->assertSame($user, $result);
+    }
+
+    /**
+     * @return void
+     */
+    public function testGetUserInformationPassesUuidStringNotModelToRepository(): void
+    {
+        $uuid = 'abc-123-uuid';
+        $user = User::factory()->make(['uuid' => $uuid]);
+        $fullUser = User::factory()->make(['uuid' => $uuid]);
+
+        $this->userRepository
+            ->shouldReceive('getUserInformation')
+            ->once()
+            ->with($uuid)
+            ->andReturn($fullUser);
+
+        $result = $this->userService->getUserInformation($user);
+
+        $this->assertInstanceOf(User::class, $result);
+        $this->assertSame($fullUser, $result);
+    }
+
+    /**
+     * @return void
+     */
+    public function testGetUserByTokenReturnsUserWhenFound(): void
+    {
+        $token = 'valid-token-xyz';
+        $user = User::factory()->make();
+
+        $this->userRepository
+            ->shouldReceive('getUserByToken')
+            ->once()
+            ->with($token)
+            ->andReturn($user);
+
+        $result = $this->userService->getUserByToken($token);
+
+        $this->assertInstanceOf(User::class, $result);
+        $this->assertSame($user, $result);
+    }
+
+    /**
+     * @return void
+     */
+    public function testGetUserByTokenReturnsNullWhenNotFound(): void
+    {
+        $this->userRepository
+            ->shouldReceive('getUserByToken')
+            ->once()
+            ->with('invalid-token')
+            ->andReturn(null);
+
+        $result = $this->userService->getUserByToken('invalid-token');
+
+        $this->assertNull($result);
     }
 
     /**

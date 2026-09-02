@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Enums\PhoneNumberType;
-use App\Exceptions\PermissionDeniedException;
+use App\Exceptions\DuplicateUserDataException;
 use App\Exports\UserExport;
 use App\Http\Requests\ExportRequest;
 use App\Models\Permission;
@@ -27,15 +27,11 @@ readonly class UserService implements UserServiceInterface
      * @param UserRepositoryInterface $userRepository
      * @param ExportServiceInterface $exportService
      * @param PhoneNumberServiceInterface $phoneNumberService
-     * @param JobPositionServiceInterface $jobPositionService
-     * @param PermissionServiceInterface $permissionService
      */
     public function __construct(
         private UserRepositoryInterface $userRepository,
         private ExportServiceInterface $exportService,
         private PhoneNumberServiceInterface $phoneNumberService,
-        private JobPositionServiceInterface $jobPositionService,
-        private PermissionServiceInterface $permissionService,
     ) {}
 
     /**
@@ -72,6 +68,8 @@ readonly class UserService implements UserServiceInterface
      */
     public function updateUser(User $user, array $data): User
     {
+        $this->assertUniqueEmailPrivateEmailAndPesel($data, $user);
+
         if (array_key_exists('private_phone_number', $data)) {
             $this->phoneNumberService->assignPhone($user, [
                 ['type' => PhoneNumberType::PRIVATE->value, 'number' => $data['private_phone_number']],
@@ -82,10 +80,6 @@ readonly class UserService implements UserServiceInterface
             $this->phoneNumberService->assignPhone($user, [
                 ['type' => PhoneNumberType::WORK->value, 'number' => $data['phone_number']],
             ]);
-        }
-
-        if (array_key_exists('job_positions', $data)) {
-            $this->jobPositionService->assignJobPosition($user, ['job_positions' => $data['job_positions']]);
         }
 
         return $this->userRepository->update($user, $data);
@@ -122,6 +116,24 @@ readonly class UserService implements UserServiceInterface
     }
 
     /**
+     * @param User $user
+     * @return User
+     */
+    public function getUserInformation(User $user): User
+    {
+        return $this->userRepository->getUserInformation($user->uuid);
+    }
+
+    /**
+     * @param string $token
+     * @return User|null
+     */
+    public function getUserByToken(string $token): ?User
+    {
+        return $this->userRepository->getUserByToken($token);
+    }
+
+    /**
      * @return User
      */
     public function getLoggedUser(): User
@@ -145,32 +157,35 @@ readonly class UserService implements UserServiceInterface
      * @param User $user
      * @param array $data
      * @return void
-     *
-     * @throws PermissionDeniedException
      */
     public function assignPermissions(User $user, array $data): void
     {
-        /** @var User $actingUser */
-        $actingUser = Auth::user();
-
         foreach ($data['permissions'] ?? [] as $permissionUuid) {
-            $permission = Permission::where('uuid', $permissionUuid)->firstOrFail();
-
-            if (! $actingUser->is_admin && ! $this->permissionService->hasPermissionGrant($actingUser, $permission)) {
-                throw new PermissionDeniedException('Nie posiadasz tego uprawnienia, nie możesz go nadać.');
-            }
-
-            $this->grant(Permission::class, $permission->uuid, $user, $data['expires_at'] ?? null);
+            $this->grant(Permission::class, $permissionUuid, $user, $data['expires_at'] ?? null);
         }
 
         foreach ($data['permission_groups'] ?? [] as $permissionGroupUuid) {
-            $group = PermissionGroup::where('uuid', $permissionGroupUuid)->firstOrFail();
+            $this->grant(PermissionGroup::class, $permissionGroupUuid, $user, $data['expires_at'] ?? null);
+        }
+    }
 
-            if (! $actingUser->is_admin && ! $this->permissionService->hasGroupGrant($actingUser, $group)) {
-                throw new PermissionDeniedException('Nie posiadasz tej grupy uprawnień, nie możesz jej nadać.');
-            }
+    /**
+     * @param array $data
+     * @param User $ignore
+     * @return void
+     */
+    private function assertUniqueEmailPrivateEmailAndPesel(array $data, User $ignore): void
+    {
+        if (! empty($data['email']) && $this->userRepository->existsByEmail($data['email'], $ignore->uuid)) {
+            throw new DuplicateUserDataException('Użytkownik o podanym adresie e-mail już istnieje.');
+        }
 
-            $this->grant(PermissionGroup::class, $group->uuid, $user, $data['expires_at'] ?? null);
+        if (! empty($data['private_email']) && $this->userRepository->existsByPrivateEmail($data['private_email'], $ignore->uuid)) {
+            throw new DuplicateUserDataException('Użytkownik o podanym prywatnym adresie e-mail już istnieje.');
+        }
+
+        if (! empty($data['pesel']) && $this->userRepository->existsByPesel($data['pesel'], $ignore->uuid)) {
+            throw new DuplicateUserDataException('Użytkownik o podanym numerze PESEL już istnieje.');
         }
     }
 

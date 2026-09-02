@@ -206,14 +206,14 @@ class JobPositionController extends Controller
      */
     #[OA\Patch(
         path: '/api/user/{uuid}/jobposition',
-        summary: 'Przypisuje stanowiska do użytkownika',
+        summary: 'Przypisuje stanowisko do użytkownika',
         security: [['sanctum' => []]],
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
-                required: ['job_positions'],
+                required: ['job_position_uuid'],
                 properties: [
-                    new OA\Property(property: 'job_positions', type: 'array', items: new OA\Items(type: 'string', format: 'uuid')),
+                    new OA\Property(property: 'job_position_uuid', type: 'string', format: 'uuid'),
                 ]
             )
         ),

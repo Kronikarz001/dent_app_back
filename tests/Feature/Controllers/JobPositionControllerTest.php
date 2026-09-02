@@ -158,9 +158,11 @@ class JobPositionControllerTest extends TestCase
 
         $this->callApiWithLoggedUser()
             ->patchJson(route('user.jobPosition.assignJobPosition', ['user' => $user->uuid]), [
-                'job_positions' => [$jobPosition->uuid],
+                'job_position_uuid' => $jobPosition->uuid,
             ])
             ->assertNoContent();
+
+        $this->assertSame($jobPosition->uuid, $user->fresh()->job_position_uuid);
     }
 
     /**
