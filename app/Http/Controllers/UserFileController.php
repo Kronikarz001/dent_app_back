@@ -277,23 +277,24 @@ class UserFileController extends Controller
         );
     }
 
-    #[OA\Get(
-        path: '/api/user/{user}/file-avatar-download/{file}',
+    #[OA\Delete(
+        path: '/api/user/{user}/avatar',
         tags: ['UserFile'],
-        summary: 'Pobiera avatar użytkownika (obraz binarny)',
+        summary: 'Usuwa avatar użytkownika',
         security: [['sanctum' => []]],
         parameters: [
             new OA\PathParameter(name: 'user', schema: new OA\Schema(type: 'string', format: 'uuid')),
-            new OA\PathParameter(name: 'file', schema: new OA\Schema(type: 'string', format: 'uuid')),
         ],
         responses: [
-            new OA\Response(response: 200, description: 'Obraz', content: new OA\MediaType(mediaType: 'image/*')),
+            new OA\Response(response: 204, description: 'Usunięto'),
             new OA\Response(response: 404, description: 'Nie znaleziono'),
         ]
     )]
-    public function avatarDownload(User $user, File $file): Response
+    public function destroyAvatar(User $user): JsonResponse
     {
-        return response($this->fileService->getPhotoFile($file), 200, ['Content-Type' => $file->mimetype]);
+        $this->fileService->deleteAvatar(UserAvatar::find($user->uuid));
+
+        return new JsonResponse(null, 204);
     }
 
     #[OA\Post(

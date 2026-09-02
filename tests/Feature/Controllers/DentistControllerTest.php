@@ -28,10 +28,10 @@ class DentistControllerTest extends TestCase
         $otherPosition = JobPosition::factory()->create();
 
         $dentist = User::factory()->create();
-        $dentist->jobPositions()->attach($dentistPosition->uuid);
+        $dentist->update(['job_position_uuid' => $dentistPosition->uuid]);
 
         $other = User::factory()->create();
-        $other->jobPositions()->attach($otherPosition->uuid);
+        $other->update(['job_position_uuid' => $otherPosition->uuid]);
 
         $response = $this->callApiWithLoggedUser()
             ->getJson(route('dentist.index'));
@@ -49,7 +49,7 @@ class DentistControllerTest extends TestCase
     {
         $dentistPosition = $this->dentistJobPosition();
         $dentist = User::factory()->create();
-        $dentist->jobPositions()->attach($dentistPosition->uuid);
+        $dentist->update(['job_position_uuid' => $dentistPosition->uuid]);
 
         $response = $this->callApiWithLoggedUser()
             ->getJson(route('dentist.selectList'));
@@ -64,7 +64,7 @@ class DentistControllerTest extends TestCase
     {
         $dentistPosition = $this->dentistJobPosition();
         $dentist = User::factory()->create();
-        $dentist->jobPositions()->attach($dentistPosition->uuid);
+        $dentist->update(['job_position_uuid' => $dentistPosition->uuid]);
 
         $response = $this->callApiWithLoggedUser()
             ->getJson(route('dentist.show', ['dentist' => $dentist->uuid]));
@@ -80,7 +80,7 @@ class DentistControllerTest extends TestCase
     {
         $otherPosition = JobPosition::factory()->create();
         $user = User::factory()->create();
-        $user->jobPositions()->attach($otherPosition->uuid);
+        $user->update(['job_position_uuid' => $otherPosition->uuid]);
 
         $response = $this->callApiWithLoggedUser()
             ->getJson(route('dentist.show', ['dentist' => $user->uuid]));

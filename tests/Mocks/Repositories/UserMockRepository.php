@@ -116,4 +116,34 @@ class UserMockRepository implements UserRepositoryInterface
     {
         return new User;
     }
+
+    /**
+     * @param string $email
+     * @param string|null $ignoreUuid
+     * @return bool
+     */
+    public function existsByEmail(string $email, ?string $ignoreUuid = null): bool
+    {
+        return false;
+    }
+
+    /**
+     * @param string $privateEmail
+     * @param string|null $ignoreUuid
+     * @return bool
+     */
+    public function existsByPrivateEmail(string $privateEmail, ?string $ignoreUuid = null): bool
+    {
+        return false;
+    }
+
+    /**
+     * @param string $pesel
+     * @param string|null $ignoreUuid
+     * @return bool
+     */
+    public function existsByPesel(string $pesel, ?string $ignoreUuid = null): bool
+    {
+        return false;
+    }
 }

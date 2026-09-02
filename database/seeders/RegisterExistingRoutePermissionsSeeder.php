@@ -190,10 +190,10 @@ class RegisterExistingRoutePermissionsSeeder extends Seeder
             ],
             'userfile' => [
                 'userfile.avatar-store',
+                'userfile.avatar-destroy',
                 'userfile.background-store',
                 'userfile.index',
                 'userfile.store',
-                'userfile.avatar-download',
                 'userfile.background-download',
                 'userfile.download',
                 'userfile.newversion',

@@ -37,10 +37,10 @@ class DentistServiceTest extends TestCase
         $otherPosition = JobPosition::factory()->create();
 
         $dentist = User::factory()->create();
-        $dentist->jobPositions()->attach($dentistPosition->uuid);
+        $dentist->update(['job_position_uuid' => $dentistPosition->uuid]);
 
         $other = User::factory()->create();
-        $other->jobPositions()->attach($otherPosition->uuid);
+        $other->update(['job_position_uuid' => $otherPosition->uuid]);
 
         $result = $this->service->getDentists();
 
@@ -57,7 +57,7 @@ class DentistServiceTest extends TestCase
     {
         $dentistPosition = JobPosition::factory()->create(['name' => JobPosition::DENTIST_NAME]);
         $dentist = User::factory()->create();
-        $dentist->jobPositions()->attach($dentistPosition->uuid);
+        $dentist->update(['job_position_uuid' => $dentistPosition->uuid]);
 
         $result = $this->service->getDentistsList();
 

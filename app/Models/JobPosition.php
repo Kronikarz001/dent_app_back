@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Traits\Auditable;
 use App\Traits\HasFile;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 
@@ -43,11 +44,11 @@ class JobPosition extends UuidModel
     ];
 
     /**
-     * @return BelongsToMany
+     * @return HasMany
      */
-    public function user(): BelongsToMany
+    public function users(): HasMany
     {
-        return $this->BelongsToMany(User::class, 'users_job_positions', 'job_position_uuid', 'user_uuid');
+        return $this->hasMany(User::class, 'job_position_uuid', 'uuid');
     }
 
     /**
