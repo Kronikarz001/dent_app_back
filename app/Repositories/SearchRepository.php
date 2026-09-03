@@ -234,12 +234,17 @@ class SearchRepository implements SearchRepositoryInterface
     }
 
     /**
+     * A negative $perPage means "no limit" (e.g. exports). Passing that
+     * straight to paginate() ends up as `OFFSET 0` with no `LIMIT` — valid on
+     * PostgreSQL, a syntax error on MySQL. PHP_INT_MAX preserves the same
+     * "return everything" behavior while staying valid SQL on both.
+     *
      * @param Builder $query
      * @param int $perPage
      * @return LengthAwarePaginator
      */
     public function paginate(Builder $query, int $perPage): LengthAwarePaginator
     {
-        return $query->paginate($perPage);
+        return $query->paginate($perPage > 0 ? $perPage : PHP_INT_MAX);
     }
 }

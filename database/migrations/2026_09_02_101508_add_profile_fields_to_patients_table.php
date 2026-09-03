@@ -11,12 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
+        Schema::table('patients', function (Blueprint $table) {
             $table->string('street')->nullable();
             $table->string('house_number')->nullable();
             $table->string('apartment_number')->nullable();
             $table->string('postal_code')->nullable();
             $table->string('city')->nullable();
+            $table->string('gender')->nullable();
+            $table->text('notes')->nullable();
+            $table->uuid('doctor_uuid')->nullable();
+
+            $table->foreign('doctor_uuid')
+                ->references('uuid')->on('users')
+                ->nullOnDelete();
         });
     }
 
@@ -25,8 +32,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn(['street', 'house_number', 'apartment_number', 'postal_code', 'city']);
+        Schema::table('patients', function (Blueprint $table) {
+            $table->dropForeign(['doctor_uuid']);
+            $table->dropColumn(['street', 'house_number', 'apartment_number', 'postal_code', 'city', 'gender', 'notes', 'doctor_uuid']);
         });
     }
 };

@@ -14,9 +14,10 @@ return new class extends Migration
         Schema::create('calendars_dental_examinations', function (Blueprint $table) {
             $table->uuid('calendar_uuid');
             $table->uuid('dental_examination_uuid');
-            $table->foreign('calendar_uuid')->references('uuid')->on('calendars');
-            $table->foreign('dental_examination_uuid')->references('uuid')->on('dental_examinations');
+            $table->foreign('calendar_uuid')->references('uuid')->on('calendars')->cascadeOnDelete();
+            $table->foreign('dental_examination_uuid')->references('uuid')->on('dental_examinations')->cascadeOnDelete();
             $table->timestamp('assigned_at')->useCurrent();
+            $table->unique(['calendar_uuid', 'dental_examination_uuid'], 'calendars_dental_examinations_unique');
         });
     }
 

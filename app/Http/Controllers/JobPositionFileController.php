@@ -111,6 +111,8 @@ class JobPositionFileController extends Controller
     )]
     public function show(JobPosition $jobPosition, File $file): FileResource
     {
+        $this->assertFileBelongsTo($file, $jobPosition);
+
         return new FileResource($file);
     }
 
@@ -130,6 +132,8 @@ class JobPositionFileController extends Controller
     )]
     public function download(JobPosition $jobPosition, File $file): JsonResponse
     {
+        $this->assertFileBelongsTo($file, $jobPosition);
+
         return new JsonResponse($this->fileService->getFile($file));
     }
 
@@ -165,6 +169,8 @@ class JobPositionFileController extends Controller
     )]
     public function update(JobPosition $jobPosition, File $file, FileUpdateRequest $request): FileResource
     {
+        $this->assertFileBelongsTo($file, $jobPosition);
+
         return new FileResource(
             $this->fileService->updateFileName($file, $request->input('filename'))
         );
@@ -186,6 +192,8 @@ class JobPositionFileController extends Controller
     )]
     public function destroy(JobPosition $jobPosition, File $file): JsonResponse
     {
+        $this->assertFileBelongsTo($file, $jobPosition);
+
         $this->fileService->deleteFile($file);
 
         return new JsonResponse(null, 204);
@@ -224,6 +232,8 @@ class JobPositionFileController extends Controller
     )]
     public function storeNewVersion(JobPosition $jobPosition, File $file, FileStoreRequest $request): AnonymousResourceCollection
     {
+        $this->assertFileBelongsTo($file, $jobPosition);
+
         return FileResource::collection(
             $this->fileService->createNewVersionFile(
                 $file,

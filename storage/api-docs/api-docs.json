@@ -1596,13 +1596,13 @@
                 ]
             }
         },
-        "/api/job-position/{calendar}/file": {
+        "/api/calendar/{calendar}/file": {
             "get": {
                 "tags": [
                     "CalendarFile"
                 ],
-                "summary": "Lista plików stanowiska (paginacja)",
-                "operationId": "be69df184070d997c5ab9f28d273fbed",
+                "summary": "Lista plików kalendarza (paginacja)",
+                "operationId": "769557f7bfd819a7cb89e9ae3d57ae71",
                 "parameters": [
                     {
                         "name": "calendar",
@@ -1651,8 +1651,8 @@
                 "tags": [
                     "CalendarFile"
                 ],
-                "summary": "Wgrywa pliki dla stanowiska",
-                "operationId": "20b72e6304a1bed428ddcd20744b73a3",
+                "summary": "Wgrywa pliki dla kalendarza",
+                "operationId": "72d65acd79a0e9cb8e3ceab6ad098933",
                 "parameters": [
                     {
                         "name": "calendar",
@@ -1713,13 +1713,13 @@
                 ]
             }
         },
-        "/api/job-position/{calendar}/file/{file}": {
+        "/api/calendar/{calendar}/file/{file}": {
             "get": {
                 "tags": [
                     "CalendarFile"
                 ],
-                "summary": "Pobiera metadane pliku stanowiska",
-                "operationId": "56696b8a474cbc5c2380465af51ab67b",
+                "summary": "Pobiera metadane pliku kalendarza",
+                "operationId": "72570fbcd256c4331e9dc453e56c4d27",
                 "parameters": [
                     {
                         "name": "calendar",
@@ -1770,8 +1770,8 @@
                 "tags": [
                     "CalendarFile"
                 ],
-                "summary": "Zmienia nazwę pliku stanowiska",
-                "operationId": "e5fe81e16622ec112ac820a53977e524",
+                "summary": "Zmienia nazwę pliku kalendarza",
+                "operationId": "7892a5d23d58b2dd0283e2acab67e4bb",
                 "parameters": [
                     {
                         "name": "calendar",
@@ -1844,8 +1844,8 @@
                 "tags": [
                     "CalendarFile"
                 ],
-                "summary": "Usuwa plik stanowiska",
-                "operationId": "d0268ec6ce55536964c3c482d3527cbb",
+                "summary": "Usuwa plik kalendarza",
+                "operationId": "0d3836f260b4c390c68221d71b86ad48",
                 "parameters": [
                     {
                         "name": "calendar",
@@ -1881,13 +1881,13 @@
                 ]
             }
         },
-        "/api/job-position/{calendar}/file-download/{file}": {
+        "/api/calendar/{calendar}/file-download/{file}": {
             "get": {
                 "tags": [
                     "CalendarFile"
                 ],
-                "summary": "Pobiera zawartość pliku stanowiska",
-                "operationId": "3dd066a6d57908fe4186e56acb1f0e06",
+                "summary": "Pobiera zawartość pliku kalendarza",
+                "operationId": "eaa8764c672c6273999bf16821641907",
                 "parameters": [
                     {
                         "name": "calendar",
@@ -1923,13 +1923,13 @@
                 ]
             }
         },
-        "/api/job-position/{calendar}/file-new-version/{file}": {
+        "/api/calendar/{calendar}/file-new-version/{file}": {
             "post": {
                 "tags": [
                     "CalendarFile"
                 ],
-                "summary": "Tworzy nową wersję pliku stanowiska",
-                "operationId": "970f66303450ead880300f0aadaa055a",
+                "summary": "Tworzy nową wersję pliku kalendarza",
+                "operationId": "9a6121b9d6fabdc1cb27b0c729a56831",
                 "parameters": [
                     {
                         "name": "calendar",
@@ -6928,6 +6928,38 @@
                                     "pesel": {
                                         "type": "string",
                                         "example": "98010112345"
+                                    },
+                                    "street": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "house_number": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "apartment_number": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "postal_code": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "city": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "gender": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "enum": [
+                                            "MALE",
+                                            "FEMALE"
+                                        ]
+                                    },
+                                    "notes": {
+                                        "type": "string",
+                                        "nullable": true
                                     }
                                 },
                                 "type": "object"
@@ -7081,6 +7113,43 @@
                                             },
                                             "type": "object"
                                         },
+                                        "nullable": true
+                                    },
+                                    "street": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "house_number": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "apartment_number": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "postal_code": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "city": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "gender": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "enum": [
+                                            "MALE",
+                                            "FEMALE"
+                                        ]
+                                    },
+                                    "notes": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "doctor_uuid": {
+                                        "type": "string",
+                                        "format": "uuid",
                                         "nullable": true
                                     }
                                 },
@@ -10353,6 +10422,46 @@
                         "items": {
                             "$ref": "#/components/schemas/PhoneNumberResource"
                         }
+                    },
+                    "street": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "house_number": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "apartment_number": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "postal_code": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "city": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "gender": {
+                        "type": "string",
+                        "nullable": true,
+                        "enum": [
+                            "MALE",
+                            "FEMALE"
+                        ]
+                    },
+                    "notes": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "doctor": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/UserResource"
+                            }
+                        ],
+                        "nullable": true
                     },
                     "created_at": {
                         "type": "string",

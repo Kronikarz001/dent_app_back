@@ -2,6 +2,7 @@
 
 namespace App\Exports;
 
+use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -10,34 +11,27 @@ use Maatwebsite\Excel\Events\AfterSheet;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 
 /**
- * Summary of Export
+ * Base for concrete exports (UserExport, PatientExport, ...) — collection(),
+ * headings() and map() are left abstract so every subclass is forced by PHP
+ * to provide them; only the shared border-styling event handler lives here.
  */
-class Export implements ExportInterface, FromCollection, WithEvents, WithHeadings, WithMapping
+abstract class Export implements ExportInterface, FromCollection, WithEvents, WithHeadings, WithMapping
 {
     /**
-     * @return void
+     * @return Collection
      */
-    public function collection()
-    {
-        // TODO: Implement collection() method.
-    }
+    abstract public function collection();
 
     /**
      * @return array
      */
-    public function headings(): array
-    {
-        // TODO: Implement headings() method.
-    }
+    abstract public function headings(): array;
 
     /**
-     * @param $row
+     * @param mixed $row
      * @return array
      */
-    public function map($row): array
-    {
-        // TODO: Implement map() method.
-    }
+    abstract public function map($row): array;
 
     /**
      * @return array

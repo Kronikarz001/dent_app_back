@@ -6,14 +6,17 @@ use App\Dto\FileDto;
 use App\Enums\FileableType;
 use App\Exceptions\FileUploadException;
 use App\Models\File;
+use App\Models\User;
 use App\Models\UserAvatar;
 use App\Repositories\FileRepositoryInterface;
+use App\Traits\AssertsFileOwnership;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -22,12 +25,24 @@ use Illuminate\Support\Str;
  */
 readonly class FileService implements FileServiceInterface
 {
+    use AssertsFileOwnership;
+
     /**
      * @param FileRepositoryInterface $fileRepository
      */
     public function __construct(
         private FileRepositoryInterface $fileRepository,
     ) {}
+
+    /**
+     * @param File $file
+     * @param Model $owner
+     * @return void
+     */
+    public function assertFileOwnedBy(File $file, Model $owner): void
+    {
+        $this->assertFileBelongsTo($file, $owner);
+    }
 
     /**
      * @param Model $model
@@ -69,6 +84,18 @@ readonly class FileService implements FileServiceInterface
     public function createNewVersionFile(File $existingFile, FileDto $fileDto, Model $model): array
     {
         return $this->processFiles($fileDto, $model, $existingFile);
+    }
+
+    /**
+     * @param User $user
+     * @param UploadedFile $file
+     * @return array
+     *
+     * @throws FileUploadException
+     */
+    public function saveAvatar(User $user, UploadedFile $file): array
+    {
+        return $this->processFiles(new FileDto([$file], FileableType::USER_AVATAR), UserAvatar::find($user->uuid));
     }
 
     /**
@@ -195,24 +222,29 @@ readonly class FileService implements FileServiceInterface
 
         $this->saveFileToDisk($upload, $path, $type);
 
-        $newFile = $this->fileRepository->create([
-            'uuid' => $newUuid,
-            'filename' => pathinfo($upload->getClientOriginalName(), PATHINFO_FILENAME),
-            'fileable_type' => $model->getMorphClass(),
-            'fileable_id' => $model->uuid,
-            'extension' => $upload->getClientOriginalExtension(),
-            'size' => $upload->getSize(),
-            'mimetype' => $upload->getMimeType(),
-            'path' => $path,
-            'file_uuid' => null,
-            'is_latest' => true,
-        ]);
+        // Creating the new "latest" row and demoting the previous one must
+        // not be observable half-done — otherwise a crash in between leaves
+        // two rows with is_latest=true for the same file lineage.
+        return DB::transaction(function () use ($newUuid, $upload, $model, $path, $parentFile) {
+            $newFile = $this->fileRepository->create([
+                'uuid' => $newUuid,
+                'filename' => pathinfo($upload->getClientOriginalName(), PATHINFO_FILENAME),
+                'fileable_type' => $model->getMorphClass(),
+                'fileable_id' => $model->uuid,
+                'extension' => $upload->getClientOriginalExtension(),
+                'size' => $upload->getSize(),
+                'mimetype' => $upload->getMimeType(),
+                'path' => $path,
+                'file_uuid' => null,
+                'is_latest' => true,
+            ]);
 
-        if ($parentFile) {
-            $this->updateAllPreviousVersions($newFile, $parentFile);
-        }
+            if ($parentFile) {
+                $this->updateAllPreviousVersions($newFile, $parentFile);
+            }
 
-        return $newFile;
+            return $newFile;
+        });
     }
 
     /**
@@ -338,13 +370,13 @@ readonly class FileService implements FileServiceInterface
     }
 
     /**
-     * @param Model $model
+     * @param User $user
      * @return void
      *
      * @throws FileNotFoundException
      */
-    public function deleteAvatar(Model $model): void
+    public function deleteAvatar(User $user): void
     {
-        $this->getAllFilesWithoutPagination($model)->each(fn (File $file) => $this->deleteFile($file));
+        $this->getAllFilesWithoutPagination(UserAvatar::find($user->uuid))->each(fn (File $file) => $this->deleteFile($file));
     }
 }

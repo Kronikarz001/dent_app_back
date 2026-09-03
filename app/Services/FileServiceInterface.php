@@ -4,8 +4,10 @@ namespace App\Services;
 
 use App\Dto\FileDto;
 use App\Models\File;
+use App\Models\User;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
@@ -80,8 +82,22 @@ interface FileServiceInterface
     public function getPhotoFile(File $file): string;
 
     /**
-     * @param Model $model
+     * @param File $file
+     * @param Model $owner
      * @return void
      */
-    public function deleteAvatar(Model $model): void;
+    public function assertFileOwnedBy(File $file, Model $owner): void;
+
+    /**
+     * @param User $user
+     * @param UploadedFile $file
+     * @return array
+     */
+    public function saveAvatar(User $user, UploadedFile $file): array;
+
+    /**
+     * @param User $user
+     * @return void
+     */
+    public function deleteAvatar(User $user): void;
 }

@@ -289,7 +289,11 @@ class SearchService implements SearchServiceInterface
     public function applyRelationSort(Builder $query, string $sortField, string $direction): void
     {
         [$relation, $relField] = explode('.', $sortField, 2);
-        $relationObj = $query->getModel()->{$relation}();
+        $relationObj = $this->resolveRelation($query, $relation);
+
+        if ($relationObj === null || $this->isRestrictedRelationField($relationObj, $relField)) {
+            return;
+        }
 
         if ($relationObj instanceof BelongsTo) {
             $this->sortByBelongsTo($query, $relationObj, $relation, $relField, $direction);
@@ -372,7 +376,7 @@ class SearchService implements SearchServiceInterface
     private function applyRelationFieldFilter(Builder $query, string $relation, string $relField, mixed $value, bool $useOr, SearchConfig $config): void
     {
         $relationObj = $this->resolveRelation($query, $relation);
-        if ($relationObj === null) {
+        if ($relationObj === null || $this->isRestrictedRelationField($relationObj, $relField)) {
             return;
         }
 
@@ -442,8 +446,10 @@ class SearchService implements SearchServiceInterface
 
     private function applySearchStringField(Builder $q, Builder $baseQuery, string $field, string $searchString, string $table): void
     {
+        $operator = $this->caseInsensitiveLikeOperator($baseQuery);
+
         if (! str_contains($field, '.')) {
-            $this->repo->orWhereOp($q, $table.'.'.$field, 'ILIKE', '%'.$searchString.'%');
+            $this->repo->orWhereOp($q, $table.'.'.$field, $operator, '%'.$searchString.'%');
 
             return;
         }
@@ -452,7 +458,7 @@ class SearchService implements SearchServiceInterface
 
         if (str_starts_with($relField, 'pivot.')) {
             $pivotField = str_replace('pivot.', '', $relField);
-            $this->repo->orWhereHas($q, $relation, fn (Builder $q2) => $q2->wherePivot($pivotField, 'ILIKE', '%'.$searchString.'%'));
+            $this->repo->orWhereHas($q, $relation, fn (Builder $q2) => $q2->wherePivot($pivotField, $operator, '%'.$searchString.'%'));
 
             return;
         }
@@ -463,7 +469,37 @@ class SearchService implements SearchServiceInterface
         }
 
         $qualifiedField = $this->qualifyRelationField($relationObj, $relField);
-        $this->repo->orWhereHas($q, $relation, fn (Builder $q2) => $this->repo->whereOp($q2, $qualifiedField, 'ILIKE', '%'.$searchString.'%'));
+        $this->repo->orWhereHas($q, $relation, fn (Builder $q2) => $this->repo->whereOp($q2, $qualifiedField, $operator, '%'.$searchString.'%'));
+    }
+
+    /**
+     * ILIKE is PostgreSQL-only syntax; MySQL/SQLite use LIKE, which is
+     * already case-insensitive there under the default collation.
+     *
+     * @param Builder $query
+     * @return string
+     */
+    private function caseInsensitiveLikeOperator(Builder $query): string
+    {
+        return $query->getConnection()->getDriverName() === 'pgsql' ? 'ILIKE' : 'LIKE';
+    }
+
+    /**
+     * Blocks sort/filter access to any relation column the related model
+     * itself declares hidden (e.g. password, remember_token) — closes a
+     * side-channel where a whitelisted, loaded relation could otherwise be
+     * used to sort/filter by a secret column via ?sort=user.password.
+     *
+     * @param Relation $relation
+     * @param string $relField
+     * @return bool
+     */
+    private function isRestrictedRelationField(Relation $relation, string $relField): bool
+    {
+        $column = explode('->', $relField, 2)[0];
+        $column = explode('.', $column)[0];
+
+        return in_array($column, $relation->getRelated()->getHidden(), true);
     }
 
     private function sortByBelongsTo(Builder $query, BelongsTo $relation, string $relationName, string $relField, string $direction): void

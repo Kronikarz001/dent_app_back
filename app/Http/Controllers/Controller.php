@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Traits\AssertsFileOwnership;
 use OpenApi\Attributes as OA;
 
 #[OA\Info(version: '1.0.0', description: 'API aplikacji DentApp', title: 'DentApp API')]
@@ -101,6 +102,14 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: 'pesel', type: 'string'),
         new OA\Property(property: 'is_active', type: 'boolean'),
         new OA\Property(property: 'phone_number', type: 'array', items: new OA\Items(ref: '#/components/schemas/PhoneNumberResource')),
+        new OA\Property(property: 'street', type: 'string', nullable: true),
+        new OA\Property(property: 'house_number', type: 'string', nullable: true),
+        new OA\Property(property: 'apartment_number', type: 'string', nullable: true),
+        new OA\Property(property: 'postal_code', type: 'string', nullable: true),
+        new OA\Property(property: 'city', type: 'string', nullable: true),
+        new OA\Property(property: 'gender', type: 'string', enum: ['MALE', 'FEMALE'], nullable: true),
+        new OA\Property(property: 'notes', type: 'string', nullable: true),
+        new OA\Property(property: 'doctor', ref: '#/components/schemas/UserResource', nullable: true),
         new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
     ]
 )]
@@ -260,5 +269,5 @@ use OpenApi\Attributes as OA;
 )]
 abstract class Controller
 {
-    //
+    use AssertsFileOwnership;
 }

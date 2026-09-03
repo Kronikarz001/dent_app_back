@@ -93,11 +93,13 @@ class FileRepository extends SearchableRepository implements FileRepositoryInter
         return File::query()
             ->where('fileable_type', $fileableType)
             ->where('fileable_id', $fileableId)
-            ->when($oldFileUuid !== null, function ($q) use ($oldFileUuid) {
-                $q->where('uuid', $oldFileUuid)
-                    ->orWhere('file_uuid', $oldFileUuid);
-            })
             ->where('uuid', '<>', $excludeUuid)
+            ->when($oldFileUuid !== null, function ($q) use ($oldFileUuid) {
+                $q->where(function ($q2) use ($oldFileUuid) {
+                    $q2->where('uuid', $oldFileUuid)
+                        ->orWhere('file_uuid', $oldFileUuid);
+                });
+            })
             ->get();
     }
 

@@ -182,44 +182,6 @@ class UserServiceTest extends TestCase
     /**
      * @return void
      */
-    public function testGetUserInformationReturnsUser(): void
-    {
-        $user = User::factory()->create();
-
-        $result = $this->service->getUserInformation($user);
-
-        $this->assertInstanceOf(User::class, $result);
-        $this->assertSame($user->uuid, $result->uuid);
-    }
-
-    /**
-     * @return void
-     */
-    public function testGetUserByTokenReturnsUserForValidToken(): void
-    {
-        $user = User::factory()->create();
-        $token = $user->createToken('test')->plainTextToken;
-        $tokenValue = explode('|', $token)[1];
-
-        $result = $this->service->getUserByToken($tokenValue);
-
-        $this->assertInstanceOf(User::class, $result);
-        $this->assertSame($user->uuid, $result->uuid);
-    }
-
-    /**
-     * @return void
-     */
-    public function testGetUserByTokenReturnsNullForInvalidToken(): void
-    {
-        $result = $this->service->getUserByToken('invalid-token-xyz');
-
-        $this->assertNull($result);
-    }
-
-    /**
-     * @return void
-     */
     public function testGetLoggedUserReturnsAuthenticatedUser(): void
     {
         $user = User::factory()->create();

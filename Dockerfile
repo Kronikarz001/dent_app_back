@@ -40,7 +40,7 @@ COPY ./ /var/www
 RUN mkdir -p /var/www/storage/logs /var/www/storage/framework/cache \
     /var/www/storage/framework/sessions /var/www/storage/framework/views \
     /var/www/bootstrap/cache \
-    && chmod -R 777 /var/www/storage /var/www/bootstrap/cache \
+    && chmod -R 775 /var/www/storage /var/www/bootstrap/cache \
     && chown -R www:www /var/www
 
 USER www

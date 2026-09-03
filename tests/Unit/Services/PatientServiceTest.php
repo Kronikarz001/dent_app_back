@@ -7,6 +7,7 @@ use App\Models\Patient;
 use App\Repositories\PatientRepositoryInterface;
 use App\Services\ExportServiceInterface;
 use App\Services\PatientService;
+use App\Services\PhoneNumberServiceInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Mockery;
 use Mockery\MockInterface;
@@ -33,7 +34,8 @@ class PatientServiceTest extends TestCase
 
         $this->patientRepository = Mockery::mock(PatientRepositoryInterface::class);
         $this->exportService = Mockery::mock(ExportServiceInterface::class);
-        $this->patientService = new PatientService($this->patientRepository, $this->exportService);
+        $phoneNumberService = Mockery::mock(PhoneNumberServiceInterface::class);
+        $this->patientService = new PatientService($this->patientRepository, $this->exportService, $phoneNumberService);
     }
 
     /**

@@ -18,7 +18,7 @@ return new class extends Migration
         });
 
         Schema::table('messages', function (Blueprint $table) {
-            $table->foreign('message_group_uuid')->references('uuid')->on('message_groups');
+            $table->foreign('message_group_uuid')->references('uuid')->on('message_groups')->cascadeOnDelete();
         });
     }
 

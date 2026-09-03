@@ -10,7 +10,6 @@ enum ExportType: string
     case XLSX = 'xlsx';
     case PDF = 'pdf';
     case CSV = 'csv';
-    case WORD = 'word';
     case XLS = 'xls';
 
     /**
@@ -22,7 +21,6 @@ enum ExportType: string
             self::XLSX => 'xlsx',
             self::PDF => 'pdf',
             self::CSV => 'csv',
-            self::WORD => 'word',
             self::XLS => 'xls',
         };
     }

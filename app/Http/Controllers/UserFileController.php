@@ -10,7 +10,6 @@ use App\Http\Requests\PhotoStoreRequest;
 use App\Http\Resources\FileResource;
 use App\Models\File;
 use App\Models\User;
-use App\Models\UserAvatar;
 use App\Models\UserBackground;
 use App\Services\FileServiceInterface;
 use Illuminate\Http\JsonResponse;
@@ -115,6 +114,8 @@ class UserFileController extends Controller
     )]
     public function show(User $user, File $file): FileResource
     {
+        $this->fileService->assertFileOwnedBy($file, $user);
+
         return new FileResource($file);
     }
 
@@ -134,6 +135,8 @@ class UserFileController extends Controller
     )]
     public function download(User $user, File $file): JsonResponse
     {
+        $this->fileService->assertFileOwnedBy($file, $user);
+
         return new JsonResponse($this->fileService->getFile($file));
     }
 
@@ -169,6 +172,8 @@ class UserFileController extends Controller
     )]
     public function update(User $user, File $file, FileUpdateRequest $request): FileResource
     {
+        $this->fileService->assertFileOwnedBy($file, $user);
+
         return new FileResource(
             $this->fileService->updateFileName($file, $request->input('filename'))
         );
@@ -190,6 +195,8 @@ class UserFileController extends Controller
     )]
     public function destroy(User $user, File $file): JsonResponse
     {
+        $this->fileService->assertFileOwnedBy($file, $user);
+
         $this->fileService->deleteFile($file);
 
         return new JsonResponse(null, 204);
@@ -228,6 +235,8 @@ class UserFileController extends Controller
     )]
     public function storeNewVersion(User $user, File $file, FileStoreRequest $request): AnonymousResourceCollection
     {
+        $this->fileService->assertFileOwnedBy($file, $user);
+
         return FileResource::collection(
             $this->fileService->createNewVersionFile(
                 $file,
@@ -239,12 +248,8 @@ class UserFileController extends Controller
 
     #[OA\Post(
         path: '/api/user/{user}/avatar',
-        tags: ['UserFile'],
         summary: 'Wgrywa avatar użytkownika',
         security: [['sanctum' => []]],
-        parameters: [
-            new OA\PathParameter(name: 'user', schema: new OA\Schema(type: 'string', format: 'uuid')),
-        ],
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\MediaType(
@@ -257,6 +262,10 @@ class UserFileController extends Controller
                 )
             )
         ),
+        tags: ['UserFile'],
+        parameters: [
+            new OA\PathParameter(name: 'user', schema: new OA\Schema(type: 'string', format: 'uuid')),
+        ],
         responses: [
             new OA\Response(
                 response: 200,
@@ -270,10 +279,7 @@ class UserFileController extends Controller
     public function storeAvatar(User $user, PhotoStoreRequest $request): AnonymousResourceCollection
     {
         return FileResource::collection(
-            $this->fileService->saveFile(
-                new FileDto([$request->file('file')], FileableType::USER_AVATAR),
-                UserAvatar::find($user->uuid)
-            )
+            $this->fileService->saveAvatar($user, $request->file('file'))
         );
     }
 
@@ -292,19 +298,15 @@ class UserFileController extends Controller
     )]
     public function destroyAvatar(User $user): JsonResponse
     {
-        $this->fileService->deleteAvatar(UserAvatar::find($user->uuid));
+        $this->fileService->deleteAvatar($user);
 
         return new JsonResponse(null, 204);
     }
 
     #[OA\Post(
         path: '/api/user/{user}/background',
-        tags: ['UserFile'],
         summary: 'Wgrywa tło użytkownika',
         security: [['sanctum' => []]],
-        parameters: [
-            new OA\PathParameter(name: 'user', schema: new OA\Schema(type: 'string', format: 'uuid')),
-        ],
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\MediaType(
@@ -317,6 +319,10 @@ class UserFileController extends Controller
                 )
             )
         ),
+        tags: ['UserFile'],
+        parameters: [
+            new OA\PathParameter(name: 'user', schema: new OA\Schema(type: 'string', format: 'uuid')),
+        ],
         responses: [
             new OA\Response(
                 response: 200,
@@ -339,9 +345,9 @@ class UserFileController extends Controller
 
     #[OA\Get(
         path: '/api/user/{user}/file-background-download/{file}',
-        tags: ['UserFile'],
         summary: 'Pobiera tło użytkownika (obraz binarny)',
         security: [['sanctum' => []]],
+        tags: ['UserFile'],
         parameters: [
             new OA\PathParameter(name: 'user', schema: new OA\Schema(type: 'string', format: 'uuid')),
             new OA\PathParameter(name: 'file', schema: new OA\Schema(type: 'string', format: 'uuid')),
@@ -353,6 +359,8 @@ class UserFileController extends Controller
     )]
     public function backgroundDownload(User $user, File $file): Response
     {
+        $this->fileService->assertFileOwnedBy($file, UserBackground::find($user->uuid));
+
         return response($this->fileService->getPhotoFile($file), 200, ['Content-Type' => $file->mimetype]);
     }
 }

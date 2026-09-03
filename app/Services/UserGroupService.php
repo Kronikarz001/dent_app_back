@@ -91,15 +91,32 @@ readonly class UserGroupService implements UserGroupServiceInterface
      * @param UserGroup $group
      * @param array $data
      * @return void
+     *
+     * @throws PermissionDeniedException
      */
     public function assignPermissions(UserGroup $group, array $data): void
     {
+        /** @var User $actingUser */
+        $actingUser = Auth::user();
+
         foreach ($data['permissions'] ?? [] as $permissionUuid) {
-            $this->grant(Permission::class, $permissionUuid, $group, $data['expires_at'] ?? null);
+            $permission = Permission::where('uuid', $permissionUuid)->firstOrFail();
+
+            if (! $actingUser->is_admin && ! $this->permissionService->hasPermissionGrant($actingUser, $permission)) {
+                throw new PermissionDeniedException('Nie posiadasz tego uprawnienia, nie możesz go nadać.');
+            }
+
+            $this->grant(Permission::class, $permission->uuid, $group, $data['expires_at'] ?? null);
         }
 
         foreach ($data['permission_groups'] ?? [] as $permissionGroupUuid) {
-            $this->grant(PermissionGroup::class, $permissionGroupUuid, $group, $data['expires_at'] ?? null);
+            $permissionGroup = PermissionGroup::where('uuid', $permissionGroupUuid)->firstOrFail();
+
+            if (! $actingUser->is_admin && ! $this->permissionService->hasGroupGrant($actingUser, $permissionGroup)) {
+                throw new PermissionDeniedException('Nie posiadasz tej grupy uprawnień, nie możesz jej nadać.');
+            }
+
+            $this->grant(PermissionGroup::class, $permissionGroup->uuid, $group, $data['expires_at'] ?? null);
         }
     }
 

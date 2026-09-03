@@ -23,6 +23,7 @@ return new class extends Migration
             $table->boolean('no_show')->default(false);
             $table->boolean('is_active')->default(false);
             $table->timestamps();
+            $table->index(['type', 'date']);
         });
     }
 

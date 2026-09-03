@@ -117,6 +117,8 @@ class MaterialFileController extends Controller
     )]
     public function show(Material $material, File $file): FileResource
     {
+        $this->assertFileBelongsTo($file, $material);
+
         return new FileResource($file);
     }
 
@@ -136,6 +138,8 @@ class MaterialFileController extends Controller
     )]
     public function download(Material $material, File $file): JsonResponse
     {
+        $this->assertFileBelongsTo($file, $material);
+
         return new JsonResponse($this->fileService->getFile($file));
     }
 
@@ -171,6 +175,8 @@ class MaterialFileController extends Controller
     )]
     public function update(Material $material, File $file, FileUpdateRequest $request): FileResource
     {
+        $this->assertFileBelongsTo($file, $material);
+
         return new FileResource(
             $this->fileService->updateFileName($file, $request->input('filename'))
         );
@@ -192,6 +198,8 @@ class MaterialFileController extends Controller
     )]
     public function destroy(Material $material, File $file): JsonResponse
     {
+        $this->assertFileBelongsTo($file, $material);
+
         $this->fileService->deleteFile($file);
 
         return new JsonResponse(null, 204);
@@ -230,6 +238,8 @@ class MaterialFileController extends Controller
     )]
     public function storeNewVersion(Material $material, File $file, FileStoreRequest $request): AnonymousResourceCollection
     {
+        $this->assertFileBelongsTo($file, $material);
+
         return FileResource::collection(
             $this->fileService->createNewVersionFile(
                 $file,

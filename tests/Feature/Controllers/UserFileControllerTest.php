@@ -104,6 +104,24 @@ class UserFileControllerTest extends TestCase
     /**
      * @return void
      */
+    public function testShowRejectsFileBelongingToAnotherUser(): void
+    {
+        $ownUser = User::factory()->create();
+        $otherUser = User::factory()->create();
+        $foreignFile = File::factory()->create([
+            'fileable_type' => FileableType::USER->value,
+            'fileable_id' => $otherUser->uuid,
+        ]);
+
+        $response = $this->callApiWithLoggedUser()
+            ->getJson(route('userfile.show', ['user' => $ownUser->uuid, 'file' => $foreignFile->uuid]));
+
+        $response->assertNotFound();
+    }
+
+    /**
+     * @return void
+     */
     public function testDownloadReturnsOriginalFileContent(): void
     {
         $user = User::factory()->create();

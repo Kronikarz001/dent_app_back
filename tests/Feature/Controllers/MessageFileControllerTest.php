@@ -102,6 +102,24 @@ class MessageFileControllerTest extends TestCase
     /**
      * @return void
      */
+    public function testShowRejectsFileBelongingToAnotherMessage(): void
+    {
+        $ownMessage = Message::factory()->create();
+        $otherMessage = Message::factory()->create();
+        $foreignFile = File::factory()->create([
+            'fileable_type' => FileableType::MESSAGE->value,
+            'fileable_id' => $otherMessage->uuid,
+        ]);
+
+        $response = $this->callApiWithLoggedUser()
+            ->getJson(route('messagefile.show', ['message' => $ownMessage->uuid, 'file' => $foreignFile->uuid]));
+
+        $response->assertNotFound();
+    }
+
+    /**
+     * @return void
+     */
     public function testDownloadReturnsOriginalFileContent(): void
     {
         $message = Message::factory()->create();

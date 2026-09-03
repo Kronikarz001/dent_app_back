@@ -170,4 +170,38 @@ class EmployeeScheduleControllerTest extends TestCase
 
         $response->assertStatus(422);
     }
+
+    /**
+     * @return void
+     */
+    public function testAssignUsersRejectsOverlappingScheduleForSameEmployee(): void
+    {
+        $employee = User::factory()->create();
+        $existing = EmployeeSchedule::factory()->create([
+            'date' => '2030-01-10',
+            'start_time' => '08:00',
+            'end_time' => '16:00',
+            'is_active' => true,
+        ]);
+        $existing->users()->attach($employee->uuid);
+
+        $newSchedule = EmployeeSchedule::factory()->create([
+            'date' => '2030-01-10',
+            'start_time' => '15:00',
+            'end_time' => '23:00',
+            'is_active' => true,
+        ]);
+
+        $response = $this->callApiWithLoggedUser()
+            ->patchJson(route('employee-schedule.assignUsers', ['employeeSchedule' => $newSchedule->uuid]), [
+                'users' => [$employee->uuid],
+            ]);
+
+        $response->assertStatus(409);
+        $this->assertDatabaseMissing('calendar_users', [
+            'calendar_uuid' => $newSchedule->uuid,
+            'userable_id' => $employee->uuid,
+            'userable_type' => User::class,
+        ]);
+    }
 }

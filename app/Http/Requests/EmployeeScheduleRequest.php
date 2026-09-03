@@ -29,9 +29,9 @@ class EmployeeScheduleRequest extends FormRequest
             'name' => ['nullable'],
             'description' => ['nullable'],
             'date' => ['required', 'date'],
-            'end_date' => ['nullable', 'date'],
+            'end_date' => ['nullable', 'date', 'after_or_equal:date'],
             'start_time' => ['nullable', 'date_format:H:i'],
-            'end_time' => ['nullable', 'date_format:H:i'],
+            'end_time' => ['nullable', 'date_format:H:i', 'after:start_time'],
             'is_active' => ['boolean'],
         ];
     }
@@ -47,8 +47,10 @@ class EmployeeScheduleRequest extends FormRequest
             'date.required' => 'Data jest wymagana.',
             'date.date' => 'Data musi być prawidłową datą.',
             'end_date.date' => 'Data zakończenia musi być prawidłową datą.',
+            'end_date.after_or_equal' => 'Data zakończenia nie może być wcześniejsza niż data rozpoczęcia.',
             'start_time.date_format' => 'Godzina rozpoczęcia musi być w formacie GG:MM.',
             'end_time.date_format' => 'Godzina zakończenia musi być w formacie GG:MM.',
+            'end_time.after' => 'Godzina zakończenia musi być późniejsza niż godzina rozpoczęcia.',
             'is_active.boolean' => 'Pole is_active musi być wartością logiczną.',
         ];
     }

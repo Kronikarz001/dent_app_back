@@ -28,9 +28,9 @@ class CalendarFileController extends Controller
     ) {}
 
     #[OA\Get(
-        path: '/api/job-position/{calendar}/file',
+        path: '/api/calendar/{calendar}/file',
         tags: ['CalendarFile'],
-        summary: 'Lista plików stanowiska (paginacja)',
+        summary: 'Lista plików kalendarza (paginacja)',
         security: [['sanctum' => []]],
         parameters: [
             new OA\PathParameter(name: 'calendar', schema: new OA\Schema(type: 'string', format: 'uuid')),
@@ -59,9 +59,9 @@ class CalendarFileController extends Controller
     }
 
     #[OA\Post(
-        path: '/api/job-position/{calendar}/file',
+        path: '/api/calendar/{calendar}/file',
         tags: ['CalendarFile'],
-        summary: 'Wgrywa pliki dla stanowiska',
+        summary: 'Wgrywa pliki dla kalendarza',
         security: [['sanctum' => []]],
         parameters: [
             new OA\PathParameter(name: 'calendar', schema: new OA\Schema(type: 'string', format: 'uuid')),
@@ -92,16 +92,16 @@ class CalendarFileController extends Controller
     {
         return FileResource::collection(
             $this->fileService->saveFile(
-                new FileDto($request->file('files'), FileableType::JOB_POSITION),
+                new FileDto($request->file('files'), FileableType::CALENDAR),
                 $calendar
             )
         );
     }
 
     #[OA\Get(
-        path: '/api/job-position/{calendar}/file/{file}',
+        path: '/api/calendar/{calendar}/file/{file}',
         tags: ['CalendarFile'],
-        summary: 'Pobiera metadane pliku stanowiska',
+        summary: 'Pobiera metadane pliku kalendarza',
         security: [['sanctum' => []]],
         parameters: [
             new OA\PathParameter(name: 'calendar', schema: new OA\Schema(type: 'string', format: 'uuid')),
@@ -120,13 +120,15 @@ class CalendarFileController extends Controller
     )]
     public function show(Calendar $calendar, File $file): FileResource
     {
+        $this->assertFileBelongsTo($file, $calendar);
+
         return new FileResource($file);
     }
 
     #[OA\Get(
-        path: '/api/job-position/{calendar}/file-download/{file}',
+        path: '/api/calendar/{calendar}/file-download/{file}',
         tags: ['CalendarFile'],
-        summary: 'Pobiera zawartość pliku stanowiska',
+        summary: 'Pobiera zawartość pliku kalendarza',
         security: [['sanctum' => []]],
         parameters: [
             new OA\PathParameter(name: 'calendar', schema: new OA\Schema(type: 'string', format: 'uuid')),
@@ -139,13 +141,15 @@ class CalendarFileController extends Controller
     )]
     public function download(Calendar $calendar, File $file): JsonResponse
     {
+        $this->assertFileBelongsTo($file, $calendar);
+
         return new JsonResponse($this->fileService->getFile($file));
     }
 
     #[OA\Put(
-        path: '/api/job-position/{calendar}/file/{file}',
+        path: '/api/calendar/{calendar}/file/{file}',
         tags: ['CalendarFile'],
-        summary: 'Zmienia nazwę pliku stanowiska',
+        summary: 'Zmienia nazwę pliku kalendarza',
         security: [['sanctum' => []]],
         parameters: [
             new OA\PathParameter(name: 'calendar', schema: new OA\Schema(type: 'string', format: 'uuid')),
@@ -174,15 +178,17 @@ class CalendarFileController extends Controller
     )]
     public function update(Calendar $calendar, File $file, FileUpdateRequest $request): FileResource
     {
+        $this->assertFileBelongsTo($file, $calendar);
+
         return new FileResource(
             $this->fileService->updateFileName($file, $request->input('filename'))
         );
     }
 
     #[OA\Delete(
-        path: '/api/job-position/{calendar}/file/{file}',
+        path: '/api/calendar/{calendar}/file/{file}',
         tags: ['CalendarFile'],
-        summary: 'Usuwa plik stanowiska',
+        summary: 'Usuwa plik kalendarza',
         security: [['sanctum' => []]],
         parameters: [
             new OA\PathParameter(name: 'calendar', schema: new OA\Schema(type: 'string', format: 'uuid')),
@@ -195,15 +201,17 @@ class CalendarFileController extends Controller
     )]
     public function destroy(Calendar $calendar, File $file): JsonResponse
     {
+        $this->assertFileBelongsTo($file, $calendar);
+
         $this->fileService->deleteFile($file);
 
         return new JsonResponse(null, 204);
     }
 
     #[OA\Post(
-        path: '/api/job-position/{calendar}/file-new-version/{file}',
+        path: '/api/calendar/{calendar}/file-new-version/{file}',
         tags: ['CalendarFile'],
-        summary: 'Tworzy nową wersję pliku stanowiska',
+        summary: 'Tworzy nową wersję pliku kalendarza',
         security: [['sanctum' => []]],
         parameters: [
             new OA\PathParameter(name: 'calendar', schema: new OA\Schema(type: 'string', format: 'uuid')),
@@ -233,10 +241,12 @@ class CalendarFileController extends Controller
     )]
     public function storeNewVersion(Calendar $calendar, File $file, FileStoreRequest $request): AnonymousResourceCollection
     {
+        $this->assertFileBelongsTo($file, $calendar);
+
         return FileResource::collection(
             $this->fileService->createNewVersionFile(
                 $file,
-                new FileDto($request->file('files'), FileableType::JOB_POSITION),
+                new FileDto($request->file('files'), FileableType::CALENDAR),
                 $calendar
             )
         );

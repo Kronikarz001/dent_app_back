@@ -137,6 +137,38 @@ class UserGroupControllerTest extends TestCase
     /**
      * @return void
      */
+    public function testAssignPermissionsForbiddenWhenActingUserLacksGrant(): void
+    {
+        $actingUser = User::factory()->create(['is_admin' => false]);
+        $group = UserGroup::factory()->create();
+
+        $ownResourcePermission = Permission::where('resource', 'user-group')->where('type', 'edit')->firstOrFail();
+        PermissionAssignment::create([
+            'grantable_type' => Permission::class,
+            'grantable_id' => $ownResourcePermission->uuid,
+            'assignable_type' => User::class,
+            'assignable_id' => $actingUser->uuid,
+        ]);
+
+        $unownedPermission = Permission::where('resource', 'user')->where('type', 'edit')->firstOrFail();
+
+        $response = $this->callApiWithLoggedUser($actingUser)
+            ->patchJson(route('user-group.assignPermissions', ['userGroup' => $group->uuid]), [
+                'permissions' => [$unownedPermission->uuid],
+            ]);
+
+        $response->assertStatus(403);
+        $this->assertDatabaseMissing('permission_assignments', [
+            'grantable_type' => Permission::class,
+            'grantable_id' => $unownedPermission->uuid,
+            'assignable_type' => UserGroup::class,
+            'assignable_id' => $group->uuid,
+        ]);
+    }
+
+    /**
+     * @return void
+     */
     public function testCreateRoleAllowsManagerToCreateRoleWithinGroupPermissions(): void
     {
         $group = UserGroup::factory()->create();
