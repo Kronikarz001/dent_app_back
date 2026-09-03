@@ -1,0 +1,83 @@
+name: DentApp CD
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+env:
+  PHP_BIN: /usr/local/php84-fpm/bin/php
+  COMPOSER_BIN: /usr/bin/composer
+  # Host key of serwer466029.lh.pl:40022, pinned so the runner never falls
+  # back to TOFU (host keys are public info, not a secret).
+  SSH_KNOWN_HOSTS: "[serwer466029.lh.pl]:40022 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKyBEKAMS05prsIbz7kaH2tYwFZ8SPNYUfRphHD0S4hd"
+
+jobs:
+  deploy:
+    name: Deploy to production
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up deploy key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/dentapp_deploy
+          chmod 600 ~/.ssh/dentapp_deploy
+          echo "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+
+      - name: Backup current release and enter maintenance mode
+        run: |
+          ssh -i ~/.ssh/dentapp_deploy -p ${{ secrets.SSH_PORT }} \
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
+            "cd ${{ secrets.DEPLOY_PATH }} && \
+             tar czf ../cd_rollback_backup.tar.gz --exclude=storage --exclude=.env . && \
+             $PHP_BIN artisan down || true"
+
+      - name: Sync application code
+        run: |
+          rsync -az --delete --no-perms --no-owner --no-group \
+            -e "ssh -i ~/.ssh/dentapp_deploy -p ${{ secrets.SSH_PORT }}" \
+            --exclude='.git' --exclude='.github/' --exclude='.env' --exclude='.env.*' \
+            --exclude='storage/' --exclude='vendor/' --exclude='node_modules/' \
+            --exclude='.idea/' --exclude='.DS_Store' --exclude='docker/' \
+            --exclude='Dockerfile' --exclude='docker-compose*.yml' --exclude='tests/' \
+            --exclude='bootstrap/cache/' --exclude='public/storage' \
+            ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.DEPLOY_PATH }}/
+
+      - name: Install dependencies and refresh the app on the server
+        run: |
+          ssh -i ~/.ssh/dentapp_deploy -p ${{ secrets.SSH_PORT }} \
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
+            "set -e && cd ${{ secrets.DEPLOY_PATH }} && \
+             $PHP_BIN $COMPOSER_BIN install --no-dev --optimize-autoloader --no-interaction && \
+             $PHP_BIN artisan storage:link --force && \
+             $PHP_BIN artisan migrate --force && \
+             $PHP_BIN artisan config:cache && \
+             $PHP_BIN artisan route:cache && \
+             $PHP_BIN artisan optimize"
+
+      - name: Leave maintenance mode
+        run: |
+          ssh -i ~/.ssh/dentapp_deploy -p ${{ secrets.SSH_PORT }} \
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
+            "cd ${{ secrets.DEPLOY_PATH }} && $PHP_BIN artisan up && rm -f ../cd_rollback_backup.tar.gz"
+
+      - name: Reset opcache
+        run: curl -sf https://dentapp.com.pl/_reset_opcache.php || true
+
+      - name: Roll back to previous release on failure
+        if: failure()
+        run: |
+          ssh -i ~/.ssh/dentapp_deploy -p ${{ secrets.SSH_PORT }} \
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
+            "cd ${{ secrets.DEPLOY_PATH }} && \
+             tar xzf ../cd_rollback_backup.tar.gz && \
+             $PHP_BIN $COMPOSER_BIN install --no-dev --optimize-autoloader --no-interaction && \
+             $PHP_BIN artisan storage:link --force && \
+             $PHP_BIN artisan migrate --force && \
+             $PHP_BIN artisan config:cache && \
+             $PHP_BIN artisan route:cache && \
+             $PHP_BIN artisan up"

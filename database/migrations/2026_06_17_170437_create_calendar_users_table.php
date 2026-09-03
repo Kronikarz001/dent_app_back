@@ -15,8 +15,10 @@ return new class extends Migration
             $table->uuid('calendar_uuid');
             $table->uuid('userable_id');
             $table->string('userable_type');
-            $table->foreign('calendar_uuid')->references('uuid')->on('calendars');
+            $table->foreign('calendar_uuid')->references('uuid')->on('calendars')->cascadeOnDelete();
             $table->timestamp('assigned_at')->useCurrent();
+            $table->unique(['calendar_uuid', 'userable_id', 'userable_type'], 'calendar_users_unique_assignment');
+            $table->index(['userable_type', 'userable_id']);
         });
     }
 

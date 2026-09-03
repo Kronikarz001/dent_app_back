@@ -10,7 +10,5 @@ return [
     'default_sort' => 'desc',
     'sort_asc_default_character' => 'asc',
     'sort_desc_default_character' => 'desc',
-    'from_keyword' => 'from',
-    'to_keyword' => 'to',
     'search_string_keyword' => 'searchString',
 ];

@@ -179,37 +179,4 @@ class AuthServiceTest extends TestCase
 
         $this->assertEquals(422, $result->getStatusCode());
     }
-
-    /**
-     * @return void
-     */
-    public function testAuthenticateSetsUserFromValidToken(): void
-    {
-        $user = User::factory()->create();
-        $plainToken = $user->createToken('test-token')->plainTextToken;
-
-        $this->authService->authenticate($plainToken);
-
-        $this->assertEquals($user->uuid, Auth::user()->uuid);
-    }
-
-    /**
-     * @return void
-     */
-    public function testAuthenticateThrowsExceptionForInvalidToken(): void
-    {
-        $this->expectException(AuthenticationException::class);
-
-        $this->authService->authenticate('invalid-token');
-    }
-
-    /**
-     * @return void
-     */
-    public function testAuthenticateThrowsExceptionForNullToken(): void
-    {
-        $this->expectException(AuthenticationException::class);
-
-        $this->authService->authenticate(null);
-    }
 }

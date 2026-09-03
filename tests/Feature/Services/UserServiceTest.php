@@ -3,6 +3,7 @@
 namespace Tests\Feature\Services;
 
 use App\Enums\PhoneNumberType;
+use App\Exceptions\DuplicateUserDataException;
 use App\Models\User;
 use App\Services\UserServiceInterface;
 use Illuminate\Foundation\Application;
@@ -93,6 +94,31 @@ class UserServiceTest extends TestCase
     /**
      * @return void
      */
+    public function testUpdateUserThrowsWhenPrivateEmailAlreadyTakenByAnotherUser(): void
+    {
+        User::factory()->create(['private_email' => 'taken@example.com']);
+        $user = User::factory()->create();
+
+        $this->expectException(DuplicateUserDataException::class);
+
+        $this->service->updateUser($user, ['private_email' => 'taken@example.com']);
+    }
+
+    /**
+     * @return void
+     */
+    public function testUpdateUserAllowsKeepingOwnEmailUnchanged(): void
+    {
+        $user = User::factory()->create(['email' => 'own@example.com']);
+
+        $result = $this->service->updateUser($user, ['email' => 'own@example.com']);
+
+        $this->assertSame('own@example.com', $result->email);
+    }
+
+    /**
+     * @return void
+     */
     public function testUpdateUserAssignsPrivateAndWorkPhoneNumbers(): void
     {
         $user = User::factory()->create();
@@ -151,44 +177,6 @@ class UserServiceTest extends TestCase
         $this->assertInstanceOf(User::class, $result);
         $fresh = User::find($user->uuid);
         $this->assertTrue(Hash::check($plaintext, $fresh->password));
-    }
-
-    /**
-     * @return void
-     */
-    public function testGetUserInformationReturnsUser(): void
-    {
-        $user = User::factory()->create();
-
-        $result = $this->service->getUserInformation($user);
-
-        $this->assertInstanceOf(User::class, $result);
-        $this->assertSame($user->uuid, $result->uuid);
-    }
-
-    /**
-     * @return void
-     */
-    public function testGetUserByTokenReturnsUserForValidToken(): void
-    {
-        $user = User::factory()->create();
-        $token = $user->createToken('test')->plainTextToken;
-        $tokenValue = explode('|', $token)[1];
-
-        $result = $this->service->getUserByToken($tokenValue);
-
-        $this->assertInstanceOf(User::class, $result);
-        $this->assertSame($user->uuid, $result->uuid);
-    }
-
-    /**
-     * @return void
-     */
-    public function testGetUserByTokenReturnsNullForInvalidToken(): void
-    {
-        $result = $this->service->getUserByToken('invalid-token-xyz');
-
-        $this->assertNull($result);
     }
 
     /**

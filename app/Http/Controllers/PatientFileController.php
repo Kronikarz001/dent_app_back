@@ -111,6 +111,8 @@ class PatientFileController extends Controller
     )]
     public function show(Patient $patient, File $file): FileResource
     {
+        $this->assertFileBelongsTo($file, $patient);
+
         return new FileResource($file);
     }
 
@@ -130,6 +132,8 @@ class PatientFileController extends Controller
     )]
     public function download(Patient $patient, File $file): JsonResponse
     {
+        $this->assertFileBelongsTo($file, $patient);
+
         return new JsonResponse($this->fileService->getFile($file));
     }
 
@@ -165,6 +169,8 @@ class PatientFileController extends Controller
     )]
     public function update(Patient $patient, File $file, FileUpdateRequest $request): FileResource
     {
+        $this->assertFileBelongsTo($file, $patient);
+
         return new FileResource(
             $this->fileService->updateFileName($file, $request->input('filename'))
         );
@@ -186,6 +192,8 @@ class PatientFileController extends Controller
     )]
     public function destroy(Patient $patient, File $file): JsonResponse
     {
+        $this->assertFileBelongsTo($file, $patient);
+
         $this->fileService->deleteFile($file);
 
         return new JsonResponse(null, 204);
@@ -224,6 +232,8 @@ class PatientFileController extends Controller
     )]
     public function storeNewVersion(Patient $patient, File $file, FileStoreRequest $request): AnonymousResourceCollection
     {
+        $this->assertFileBelongsTo($file, $patient);
+
         return FileResource::collection(
             $this->fileService->createNewVersionFile(
                 $file,

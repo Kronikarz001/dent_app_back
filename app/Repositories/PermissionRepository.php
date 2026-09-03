@@ -172,7 +172,7 @@ class PermissionRepository extends SearchableRepository implements PermissionRep
     private function assignableReachableQuery(User $user): Builder
     {
         $roleUuids = $user->roles()->pluck('roles.uuid');
-        $jobPositionUuids = $user->jobPositions()->pluck('job_positions.uuid');
+        $jobPositionUuids = collect([$user->job_position_uuid])->filter();
         $userGroupUuids = $this->containerUuidsFor(UserGroup::class, $user->userGroups(), $roleUuids, $jobPositionUuids);
         $departmentUuids = $this->containerUuidsFor(Department::class, $user->departments(), $roleUuids, $jobPositionUuids);
 

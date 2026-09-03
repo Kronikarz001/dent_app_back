@@ -6,13 +6,17 @@ use App\Dto\FileDto;
 use App\Enums\FileableType;
 use App\Exceptions\FileUploadException;
 use App\Models\File;
+use App\Models\User;
+use App\Models\UserAvatar;
 use App\Repositories\FileRepositoryInterface;
+use App\Traits\AssertsFileOwnership;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -21,12 +25,24 @@ use Illuminate\Support\Str;
  */
 readonly class FileService implements FileServiceInterface
 {
+    use AssertsFileOwnership;
+
     /**
      * @param FileRepositoryInterface $fileRepository
      */
     public function __construct(
         private FileRepositoryInterface $fileRepository,
     ) {}
+
+    /**
+     * @param File $file
+     * @param Model $owner
+     * @return void
+     */
+    public function assertFileOwnedBy(File $file, Model $owner): void
+    {
+        $this->assertFileBelongsTo($file, $owner);
+    }
 
     /**
      * @param Model $model
@@ -68,6 +84,18 @@ readonly class FileService implements FileServiceInterface
     public function createNewVersionFile(File $existingFile, FileDto $fileDto, Model $model): array
     {
         return $this->processFiles($fileDto, $model, $existingFile);
+    }
+
+    /**
+     * @param User $user
+     * @param UploadedFile $file
+     * @return array
+     *
+     * @throws FileUploadException
+     */
+    public function saveAvatar(User $user, UploadedFile $file): array
+    {
+        return $this->processFiles(new FileDto([$file], FileableType::USER_AVATAR), UserAvatar::find($user->uuid));
     }
 
     /**
@@ -180,48 +208,78 @@ readonly class FileService implements FileServiceInterface
     private function processSingleFile(UploadedFile $upload, FileableType $type, Model $model, ?File $parentFile = null): File
     {
         $newUuid = Str::uuid()->toString();
-        $rootUuid = $parentFile
-            ? ($this->getRootUuidFromPath($parentFile->path, $type)
-                ?? $this->fileRepository->getRootUuid($parentFile->fileable_type, $parentFile->fileable_id))
-            : $newUuid;
 
-        $path = $this->makeFilePath($newUuid, $type, $rootUuid);
-        $this->saveFileToDisk($upload, $path);
+        if ($type === FileableType::USER_AVATAR) {
+            $path = $this->makeAvatarPath($newUuid, $upload);
+        } else {
+            $rootUuid = $parentFile
+                ? ($this->getRootUuidFromPath($parentFile->path, $type)
+                    ?? $this->fileRepository->getRootUuid($parentFile->fileable_type, $parentFile->fileable_id))
+                : $newUuid;
 
-        $newFile = $this->fileRepository->create([
-            'uuid' => $newUuid,
-            'filename' => pathinfo($upload->getClientOriginalName(), PATHINFO_FILENAME),
-            'fileable_type' => $model->getMorphClass(),
-            'fileable_id' => $model->uuid,
-            'extension' => $upload->getClientOriginalExtension(),
-            'size' => $upload->getSize(),
-            'mimetype' => $upload->getMimeType(),
-            'path' => $path,
-            'file_uuid' => null,
-            'is_latest' => true,
-        ]);
-
-        if ($parentFile) {
-            $this->updateAllPreviousVersions($newFile, $parentFile);
+            $path = $this->makeFilePath($newUuid, $type, $rootUuid);
         }
 
-        return $newFile;
+        $this->saveFileToDisk($upload, $path, $type);
+
+        // Creating the new "latest" row and demoting the previous one must
+        // not be observable half-done — otherwise a crash in between leaves
+        // two rows with is_latest=true for the same file lineage.
+        return DB::transaction(function () use ($newUuid, $upload, $model, $path, $parentFile) {
+            $newFile = $this->fileRepository->create([
+                'uuid' => $newUuid,
+                'filename' => pathinfo($upload->getClientOriginalName(), PATHINFO_FILENAME),
+                'fileable_type' => $model->getMorphClass(),
+                'fileable_id' => $model->uuid,
+                'extension' => $upload->getClientOriginalExtension(),
+                'size' => $upload->getSize(),
+                'mimetype' => $upload->getMimeType(),
+                'path' => $path,
+                'file_uuid' => null,
+                'is_latest' => true,
+            ]);
+
+            if ($parentFile) {
+                $this->updateAllPreviousVersions($newFile, $parentFile);
+            }
+
+            return $newFile;
+        });
     }
 
     /**
      * @param UploadedFile $file
      * @param string $path
+     * @param FileableType $type
      * @return void
      *
      * @throws FileUploadException
      */
-    private function saveFileToDisk(UploadedFile $file, string $path): void
+    private function saveFileToDisk(UploadedFile $file, string $path, FileableType $type): void
     {
+        if ($type === FileableType::USER_AVATAR) {
+            if (! Storage::disk('public')->put($path, $file->get())) {
+                throw new FileUploadException("Error uploading file to {$path}");
+            }
+
+            return;
+        }
+
         $encrypted = Crypt::encrypt($file->getContent());
 
         if (! Storage::disk('files')->put($path, $encrypted)) {
             throw new FileUploadException("Error uploading file to {$path}");
         }
+    }
+
+    /**
+     * @param string $uuid
+     * @param UploadedFile $upload
+     * @return string
+     */
+    private function makeAvatarPath(string $uuid, UploadedFile $upload): string
+    {
+        return "avatar/{$uuid}.{$upload->getClientOriginalExtension()}";
     }
 
     /**
@@ -256,11 +314,13 @@ readonly class FileService implements FileServiceInterface
      */
     private function deletePhysicalFile(File $file): void
     {
-        if (! Storage::disk('files')->exists($file->path)) {
+        $disk = $file->fileable_type === UserAvatar::class ? 'public' : 'files';
+
+        if (! Storage::disk($disk)->exists($file->path)) {
             throw new FileNotFoundException($file->path);
         }
 
-        Storage::disk('files')->delete($file->path);
+        Storage::disk($disk)->delete($file->path);
     }
 
     /**
@@ -307,5 +367,16 @@ readonly class FileService implements FileServiceInterface
                 'is_latest' => true,
             ]
         );
+    }
+
+    /**
+     * @param User $user
+     * @return void
+     *
+     * @throws FileNotFoundException
+     */
+    public function deleteAvatar(User $user): void
+    {
+        $this->getAllFilesWithoutPagination(UserAvatar::find($user->uuid))->each(fn (File $file) => $this->deleteFile($file));
     }
 }

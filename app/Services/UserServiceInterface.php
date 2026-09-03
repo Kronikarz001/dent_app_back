@@ -51,18 +51,6 @@ interface UserServiceInterface
     public function editPassword(User $user, array $data): User;
 
     /**
-     * @param User $user
-     * @return User
-     */
-    public function getUserInformation(User $user): User;
-
-    /**
-     * @param string $token
-     * @return User|null
-     */
-    public function getUserByToken(string $token): ?User;
-
-    /**
      * @return User
      */
     public function getLoggedUser(): User;

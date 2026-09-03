@@ -19,10 +19,12 @@ readonly class PatientService implements PatientServiceInterface
     /**
      * @param PatientRepositoryInterface $patientRepository
      * @param ExportServiceInterface $exportService
+     * @param PhoneNumberServiceInterface $phoneNumberService
      */
     public function __construct(
         private PatientRepositoryInterface $patientRepository,
         private ExportServiceInterface $exportService,
+        private PhoneNumberServiceInterface $phoneNumberService,
     ) {}
 
     /**
@@ -57,6 +59,10 @@ readonly class PatientService implements PatientServiceInterface
      */
     public function updatePatient(Patient $patient, array $data): Patient
     {
+        if (array_key_exists('phone_numbers', $data)) {
+            $this->phoneNumberService->assignPhone($patient, $data['phone_numbers'] ?? []);
+        }
+
         return $this->patientRepository->update($patient, $data);
     }
 

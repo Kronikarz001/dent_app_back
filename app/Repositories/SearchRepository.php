@@ -5,7 +5,6 @@ namespace App\Repositories;
 use Closure;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Pagination\LengthAwarePaginator as LengthAwarePaginatorImpl;
 
 /**
  * Summary of SearchRepository
@@ -235,18 +234,17 @@ class SearchRepository implements SearchRepositoryInterface
     }
 
     /**
+     * A negative $perPage means "no limit" (e.g. exports). Passing that
+     * straight to paginate() ends up as `OFFSET 0` with no `LIMIT` — valid on
+     * PostgreSQL, a syntax error on MySQL. PHP_INT_MAX preserves the same
+     * "return everything" behavior while staying valid SQL on both.
+     *
      * @param Builder $query
      * @param int $perPage
      * @return LengthAwarePaginator
      */
     public function paginate(Builder $query, int $perPage): LengthAwarePaginator
     {
-        if ($perPage < 0) {
-            $items = $query->get();
-
-            return new LengthAwarePaginatorImpl($items, $items->count(), max($items->count(), 1));
-        }
-
-        return $query->paginate($perPage);
+        return $query->paginate($perPage > 0 ? $perPage : PHP_INT_MAX);
     }
 }

@@ -85,4 +85,43 @@ class UserRepository extends SearchableRepository implements UserRepositoryInter
     {
         return User::find($userUuid);
     }
+
+    /**
+     * @param string $email
+     * @param string|null $ignoreUuid
+     * @return bool
+     */
+    public function existsByEmail(string $email, ?string $ignoreUuid = null): bool
+    {
+        return User::query()
+            ->where('email', $email)
+            ->when($ignoreUuid, fn ($query) => $query->where('uuid', '!=', $ignoreUuid))
+            ->exists();
+    }
+
+    /**
+     * @param string $privateEmail
+     * @param string|null $ignoreUuid
+     * @return bool
+     */
+    public function existsByPrivateEmail(string $privateEmail, ?string $ignoreUuid = null): bool
+    {
+        return User::query()
+            ->where('private_email', $privateEmail)
+            ->when($ignoreUuid, fn ($query) => $query->where('uuid', '!=', $ignoreUuid))
+            ->exists();
+    }
+
+    /**
+     * @param string $pesel
+     * @param string|null $ignoreUuid
+     * @return bool
+     */
+    public function existsByPesel(string $pesel, ?string $ignoreUuid = null): bool
+    {
+        return User::query()
+            ->where('pesel', $pesel)
+            ->when($ignoreUuid, fn ($query) => $query->where('uuid', '!=', $ignoreUuid))
+            ->exists();
+    }
 }

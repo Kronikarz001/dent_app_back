@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Services;
 
+use App\Enums\PhoneNumberType;
 use App\Models\Patient;
 use App\Services\PatientServiceInterface;
 use Illuminate\Foundation\Application;
@@ -75,6 +76,27 @@ class PatientServiceTest extends TestCase
 
         $this->assertInstanceOf(Patient::class, $result);
         $this->assertDatabaseHas(self::PATIENTS_TABLE, ['uuid' => $patient->uuid, 'first_name' => 'Zmienione']);
+    }
+
+    /**
+     * @return void
+     */
+    public function testUpdatePatientAssignsPhoneNumbers(): void
+    {
+        $patient = Patient::factory()->create();
+
+        $this->service->updatePatient($patient, [
+            'phone_numbers' => [
+                ['number' => '48500100200', 'type' => PhoneNumberType::PRIVATE->value],
+            ],
+        ]);
+
+        $this->assertDatabaseHas('phone_numbers', [
+            'phoneable_type' => Patient::class,
+            'phoneable_uuid' => $patient->uuid,
+            'number' => '48500100200',
+            'type' => PhoneNumberType::PRIVATE->value,
+        ]);
     }
 
     /**

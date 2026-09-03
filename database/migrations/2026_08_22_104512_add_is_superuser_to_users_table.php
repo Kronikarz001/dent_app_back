@@ -13,6 +13,16 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->boolean('is_superuser')->default(false)->after('is_admin');
+            $table->uuid('job_position_uuid')->nullable()->after('is_superuser');
+            $table->string('street')->nullable();
+            $table->string('house_number')->nullable();
+            $table->string('apartment_number')->nullable();
+            $table->string('postal_code')->nullable();
+            $table->string('city')->nullable();
+
+            $table->foreign('job_position_uuid')
+                ->references('uuid')->on('job_positions')
+                ->nullOnDelete();
         });
     }
 
@@ -22,7 +32,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('is_superuser');
+            $table->dropForeign(['job_position_uuid']);
+            $table->dropColumn(['job_position_uuid', 'is_superuser', 'street', 'house_number', 'apartment_number', 'postal_code', 'city']);
         });
     }
 };

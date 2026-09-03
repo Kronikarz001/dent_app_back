@@ -131,6 +131,8 @@ class MessageFileController extends Controller
     )]
     public function show(Message $message, File $file): FileResource
     {
+        $this->assertFileBelongsTo($file, $message);
+
         return new FileResource($file);
     }
 
@@ -155,6 +157,8 @@ class MessageFileController extends Controller
     )]
     public function download(Message $message, File $file): JsonResponse
     {
+        $this->assertFileBelongsTo($file, $message);
+
         return new JsonResponse($this->fileService->getFile($file));
     }
 
@@ -195,6 +199,8 @@ class MessageFileController extends Controller
     )]
     public function update(Message $message, File $file, FileUpdateRequest $request): FileResource
     {
+        $this->assertFileBelongsTo($file, $message);
+
         return new FileResource(
             $this->fileService->updateFileName($file, $request->input('filename'))
         );
@@ -221,6 +227,8 @@ class MessageFileController extends Controller
     )]
     public function destroy(Message $message, File $file): JsonResponse
     {
+        $this->assertFileBelongsTo($file, $message);
+
         $this->fileService->deleteFile($file);
 
         return new JsonResponse(null, 204);

@@ -14,7 +14,7 @@ class PermissionGroupResource extends JsonResource
         return [
             'uuid' => $this->uuid,
             'name' => $this->name,
-            'permissions' => PermissionResource::collection($this->whenLoaded('permissions')),
+            'permissions' => PermissionResource::collection($this->permissions),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

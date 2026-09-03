@@ -111,15 +111,32 @@ readonly class DepartmentService implements DepartmentServiceInterface
      * @param Department $department
      * @param array $data
      * @return void
+     *
+     * @throws PermissionDeniedException
      */
     public function assignPermissions(Department $department, array $data): void
     {
+        /** @var User $actingUser */
+        $actingUser = Auth::user();
+
         foreach ($data['permissions'] ?? [] as $permissionUuid) {
-            $this->grant(Permission::class, $permissionUuid, $department, $data['expires_at'] ?? null);
+            $permission = Permission::where('uuid', $permissionUuid)->firstOrFail();
+
+            if (! $actingUser->is_admin && ! $this->permissionService->hasPermissionGrant($actingUser, $permission)) {
+                throw new PermissionDeniedException('Nie posiadasz tego uprawnienia, nie możesz go nadać.');
+            }
+
+            $this->grant(Permission::class, $permission->uuid, $department, $data['expires_at'] ?? null);
         }
 
         foreach ($data['permission_groups'] ?? [] as $permissionGroupUuid) {
-            $this->grant(PermissionGroup::class, $permissionGroupUuid, $department, $data['expires_at'] ?? null);
+            $group = PermissionGroup::where('uuid', $permissionGroupUuid)->firstOrFail();
+
+            if (! $actingUser->is_admin && ! $this->permissionService->hasGroupGrant($actingUser, $group)) {
+                throw new PermissionDeniedException('Nie posiadasz tej grupy uprawnień, nie możesz jej nadać.');
+            }
+
+            $this->grant(PermissionGroup::class, $group->uuid, $department, $data['expires_at'] ?? null);
         }
     }
 
@@ -209,6 +226,12 @@ readonly class DepartmentService implements DepartmentServiceInterface
     }
 
     /**
+     * A department manager is either a user directly attached to the
+     * department with is_manager=true, or a manager of a role that is
+     * itself attached to the department — matching isMember()'s notion of
+     * "belongs to this department" so the two never disagree on the same
+     * user.
+     *
      * @param Department $department
      * @param User $user
      * @return void
@@ -217,7 +240,13 @@ readonly class DepartmentService implements DepartmentServiceInterface
      */
     private function assertIsManager(Department $department, User $user): void
     {
-        if (! $department->users()->where('users.uuid', $user->uuid)->wherePivot('is_manager', true)->exists()) {
+        $isDirectManager = $department->users()->where('users.uuid', $user->uuid)->wherePivot('is_manager', true)->exists();
+
+        $isManagerViaRole = $department->roles()
+            ->whereHas('users', fn ($query) => $query->where('users.uuid', $user->uuid)->where('role_user.is_manager', true))
+            ->exists();
+
+        if (! $isDirectManager && ! $isManagerViaRole) {
             throw new PermissionDeniedException('Nie jesteś kierownikiem tego działu.');
         }
     }

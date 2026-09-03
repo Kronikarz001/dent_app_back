@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Controllers;
 
+use App\Models\JobPosition;
 use App\Models\Permission;
 use App\Models\PermissionAssignment;
 use App\Models\User;
@@ -97,6 +98,37 @@ class UserControllerTest extends TestCase
     /**
      * @return void
      */
+    public function testShowUserReturnsPeselAddressFieldsAndJobPositionAsObject(): void
+    {
+        $jobPosition = JobPosition::factory()->create();
+        $user = User::factory()->create([
+            'pesel' => '12345678901',
+            'street' => 'Kwiatowa',
+            'house_number' => '12A',
+            'apartment_number' => '3',
+            'postal_code' => '00-001',
+            'city' => 'Warszawa',
+            'job_position_uuid' => $jobPosition->uuid,
+        ]);
+
+        $response = $this->callApiWithLoggedUser()
+            ->getJson(route('user.show', ['user' => $user->uuid]));
+
+        $response->assertOk();
+        $response->assertJsonPath('pesel', '12345678901');
+        $response->assertJsonPath('street', 'Kwiatowa');
+        $response->assertJsonPath('house_number', '12A');
+        $response->assertJsonPath('apartment_number', '3');
+        $response->assertJsonPath('postal_code', '00-001');
+        $response->assertJsonPath('city', 'Warszawa');
+        $response->assertJsonPath('job_position.uuid', $jobPosition->uuid);
+        $this->assertIsArray($response->json('job_position'));
+        $this->assertArrayNotHasKey(0, $response->json('job_position'));
+    }
+
+    /**
+     * @return void
+     */
     public function testShowUserReturnsStatusNonActiveWithoutValidToken(): void
     {
         $target = User::factory()->create();
@@ -164,6 +196,22 @@ class UserControllerTest extends TestCase
         $this->assertDatabaseHas('users', [
             'email' => 'example_updated@mail',
         ]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testUpdateUserReturnsConflictWhenPeselAlreadyTaken(): void
+    {
+        User::factory()->create(['pesel' => '12345678901']);
+        $user = User::factory()->create();
+
+        $response = $this->callApiWithLoggedUser()
+            ->putJson(route('user.update', ['user' => $user->uuid]), [
+                'pesel' => '12345678901',
+            ]);
+
+        $response->assertStatus(409);
     }
 
     /**

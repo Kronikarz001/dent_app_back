@@ -15,8 +15,7 @@ class AssignJobPositionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'job_positions' => ['required', 'array'],
-            'job_positions.*' => ['required', 'exists:job_positions,uuid'],
+            'job_position_uuid' => ['required', 'string', 'exists:job_positions,uuid'],
         ];
     }
 
@@ -34,10 +33,9 @@ class AssignJobPositionRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'job_positions.required' => 'Pole job_positions jest wymagane.',
-            'job_positions.array' => 'Pole job_positions musi być tablicą.',
-            'job_positions.*.required' => 'Identyfikator stanowiska jest wymagany.',
-            'job_positions.*.exists' => 'Wybrane stanowisko nie istnieje.',
+            'job_position_uuid.required' => 'Pole job_position_uuid jest wymagane.',
+            'job_position_uuid.string' => 'Pole job_position_uuid musi być tekstem.',
+            'job_position_uuid.exists' => 'Wybrane stanowisko nie istnieje.',
         ];
     }
 }

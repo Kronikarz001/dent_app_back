@@ -11,12 +11,14 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\HasApiTokens;
 use Laravel\Sanctum\PersonalAccessToken;
 
@@ -29,14 +31,19 @@ use Laravel\Sanctum\PersonalAccessToken;
  * @property string $password
  * @property string $pesel
  * @property string|null $avatar_path
- * @property string|null $pwz_numer
  * @property string|null $remember_token
  * @property string|null $status
+ * @property string|null $job_position_uuid
+ * @property string|null $street
+ * @property string|null $house_number
+ * @property string|null $apartment_number
+ * @property string|null $postal_code
+ * @property string|null $city
  * @property bool $is_admin
  * @property bool $is_superuser
  * @property Carbon|null $email_verified_at
  * @property Carbon|null $private_email_verified_at
- * @property-read Collection|JobPosition[] $jobPositions
+ * @property-read JobPosition|null $jobPosition
  * @property-read Collection|PhoneNumber[] $phoneNumbers
  * @property-read Collection|UserGroup[] $userGroups
  * @property-read Collection|Role[] $roles
@@ -69,8 +76,13 @@ abstract class BasicUser extends Authenticatable
         'is_admin',
         'is_superuser',
         'avatar_path',
-        'pwz_numer',
         'status',
+        'job_position_uuid',
+        'street',
+        'house_number',
+        'apartment_number',
+        'postal_code',
+        'city',
     ];
 
     /**
@@ -148,7 +160,7 @@ abstract class BasicUser extends Authenticatable
             return null;
         }
 
-        return route('userfile.avatar-download', ['user' => $this->uuid, 'file' => $file->uuid]);
+        return Storage::disk('public')->url($file->path);
     }
 
     /**
@@ -170,18 +182,11 @@ abstract class BasicUser extends Authenticatable
     }
 
     /**
-     * @return BelongsToMany
+     * @return BelongsTo
      */
-    public function jobPositions(): BelongsToMany
+    public function jobPosition(): BelongsTo
     {
-        return $this->belongsToMany(
-            JobPosition::class,
-            'users_job_positions',
-            'user_uuid',
-            'job_position_uuid',
-            'uuid',
-            'uuid'
-        );
+        return $this->belongsTo(JobPosition::class, 'job_position_uuid', 'uuid');
     }
 
     /**

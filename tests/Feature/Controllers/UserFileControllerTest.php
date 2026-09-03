@@ -3,6 +3,7 @@
 namespace Tests\Feature\Controllers;
 
 use App\Enums\FileableType;
+use App\Http\Resources\UserResource;
 use App\Models\File;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
@@ -22,6 +23,7 @@ class UserFileControllerTest extends TestCase
         parent::setUp();
 
         Storage::fake('files');
+        Storage::fake('public');
     }
 
     /**
@@ -97,6 +99,24 @@ class UserFileControllerTest extends TestCase
 
         $response->assertOk();
         $response->assertJsonPath('uuid', $file->uuid);
+    }
+
+    /**
+     * @return void
+     */
+    public function testShowRejectsFileBelongingToAnotherUser(): void
+    {
+        $ownUser = User::factory()->create();
+        $otherUser = User::factory()->create();
+        $foreignFile = File::factory()->create([
+            'fileable_type' => FileableType::USER->value,
+            'fileable_id' => $otherUser->uuid,
+        ]);
+
+        $response = $this->callApiWithLoggedUser()
+            ->getJson(route('userfile.show', ['user' => $ownUser->uuid, 'file' => $foreignFile->uuid]));
+
+        $response->assertNotFound();
     }
 
     /**
@@ -241,7 +261,7 @@ class UserFileControllerTest extends TestCase
     /**
      * @return void
      */
-    public function testAvatarDownloadReturnsBinaryImageContent(): void
+    public function testStoreAvatarExposesPublicStoragePath(): void
     {
         $user = User::factory()->create();
         $image = UploadedFile::fake()->image('avatar.jpg', 5, 5);
@@ -253,12 +273,34 @@ class UserFileControllerTest extends TestCase
 
         $file = File::query()->where('fileable_type', FileableType::USER_AVATAR->value)->first();
 
-        $response = $this->callApiWithLoggedUser($user)
-            ->get(route('userfile.avatar-download', ['user' => $user->uuid, 'file' => $file->uuid]));
+        Storage::disk('public')->assertExists($file->path);
+        $this->assertStringStartsWith('avatar/', $file->path);
 
-        $response->assertOk();
-        $response->assertHeader('Content-Type', $file->mimetype);
-        $this->assertSame(file_get_contents($image->getPathname()), $response->getContent());
+        $avatarPath = (new UserResource($user->fresh()))->resolve()['avatar_path'];
+        $this->assertStringContainsString('storage/avatar/', $avatarPath);
+    }
+
+    /**
+     * @return void
+     */
+    public function testDestroyAvatarRemovesFileAndClearsPath(): void
+    {
+        $user = User::factory()->create();
+        $image = UploadedFile::fake()->image('avatar.jpg', 5, 5);
+
+        $this->callApiWithLoggedUser($user)
+            ->postJson(route('userfile.avatar-store', ['user' => $user->uuid]), [
+                'file' => $image,
+            ]);
+
+        $file = File::query()->where('fileable_type', FileableType::USER_AVATAR->value)->first();
+
+        $this->callApiWithLoggedUser($user)
+            ->deleteJson(route('userfile.avatar-destroy', ['user' => $user->uuid]))
+            ->assertNoContent();
+
+        Storage::disk('public')->assertMissing($file->path);
+        $this->assertNull((new UserResource($user->fresh()))->resolve()['avatar_path']);
     }
 
     /**

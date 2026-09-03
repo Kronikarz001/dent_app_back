@@ -32,10 +32,4 @@ interface AuthServiceInterface
      * @return JsonResponse
      */
     public function resetPassword(array $data): JsonResponse;
-
-    /**
-     * @param string|null $token
-     * @return void
-     */
-    public function authenticate(?string $token): void;
 }

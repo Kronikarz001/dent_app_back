@@ -24,7 +24,7 @@ class FileStoreRequest extends FormRequest
     {
         return [
             'files' => ['required', 'array'],
-            'files.*' => ['required', 'file'],
+            'files.*' => ['required', 'file', 'max:25600', 'mimes:pdf,jpg,jpeg,png,webp,doc,docx,xls,xlsx,csv,txt'],
         ];
     }
 
@@ -38,6 +38,8 @@ class FileStoreRequest extends FormRequest
             'files.array' => 'Pole files musi być tablicą.',
             'files.*.required' => 'Plik jest wymagany.',
             'files.*.file' => 'Przesłany element musi być plikiem.',
+            'files.*.max' => 'Plik nie może być większy niż 25 MB.',
+            'files.*.mimes' => 'Niedozwolony typ pliku.',
         ];
     }
 }

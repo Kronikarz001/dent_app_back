@@ -32,7 +32,10 @@ class MessageSent implements ShouldBroadcastNow
             return [new PrivateChannel('message-group.'.$this->message->message_group_uuid)];
         }
 
-        return [new PrivateChannel('App.Models.User.'.$this->message->recipient_user_uuid)];
+        return [
+            new PrivateChannel('App.Models.User.'.$this->message->recipient_user_uuid),
+            new PrivateChannel('App.Models.User.'.$this->message->user_uuid),
+        ];
     }
 
     /**

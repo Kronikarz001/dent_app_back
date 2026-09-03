@@ -102,6 +102,24 @@ class MaterialFileControllerTest extends TestCase
     /**
      * @return void
      */
+    public function testShowRejectsFileBelongingToAnotherMaterial(): void
+    {
+        $ownMaterial = Material::factory()->create();
+        $otherMaterial = Material::factory()->create();
+        $foreignFile = File::factory()->create([
+            'fileable_type' => FileableType::MATERIAL->value,
+            'fileable_id' => $otherMaterial->uuid,
+        ]);
+
+        $response = $this->callApiWithLoggedUser()
+            ->getJson(route('materialfile.show', ['material' => $ownMaterial->uuid, 'file' => $foreignFile->uuid]));
+
+        $response->assertNotFound();
+    }
+
+    /**
+     * @return void
+     */
     public function testDownloadReturnsOriginalFileContent(): void
     {
         $material = Material::factory()->create();
