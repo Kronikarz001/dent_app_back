@@ -96,6 +96,13 @@ class PatientController extends Controller
                     new OA\Property(property: 'last_name', type: 'string', example: 'Nowak'),
                     new OA\Property(property: 'email', type: 'string', format: 'email'),
                     new OA\Property(property: 'pesel', type: 'string', example: '98010112345'),
+                    new OA\Property(property: 'street', type: 'string', nullable: true),
+                    new OA\Property(property: 'house_number', type: 'string', nullable: true),
+                    new OA\Property(property: 'apartment_number', type: 'string', nullable: true),
+                    new OA\Property(property: 'postal_code', type: 'string', nullable: true),
+                    new OA\Property(property: 'city', type: 'string', nullable: true),
+                    new OA\Property(property: 'gender', type: 'string', enum: ['MALE', 'FEMALE'], nullable: true),
+                    new OA\Property(property: 'notes', type: 'string', nullable: true),
                 ]
             )
         ),
@@ -140,6 +147,14 @@ class PatientController extends Controller
                             new OA\Property(property: 'type', type: 'string', enum: ['PRIVATE', 'WORK']),
                         ])
                     ),
+                    new OA\Property(property: 'street', type: 'string', nullable: true),
+                    new OA\Property(property: 'house_number', type: 'string', nullable: true),
+                    new OA\Property(property: 'apartment_number', type: 'string', nullable: true),
+                    new OA\Property(property: 'postal_code', type: 'string', nullable: true),
+                    new OA\Property(property: 'city', type: 'string', nullable: true),
+                    new OA\Property(property: 'gender', type: 'string', enum: ['MALE', 'FEMALE'], nullable: true),
+                    new OA\Property(property: 'notes', type: 'string', nullable: true),
+                    new OA\Property(property: 'doctor_uuid', type: 'string', format: 'uuid', nullable: true),
                 ]
             )
         ),

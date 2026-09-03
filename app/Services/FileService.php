@@ -6,8 +6,10 @@ use App\Dto\FileDto;
 use App\Enums\FileableType;
 use App\Exceptions\FileUploadException;
 use App\Models\File;
+use App\Models\User;
 use App\Models\UserAvatar;
 use App\Repositories\FileRepositoryInterface;
+use App\Traits\AssertsFileOwnership;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
@@ -23,12 +25,24 @@ use Illuminate\Support\Str;
  */
 readonly class FileService implements FileServiceInterface
 {
+    use AssertsFileOwnership;
+
     /**
      * @param FileRepositoryInterface $fileRepository
      */
     public function __construct(
         private FileRepositoryInterface $fileRepository,
     ) {}
+
+    /**
+     * @param File $file
+     * @param Model $owner
+     * @return void
+     */
+    public function assertFileOwnedBy(File $file, Model $owner): void
+    {
+        $this->assertFileBelongsTo($file, $owner);
+    }
 
     /**
      * @param Model $model
@@ -70,6 +84,18 @@ readonly class FileService implements FileServiceInterface
     public function createNewVersionFile(File $existingFile, FileDto $fileDto, Model $model): array
     {
         return $this->processFiles($fileDto, $model, $existingFile);
+    }
+
+    /**
+     * @param User $user
+     * @param UploadedFile $file
+     * @return array
+     *
+     * @throws FileUploadException
+     */
+    public function saveAvatar(User $user, UploadedFile $file): array
+    {
+        return $this->processFiles(new FileDto([$file], FileableType::USER_AVATAR), UserAvatar::find($user->uuid));
     }
 
     /**
@@ -344,13 +370,13 @@ readonly class FileService implements FileServiceInterface
     }
 
     /**
-     * @param Model $model
+     * @param User $user
      * @return void
      *
      * @throws FileNotFoundException
      */
-    public function deleteAvatar(Model $model): void
+    public function deleteAvatar(User $user): void
     {
-        $this->getAllFilesWithoutPagination($model)->each(fn (File $file) => $this->deleteFile($file));
+        $this->getAllFilesWithoutPagination(UserAvatar::find($user->uuid))->each(fn (File $file) => $this->deleteFile($file));
     }
 }

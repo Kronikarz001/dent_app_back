@@ -22,6 +22,11 @@ return new class extends Migration
             $table->foreign('granted_by')
                 ->references('uuid')->on('users')
                 ->nullOnDelete();
+
+            $table->unique(
+                ['grantable_type', 'grantable_id', 'assignable_type', 'assignable_id'],
+                'permission_assignments_unique_grant'
+            );
         });
     }
 

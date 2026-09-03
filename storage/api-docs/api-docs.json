@@ -6928,6 +6928,38 @@
                                     "pesel": {
                                         "type": "string",
                                         "example": "98010112345"
+                                    },
+                                    "street": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "house_number": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "apartment_number": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "postal_code": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "city": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "gender": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "enum": [
+                                            "MALE",
+                                            "FEMALE"
+                                        ]
+                                    },
+                                    "notes": {
+                                        "type": "string",
+                                        "nullable": true
                                     }
                                 },
                                 "type": "object"
@@ -7081,6 +7113,43 @@
                                             },
                                             "type": "object"
                                         },
+                                        "nullable": true
+                                    },
+                                    "street": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "house_number": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "apartment_number": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "postal_code": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "city": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "gender": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "enum": [
+                                            "MALE",
+                                            "FEMALE"
+                                        ]
+                                    },
+                                    "notes": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "doctor_uuid": {
+                                        "type": "string",
+                                        "format": "uuid",
                                         "nullable": true
                                     }
                                 },
@@ -10353,6 +10422,46 @@
                         "items": {
                             "$ref": "#/components/schemas/PhoneNumberResource"
                         }
+                    },
+                    "street": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "house_number": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "apartment_number": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "postal_code": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "city": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "gender": {
+                        "type": "string",
+                        "nullable": true,
+                        "enum": [
+                            "MALE",
+                            "FEMALE"
+                        ]
+                    },
+                    "notes": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "doctor": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/UserResource"
+                            }
+                        ],
+                        "nullable": true
                     },
                     "created_at": {
                         "type": "string",
