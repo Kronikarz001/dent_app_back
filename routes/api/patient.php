@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuditableController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\PatientFileController;
+use App\Http\Controllers\PatientPhotoController;
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/patient/export', [PatientController::class, 'export'])
@@ -24,4 +25,9 @@ Route::middleware('auth:sanctum')->group(function () {
         ->name('patientfile.download');
     Route::post('/patient/{patient}/file-new-version/{file}', [PatientFileController::class, 'storeNewVersion'])
         ->name('patientfile.newversion');
+
+    Route::apiResource('/patient/{patient}/photo', PatientPhotoController::class)
+        ->names('patientphoto');
+    Route::get('/patient/{patient}/photo-download/{photo}', [PatientPhotoController::class, 'download'])
+        ->name('patientphoto.download');
 });

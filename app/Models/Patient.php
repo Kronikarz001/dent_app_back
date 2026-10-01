@@ -9,6 +9,7 @@ use App\Traits\HasFile;
 use App\Traits\HasPhoneNumber;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Support\Carbon;
 
@@ -82,6 +83,14 @@ class Patient extends UuidModel
     public function doctor(): BelongsTo
     {
         return $this->belongsTo(User::class, 'doctor_uuid', 'uuid');
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function photos(): HasMany
+    {
+        return $this->hasMany(Photo::class, 'patient_uuid', 'uuid');
     }
 
     /**

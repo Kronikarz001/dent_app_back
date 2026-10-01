@@ -20,4 +20,15 @@ enum Gender: string
             self::FEMALE => 'Female',
         };
     }
+
+    /**
+     * @return string
+     */
+    public function code(): string
+    {
+        return match ($this) {
+            self::MALE => 'M',
+            self::FEMALE => 'F',
+        };
+    }
 }

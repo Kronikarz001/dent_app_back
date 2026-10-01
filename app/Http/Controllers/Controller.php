@@ -38,6 +38,18 @@ use OpenApi\Attributes as OA;
     ]
 )]
 #[OA\Schema(
+    schema: 'PhotoResource',
+    properties: [
+        new OA\Property(property: 'uuid', type: 'string', format: 'uuid'),
+        new OA\Property(property: 'filename', type: 'string'),
+        new OA\Property(property: 'extension', type: 'string'),
+        new OA\Property(property: 'size', type: 'integer'),
+        new OA\Property(property: 'mimetype', type: 'string'),
+        new OA\Property(property: 'path', type: 'string'),
+        new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
+    ]
+)]
+#[OA\Schema(
     schema: 'PhoneNumberResource',
     properties: [
         new OA\Property(property: 'uuid', type: 'string', format: 'uuid'),
@@ -55,6 +67,7 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: 'email', type: 'string', format: 'email', nullable: true),
         new OA\Property(property: 'private_email', type: 'string', format: 'email'),
         new OA\Property(property: 'pesel', type: 'string', nullable: true),
+        new OA\Property(property: 'gender', type: 'string', enum: ['M', 'F'], description: 'Wyliczana z numeru PESEL'),
         new OA\Property(property: 'is_active', type: 'boolean'),
         new OA\Property(property: 'avatar_path', type: 'string', nullable: true),
         new OA\Property(property: 'background_path', type: 'string', nullable: true),
@@ -79,6 +92,7 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: 'email', type: 'string', format: 'email', nullable: true),
         new OA\Property(property: 'private_email', type: 'string', format: 'email'),
         new OA\Property(property: 'pesel', type: 'string', nullable: true),
+        new OA\Property(property: 'gender', type: 'string', enum: ['M', 'F'], description: 'Wyliczana z numeru PESEL'),
         new OA\Property(property: 'is_active', type: 'boolean'),
         new OA\Property(property: 'avatar_path', type: 'string', nullable: true),
         new OA\Property(property: 'private_phone_number', type: 'string', nullable: true),
@@ -192,6 +206,34 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: 'form_of_ownership', type: 'string', nullable: true),
         new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
         new OA\Property(property: 'updated_at', type: 'string', format: 'date-time'),
+    ]
+)]
+#[OA\Schema(
+    schema: 'MedicineResource',
+    properties: [
+        new OA\Property(property: 'uuid', type: 'string', format: 'uuid'),
+        new OA\Property(property: 'name', type: 'string'),
+        new OA\Property(property: 'description', type: 'string', nullable: true),
+        new OA\Property(property: 'ean_gtin', type: 'string', nullable: true),
+        new OA\Property(property: 'reimbursement_level', type: 'string', enum: ['FULL', 'FLAT_RATE', 'FREE', 'R', 'OTHER']),
+        new OA\Property(property: 'external_reference', type: 'string', nullable: true, description: 'Pole przygotowane pod przyszłą integrację z Medfile/P1'),
+        new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
+    ]
+)]
+#[OA\Schema(
+    schema: 'PrescriptionResource',
+    properties: [
+        new OA\Property(property: 'uuid', type: 'string', format: 'uuid'),
+        new OA\Property(property: 'name', type: 'string', nullable: true),
+        new OA\Property(property: 'code', type: 'string', nullable: true),
+        new OA\Property(property: 'status', type: 'string', enum: ['DRAFT', 'ISSUED', 'REALIZED', 'CANCELLED', 'EXPIRED']),
+        new OA\Property(property: 'patient_uuid', type: 'string', format: 'uuid'),
+        new OA\Property(property: 'doctor_uuid', type: 'string', format: 'uuid'),
+        new OA\Property(property: 'external_reference', type: 'string', nullable: true, description: 'Pole przygotowane pod przyszłą integrację z Medfile/P1'),
+        new OA\Property(property: 'patient', ref: '#/components/schemas/PatientResource', nullable: true),
+        new OA\Property(property: 'doctor', ref: '#/components/schemas/UserResource', nullable: true),
+        new OA\Property(property: 'medicines', type: 'array', items: new OA\Items(ref: '#/components/schemas/MedicineResource')),
+        new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
     ]
 )]
 #[OA\Schema(

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\Gender;
 use App\Enums\UserStatusType;
 use App\Notifications\ResetPasswordNotification;
 use App\Traits\Auditable;
@@ -30,6 +31,7 @@ use Laravel\Sanctum\PersonalAccessToken;
  * @property string $private_email
  * @property string $password
  * @property string $pesel
+ * @property-read string $gender
  * @property string|null $avatar_path
  * @property string|null $remember_token
  * @property string|null $status
@@ -143,6 +145,20 @@ abstract class BasicUser extends Authenticatable
     public function getName(): string
     {
         return "{$this->firstName} {$this->lastName}";
+    }
+
+    /**
+     * Płeć wyliczona z 10. cyfry numeru PESEL (nieparzysta = mężczyzna, parzysta = kobieta).
+     *
+     * @return string
+     */
+    public function getGenderAttribute(): string
+    {
+        $genderDigit = (int) substr($this->pesel, 9, 1);
+
+        $gender = $genderDigit % 2 === 0 ? Gender::FEMALE : Gender::MALE;
+
+        return $gender->code();
     }
 
     /**
