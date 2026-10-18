@@ -5,7 +5,6 @@ namespace App\Models;
 use App\Observers\DictionaryObserver;
 use App\Scopes\DictionaryTypeScope;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
-use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 
 /**
  * @property null|string $key
@@ -14,7 +13,6 @@ use Illuminate\Database\Eloquent\Attributes\ScopedBy;
  * @property string $type
  */
 #[ObservedBy(DictionaryObserver::class)]
-#[ScopedBy(DictionaryTypeScope::class)]
 abstract class Dictionary extends UuidModel
 {
     protected $table = 'dictionaries';
@@ -27,4 +25,12 @@ abstract class Dictionary extends UuidModel
         'value',
         'additional',
     ];
+
+    /**
+     * @return void
+     */
+    protected static function booted(): void
+    {
+        static::addGlobalScope(new DictionaryTypeScope);
+    }
 }

@@ -65,10 +65,7 @@ class Patient extends UuidModel
      */
     public function getName(): string
     {
-        $firstName = $this->firstName;
-        $lastName = $this->lastName;
-
-        return "$firstName $lastName";
+        return "{$this->first_name} {$this->last_name}";
     }
 
     /**
