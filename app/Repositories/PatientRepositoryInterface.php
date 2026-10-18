@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Models\Patient;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 /**
  * Summary of PatientRepositoryInterface
@@ -15,6 +16,11 @@ interface PatientRepositoryInterface extends BasicRepositoryInterface
      * @return Patient|null
      */
     public function findByUuid(string $uuid): ?Patient;
+
+    /**
+     * @return LengthAwarePaginator
+     */
+    public function findAllWithRomexisId(): LengthAwarePaginator;
 
     /**
      * @param array $data

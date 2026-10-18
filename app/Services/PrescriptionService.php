@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\PrescriptionStatus;
+use App\Models\Patient;
 use App\Models\Prescription;
 use App\Repositories\PrescriptionRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -29,6 +30,15 @@ readonly class PrescriptionService implements PrescriptionServiceInterface
     public function getPrescriptions(): LengthAwarePaginator
     {
         return $this->prescriptionRepository->findAllWithPagination();
+    }
+
+    /**
+     * @param Patient $patient
+     * @return LengthAwarePaginator
+     */
+    public function getPrescriptionsForPatient(Patient $patient): LengthAwarePaginator
+    {
+        return $this->prescriptionRepository->findAllByPatient($patient->uuid);
     }
 
     /**

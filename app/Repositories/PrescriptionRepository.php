@@ -52,6 +52,19 @@ class PrescriptionRepository extends SearchableRepository implements Prescriptio
     }
 
     /**
+     * @param string $patientUuid
+     * @return LengthAwarePaginator
+     */
+    public function findAllByPatient(string $patientUuid): LengthAwarePaginator
+    {
+        return Prescription::query()
+            ->where('patient_uuid', $patientUuid)
+            ->with(['patient', 'doctor', 'medicines'])
+            ->latest()
+            ->paginate();
+    }
+
+    /**
      * @param array $data
      * @return Prescription
      */

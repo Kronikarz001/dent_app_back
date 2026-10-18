@@ -6,9 +6,11 @@ use App\Http\Requests\ExportRequest;
 use App\Http\Requests\PatientStoreRequest;
 use App\Http\Requests\PatientUpdateRequest;
 use App\Http\Resources\PatientResource;
+use App\Http\Resources\PatientRomexisSyncResource;
 use App\Models\Patient;
 use App\Services\PatientServiceInterface;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -56,6 +58,31 @@ class PatientController extends Controller
     public function selectList(): LengthAwarePaginator
     {
         return $this->patientService->getPatientsList();
+    }
+
+    #[OA\Get(
+        path: '/api/patient/romexis-sync-list',
+        tags: ['Patient'],
+        summary: 'Lista pacjentów z ustawionym romexis_patient_id (do synchronizacji zdjęć przez agenta Romexis)',
+        security: [['sanctum' => []]],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'OK',
+                content: new OA\JsonContent(
+                    allOf: [
+                        new OA\Schema(ref: '#/components/schemas/PaginatedResponse'),
+                        new OA\Schema(properties: [
+                            new OA\Property(property: 'data', type: 'array', items: new OA\Items(ref: '#/components/schemas/PatientRomexisSyncResource')),
+                        ]),
+                    ]
+                )
+            ),
+        ]
+    )]
+    public function romexisSyncList(): AnonymousResourceCollection
+    {
+        return PatientRomexisSyncResource::collection($this->patientService->getPatientsWithRomexisId());
     }
 
     #[OA\Get(

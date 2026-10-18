@@ -140,4 +140,56 @@ class PhoneNumberServiceTest extends TestCase
 
         $this->assertDatabaseMissing(self::PHONE_NUMBERS_TABLE, ['phoneable_uuid' => $user->uuid]);
     }
+
+    /**
+     * @return void
+     */
+    public function testAssignPhoneWithEmptyNumberRemovesExistingPhone(): void
+    {
+        $user = User::factory()->create();
+        $this->service->assignPhone($user, [['number' => '500100200', 'type' => PhoneNumberType::WORK->value]]);
+
+        $this->service->assignPhone($user, [['number' => null, 'type' => PhoneNumberType::WORK->value]]);
+
+        $this->assertDatabaseMissing(self::PHONE_NUMBERS_TABLE, [
+            'phoneable_uuid' => $user->uuid,
+            'type' => PhoneNumberType::WORK->value,
+        ]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testAssignPhoneWithEmptyNumberRemovesOnlyGivenType(): void
+    {
+        $user = User::factory()->create();
+        $this->service->assignPhone($user, [
+            ['number' => '500100200', 'type' => PhoneNumberType::WORK->value],
+            ['number' => '600200300', 'type' => PhoneNumberType::PRIVATE->value],
+        ]);
+
+        $this->service->assignPhone($user, [['number' => '', 'type' => PhoneNumberType::WORK->value]]);
+
+        $this->assertDatabaseMissing(self::PHONE_NUMBERS_TABLE, [
+            'phoneable_uuid' => $user->uuid,
+            'type' => PhoneNumberType::WORK->value,
+        ]);
+        $this->assertDatabaseHas(self::PHONE_NUMBERS_TABLE, [
+            'phoneable_uuid' => $user->uuid,
+            'number' => '600200300',
+            'type' => PhoneNumberType::PRIVATE->value,
+        ]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testAssignPhoneWithEmptyNumberDoesNothingWhenNoneAssigned(): void
+    {
+        $user = User::factory()->create();
+
+        $this->service->assignPhone($user, [['number' => null, 'type' => PhoneNumberType::PRIVATE->value]]);
+
+        $this->assertDatabaseMissing(self::PHONE_NUMBERS_TABLE, ['phoneable_uuid' => $user->uuid]);
+    }
 }

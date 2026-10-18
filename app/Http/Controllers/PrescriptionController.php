@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Http\Requests\PrescriptionStoreRequest;
 use App\Http\Requests\PrescriptionUpdateRequest;
 use App\Http\Resources\PrescriptionResource;
+use App\Models\Patient;
 use App\Models\Prescription;
 use App\Services\PrescriptionServiceInterface;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use OpenApi\Attributes as OA;
 
@@ -46,6 +48,35 @@ class PrescriptionController extends Controller
     public function index(): LengthAwarePaginator
     {
         return $this->prescriptionService->getPrescriptions();
+    }
+
+    #[OA\Get(
+        path: '/api/patient/{uuid}/prescription',
+        summary: 'Lista recept danego pacjenta (paginacja)',
+        security: [['sanctum' => []]],
+        tags: ['Prescription'],
+        parameters: [
+            new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'OK',
+                content: new OA\JsonContent(
+                    allOf: [
+                        new OA\Schema(ref: '#/components/schemas/PaginatedResponse'),
+                        new OA\Schema(properties: [
+                            new OA\Property(property: 'data', type: 'array', items: new OA\Items(ref: '#/components/schemas/PrescriptionResource')),
+                        ]),
+                    ]
+                )
+            ),
+            new OA\Response(response: 404, description: 'Nie znaleziono'),
+        ]
+    )]
+    public function byPatient(Patient $patient): AnonymousResourceCollection
+    {
+        return PrescriptionResource::collection($this->prescriptionService->getPrescriptionsForPatient($patient));
     }
 
     #[OA\Get(

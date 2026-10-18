@@ -30,6 +30,23 @@ class PrescriptionControllerTest extends TestCase
     /**
      * @return void
      */
+    public function testByPatientReturnsOnlyThatPatientsPrescriptions(): void
+    {
+        $patient = Patient::factory()->create();
+        $ownPrescription = Prescription::factory()->create(['patient_uuid' => $patient->uuid]);
+        Prescription::factory()->create();
+
+        $response = $this->callApiWithLoggedUser()
+            ->getJson(route('patient.prescriptions', ['patient' => $patient->uuid]));
+
+        $response->assertOk();
+        $response->assertJsonCount(1, 'data');
+        $response->assertJsonPath('data.0.uuid', $ownPrescription->uuid);
+    }
+
+    /**
+     * @return void
+     */
     public function testShowPrescriptionReturnsNestedPatientDoctorAndMedicines(): void
     {
         $prescription = Prescription::factory()->create();

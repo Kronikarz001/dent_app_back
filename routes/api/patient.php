@@ -4,6 +4,7 @@ use App\Http\Controllers\AuditableController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\PatientFileController;
 use App\Http\Controllers\PatientPhotoController;
+use App\Http\Controllers\PrescriptionController;
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/patient/export', [PatientController::class, 'export'])
@@ -16,6 +17,8 @@ Route::middleware('auth:sanctum')->group(function () {
         ->name('patient.history.export');
     Route::get('/patient/selectlist', [PatientController::class, 'selectList'])
         ->name('patient.selectList');
+    Route::get('/patient/romexis-sync-list', [PatientController::class, 'romexisSyncList'])
+        ->name('patient.romexisSyncList');
     Route::apiResource('/patient', PatientController::class)
         ->names('patient');
 
@@ -30,4 +33,7 @@ Route::middleware('auth:sanctum')->group(function () {
         ->names('patientphoto');
     Route::get('/patient/{patient}/photo-download/{photo}', [PatientPhotoController::class, 'download'])
         ->name('patientphoto.download');
+
+    Route::get('/patient/{patient}/prescription', [PrescriptionController::class, 'byPatient'])
+        ->name('patient.prescriptions');
 });

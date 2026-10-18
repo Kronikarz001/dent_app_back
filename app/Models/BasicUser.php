@@ -148,17 +148,11 @@ abstract class BasicUser extends Authenticatable
     }
 
     /**
-     * Płeć wyliczona z 10. cyfry numeru PESEL (nieparzysta = mężczyzna, parzysta = kobieta).
-     *
-     * @return string
+     * @return string|null
      */
-    public function getGenderAttribute(): string
+    public function getGenderAttribute(): ?string
     {
-        $genderDigit = (int) substr($this->pesel, 9, 1);
-
-        $gender = $genderDigit % 2 === 0 ? Gender::FEMALE : Gender::MALE;
-
-        return $gender->code();
+        return Gender::fromPesel($this->pesel)?->code();
     }
 
     /**

@@ -11,6 +11,19 @@ enum Gender: string
     case FEMALE = 'FEMALE';
 
     /**
+     * @param string|null $pesel
+     * @return self|null
+     */
+    public static function fromPesel(?string $pesel): ?self
+    {
+        if (strlen((string) $pesel) !== 11) {
+            return null;
+        }
+
+        return ((int) $pesel[9]) % 2 === 0 ? self::FEMALE : self::MALE;
+    }
+
+    /**
      * @return string
      */
     public function name(): string

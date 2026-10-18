@@ -44,6 +44,14 @@ readonly class PatientService implements PatientServiceInterface
     }
 
     /**
+     * @return LengthAwarePaginator
+     */
+    public function getPatientsWithRomexisId(): LengthAwarePaginator
+    {
+        return $this->patientRepository->findAllWithRomexisId();
+    }
+
+    /**
      * @param array $data
      * @return Patient
      */

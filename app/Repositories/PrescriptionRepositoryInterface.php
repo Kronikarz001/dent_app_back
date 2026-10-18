@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\Prescription;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -15,6 +16,12 @@ interface PrescriptionRepositoryInterface extends BasicRepositoryInterface
      * @return Prescription|null
      */
     public function findByUuid(string $uuid): ?Prescription;
+
+    /**
+     * @param string $patientUuid
+     * @return LengthAwarePaginator
+     */
+    public function findAllByPatient(string $patientUuid): LengthAwarePaginator;
 
     /**
      * @param array $data

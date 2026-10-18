@@ -7298,6 +7298,47 @@
                 ]
             }
         },
+        "/api/patient/romexis-sync-list": {
+            "get": {
+                "tags": [
+                    "Patient"
+                ],
+                "summary": "Lista pacjentów z ustawionym romexis_patient_id (do synchronizacji zdjęć przez agenta Romexis)",
+                "operationId": "7cd382aa9c539d394c9519a1cc04dfab",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/PaginatedResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/PatientRomexisSyncResource"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/patient/{uuid}": {
             "get": {
                 "tags": [
@@ -8789,6 +8830,61 @@
                     },
                     "422": {
                         "description": "Błąd walidacji"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/patient/{uuid}/prescription": {
+            "get": {
+                "tags": [
+                    "Prescription"
+                ],
+                "summary": "Lista recept danego pacjenta (paginacja)",
+                "operationId": "eb39205b53b3e2520c35b3edff9f83b5",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/PaginatedResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/PrescriptionResource"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
                     }
                 },
                 "security": [
@@ -11266,8 +11362,9 @@
                         "nullable": true
                     },
                     "gender": {
-                        "description": "Wyliczana z numeru PESEL",
+                        "description": "Wyliczana z numeru PESEL; null gdy PESEL nie jest podany",
                         "type": "string",
+                        "nullable": true,
                         "enum": [
                             "M",
                             "F"
@@ -11361,8 +11458,9 @@
                         "nullable": true
                     },
                     "gender": {
-                        "description": "Wyliczana z numeru PESEL",
+                        "description": "Wyliczana z numeru PESEL; null gdy PESEL nie jest podany",
                         "type": "string",
+                        "nullable": true,
                         "enum": [
                             "M",
                             "F"
@@ -11486,9 +11584,25 @@
                         ],
                         "nullable": true
                     },
+                    "romexis_patient_id": {
+                        "type": "string",
+                        "nullable": true
+                    },
                     "created_at": {
                         "type": "string",
                         "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "PatientRomexisSyncResource": {
+                "properties": {
+                    "uuid": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "romexis_patient_id": {
+                        "type": "string"
                     }
                 },
                 "type": "object"

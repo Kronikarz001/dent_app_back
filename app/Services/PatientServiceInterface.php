@@ -25,6 +25,11 @@ interface PatientServiceInterface
     public function getPatientsList(): LengthAwarePaginator;
 
     /**
+     * @return LengthAwarePaginator
+     */
+    public function getPatientsWithRomexisId(): LengthAwarePaginator;
+
+    /**
      * @param array $data
      * @return Patient
      */

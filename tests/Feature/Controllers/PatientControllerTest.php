@@ -5,6 +5,8 @@ namespace Tests\Feature\Controllers;
 use App\Enums\AuditableEventType;
 use App\Models\Audit;
 use App\Models\Patient;
+use App\Models\Permission;
+use App\Models\PermissionAssignment;
 use App\Models\User;
 use Tests\TestCase;
 
@@ -82,6 +84,91 @@ class PatientControllerTest extends TestCase
 
         $response->assertOk();
         $response->assertJsonPath('data.0.uuid', $target->uuid);
+    }
+
+    /**
+     * @return void
+     */
+    public function testRomexisSyncListReturnsOnlyPatientsWithRomexisIdSet(): void
+    {
+        $withId = Patient::factory()->create(['romexis_patient_id' => '12345']);
+        Patient::factory()->create(['romexis_patient_id' => null]);
+
+        $response = $this->callApiWithLoggedUser()
+            ->getJson(route('patient.romexisSyncList'));
+
+        $response->assertOk();
+        $response->assertJsonCount(1, 'data');
+        $response->assertJsonPath('data.0.uuid', $withId->uuid);
+        $response->assertJsonPath('data.0.romexis_patient_id', '12345');
+        $this->assertArrayNotHasKey('first_name', $response->json('data.0'));
+    }
+
+    /**
+     * @return void
+     */
+    public function testUserGrantedOnlyPatientphotoPermissionCanUseRomexisSyncListButNotPatientIndex(): void
+    {
+        $serviceAccount = User::factory()->create(['is_admin' => false]);
+
+        foreach (['view', 'edit'] as $type) {
+            $permission = Permission::where(['resource' => 'patientphoto', 'type' => $type])->firstOrFail();
+            PermissionAssignment::create([
+                'grantable_type' => Permission::class,
+                'grantable_id' => $permission->uuid,
+                'assignable_type' => User::class,
+                'assignable_id' => $serviceAccount->uuid,
+            ]);
+        }
+
+        $this->callApiWithLoggedUser($serviceAccount)
+            ->getJson(route('patient.romexisSyncList'))
+            ->assertOk();
+
+        $this->callApiWithLoggedUser($serviceAccount)
+            ->getJson(route('patient.index'))
+            ->assertForbidden();
+    }
+
+    /**
+     * @return void
+     */
+    public function testStorePatientWithDuplicateRomexisPatientIdReturnsValidationError(): void
+    {
+        Patient::factory()->create(['romexis_patient_id' => '12345']);
+
+        $response = $this->callApiWithLoggedUser()
+            ->postJson(route('patient.store'), [
+                'first_name' => 'Jan',
+                'last_name' => 'Kowalski',
+                'email' => 'inny@example.com',
+                'pesel' => '44051401359',
+                'romexis_patient_id' => '12345',
+            ]);
+
+        $response->assertStatus(422);
+    }
+
+    /**
+     * @return void
+     */
+    public function testUpdatePatientSetsRomexisPatientId(): void
+    {
+        $patient = Patient::factory()->create();
+
+        $response = $this->callApiWithLoggedUser()
+            ->putJson(route('patient.update', ['patient' => $patient->uuid]), [
+                'first_name' => $patient->first_name,
+                'last_name' => $patient->last_name,
+                'email' => $patient->email,
+                'romexis_patient_id' => '98765',
+            ]);
+
+        $response->assertNoContent();
+        $this->assertDatabaseHas('patients', [
+            'uuid' => $patient->uuid,
+            'romexis_patient_id' => '98765',
+        ]);
     }
 
     /**

@@ -52,6 +52,17 @@ class PatientRepository extends SearchableRepository implements PatientRepositor
     }
 
     /**
+     * @return LengthAwarePaginator
+     */
+    public function findAllWithRomexisId(): LengthAwarePaginator
+    {
+        return Patient::query()
+            ->select(['uuid', 'romexis_patient_id'])
+            ->whereNotNull('romexis_patient_id')
+            ->paginate();
+    }
+
+    /**
      * @param array $data
      * @return Patient
      */

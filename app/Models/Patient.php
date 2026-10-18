@@ -30,6 +30,7 @@ use Illuminate\Support\Carbon;
  * @property Gender|null $gender
  * @property string|null $notes
  * @property string|null $doctor_uuid
+ * @property string|null $romexis_patient_id
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read User|null $doctor
@@ -56,6 +57,7 @@ class Patient extends UuidModel
         'gender',
         'notes',
         'doctor_uuid',
+        'romexis_patient_id',
     ];
 
     /**

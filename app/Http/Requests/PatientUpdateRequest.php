@@ -42,6 +42,7 @@ class PatientUpdateRequest extends FormRequest
             'gender' => ['nullable', new Enum(Gender::class)],
             'notes' => ['nullable', 'string'],
             'doctor_uuid' => ['nullable', 'string', 'exists:users,uuid'],
+            'romexis_patient_id' => ['nullable', 'string', Rule::unique('patients', 'romexis_patient_id')->ignore($this->route('patient'))],
         ];
     }
 
@@ -70,6 +71,7 @@ class PatientUpdateRequest extends FormRequest
             'gender.enum' => 'Wybrana płeć jest nieprawidłowa.',
             'notes.string' => 'Pole notes musi być tekstem.',
             'doctor_uuid.exists' => 'Wybrany lekarz nie istnieje.',
+            'romexis_patient_id.unique' => 'Pacjent o podanym ID z Romexisa już istnieje.',
         ];
     }
 }

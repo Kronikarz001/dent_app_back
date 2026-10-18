@@ -23,6 +23,7 @@ class PatientResource extends BasicResource
             'gender' => $this->gender,
             'notes' => $this->notes,
             'doctor' => $this->doctor ? new UserResource($this->doctor) : null,
+            'romexis_patient_id' => $this->romexis_patient_id,
         ]);
     }
 }

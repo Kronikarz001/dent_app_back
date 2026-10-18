@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Patient;
 use App\Models\Prescription;
 use Illuminate\Pagination\LengthAwarePaginator;
 
@@ -14,6 +15,12 @@ interface PrescriptionServiceInterface
      * @return LengthAwarePaginator
      */
     public function getPrescriptions(): LengthAwarePaginator;
+
+    /**
+     * @param Patient $patient
+     * @return LengthAwarePaginator
+     */
+    public function getPrescriptionsForPatient(Patient $patient): LengthAwarePaginator;
 
     /**
      * @param array $data

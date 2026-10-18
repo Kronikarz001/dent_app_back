@@ -196,9 +196,6 @@ class PatientPhotoController extends Controller
     }
 
     /**
-     * Guards this controller's endpoints against IDOR: a route-bound Photo must
-     * actually belong to the route-bound Patient, not just exist.
-     *
      * @param Photo $photo
      * @param Patient $patient
      * @return void
