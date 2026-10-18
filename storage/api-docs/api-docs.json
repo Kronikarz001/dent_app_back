@@ -5668,6 +5668,291 @@
                 ]
             }
         },
+        "/api/medicine": {
+            "get": {
+                "tags": [
+                    "Medicine"
+                ],
+                "summary": "Lista leków (paginacja)",
+                "operationId": "a8cdac137256507ed5a2fb0f99b133e7",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/PaginatedResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/MedicineResource"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Medicine"
+                ],
+                "summary": "Tworzy nowy lek",
+                "operationId": "4538ea16652b3d1e0702d89dae74bc54",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "reimbursement_level"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Apap"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "ean_gtin": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "reimbursement_level": {
+                                        "type": "string",
+                                        "enum": [
+                                            "FULL",
+                                            "FLAT_RATE",
+                                            "FREE",
+                                            "R",
+                                            "OTHER"
+                                        ]
+                                    },
+                                    "external_reference": {
+                                        "type": "string",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Utworzono",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/MedicineResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Błąd walidacji"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/medicine/selectlist": {
+            "get": {
+                "tags": [
+                    "Medicine"
+                ],
+                "summary": "Leki do selecta (uuid + name)",
+                "operationId": "5e76dffa365f1701b39414db7ccee29c",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/medicine/{uuid}": {
+            "get": {
+                "tags": [
+                    "Medicine"
+                ],
+                "summary": "Pobiera jeden lek",
+                "operationId": "3f35261920cab6f93fbc23eefe5f28b3",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/MedicineResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Medicine"
+                ],
+                "summary": "Aktualizuje lek",
+                "operationId": "87fcec7179a939b3ef8f70cf5ab4b107",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "reimbursement_level"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "ean_gtin": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "reimbursement_level": {
+                                        "type": "string",
+                                        "enum": [
+                                            "FULL",
+                                            "FLAT_RATE",
+                                            "FREE",
+                                            "R",
+                                            "OTHER"
+                                        ]
+                                    },
+                                    "external_reference": {
+                                        "type": "string",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "Zaktualizowano"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    },
+                    "422": {
+                        "description": "Błąd walidacji"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Medicine"
+                ],
+                "summary": "Usuwa lek",
+                "operationId": "e08b7abb799154bc94911b8521fa3cc0",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Usunięto"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/message": {
             "get": {
                 "tags": [
@@ -7013,6 +7298,47 @@
                 ]
             }
         },
+        "/api/patient/romexis-sync-list": {
+            "get": {
+                "tags": [
+                    "Patient"
+                ],
+                "summary": "Lista pacjentów z ustawionym romexis_patient_id (do synchronizacji zdjęć przez agenta Romexis)",
+                "operationId": "7cd382aa9c539d394c9519a1cc04dfab",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/PaginatedResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/PatientRomexisSyncResource"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/patient/{uuid}": {
             "get": {
                 "tags": [
@@ -7647,6 +7973,333 @@
                 ]
             }
         },
+        "/api/patient/{patient}/photo": {
+            "get": {
+                "tags": [
+                    "PatientPhoto"
+                ],
+                "summary": "Lista zdjęć pacjenta (paginacja)",
+                "operationId": "916aeb7d509542395ad096e3089b0b79",
+                "parameters": [
+                    {
+                        "name": "patient",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/PaginatedResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/PhotoResource"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "PatientPhoto"
+                ],
+                "summary": "Wgrywa zdjęcia dla pacjenta",
+                "operationId": "5767f21b3761ce8e68034d9517596f7e",
+                "parameters": [
+                    {
+                        "name": "patient",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "files[]"
+                                ],
+                                "properties": {
+                                    "files[]": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "binary"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/PhotoResource"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/patient/{patient}/photo/{photo}": {
+            "get": {
+                "tags": [
+                    "PatientPhoto"
+                ],
+                "summary": "Pobiera metadane zdjęcia pacjenta",
+                "operationId": "ff63825949aed5ca5100a0d43c5e1265",
+                "parameters": [
+                    {
+                        "name": "patient",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "photo",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/PhotoResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "PatientPhoto"
+                ],
+                "summary": "Zmienia nazwę zdjęcia pacjenta",
+                "operationId": "ce0cf74d1f90cf374c19f395ba80ba85",
+                "parameters": [
+                    {
+                        "name": "patient",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "photo",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "filename"
+                                ],
+                                "properties": {
+                                    "filename": {
+                                        "type": "string",
+                                        "example": "nowa_nazwa"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/PhotoResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    },
+                    "422": {
+                        "description": "Błąd walidacji"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "PatientPhoto"
+                ],
+                "summary": "Usuwa zdjęcie pacjenta",
+                "operationId": "6eec99ea0a7c8d828358646ba137de92",
+                "parameters": [
+                    {
+                        "name": "patient",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "photo",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Usunięto"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/patient/{patient}/photo-download/{photo}": {
+            "get": {
+                "tags": [
+                    "PatientPhoto"
+                ],
+                "summary": "Pobiera zawartość zdjęcia pacjenta",
+                "operationId": "b2ec79b8922862e5f253bb510968dc7e",
+                "parameters": [
+                    {
+                        "name": "patient",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "photo",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/permission": {
             "get": {
                 "tags": [
@@ -8036,6 +8689,428 @@
                     },
                     "422": {
                         "description": "Błąd walidacji"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/prescription": {
+            "get": {
+                "tags": [
+                    "Prescription"
+                ],
+                "summary": "Lista recept (paginacja)",
+                "operationId": "26a835ebbed4b5f635f20f467bb2b5cc",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/PaginatedResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/PrescriptionResource"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Prescription"
+                ],
+                "summary": "Tworzy nową receptę",
+                "operationId": "e3c6ad550ecbb0acfe39c7cfd1801548",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "status",
+                                    "patient_uuid",
+                                    "doctor_uuid"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "code": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "DRAFT",
+                                            "ISSUED",
+                                            "REALIZED",
+                                            "CANCELLED",
+                                            "EXPIRED"
+                                        ]
+                                    },
+                                    "patient_uuid": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "doctor_uuid": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "external_reference": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "medicines": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "medicine_uuid": {
+                                                    "type": "string",
+                                                    "format": "uuid"
+                                                },
+                                                "quantity": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "dosage": {
+                                                    "type": "string",
+                                                    "example": "1 tabletka co 8 godzin"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Utworzono",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/PrescriptionResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Błąd walidacji"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/patient/{uuid}/prescription": {
+            "get": {
+                "tags": [
+                    "Prescription"
+                ],
+                "summary": "Lista recept danego pacjenta (paginacja)",
+                "operationId": "eb39205b53b3e2520c35b3edff9f83b5",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/PaginatedResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/PrescriptionResource"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/prescription/{uuid}": {
+            "get": {
+                "tags": [
+                    "Prescription"
+                ],
+                "summary": "Pobiera jedną receptę",
+                "operationId": "22ca035b6bb20de7e3124db9b25cc683",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/PrescriptionResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Prescription"
+                ],
+                "summary": "Aktualizuje receptę",
+                "operationId": "6ba37b1cc9df786ccaa4d533676df3ee",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "status",
+                                    "patient_uuid",
+                                    "doctor_uuid"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "code": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "DRAFT",
+                                            "ISSUED",
+                                            "REALIZED",
+                                            "CANCELLED",
+                                            "EXPIRED"
+                                        ]
+                                    },
+                                    "patient_uuid": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "doctor_uuid": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "external_reference": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "medicines": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "medicine_uuid": {
+                                                    "type": "string",
+                                                    "format": "uuid"
+                                                },
+                                                "quantity": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "dosage": {
+                                                    "type": "string",
+                                                    "example": "1 tabletka co 8 godzin"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "Zaktualizowano"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    },
+                    "422": {
+                        "description": "Błąd walidacji"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Prescription"
+                ],
+                "summary": "Usuwa receptę",
+                "operationId": "5e43080452fb80f4d783c445be353b93",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Usunięto"
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/prescription/{uuid}/issue": {
+            "post": {
+                "tags": [
+                    "Prescription"
+                ],
+                "summary": "Wystawia receptę w systemie P1 (eZdrowie) - integracja w przygotowaniu, obecnie zwraca błąd 501",
+                "operationId": "d822b098103a520ba065e91430ca1124",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/PrescriptionResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    },
+                    "501": {
+                        "description": "Integracja z P1 nie jest jeszcze podłączona"
                     }
                 },
                 "security": [
@@ -10210,6 +11285,34 @@
                 },
                 "type": "object"
             },
+            "PhotoResource": {
+                "properties": {
+                    "uuid": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "filename": {
+                        "type": "string"
+                    },
+                    "extension": {
+                        "type": "string"
+                    },
+                    "size": {
+                        "type": "integer"
+                    },
+                    "mimetype": {
+                        "type": "string"
+                    },
+                    "path": {
+                        "type": "string"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
             "PhoneNumberResource": {
                 "properties": {
                     "uuid": {
@@ -10257,6 +11360,15 @@
                     "pesel": {
                         "type": "string",
                         "nullable": true
+                    },
+                    "gender": {
+                        "description": "Wyliczana z numeru PESEL; null gdy PESEL nie jest podany",
+                        "type": "string",
+                        "nullable": true,
+                        "enum": [
+                            "M",
+                            "F"
+                        ]
                     },
                     "is_active": {
                         "type": "boolean"
@@ -10344,6 +11456,15 @@
                     "pesel": {
                         "type": "string",
                         "nullable": true
+                    },
+                    "gender": {
+                        "description": "Wyliczana z numeru PESEL; null gdy PESEL nie jest podany",
+                        "type": "string",
+                        "nullable": true,
+                        "enum": [
+                            "M",
+                            "F"
+                        ]
                     },
                     "is_active": {
                         "type": "boolean"
@@ -10463,9 +11584,25 @@
                         ],
                         "nullable": true
                     },
+                    "romexis_patient_id": {
+                        "type": "string",
+                        "nullable": true
+                    },
                     "created_at": {
                         "type": "string",
                         "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "PatientRomexisSyncResource": {
+                "properties": {
+                    "uuid": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "romexis_patient_id": {
+                        "type": "string"
                     }
                 },
                 "type": "object"
@@ -10685,6 +11822,111 @@
                         "format": "date-time"
                     },
                     "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "MedicineResource": {
+                "properties": {
+                    "uuid": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "ean_gtin": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "reimbursement_level": {
+                        "type": "string",
+                        "enum": [
+                            "FULL",
+                            "FLAT_RATE",
+                            "FREE",
+                            "R",
+                            "OTHER"
+                        ]
+                    },
+                    "external_reference": {
+                        "description": "Pole przygotowane pod przyszłą integrację z Medfile/P1",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "PrescriptionResource": {
+                "properties": {
+                    "uuid": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "name": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "code": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "DRAFT",
+                            "ISSUED",
+                            "REALIZED",
+                            "CANCELLED",
+                            "EXPIRED"
+                        ]
+                    },
+                    "patient_uuid": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "doctor_uuid": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "external_reference": {
+                        "description": "Pole przygotowane pod przyszłą integrację z Medfile/P1",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "patient": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/PatientResource"
+                            }
+                        ],
+                        "nullable": true
+                    },
+                    "doctor": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/UserResource"
+                            }
+                        ],
+                        "nullable": true
+                    },
+                    "medicines": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/MedicineResource"
+                        }
+                    },
+                    "created_at": {
                         "type": "string",
                         "format": "date-time"
                     }
@@ -11054,6 +12296,10 @@
             "description": "MaterialFile"
         },
         {
+            "name": "Medicine",
+            "description": "Medicine"
+        },
+        {
             "name": "Message",
             "description": "Message"
         },
@@ -11078,12 +12324,20 @@
             "description": "PatientFile"
         },
         {
+            "name": "PatientPhoto",
+            "description": "PatientPhoto"
+        },
+        {
             "name": "Permission",
             "description": "Permission"
         },
         {
             "name": "PermissionGroup",
             "description": "PermissionGroup"
+        },
+        {
+            "name": "Prescription",
+            "description": "Prescription"
         },
         {
             "name": "Role",

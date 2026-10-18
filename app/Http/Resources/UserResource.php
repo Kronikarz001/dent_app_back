@@ -17,6 +17,7 @@ class UserResource extends BasicResource
     {
         return array_merge(parent::toArray($request), [
             'pesel' => $this->pesel,
+            'gender' => $this->gender,
             'private_phone_number' => $this->phoneNumbers->firstWhere('type', PhoneNumberType::PRIVATE->value)?->number,
             'phone_number' => $this->phoneNumbers->firstWhere('type', PhoneNumberType::WORK->value)?->number,
             'job_position' => new JobPositionResource($this->jobPosition),

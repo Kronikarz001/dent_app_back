@@ -37,6 +37,7 @@ class PatientStoreRequest extends FormRequest
             'city' => ['nullable', 'string'],
             'gender' => ['nullable', new Enum(Gender::class)],
             'notes' => ['nullable', 'string'],
+            'romexis_patient_id' => ['nullable', 'string', 'unique:patients,romexis_patient_id'],
         ];
     }
 
@@ -63,6 +64,7 @@ class PatientStoreRequest extends FormRequest
             'city.string' => 'Pole city musi być tekstem.',
             'gender.enum' => 'Wybrana płeć jest nieprawidłowa.',
             'notes.string' => 'Pole notes musi być tekstem.',
+            'romexis_patient_id.unique' => 'Pacjent o podanym ID z Romexisa już istnieje.',
         ];
     }
 }

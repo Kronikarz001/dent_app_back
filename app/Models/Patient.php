@@ -9,6 +9,7 @@ use App\Traits\HasFile;
 use App\Traits\HasPhoneNumber;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Support\Carbon;
 
@@ -29,6 +30,7 @@ use Illuminate\Support\Carbon;
  * @property Gender|null $gender
  * @property string|null $notes
  * @property string|null $doctor_uuid
+ * @property string|null $romexis_patient_id
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read User|null $doctor
@@ -55,6 +57,7 @@ class Patient extends UuidModel
         'gender',
         'notes',
         'doctor_uuid',
+        'romexis_patient_id',
     ];
 
     /**
@@ -62,10 +65,7 @@ class Patient extends UuidModel
      */
     public function getName(): string
     {
-        $firstName = $this->firstName;
-        $lastName = $this->lastName;
-
-        return "$firstName $lastName";
+        return "{$this->first_name} {$this->last_name}";
     }
 
     /**
@@ -82,6 +82,14 @@ class Patient extends UuidModel
     public function doctor(): BelongsTo
     {
         return $this->belongsTo(User::class, 'doctor_uuid', 'uuid');
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function photos(): HasMany
+    {
+        return $this->hasMany(Photo::class, 'patient_uuid', 'uuid');
     }
 
     /**

@@ -16,6 +16,7 @@ renew:
 	$(SUDO) docker exec dent_app_back_app php artisan config:clear
 	$(SUDO) docker exec dent_app_back_app php artisan cache:clear
 	$(SUDO) docker exec dent_app_back_app php scripts/create_user.php
+	$(SUDO) docker exec dent_app_back_app php scripts/create_romexis_user.php
 
 up:
 	$(SUDO) docker-compose up -d
@@ -49,6 +50,13 @@ create-user:
 	$(SUDO) docker exec dent_app_back_app php artisan config:clear
 	$(SUDO) docker exec dent_app_back_app php artisan cache:clear
 	$(SUDO) docker exec dent_app_back_app php scripts/create_user.php
+
+create-romexis-user:
+	$(SUDO) docker exec dent_app_back_app php artisan route:clear
+	$(SUDO) docker exec dent_app_back_app php artisan cache:clear
+	$(SUDO) docker exec dent_app_back_app php artisan config:clear
+	$(SUDO) docker exec dent_app_back_app php artisan cache:clear
+	$(SUDO) docker exec dent_app_back_app php scripts/create_romexis_user.php
 
 migration:
 	$(SUDO) docker-compose exec dent_app_back_app php artisan make:migration $(name)

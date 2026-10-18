@@ -35,4 +35,11 @@ return [
         ],
     ],
 
+    'p1' => [
+        'base_url' => env('P1_BASE_URL'),
+        'auth_key' => env('P1_AUTH_KEY'),
+        'cert_path' => env('P1_CERT_PATH'),
+        'cert_passphrase' => env('P1_CERT_PASSPHRASE'),
+    ],
+
 ];

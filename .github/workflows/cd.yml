@@ -10,8 +10,6 @@ permissions:
 env:
   PHP_BIN: /usr/local/php84-fpm/bin/php
   COMPOSER_BIN: /usr/bin/composer
-  # Host key of serwer466029.lh.pl:40022, pinned so the runner never falls
-  # back to TOFU (host keys are public info, not a secret).
   SSH_KNOWN_HOSTS: "[serwer466029.lh.pl]:40022 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKyBEKAMS05prsIbz7kaH2tYwFZ8SPNYUfRphHD0S4hd"
 
 jobs:
@@ -21,6 +19,19 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      - name: Verify required deploy secrets are set
+        run: |
+          missing=""
+          [ -z "${{ secrets.SSH_KEY }}" ] && missing="$missing SSH_KEY"
+          [ -z "${{ secrets.SSH_PORT }}" ] && missing="$missing SSH_PORT"
+          [ -z "${{ secrets.SSH_USER }}" ] && missing="$missing SSH_USER"
+          [ -z "${{ secrets.SSH_HOST }}" ] && missing="$missing SSH_HOST"
+          [ -z "${{ secrets.DEPLOY_PATH }}" ] && missing="$missing DEPLOY_PATH"
+          if [ -n "$missing" ]; then
+            echo "::error::Missing required repository secrets:$missing — set them under Settings > Secrets and variables > Actions before deploying."
+            exit 1
+          fi
+
       - name: Set up deploy key
         run: |
           mkdir -p ~/.ssh
@@ -29,6 +40,7 @@ jobs:
           echo "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
 
       - name: Backup current release and enter maintenance mode
+        id: backup
         run: |
           ssh -i ~/.ssh/dentapp_deploy -p ${{ secrets.SSH_PORT }} \
             ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
@@ -69,7 +81,7 @@ jobs:
         run: curl -sf https://dentapp.com.pl/_reset_opcache.php || true
 
       - name: Roll back to previous release on failure
-        if: failure()
+        if: failure() && steps.backup.outcome == 'success'
         run: |
           ssh -i ~/.ssh/dentapp_deploy -p ${{ secrets.SSH_PORT }} \
             ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \

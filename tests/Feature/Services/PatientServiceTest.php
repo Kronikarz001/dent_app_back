@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Services;
 
+use App\Enums\Gender;
 use App\Enums\PhoneNumberType;
 use App\Models\Patient;
 use App\Services\PatientServiceInterface;
@@ -63,6 +64,36 @@ class PatientServiceTest extends TestCase
 
         $this->assertInstanceOf(Patient::class, $patient);
         $this->assertDatabaseHas(self::PATIENTS_TABLE, ['email' => $data['email']]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testCreatePatientDerivesGenderFromPesel(): void
+    {
+        $data = Patient::factory()->make(['pesel' => '90010112335'])->toArray();
+
+        $patient = $this->service->createPatient($data);
+
+        $this->assertDatabaseHas(self::PATIENTS_TABLE, [
+            'uuid' => $patient->uuid,
+            'gender' => Gender::MALE->value,
+        ]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testUpdatePatientRederivesGenderWhenPeselChanges(): void
+    {
+        $patient = Patient::factory()->create(['pesel' => '90010112335']);
+
+        $this->service->updatePatient($patient, ['pesel' => '90010112345']);
+
+        $this->assertDatabaseHas(self::PATIENTS_TABLE, [
+            'uuid' => $patient->uuid,
+            'gender' => Gender::FEMALE->value,
+        ]);
     }
 
     /**

@@ -143,6 +143,25 @@ class UserServiceTest extends TestCase
     /**
      * @return void
      */
+    public function testUpdateUserWithEmptyPhoneNumbersRemovesThem(): void
+    {
+        $user = User::factory()->create();
+        $this->service->updateUser($user, [
+            'private_phone_number' => '48500100200',
+            'phone_number' => '48600200300',
+        ]);
+
+        $this->service->updateUser($user, [
+            'private_phone_number' => null,
+            'phone_number' => null,
+        ]);
+
+        $this->assertDatabaseMissing('phone_numbers', ['phoneable_uuid' => $user->uuid]);
+    }
+
+    /**
+     * @return void
+     */
     public function testDeactivateUserSetsActiveToFalse(): void
     {
         $user = User::factory()->create(['is_active' => true]);

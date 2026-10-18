@@ -23,6 +23,12 @@ class PhoneNumberService implements PhoneNumberServiceInterface
         $modelClass = get_class($model);
 
         foreach ($phones as $phone) {
+            if (blank($phone['number'] ?? null)) {
+                $this->removePhone($modelClass, $model->uuid, $phone['type']);
+
+                continue;
+            }
+
             $this->assertNumberNotOwnedByAnotherEntity($modelClass, $model->uuid, $phone['number']);
 
             $existing = PhoneNumber::where('phoneable_type', $modelClass)
@@ -36,10 +42,6 @@ class PhoneNumberService implements PhoneNumberServiceInterface
                 continue;
             }
 
-            // Guard above already rules out the "owned by someone else"
-            // case, so a match here (by number, not owner+type — see the
-            // check above) can only be this same owner's row under a
-            // different type, which is exactly what should be renamed.
             PhoneNumber::updateOrCreate(
                 ['number' => $phone['number']],
                 [
@@ -52,11 +54,20 @@ class PhoneNumberService implements PhoneNumberServiceInterface
     }
 
     /**
-     * `number` is unique system-wide (not just per owner) — without this
-     * check, assigning a number already held by a different user/patient
-     * would silently reassign that row's phoneable_type/phoneable_uuid to
-     * the new owner instead of rejecting the request.
-     *
+     * @param string $modelClass
+     * @param string $modelUuid
+     * @param string $type
+     * @return void
+     */
+    private function removePhone(string $modelClass, string $modelUuid, string $type): void
+    {
+        PhoneNumber::where('phoneable_type', $modelClass)
+            ->where('phoneable_uuid', $modelUuid)
+            ->where('type', $type)
+            ->delete();
+    }
+
+    /**
      * @param string $modelClass
      * @param string $modelUuid
      * @param string $number
