@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Repositories;
 
+use App\Enums\ReimbursementLevel;
 use App\Models\Medicine;
 use App\Repositories\MedicineRepositoryInterface;
 use Illuminate\Support\Str;
@@ -76,5 +77,32 @@ class MedicineRepositoryTest extends TestCase
 
         $this->assertTrue($this->repository->delete($medicine));
         $this->assertDatabaseMissing('medicines', ['uuid' => $medicine->uuid]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testUpdateOrCreateByEanGtinCreatesWhenMissing(): void
+    {
+        $medicine = $this->repository->updateOrCreateByEanGtin('5900512345678', [
+            'name' => 'Apap',
+            'reimbursement_level' => ReimbursementLevel::FULL->value,
+        ]);
+
+        $this->assertDatabaseHas('medicines', ['uuid' => $medicine->uuid, 'ean_gtin' => '5900512345678']);
+    }
+
+    /**
+     * @return void
+     */
+    public function testUpdateOrCreateByEanGtinUpdatesWhenMatchExists(): void
+    {
+        $existing = Medicine::factory()->create(['ean_gtin' => '5900512345678']);
+
+        $result = $this->repository->updateOrCreateByEanGtin('5900512345678', ['name' => 'Zmieniony']);
+
+        $this->assertTrue($result->is($existing));
+        $this->assertDatabaseCount('medicines', 1);
+        $this->assertDatabaseHas('medicines', ['uuid' => $existing->uuid, 'name' => 'Zmieniony']);
     }
 }

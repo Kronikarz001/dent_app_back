@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\ReimbursementLevel;
 use App\Models\Medicine;
 use App\Repositories\MedicineRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -60,5 +61,27 @@ readonly class MedicineService implements MedicineServiceInterface
     public function deleteMedicine(Medicine $medicine): void
     {
         $this->medicineRepository->delete($medicine);
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $medicines
+     * @return int
+     */
+    public function syncFromExternalSource(array $medicines): int
+    {
+        foreach ($medicines as $medicineData) {
+            $reimbursementLevel = $medicineData['reimbursement_level'];
+
+            $this->medicineRepository->updateOrCreateByEanGtin($medicineData['ean_gtin'], [
+                'name' => $medicineData['name'],
+                'description' => $medicineData['description'] ?? null,
+                'reimbursement_level' => $reimbursementLevel instanceof ReimbursementLevel
+                    ? $reimbursementLevel->value
+                    : $reimbursementLevel,
+                'external_reference' => $medicineData['external_reference'] ?? null,
+            ]);
+        }
+
+        return count($medicines);
     }
 }

@@ -38,4 +38,10 @@ interface MedicineServiceInterface
      * @return void
      */
     public function deleteMedicine(Medicine $medicine): void;
+
+    /**
+     * @param array<int, array<string, mixed>> $medicines
+     * @return int
+     */
+    public function syncFromExternalSource(array $medicines): int;
 }

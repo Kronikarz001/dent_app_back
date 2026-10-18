@@ -2,9 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Enums\ReimbursementLevel;
 use App\Exceptions\P1IntegrationNotImplementedException;
-use App\Models\Medicine;
+use App\Services\MedicineServiceInterface;
 use App\Services\P1ServiceInterface;
 use Illuminate\Console\Command;
 
@@ -25,9 +24,11 @@ class SyncP1MedicinesCommand extends Command
 
     /**
      * @param P1ServiceInterface $p1Service
+     * @param MedicineServiceInterface $medicineService
      */
     public function __construct(
         private readonly P1ServiceInterface $p1Service,
+        private readonly MedicineServiceInterface $medicineService,
     ) {
         parent::__construct();
     }
@@ -45,23 +46,9 @@ class SyncP1MedicinesCommand extends Command
             return self::FAILURE;
         }
 
-        foreach ($medicines as $medicineData) {
-            $reimbursementLevel = $medicineData['reimbursement_level'];
+        $count = $this->medicineService->syncFromExternalSource($medicines);
 
-            Medicine::query()->updateOrCreate(
-                ['ean_gtin' => $medicineData['ean_gtin']],
-                [
-                    'name' => $medicineData['name'],
-                    'description' => $medicineData['description'] ?? null,
-                    'reimbursement_level' => $reimbursementLevel instanceof ReimbursementLevel
-                        ? $reimbursementLevel->value
-                        : $reimbursementLevel,
-                    'external_reference' => $medicineData['external_reference'] ?? null,
-                ]
-            );
-        }
-
-        $this->info(sprintf('Zsynchronizowano %d leków z P1.', count($medicines)));
+        $this->info(sprintf('Zsynchronizowano %d leków z P1.', $count));
 
         return self::SUCCESS;
     }

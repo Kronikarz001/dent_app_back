@@ -34,4 +34,11 @@ interface MedicineRepositoryInterface extends BasicRepositoryInterface
      * @return bool
      */
     public function delete(Model|Medicine $model): bool;
+
+    /**
+     * @param string $eanGtin
+     * @param array $data
+     * @return Medicine
+     */
+    public function updateOrCreateByEanGtin(string $eanGtin, array $data): Medicine;
 }

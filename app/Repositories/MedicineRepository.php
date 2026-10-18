@@ -80,4 +80,14 @@ class MedicineRepository extends SearchableRepository implements MedicineReposit
     {
         return $model->delete();
     }
+
+    /**
+     * @param string $eanGtin
+     * @param array $data
+     * @return Medicine
+     */
+    public function updateOrCreateByEanGtin(string $eanGtin, array $data): Medicine
+    {
+        return Medicine::query()->updateOrCreate(['ean_gtin' => $eanGtin], $data);
+    }
 }
