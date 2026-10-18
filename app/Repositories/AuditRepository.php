@@ -8,6 +8,7 @@ use App\Search\AuditSearch;
 use App\Search\Search;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 
 /**
@@ -62,7 +63,7 @@ class AuditRepository extends SearchableRepository implements AuditRepositoryInt
     {
         try {
             return $modelClass::query()->findOrFail($uuid);
-        } catch (QueryException $e) {
+        } catch (QueryException|ModelNotFoundException $e) {
             throw new InvalidAuditableIdentifierException("Invalid identifier [{$uuid}] for [{$modelClass}].");
         }
     }
