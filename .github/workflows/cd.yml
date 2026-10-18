@@ -10,8 +10,6 @@ permissions:
 env:
   PHP_BIN: /usr/local/php84-fpm/bin/php
   COMPOSER_BIN: /usr/bin/composer
-  # Host key of serwer466029.lh.pl:40022, pinned so the runner never falls
-  # back to TOFU (host keys are public info, not a secret).
   SSH_KNOWN_HOSTS: "[serwer466029.lh.pl]:40022 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKyBEKAMS05prsIbz7kaH2tYwFZ8SPNYUfRphHD0S4hd"
 
 jobs:
@@ -83,10 +81,6 @@ jobs:
         run: curl -sf https://dentapp.com.pl/_reset_opcache.php || true
 
       - name: Roll back to previous release on failure
-        # Only meaningful once the backup tarball actually exists on the
-        # server — if secret validation or the backup step itself failed,
-        # there is nothing to roll back to and attempting it just produces
-        # a second, unrelated failure on top of the real one.
         if: failure() && steps.backup.outcome == 'success'
         run: |
           ssh -i ~/.ssh/dentapp_deploy -p ${{ secrets.SSH_PORT }} \

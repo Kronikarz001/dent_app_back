@@ -29,9 +29,6 @@ jobs:
     name: Testy PHPUnit/Pest
     runs-on: ubuntu-latest
 
-    # MySQL, not Postgres — produkcja (shared hosting) działa na MySQL, więc CI
-    # musi testować na tym samym silniku, inaczej różnice (np. ILIKE, case
-    # sensitivity) przechodzą CI i psują się dopiero na produkcji.
     services:
       mysql:
         image: mysql:8.0
