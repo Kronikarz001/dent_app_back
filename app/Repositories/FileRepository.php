@@ -113,7 +113,7 @@ class FileRepository extends SearchableRepository implements FileRepositoryInter
         return File::query()
             ->where('fileable_type', $fileableType)
             ->where('fileable_id', $fileableId)
-            ->orderBy('created_at', 'asc')
+            ->oldest()
             ->value('uuid');
     }
 

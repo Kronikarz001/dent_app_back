@@ -7,6 +7,7 @@ use App\Http\Resources\UserResource;
 use App\Models\File;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -346,5 +347,28 @@ class UserFileControllerTest extends TestCase
         $response->assertOk();
         $response->assertHeader('Content-Type', $file->mimetype);
         $this->assertSame(file_get_contents($image->getPathname()), $response->getContent());
+    }
+
+    /**
+     * @return void
+     */
+    public function testUnauthenticatedSignedDownloadRoutesAreNotRegistered(): void
+    {
+        $this->assertFalse(Route::has('userfile.avatar-download-signed'));
+        $this->assertFalse(Route::has('userfile.background-download-signed'));
+    }
+
+    /**
+     * @return void
+     */
+    public function testBackgroundDownloadRequiresAuthentication(): void
+    {
+        $user = User::factory()->create();
+        $file = File::factory()->create();
+
+        $this->getJson("/api/user/{$user->uuid}/file-background-download/{$file->uuid}")
+            ->assertUnauthorized();
+        $this->getJson("/api/user/{$user->uuid}/file-background-download/{$file->uuid}/signed")
+            ->assertNotFound();
     }
 }

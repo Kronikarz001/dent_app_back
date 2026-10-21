@@ -2,9 +2,12 @@
 
 namespace App\Services;
 
+use App\Dto\PatientStatisticsDto;
 use App\Exports\PatientExport;
 use App\Http\Requests\ExportRequest;
 use App\Models\Patient;
+use App\Repositories\AuditRepositoryInterface;
+use App\Repositories\CalendarRepositoryInterface;
 use App\Repositories\PatientRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
 use PhpOffice\PhpSpreadsheet\Exception;
@@ -20,11 +23,15 @@ readonly class PatientService implements PatientServiceInterface
      * @param PatientRepositoryInterface $patientRepository
      * @param ExportServiceInterface $exportService
      * @param PhoneNumberServiceInterface $phoneNumberService
+     * @param CalendarRepositoryInterface $calendarRepository
+     * @param AuditRepositoryInterface $auditRepository
      */
     public function __construct(
         private PatientRepositoryInterface $patientRepository,
         private ExportServiceInterface $exportService,
         private PhoneNumberServiceInterface $phoneNumberService,
+        private CalendarRepositoryInterface $calendarRepository,
+        private AuditRepositoryInterface $auditRepository,
     ) {}
 
     /**
@@ -81,6 +88,27 @@ readonly class PatientService implements PatientServiceInterface
     public function deletePatient(Patient $patient): void
     {
         $this->patientRepository->delete($patient);
+    }
+
+    /**
+     * @param Patient $patient
+     * @return PatientStatisticsDto
+     */
+    public function getStatistics(Patient $patient): PatientStatisticsDto
+    {
+        $leadDoctor = $patient->doctor()->with('jobPosition')->first();
+
+        return new PatientStatisticsDto(
+            $this->calendarRepository->findLastVisitForPatient($patient),
+            $this->calendarRepository->findNextVisitForPatient($patient),
+            $this->calendarRepository->countForPatient($patient, true),
+            $this->calendarRepository->countForPatient($patient),
+            $this->calendarRepository->findLastNoShowForPatient($patient),
+            $leadDoctor,
+            $leadDoctor === null
+                ? null
+                : $this->auditRepository->findLatestChangeTo($patient, 'doctor_uuid', $leadDoctor->uuid)?->created_at,
+        );
     }
 
     /**

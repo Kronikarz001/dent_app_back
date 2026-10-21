@@ -3,12 +3,18 @@
 namespace Tests\Unit\Services;
 
 use App\Http\Requests\ExportRequest;
+use App\Models\Audit;
+use App\Models\Calendar;
 use App\Models\Patient;
+use App\Models\User;
+use App\Repositories\AuditRepositoryInterface;
+use App\Repositories\CalendarRepositoryInterface;
 use App\Repositories\PatientRepositoryInterface;
 use App\Services\ExportServiceInterface;
 use App\Services\PatientService;
 use App\Services\PhoneNumberServiceInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Carbon;
 use Mockery;
 use Mockery\MockInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -23,6 +29,10 @@ class PatientServiceTest extends TestCase
 
     private MockInterface $exportService;
 
+    private MockInterface $calendarRepository;
+
+    private MockInterface $auditRepository;
+
     private PatientService $patientService;
 
     /**
@@ -35,7 +45,15 @@ class PatientServiceTest extends TestCase
         $this->patientRepository = Mockery::mock(PatientRepositoryInterface::class);
         $this->exportService = Mockery::mock(ExportServiceInterface::class);
         $phoneNumberService = Mockery::mock(PhoneNumberServiceInterface::class);
-        $this->patientService = new PatientService($this->patientRepository, $this->exportService, $phoneNumberService);
+        $this->calendarRepository = Mockery::mock(CalendarRepositoryInterface::class);
+        $this->auditRepository = Mockery::mock(AuditRepositoryInterface::class);
+        $this->patientService = new PatientService(
+            $this->patientRepository,
+            $this->exportService,
+            $phoneNumberService,
+            $this->calendarRepository,
+            $this->auditRepository
+        );
     }
 
     /**
@@ -166,5 +184,59 @@ class PatientServiceTest extends TestCase
         $result = $this->patientService->export($request);
 
         $this->assertSame($response, $result);
+    }
+
+    /**
+     * @return void
+     */
+    public function testGetStatisticsAggregatesRepositoryResults(): void
+    {
+        $patient = Patient::factory()->create();
+        $lastVisit = Calendar::factory()->make();
+        $nextVisit = Calendar::factory()->make();
+        $lastNoShow = Calendar::factory()->make();
+
+        $this->calendarRepository->shouldReceive('findLastVisitForPatient')->once()->with($patient)->andReturn($lastVisit);
+        $this->calendarRepository->shouldReceive('findNextVisitForPatient')->once()->with($patient)->andReturn($nextVisit);
+        $this->calendarRepository->shouldReceive('countForPatient')->once()->with($patient, true)->andReturn(2);
+        $this->calendarRepository->shouldReceive('countForPatient')->once()->with($patient)->andReturn(10);
+        $this->calendarRepository->shouldReceive('findLastNoShowForPatient')->once()->with($patient)->andReturn($lastNoShow);
+        $this->auditRepository->shouldNotReceive('findLatestChangeTo');
+
+        $result = $this->patientService->getStatistics($patient);
+
+        $this->assertSame($lastVisit, $result->getLastVisit());
+        $this->assertSame($nextVisit, $result->getNextVisit());
+        $this->assertSame(2, $result->getNoShowCount());
+        $this->assertSame(10, $result->getTotalAppointments());
+        $this->assertSame($lastNoShow, $result->getLastNoShow());
+        $this->assertNull($result->getLeadDoctor());
+        $this->assertNull($result->getLeadDoctorSince());
+    }
+
+    /**
+     * @return void
+     */
+    public function testGetStatisticsResolvesLeadDoctorSinceFromAudit(): void
+    {
+        $doctor = User::factory()->create();
+        $patient = Patient::factory()->create(['doctor_uuid' => $doctor->uuid]);
+        $audit = new Audit(['change_to' => ['doctor_uuid' => $doctor->uuid]]);
+        $audit->created_at = Carbon::parse('2021-03-15 10:00:00');
+
+        $this->calendarRepository->shouldReceive('findLastVisitForPatient')->andReturnNull();
+        $this->calendarRepository->shouldReceive('findNextVisitForPatient')->andReturnNull();
+        $this->calendarRepository->shouldReceive('countForPatient')->andReturn(0);
+        $this->calendarRepository->shouldReceive('findLastNoShowForPatient')->andReturnNull();
+        $this->auditRepository
+            ->shouldReceive('findLatestChangeTo')
+            ->once()
+            ->with($patient, 'doctor_uuid', $doctor->uuid)
+            ->andReturn($audit);
+
+        $result = $this->patientService->getStatistics($patient);
+
+        $this->assertTrue($result->getLeadDoctor()->is($doctor));
+        $this->assertSame('2021-03-15', $result->getLeadDoctorSince()->toDateString());
     }
 }

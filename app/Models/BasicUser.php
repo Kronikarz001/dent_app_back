@@ -8,6 +8,7 @@ use App\Notifications\ResetPasswordNotification;
 use App\Traits\Auditable;
 use App\Traits\HasFile;
 use App\Traits\HasPhoneNumber;
+use App\Traits\SerializesLocalDates;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -54,7 +55,7 @@ use Laravel\Sanctum\PersonalAccessToken;
 abstract class BasicUser extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use Auditable, HasApiTokens, HasFactory, HasFile, HasPhoneNumber, HasUuids, Notifiable;
+    use Auditable, HasApiTokens, HasFactory, HasFile, HasPhoneNumber, HasUuids, Notifiable, SerializesLocalDates;
 
     protected $table = 'users';
 

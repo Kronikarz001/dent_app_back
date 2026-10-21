@@ -323,16 +323,7 @@ class UserController extends Controller
         path: '/api/user/{uuid}/permissions',
         summary: 'Nadaje użytkownikowi uprawnienia lub grupy uprawnień bezpośrednio (opcjonalnie czasowo)',
         security: [['sanctum' => []]],
-        requestBody: new OA\RequestBody(
-            required: true,
-            content: new OA\JsonContent(
-                properties: [
-                    new OA\Property(property: 'permissions', type: 'array', items: new OA\Items(type: 'string', format: 'uuid')),
-                    new OA\Property(property: 'permission_groups', type: 'array', items: new OA\Items(type: 'string', format: 'uuid')),
-                    new OA\Property(property: 'expires_at', type: 'string', format: 'date-time', nullable: true),
-                ]
-            )
-        ),
+        requestBody: new OA\RequestBody(ref: '#/components/requestBodies/AssignPermissionsRequest'),
         tags: ['User'],
         parameters: [
             new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),

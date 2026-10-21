@@ -12,6 +12,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use Mockery;
 use Mockery\MockInterface;
 use Tests\TestCase;
+use Throwable;
 
 class ExportServiceTest extends TestCase
 {
@@ -21,6 +22,8 @@ class ExportServiceTest extends TestCase
 
     /**
      * @return void
+     *
+     * @throws Throwable
      */
     protected function setUp(): void
     {

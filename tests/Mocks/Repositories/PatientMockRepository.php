@@ -12,7 +12,7 @@ use Illuminate\Pagination\LengthAwarePaginator as PaginatorImpl;
 /**
  * Summary of PatientMockRepository
  */
-class PatientMockRepository implements PatientRepositoryInterface
+abstract class PatientMockRepository implements PatientRepositoryInterface
 {
     /**
      * @param string $uuid

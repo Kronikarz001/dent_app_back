@@ -106,15 +106,7 @@ class RoleController extends Controller
         path: '/api/role',
         summary: 'Tworzy nową rolę',
         security: [['sanctum' => []]],
-        requestBody: new OA\RequestBody(
-            required: true,
-            content: new OA\JsonContent(
-                required: ['name'],
-                properties: [
-                    new OA\Property(property: 'name', type: 'string'),
-                ]
-            )
-        ),
+        requestBody: new OA\RequestBody(ref: '#/components/requestBodies/NameRequest'),
         tags: ['Role'],
         responses: [
             new OA\Response(
@@ -141,15 +133,7 @@ class RoleController extends Controller
         path: '/api/role/{uuid}',
         summary: 'Aktualizuje rolę',
         security: [['sanctum' => []]],
-        requestBody: new OA\RequestBody(
-            required: true,
-            content: new OA\JsonContent(
-                required: ['name'],
-                properties: [
-                    new OA\Property(property: 'name', type: 'string'),
-                ]
-            )
-        ),
+        requestBody: new OA\RequestBody(ref: '#/components/requestBodies/NameRequest'),
         tags: ['Role'],
         parameters: [
             new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
@@ -200,19 +184,7 @@ class RoleController extends Controller
         path: '/api/role/{uuid}/users',
         summary: 'Przypisuje użytkowników do roli (z flagą is_manager), zastępując poprzednią listę',
         security: [['sanctum' => []]],
-        requestBody: new OA\RequestBody(
-            required: true,
-            content: new OA\JsonContent(
-                properties: [
-                    new OA\Property(property: 'users', type: 'array', items: new OA\Items(
-                        properties: [
-                            new OA\Property(property: 'uuid', type: 'string', format: 'uuid'),
-                            new OA\Property(property: 'is_manager', type: 'boolean'),
-                        ]
-                    )),
-                ]
-            )
-        ),
+        requestBody: new OA\RequestBody(ref: '#/components/requestBodies/AssignUsersRequest'),
         tags: ['Role'],
         parameters: [
             new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
@@ -239,16 +211,7 @@ class RoleController extends Controller
         path: '/api/role/{uuid}/permissions',
         summary: 'Nadaje roli uprawnienia lub grupy uprawnień (opcjonalnie czasowo)',
         security: [['sanctum' => []]],
-        requestBody: new OA\RequestBody(
-            required: true,
-            content: new OA\JsonContent(
-                properties: [
-                    new OA\Property(property: 'permissions', type: 'array', items: new OA\Items(type: 'string', format: 'uuid')),
-                    new OA\Property(property: 'permission_groups', type: 'array', items: new OA\Items(type: 'string', format: 'uuid')),
-                    new OA\Property(property: 'expires_at', type: 'string', format: 'date-time', nullable: true),
-                ]
-            )
-        ),
+        requestBody: new OA\RequestBody(ref: '#/components/requestBodies/AssignPermissionsRequest'),
         tags: ['Role'],
         parameters: [
             new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
@@ -275,18 +238,7 @@ class RoleController extends Controller
         path: '/api/role/{uuid}/delegate',
         summary: 'Kierownik roli przekazuje własne uprawnienie (lub grupę uprawnień) innej osobie z tej roli',
         security: [['sanctum' => []]],
-        requestBody: new OA\RequestBody(
-            required: true,
-            content: new OA\JsonContent(
-                required: ['user_uuid'],
-                properties: [
-                    new OA\Property(property: 'user_uuid', type: 'string', format: 'uuid'),
-                    new OA\Property(property: 'permission_uuid', type: 'string', format: 'uuid', nullable: true),
-                    new OA\Property(property: 'permission_group_uuid', type: 'string', format: 'uuid', nullable: true),
-                    new OA\Property(property: 'expires_at', type: 'string', format: 'date-time', nullable: true),
-                ]
-            )
-        ),
+        requestBody: new OA\RequestBody(ref: '#/components/requestBodies/DelegatePermissionRequest'),
         tags: ['Role'],
         parameters: [
             new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),

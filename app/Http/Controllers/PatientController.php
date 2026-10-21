@@ -7,6 +7,7 @@ use App\Http\Requests\PatientStoreRequest;
 use App\Http\Requests\PatientUpdateRequest;
 use App\Http\Resources\PatientResource;
 use App\Http\Resources\PatientRomexisSyncResource;
+use App\Http\Resources\PatientStatisticsResource;
 use App\Models\Patient;
 use App\Services\PatientServiceInterface;
 use Illuminate\Http\JsonResponse;
@@ -107,6 +108,28 @@ class PatientController extends Controller
     public function show(Patient $patient): PatientResource
     {
         return new PatientResource($patient);
+    }
+
+    #[OA\Get(
+        path: '/api/patient/{uuid}/statistics',
+        tags: ['Patient'],
+        summary: 'Statystyki pacjenta (ostatnia/następna wizyta, nieobecności, lekarz prowadzący)',
+        security: [['sanctum' => []]],
+        parameters: [
+            new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'OK',
+                content: new OA\JsonContent(ref: '#/components/schemas/PatientStatisticsResource')
+            ),
+            new OA\Response(response: 404, description: 'Nie znaleziono'),
+        ]
+    )]
+    public function statistics(Patient $patient): PatientStatisticsResource
+    {
+        return new PatientStatisticsResource($this->patientService->getStatistics($patient));
     }
 
     #[OA\Post(

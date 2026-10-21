@@ -11,8 +11,11 @@ use App\Services\ExportServiceInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Mockery;
 use Mockery\MockInterface;
+use PhpOffice\PhpSpreadsheet\Exception as ExcelException;
+use PhpOffice\PhpSpreadsheet\Writer\Exception as ExcelWriterException;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Tests\TestCase;
+use Throwable;
 
 /**
  * Summary of DentalExaminationServiceTest
@@ -27,6 +30,8 @@ class DentalExaminationServiceTest extends TestCase
 
     /**
      * @return void
+     *
+     * @throws Throwable
      */
     protected function setUp(): void
     {
@@ -39,6 +44,8 @@ class DentalExaminationServiceTest extends TestCase
 
     /**
      * @return void
+     *
+     * @throws Throwable
      */
     protected function tearDown(): void
     {
@@ -144,6 +151,10 @@ class DentalExaminationServiceTest extends TestCase
 
     /**
      * @return void
+     *
+     * @throws Throwable
+     * @throws ExcelException
+     * @throws ExcelWriterException
      */
     public function testExportDelegatesToExportService(): void
     {

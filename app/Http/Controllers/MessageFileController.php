@@ -72,18 +72,7 @@ class MessageFileController extends Controller
         parameters: [
             new OA\PathParameter(name: 'message', schema: new OA\Schema(type: 'string', format: 'uuid')),
         ],
-        requestBody: new OA\RequestBody(
-            required: true,
-            content: new OA\MediaType(
-                mediaType: 'multipart/form-data',
-                schema: new OA\Schema(
-                    required: ['files[]'],
-                    properties: [
-                        new OA\Property(property: 'files[]', type: 'array', items: new OA\Items(type: 'string', format: 'binary')),
-                    ]
-                )
-            )
-        ),
+        requestBody: new OA\RequestBody(ref: '#/components/requestBodies/FileUploadRequest'),
         responses: [
             new OA\Response(
                 response: 200,
@@ -177,15 +166,7 @@ class MessageFileController extends Controller
             new OA\PathParameter(name: 'message', schema: new OA\Schema(type: 'string', format: 'uuid')),
             new OA\PathParameter(name: 'file', schema: new OA\Schema(type: 'string', format: 'uuid')),
         ],
-        requestBody: new OA\RequestBody(
-            required: true,
-            content: new OA\JsonContent(
-                required: ['filename'],
-                properties: [
-                    new OA\Property(property: 'filename', type: 'string', example: 'nowa_nazwa'),
-                ]
-            )
-        ),
+        requestBody: new OA\RequestBody(ref: '#/components/requestBodies/FileRenameRequest'),
         responses: [
             new OA\Response(
                 response: 200,

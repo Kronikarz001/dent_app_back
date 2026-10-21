@@ -110,15 +110,7 @@ class DepartmentController extends Controller
         path: '/api/department',
         summary: 'Tworzy nowy dział',
         security: [['sanctum' => []]],
-        requestBody: new OA\RequestBody(
-            required: true,
-            content: new OA\JsonContent(
-                required: ['name'],
-                properties: [
-                    new OA\Property(property: 'name', type: 'string'),
-                ]
-            )
-        ),
+        requestBody: new OA\RequestBody(ref: '#/components/requestBodies/NameRequest'),
         tags: ['Department'],
         responses: [
             new OA\Response(
@@ -145,15 +137,7 @@ class DepartmentController extends Controller
         path: '/api/department/{uuid}',
         summary: 'Aktualizuje dział',
         security: [['sanctum' => []]],
-        requestBody: new OA\RequestBody(
-            required: true,
-            content: new OA\JsonContent(
-                required: ['name'],
-                properties: [
-                    new OA\Property(property: 'name', type: 'string'),
-                ]
-            )
-        ),
+        requestBody: new OA\RequestBody(ref: '#/components/requestBodies/NameRequest'),
         tags: ['Department'],
         parameters: [
             new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
@@ -238,14 +222,7 @@ class DepartmentController extends Controller
         path: '/api/department/{uuid}/job-positions',
         summary: 'Przypisuje stanowiska do działu, zastępując poprzednią listę',
         security: [['sanctum' => []]],
-        requestBody: new OA\RequestBody(
-            required: true,
-            content: new OA\JsonContent(
-                properties: [
-                    new OA\Property(property: 'job_positions', type: 'array', items: new OA\Items(type: 'string', format: 'uuid')),
-                ]
-            )
-        ),
+        requestBody: new OA\RequestBody(ref: '#/components/requestBodies/AssignJobPositionsRequest'),
         tags: ['Department'],
         parameters: [
             new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
@@ -272,19 +249,7 @@ class DepartmentController extends Controller
         path: '/api/department/{uuid}/users',
         summary: 'Przypisuje użytkowników bezpośrednio do działu (z flagą is_manager), zastępując poprzednią listę',
         security: [['sanctum' => []]],
-        requestBody: new OA\RequestBody(
-            required: true,
-            content: new OA\JsonContent(
-                properties: [
-                    new OA\Property(property: 'users', type: 'array', items: new OA\Items(
-                        properties: [
-                            new OA\Property(property: 'uuid', type: 'string', format: 'uuid'),
-                            new OA\Property(property: 'is_manager', type: 'boolean'),
-                        ]
-                    )),
-                ]
-            )
-        ),
+        requestBody: new OA\RequestBody(ref: '#/components/requestBodies/AssignUsersRequest'),
         tags: ['Department'],
         parameters: [
             new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
@@ -311,16 +276,7 @@ class DepartmentController extends Controller
         path: '/api/department/{uuid}/permissions',
         summary: 'Nadaje działowi uprawnienia lub grupy uprawnień (opcjonalnie czasowo)',
         security: [['sanctum' => []]],
-        requestBody: new OA\RequestBody(
-            required: true,
-            content: new OA\JsonContent(
-                properties: [
-                    new OA\Property(property: 'permissions', type: 'array', items: new OA\Items(type: 'string', format: 'uuid')),
-                    new OA\Property(property: 'permission_groups', type: 'array', items: new OA\Items(type: 'string', format: 'uuid')),
-                    new OA\Property(property: 'expires_at', type: 'string', format: 'date-time', nullable: true),
-                ]
-            )
-        ),
+        requestBody: new OA\RequestBody(ref: '#/components/requestBodies/AssignPermissionsRequest'),
         tags: ['Department'],
         parameters: [
             new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
@@ -347,18 +303,7 @@ class DepartmentController extends Controller
         path: '/api/department/{uuid}/delegate',
         summary: 'Kierownik działu przekazuje własne uprawnienie (lub grupę uprawnień) innej osobie z tego działu',
         security: [['sanctum' => []]],
-        requestBody: new OA\RequestBody(
-            required: true,
-            content: new OA\JsonContent(
-                required: ['user_uuid'],
-                properties: [
-                    new OA\Property(property: 'user_uuid', type: 'string', format: 'uuid'),
-                    new OA\Property(property: 'permission_uuid', type: 'string', format: 'uuid', nullable: true),
-                    new OA\Property(property: 'permission_group_uuid', type: 'string', format: 'uuid', nullable: true),
-                    new OA\Property(property: 'expires_at', type: 'string', format: 'date-time', nullable: true),
-                ]
-            )
-        ),
+        requestBody: new OA\RequestBody(ref: '#/components/requestBodies/DelegatePermissionRequest'),
         tags: ['Department'],
         parameters: [
             new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
@@ -386,17 +331,7 @@ class DepartmentController extends Controller
         path: '/api/department/{uuid}/managed-roles',
         summary: 'Kierownik działu tworzy nową rolę w ramach działu i nadaje jej uprawnienia (muszą być podzbiorem uprawnień działu)',
         security: [['sanctum' => []]],
-        requestBody: new OA\RequestBody(
-            required: true,
-            content: new OA\JsonContent(
-                required: ['name'],
-                properties: [
-                    new OA\Property(property: 'name', type: 'string'),
-                    new OA\Property(property: 'permissions', type: 'array', items: new OA\Items(type: 'string', format: 'uuid')),
-                    new OA\Property(property: 'permission_groups', type: 'array', items: new OA\Items(type: 'string', format: 'uuid')),
-                ]
-            )
-        ),
+        requestBody: new OA\RequestBody(ref: '#/components/requestBodies/ManagedRoleRequest'),
         tags: ['Department'],
         parameters: [
             new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),

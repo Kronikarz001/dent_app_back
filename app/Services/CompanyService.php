@@ -30,6 +30,8 @@ readonly class CompanyService implements CompanyServiceInterface
     /**
      * @param array $data
      * @return Company
+     *
+     * @throws DuplicateCompanyDataException
      */
     public function createCompany(array $data): Company
     {

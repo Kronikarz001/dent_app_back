@@ -1,5 +1,5 @@
 # Local development only. Production runs on shared hosting (PHP-FPM +
-# MySQL, no Docker/Postgres) and is deployed via .github/workflows/cd.yml
+# MySQL, no Docker/Postgres) and is deployed via .GitHub/workflows/cd.yml
 # (rsync + SSH), entirely independent of this file.
 services:
   dent_app_back_nginx:

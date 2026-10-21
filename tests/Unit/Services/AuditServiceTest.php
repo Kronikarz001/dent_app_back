@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Mockery;
 use Mockery\MockInterface;
 use Tests\TestCase;
+use Throwable;
 
 /**
  * Summary of AuditServiceTest
@@ -25,6 +26,8 @@ class AuditServiceTest extends TestCase
 
     /**
      * @return void
+     *
+     * @throws Throwable
      */
     protected function setUp(): void
     {

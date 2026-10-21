@@ -30,7 +30,9 @@ use App\Providers\AppServiceProviders\RoleServiceProvider;
 use App\Providers\AppServiceProviders\SearchServiceProvider;
 use App\Providers\AppServiceProviders\UserGroupServiceProvider;
 use App\Providers\AppServiceProviders\UserServiceProvider;
+use Carbon\CarbonInterface;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\ServiceProvider;
 use PhpOffice\PhpSpreadsheet\Shared\File as SpreadsheetFile;
 
@@ -78,6 +80,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         JsonResource::withoutWrapping();
+        Date::serializeUsing(fn (CarbonInterface $date) => $date->format('Y-m-d\TH:i:s.u'));
         $this->loadJsonTranslationsFrom(__DIR__.'/../lang');
         ini_set('upload_tmp_dir', storage_path('temp'));
         SpreadsheetFile::setUseUploadTempDirectory(true);

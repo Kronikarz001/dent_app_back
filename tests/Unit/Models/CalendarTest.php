@@ -64,4 +64,36 @@ final class CalendarTest extends UnitTestCase
 
         $this->assertTrue($calendar->dentalExaminations->contains($examination));
     }
+
+    /**
+     * @return void
+     */
+    public function testStartsAtCombinesDateAndStartTime(): void
+    {
+        $calendar = Calendar::factory()->create(['date' => '2026-10-28', 'start_time' => '10:30']);
+
+        $this->assertSame('2026-10-28 10:30:00', $calendar->fresh()->startsAt()->toDateTimeString());
+    }
+
+    /**
+     * @return void
+     */
+    public function testStartsAtFallsBackToMidnightWithoutStartTime(): void
+    {
+        $calendar = Calendar::factory()->create(['date' => '2026-10-28', 'start_time' => null]);
+
+        $this->assertSame('2026-10-28 00:00:00', $calendar->fresh()->startsAt()->toDateTimeString());
+    }
+
+    /**
+     * @return void
+     */
+    public function testStartsAtUsesClinicTimezoneIncludingDaylightSavingTime(): void
+    {
+        $summer = Calendar::factory()->create(['date' => '2026-10-02', 'start_time' => '12:00']);
+        $winter = Calendar::factory()->create(['date' => '2026-10-28', 'start_time' => '10:30']);
+
+        $this->assertSame('2026-10-02T12:00:00+02:00', $summer->fresh()->startsAt()->toIso8601String());
+        $this->assertSame('2026-10-28T10:30:00+01:00', $winter->fresh()->startsAt()->toIso8601String());
+    }
 }
