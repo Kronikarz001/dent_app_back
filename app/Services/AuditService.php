@@ -144,6 +144,8 @@ readonly class AuditService implements AuditServiceInterface
      * @param string $resource
      * @param string $uuid
      * @return Model
+     *
+     * @throws InvalidAuditableIdentifierException
      */
     public function resolveAuditable(string $resource, string $uuid): Model
     {

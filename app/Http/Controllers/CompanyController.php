@@ -86,24 +86,7 @@ class CompanyController extends Controller
         path: '/api/company',
         summary: 'Tworzy nową firmę',
         security: [['sanctum' => []]],
-        requestBody: new OA\RequestBody(
-            required: true,
-            content: new OA\JsonContent(
-                required: ['name', 'regon', 'nip', 'address', 'province', 'district', 'municipality'],
-                properties: [
-                    new OA\Property(property: 'name', type: 'string'),
-                    new OA\Property(property: 'regon', type: 'string'),
-                    new OA\Property(property: 'nip', type: 'string'),
-                    new OA\Property(property: 'address', type: 'string'),
-                    new OA\Property(property: 'province', type: 'string'),
-                    new OA\Property(property: 'district', type: 'string'),
-                    new OA\Property(property: 'municipality', type: 'string'),
-                    new OA\Property(property: 'business_form', type: 'string', nullable: true),
-                    new OA\Property(property: 'type_of_business', type: 'string', nullable: true),
-                    new OA\Property(property: 'form_of_ownership', type: 'string', nullable: true),
-                ]
-            )
-        ),
+        requestBody: new OA\RequestBody(ref: '#/components/requestBodies/CompanyRequest'),
         tags: ['Company'],
         responses: [
             new OA\Response(
@@ -130,24 +113,7 @@ class CompanyController extends Controller
         path: '/api/company/{uuid}',
         summary: 'Aktualizuje firmę',
         security: [['sanctum' => []]],
-        requestBody: new OA\RequestBody(
-            required: true,
-            content: new OA\JsonContent(
-                required: ['name', 'regon', 'nip', 'address', 'province', 'district', 'municipality'],
-                properties: [
-                    new OA\Property(property: 'name', type: 'string'),
-                    new OA\Property(property: 'regon', type: 'string'),
-                    new OA\Property(property: 'nip', type: 'string'),
-                    new OA\Property(property: 'address', type: 'string'),
-                    new OA\Property(property: 'province', type: 'string'),
-                    new OA\Property(property: 'district', type: 'string'),
-                    new OA\Property(property: 'municipality', type: 'string'),
-                    new OA\Property(property: 'business_form', type: 'string', nullable: true),
-                    new OA\Property(property: 'type_of_business', type: 'string', nullable: true),
-                    new OA\Property(property: 'form_of_ownership', type: 'string', nullable: true),
-                ]
-            )
-        ),
+        requestBody: new OA\RequestBody(ref: '#/components/requestBodies/CompanyRequest'),
         tags: ['Company'],
         parameters: [
             new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),

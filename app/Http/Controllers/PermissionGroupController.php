@@ -104,15 +104,7 @@ class PermissionGroupController extends Controller
         path: '/api/permission-group',
         summary: 'Tworzy nową grupę uprawnień',
         security: [['sanctum' => []]],
-        requestBody: new OA\RequestBody(
-            required: true,
-            content: new OA\JsonContent(
-                required: ['name'],
-                properties: [
-                    new OA\Property(property: 'name', type: 'string'),
-                ]
-            )
-        ),
+        requestBody: new OA\RequestBody(ref: '#/components/requestBodies/NameRequest'),
         tags: ['PermissionGroup'],
         responses: [
             new OA\Response(
@@ -139,15 +131,7 @@ class PermissionGroupController extends Controller
         path: '/api/permission-group/{uuid}',
         summary: 'Aktualizuje grupę uprawnień',
         security: [['sanctum' => []]],
-        requestBody: new OA\RequestBody(
-            required: true,
-            content: new OA\JsonContent(
-                required: ['name'],
-                properties: [
-                    new OA\Property(property: 'name', type: 'string'),
-                ]
-            )
-        ),
+        requestBody: new OA\RequestBody(ref: '#/components/requestBodies/NameRequest'),
         tags: ['PermissionGroup'],
         parameters: [
             new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),

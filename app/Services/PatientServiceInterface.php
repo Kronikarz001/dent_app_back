@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Dto\PatientStatisticsDto;
 use App\Http\Requests\ExportRequest;
 use App\Models\Patient;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -47,6 +48,12 @@ interface PatientServiceInterface
      * @return void
      */
     public function deletePatient(Patient $patient): void;
+
+    /**
+     * @param Patient $patient
+     * @return PatientStatisticsDto
+     */
+    public function getStatistics(Patient $patient): PatientStatisticsDto;
 
     /**
      * @param ExportRequest $request

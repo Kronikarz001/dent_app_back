@@ -4,10 +4,14 @@ namespace Tests\Feature\Controllers;
 
 use App\Enums\AuditableEventType;
 use App\Models\Audit;
+use App\Models\Calendar;
+use App\Models\JobPosition;
 use App\Models\Patient;
 use App\Models\Permission;
 use App\Models\PermissionAssignment;
 use App\Models\User;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 /**
@@ -373,5 +377,134 @@ class PatientControllerTest extends TestCase
             ->assertNoContent();
 
         $this->assertDatabaseMissing('patients', ['uuid' => $patient->uuid]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testStatisticsReturnsVisitsNoShowsAndLeadDoctor(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2026-10-21 12:00:00', 'Europe/Warsaw'));
+        $jobPosition = JobPosition::factory()->create(['name' => 'Lekarz dentysta']);
+        $leadDoctor = User::factory()->create(['job_position_uuid' => $jobPosition->uuid]);
+        $visitDoctor = User::factory()->create(['job_position_uuid' => $jobPosition->uuid]);
+        $patient = Patient::factory()->create(['doctor_uuid' => $leadDoctor->uuid]);
+
+        $lastVisit = $this->createVisitFor($patient, '2026-10-02', '12:00', false, $visitDoctor);
+        $nextVisit = $this->createVisitFor($patient, '2026-10-28', '10:30', false, $visitDoctor);
+        $this->createVisitFor($patient, '2026-08-14', '09:00', true);
+
+        Audit::create([
+            'auditable_type' => $patient->getMorphClass(),
+            'auditable_id' => $patient->uuid,
+            'user_uuid' => $leadDoctor->uuid,
+            'type' => AuditableEventType::UPDATE,
+            'change_to' => ['doctor_uuid' => $leadDoctor->uuid],
+        ]);
+
+        $response = $this->callApiWithLoggedUser()
+            ->getJson(route('patient.statistics', ['patient' => $patient->uuid]));
+
+        $response->assertOk()
+            ->assertJsonPath('last_visit.uuid', $lastVisit->uuid)
+            ->assertJsonPath('last_visit.starts_at', '2026-10-02T12:00:00.000000')
+            ->assertJsonPath('last_visit.doctor', [
+                'uuid' => $visitDoctor->uuid,
+                'first_name' => $visitDoctor->first_name,
+                'last_name' => $visitDoctor->last_name,
+                'position' => 'Lekarz dentysta',
+            ])
+            ->assertJsonPath('next_visit.uuid', $nextVisit->uuid)
+            ->assertJsonPath('next_visit.starts_at', '2026-10-28T10:30:00.000000')
+            ->assertJsonPath('no_shows.count', 1)
+            ->assertJsonPath('no_shows.total_appointments', 3)
+            ->assertJsonPath('no_shows.last_at', '2026-08-14T09:00:00.000000')
+            ->assertJsonPath('lead_doctor.doctor.uuid', $leadDoctor->uuid)
+            ->assertJsonPath('lead_doctor.since', '2026-10-21');
+    }
+
+    /**
+     * @return void
+     */
+    public function testStatisticsReturnsEmptyValuesForPatientWithoutHistory(): void
+    {
+        $patient = Patient::factory()->create(['doctor_uuid' => null]);
+
+        $response = $this->callApiWithLoggedUser()
+            ->getJson(route('patient.statistics', ['patient' => $patient->uuid]));
+
+        $response->assertOk()
+            ->assertExactJson([
+                'last_visit' => null,
+                'next_visit' => null,
+                'no_shows' => [
+                    'count' => 0,
+                    'total_appointments' => 0,
+                    'last_at' => null,
+                ],
+                'lead_doctor' => null,
+            ]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testStatisticsHandlesVisitWithoutDoctorAndLeadDoctorWithoutHistory(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2026-10-21 12:00:00', 'Europe/Warsaw'));
+        $leadDoctor = User::factory()->create(['job_position_uuid' => null]);
+        $patient = Patient::factory()->create(['doctor_uuid' => $leadDoctor->uuid]);
+        $this->createVisitFor($patient, '2026-10-28', '10:30');
+
+        $response = $this->callApiWithLoggedUser()
+            ->getJson(route('patient.statistics', ['patient' => $patient->uuid]));
+
+        $response->assertOk()
+            ->assertJsonPath('last_visit', null)
+            ->assertJsonPath('next_visit.doctor', null)
+            ->assertJsonPath('no_shows.count', 0)
+            ->assertJsonPath('no_shows.total_appointments', 1)
+            ->assertJsonPath('no_shows.last_at', null)
+            ->assertJsonPath('lead_doctor.doctor', [
+                'uuid' => $leadDoctor->uuid,
+                'first_name' => $leadDoctor->first_name,
+                'last_name' => $leadDoctor->last_name,
+                'position' => null,
+            ])
+            ->assertJsonPath('lead_doctor.since', null);
+    }
+
+    /**
+     * @return void
+     */
+    public function testStatisticsReturnsNotFoundForUnknownPatient(): void
+    {
+        $this->callApiWithLoggedUser()
+            ->getJson(route('patient.statistics', ['patient' => Str::uuid()->toString()]))
+            ->assertNotFound();
+    }
+
+    /**
+     * @param Patient $patient
+     * @param string $date
+     * @param string $startTime
+     * @param bool $noShow
+     * @param User|null $doctor
+     * @return Calendar
+     */
+    private function createVisitFor(Patient $patient, string $date, string $startTime, bool $noShow = false, ?User $doctor = null): Calendar
+    {
+        $calendar = Calendar::factory()->create([
+            'date' => $date,
+            'start_time' => $startTime,
+            'no_show' => $noShow,
+        ]);
+        $calendar->patients()->attach($patient->uuid);
+
+        if ($doctor !== null) {
+            $calendar->users()->attach($doctor->uuid);
+        }
+
+        return $calendar;
     }
 }

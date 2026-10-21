@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\SerializesLocalDates;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -16,7 +17,7 @@ abstract class UuidModel extends Model
      * @use HasFactory<Factory>
      * @use HasUuids
      */
-    use HasFactory, HasUuids;
+    use HasFactory, HasUuids, SerializesLocalDates;
 
     /**
      * @var string

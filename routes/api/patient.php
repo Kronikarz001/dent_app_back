@@ -36,4 +36,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/patient/{patient}/prescription', [PrescriptionController::class, 'byPatient'])
         ->name('patient.prescriptions');
+
+    Route::get('/patient/{patient}/statistics', [PatientController::class, 'statistics'])
+        ->name('patient.statistics');
 });

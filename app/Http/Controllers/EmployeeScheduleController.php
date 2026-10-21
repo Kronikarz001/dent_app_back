@@ -104,22 +104,7 @@ class EmployeeScheduleController extends Controller
         path: '/api/employee-schedule',
         summary: 'Tworzy nowe wydarzenie w kalendarzu pracowników',
         security: [['sanctum' => []]],
-        requestBody: new OA\RequestBody(
-            required: true,
-            content: new OA\JsonContent(
-                required: ['type', 'date'],
-                properties: [
-                    new OA\Property(property: 'type', type: 'string'),
-                    new OA\Property(property: 'name', type: 'string', nullable: true),
-                    new OA\Property(property: 'description', type: 'string', nullable: true),
-                    new OA\Property(property: 'date', type: 'string', format: 'date'),
-                    new OA\Property(property: 'end_date', type: 'string', format: 'date', nullable: true),
-                    new OA\Property(property: 'start_time', type: 'string', example: '09:00', nullable: true),
-                    new OA\Property(property: 'end_time', type: 'string', example: '17:00', nullable: true),
-                    new OA\Property(property: 'is_active', type: 'boolean'),
-                ]
-            )
-        ),
+        requestBody: new OA\RequestBody(ref: '#/components/requestBodies/EmployeeScheduleRequest'),
         tags: ['EmployeeSchedule'],
         responses: [
             new OA\Response(
@@ -146,22 +131,7 @@ class EmployeeScheduleController extends Controller
         path: '/api/employee-schedule/{uuid}',
         summary: 'Aktualizuje wydarzenie w kalendarzu pracowników',
         security: [['sanctum' => []]],
-        requestBody: new OA\RequestBody(
-            required: true,
-            content: new OA\JsonContent(
-                required: ['type', 'date'],
-                properties: [
-                    new OA\Property(property: 'type', type: 'string'),
-                    new OA\Property(property: 'name', type: 'string', nullable: true),
-                    new OA\Property(property: 'description', type: 'string', nullable: true),
-                    new OA\Property(property: 'date', type: 'string', format: 'date'),
-                    new OA\Property(property: 'end_date', type: 'string', format: 'date', nullable: true),
-                    new OA\Property(property: 'start_time', type: 'string', example: '09:00', nullable: true),
-                    new OA\Property(property: 'end_time', type: 'string', example: '17:00', nullable: true),
-                    new OA\Property(property: 'is_active', type: 'boolean'),
-                ]
-            )
-        ),
+        requestBody: new OA\RequestBody(ref: '#/components/requestBodies/EmployeeScheduleRequest'),
         tags: ['EmployeeSchedule'],
         parameters: [
             new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),

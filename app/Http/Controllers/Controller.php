@@ -229,6 +229,39 @@ use OpenApi\Attributes as OA;
     ]
 )]
 #[OA\Schema(
+    schema: 'PatientStatisticsDoctor',
+    properties: [
+        new OA\Property(property: 'uuid', type: 'string', format: 'uuid'),
+        new OA\Property(property: 'first_name', type: 'string'),
+        new OA\Property(property: 'last_name', type: 'string'),
+        new OA\Property(property: 'position', type: 'string', nullable: true),
+    ]
+)]
+#[OA\Schema(
+    schema: 'PatientStatisticsVisit',
+    properties: [
+        new OA\Property(property: 'uuid', type: 'string', format: 'uuid'),
+        new OA\Property(property: 'starts_at', type: 'string', format: 'date-time'),
+        new OA\Property(property: 'doctor', ref: '#/components/schemas/PatientStatisticsDoctor', nullable: true),
+    ]
+)]
+#[OA\Schema(
+    schema: 'PatientStatisticsResource',
+    properties: [
+        new OA\Property(property: 'last_visit', ref: '#/components/schemas/PatientStatisticsVisit', nullable: true),
+        new OA\Property(property: 'next_visit', ref: '#/components/schemas/PatientStatisticsVisit', nullable: true),
+        new OA\Property(property: 'no_shows', properties: [
+            new OA\Property(property: 'count', type: 'integer'),
+            new OA\Property(property: 'total_appointments', type: 'integer'),
+            new OA\Property(property: 'last_at', type: 'string', format: 'date-time', nullable: true),
+        ], type: 'object'),
+        new OA\Property(property: 'lead_doctor', properties: [
+            new OA\Property(property: 'doctor', ref: '#/components/schemas/PatientStatisticsDoctor'),
+            new OA\Property(property: 'since', type: 'string', format: 'date', nullable: true),
+        ], type: 'object', nullable: true),
+    ]
+)]
+#[OA\Schema(
     schema: 'PrescriptionResource',
     properties: [
         new OA\Property(property: 'uuid', type: 'string', format: 'uuid'),
@@ -316,6 +349,172 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
         new OA\Property(property: 'updated_at', type: 'string', format: 'date-time'),
     ]
+)]
+#[OA\RequestBody(
+    request: 'FileUploadRequest',
+    required: true,
+    content: new OA\MediaType(
+        mediaType: 'multipart/form-data',
+        schema: new OA\Schema(
+            required: ['files[]'],
+            properties: [
+                new OA\Property(property: 'files[]', type: 'array', items: new OA\Items(type: 'string', format: 'binary')),
+            ]
+        )
+    )
+)]
+#[OA\RequestBody(
+    request: 'SingleFileUploadRequest',
+    required: true,
+    content: new OA\MediaType(
+        mediaType: 'multipart/form-data',
+        schema: new OA\Schema(
+            required: ['file'],
+            properties: [
+                new OA\Property(property: 'file', type: 'string', format: 'binary'),
+            ]
+        )
+    )
+)]
+#[OA\RequestBody(
+    request: 'FileRenameRequest',
+    required: true,
+    content: new OA\JsonContent(
+        required: ['filename'],
+        properties: [
+            new OA\Property(property: 'filename', type: 'string', example: 'nowa_nazwa'),
+        ]
+    )
+)]
+#[OA\RequestBody(
+    request: 'NameRequest',
+    required: true,
+    content: new OA\JsonContent(
+        required: ['name'],
+        properties: [
+            new OA\Property(property: 'name', type: 'string'),
+        ]
+    )
+)]
+#[OA\RequestBody(
+    request: 'AssignPermissionsRequest',
+    required: true,
+    content: new OA\JsonContent(
+        properties: [
+            new OA\Property(property: 'permissions', type: 'array', items: new OA\Items(type: 'string', format: 'uuid')),
+            new OA\Property(property: 'permission_groups', type: 'array', items: new OA\Items(type: 'string', format: 'uuid')),
+            new OA\Property(property: 'expires_at', type: 'string', format: 'date-time', nullable: true),
+        ]
+    )
+)]
+#[OA\RequestBody(
+    request: 'AssignUsersRequest',
+    required: true,
+    content: new OA\JsonContent(
+        properties: [
+            new OA\Property(property: 'users', type: 'array', items: new OA\Items(
+                properties: [
+                    new OA\Property(property: 'uuid', type: 'string', format: 'uuid'),
+                    new OA\Property(property: 'is_manager', type: 'boolean'),
+                ]
+            )),
+        ]
+    )
+)]
+#[OA\RequestBody(
+    request: 'AssignJobPositionsRequest',
+    required: true,
+    content: new OA\JsonContent(
+        properties: [
+            new OA\Property(property: 'job_positions', type: 'array', items: new OA\Items(type: 'string', format: 'uuid')),
+        ]
+    )
+)]
+#[OA\RequestBody(
+    request: 'DelegatePermissionRequest',
+    required: true,
+    content: new OA\JsonContent(
+        required: ['user_uuid'],
+        properties: [
+            new OA\Property(property: 'user_uuid', type: 'string', format: 'uuid'),
+            new OA\Property(property: 'permission_uuid', type: 'string', format: 'uuid', nullable: true),
+            new OA\Property(property: 'permission_group_uuid', type: 'string', format: 'uuid', nullable: true),
+            new OA\Property(property: 'expires_at', type: 'string', format: 'date-time', nullable: true),
+        ]
+    )
+)]
+#[OA\RequestBody(
+    request: 'ManagedRoleRequest',
+    required: true,
+    content: new OA\JsonContent(
+        required: ['name'],
+        properties: [
+            new OA\Property(property: 'name', type: 'string'),
+            new OA\Property(property: 'permissions', type: 'array', items: new OA\Items(type: 'string', format: 'uuid')),
+            new OA\Property(property: 'permission_groups', type: 'array', items: new OA\Items(type: 'string', format: 'uuid')),
+        ]
+    )
+)]
+#[OA\RequestBody(
+    request: 'CompanyRequest',
+    required: true,
+    content: new OA\JsonContent(
+        required: ['name', 'regon', 'nip', 'address', 'province', 'district', 'municipality'],
+        properties: [
+            new OA\Property(property: 'name', type: 'string'),
+            new OA\Property(property: 'regon', type: 'string'),
+            new OA\Property(property: 'nip', type: 'string'),
+            new OA\Property(property: 'address', type: 'string'),
+            new OA\Property(property: 'province', type: 'string'),
+            new OA\Property(property: 'district', type: 'string'),
+            new OA\Property(property: 'municipality', type: 'string'),
+            new OA\Property(property: 'business_form', type: 'string', nullable: true),
+            new OA\Property(property: 'type_of_business', type: 'string', nullable: true),
+            new OA\Property(property: 'form_of_ownership', type: 'string', nullable: true),
+        ]
+    )
+)]
+#[OA\RequestBody(
+    request: 'EmployeeScheduleRequest',
+    required: true,
+    content: new OA\JsonContent(
+        required: ['type', 'date'],
+        properties: [
+            new OA\Property(property: 'type', type: 'string'),
+            new OA\Property(property: 'name', type: 'string', nullable: true),
+            new OA\Property(property: 'description', type: 'string', nullable: true),
+            new OA\Property(property: 'date', type: 'string', format: 'date'),
+            new OA\Property(property: 'end_date', type: 'string', format: 'date', nullable: true),
+            new OA\Property(property: 'start_time', type: 'string', example: '09:00', nullable: true),
+            new OA\Property(property: 'end_time', type: 'string', example: '17:00', nullable: true),
+            new OA\Property(property: 'is_active', type: 'boolean'),
+        ]
+    )
+)]
+#[OA\RequestBody(
+    request: 'PrescriptionRequest',
+    required: true,
+    content: new OA\JsonContent(
+        required: ['status', 'patient_uuid', 'doctor_uuid'],
+        properties: [
+            new OA\Property(property: 'name', type: 'string', nullable: true),
+            new OA\Property(property: 'code', type: 'string', nullable: true),
+            new OA\Property(property: 'status', type: 'string', enum: ['DRAFT', 'ISSUED', 'REALIZED', 'CANCELLED', 'EXPIRED']),
+            new OA\Property(property: 'patient_uuid', type: 'string', format: 'uuid'),
+            new OA\Property(property: 'doctor_uuid', type: 'string', format: 'uuid'),
+            new OA\Property(property: 'external_reference', type: 'string', nullable: true),
+            new OA\Property(
+                property: 'medicines',
+                type: 'array',
+                nullable: true,
+                items: new OA\Items(properties: [
+                    new OA\Property(property: 'medicine_uuid', type: 'string', format: 'uuid'),
+                    new OA\Property(property: 'quantity', type: 'integer', example: 1),
+                    new OA\Property(property: 'dosage', type: 'string', example: '1 tabletka co 8 godzin'),
+                ])
+            ),
+        ]
+    )
 )]
 abstract class Controller
 {

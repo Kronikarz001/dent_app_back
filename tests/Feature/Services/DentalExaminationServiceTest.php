@@ -24,7 +24,7 @@ class DentalExaminationServiceTest extends TestCase
      */
     private DentalExaminationServiceInterface $service;
 
-    protected const DENTAL_EXAMINATIONS_TABLE = 'dental_examinations';
+    protected const string DENTAL_EXAMINATIONS_TABLE = 'dental_examinations';
 
     /**
      * @return void

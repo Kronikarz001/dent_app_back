@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Console;
 
-use Illuminate\Console\Command;
+use Symfony\Component\Console\Command\Command as CommandAlias;
 use Tests\TestCase;
 
 /**
@@ -16,6 +16,6 @@ class SyncP1MedicinesCommandTest extends TestCase
     public function testCommandFailsUntilP1IntegrationIsConnected(): void
     {
         $this->artisan('p1:sync-medicines')
-            ->assertExitCode(Command::FAILURE);
+            ->assertExitCode(CommandAlias::FAILURE);
     }
 }

@@ -1665,26 +1665,7 @@
                     }
                 ],
                 "requestBody": {
-                    "required": true,
-                    "content": {
-                        "multipart/form-data": {
-                            "schema": {
-                                "required": [
-                                    "files[]"
-                                ],
-                                "properties": {
-                                    "files[]": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string",
-                                            "format": "binary"
-                                        }
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
+                    "$ref": "#/components/requestBodies/FileUploadRequest"
                 },
                 "responses": {
                     "200": {
@@ -1793,23 +1774,7 @@
                     }
                 ],
                 "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "filename"
-                                ],
-                                "properties": {
-                                    "filename": {
-                                        "type": "string",
-                                        "example": "nowa_nazwa"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
+                    "$ref": "#/components/requestBodies/FileRenameRequest"
                 },
                 "responses": {
                     "200": {
@@ -1951,26 +1916,7 @@
                     }
                 ],
                 "requestBody": {
-                    "required": true,
-                    "content": {
-                        "multipart/form-data": {
-                            "schema": {
-                                "required": [
-                                    "files[]"
-                                ],
-                                "properties": {
-                                    "files[]": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string",
-                                            "format": "binary"
-                                        }
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
+                    "$ref": "#/components/requestBodies/FileUploadRequest"
                 },
                 "responses": {
                     "200": {
@@ -2046,58 +1992,7 @@
                 "summary": "Tworzy nową firmę",
                 "operationId": "faf1545d2af89079ca55c4f9ed6ea302",
                 "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "name",
-                                    "regon",
-                                    "nip",
-                                    "address",
-                                    "province",
-                                    "district",
-                                    "municipality"
-                                ],
-                                "properties": {
-                                    "name": {
-                                        "type": "string"
-                                    },
-                                    "regon": {
-                                        "type": "string"
-                                    },
-                                    "nip": {
-                                        "type": "string"
-                                    },
-                                    "address": {
-                                        "type": "string"
-                                    },
-                                    "province": {
-                                        "type": "string"
-                                    },
-                                    "district": {
-                                        "type": "string"
-                                    },
-                                    "municipality": {
-                                        "type": "string"
-                                    },
-                                    "business_form": {
-                                        "type": "string",
-                                        "nullable": true
-                                    },
-                                    "type_of_business": {
-                                        "type": "string",
-                                        "nullable": true
-                                    },
-                                    "form_of_ownership": {
-                                        "type": "string",
-                                        "nullable": true
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
+                    "$ref": "#/components/requestBodies/CompanyRequest"
                 },
                 "responses": {
                     "201": {
@@ -2188,58 +2083,7 @@
                     }
                 ],
                 "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "name",
-                                    "regon",
-                                    "nip",
-                                    "address",
-                                    "province",
-                                    "district",
-                                    "municipality"
-                                ],
-                                "properties": {
-                                    "name": {
-                                        "type": "string"
-                                    },
-                                    "regon": {
-                                        "type": "string"
-                                    },
-                                    "nip": {
-                                        "type": "string"
-                                    },
-                                    "address": {
-                                        "type": "string"
-                                    },
-                                    "province": {
-                                        "type": "string"
-                                    },
-                                    "district": {
-                                        "type": "string"
-                                    },
-                                    "municipality": {
-                                        "type": "string"
-                                    },
-                                    "business_form": {
-                                        "type": "string",
-                                        "nullable": true
-                                    },
-                                    "type_of_business": {
-                                        "type": "string",
-                                        "nullable": true
-                                    },
-                                    "form_of_ownership": {
-                                        "type": "string",
-                                        "nullable": true
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
+                    "$ref": "#/components/requestBodies/CompanyRequest"
                 },
                 "responses": {
                     "200": {
@@ -2704,26 +2548,7 @@
                     }
                 ],
                 "requestBody": {
-                    "required": true,
-                    "content": {
-                        "multipart/form-data": {
-                            "schema": {
-                                "required": [
-                                    "files[]"
-                                ],
-                                "properties": {
-                                    "files[]": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string",
-                                            "format": "binary"
-                                        }
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
+                    "$ref": "#/components/requestBodies/FileUploadRequest"
                 },
                 "responses": {
                     "200": {
@@ -2832,23 +2657,7 @@
                     }
                 ],
                 "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "filename"
-                                ],
-                                "properties": {
-                                    "filename": {
-                                        "type": "string",
-                                        "example": "nowa_nazwa"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
+                    "$ref": "#/components/requestBodies/FileRenameRequest"
                 },
                 "responses": {
                     "200": {
@@ -2990,26 +2799,7 @@
                     }
                 ],
                 "requestBody": {
-                    "required": true,
-                    "content": {
-                        "multipart/form-data": {
-                            "schema": {
-                                "required": [
-                                    "files[]"
-                                ],
-                                "properties": {
-                                    "files[]": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string",
-                                            "format": "binary"
-                                        }
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
+                    "$ref": "#/components/requestBodies/FileUploadRequest"
                 },
                 "responses": {
                     "200": {
@@ -3190,22 +2980,7 @@
                 "summary": "Tworzy nowy dział",
                 "operationId": "da58b28d8e0121c8e1936706214acbfe",
                 "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "name"
-                                ],
-                                "properties": {
-                                    "name": {
-                                        "type": "string"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
+                    "$ref": "#/components/requestBodies/NameRequest"
                 },
                 "responses": {
                     "201": {
@@ -3315,22 +3090,7 @@
                     }
                 ],
                 "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "name"
-                                ],
-                                "properties": {
-                                    "name": {
-                                        "type": "string"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
+                    "$ref": "#/components/requestBodies/NameRequest"
                 },
                 "responses": {
                     "204": {
@@ -3455,23 +3215,7 @@
                     }
                 ],
                 "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "properties": {
-                                    "job_positions": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string",
-                                            "format": "uuid"
-                                        }
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
+                    "$ref": "#/components/requestBodies/AssignJobPositionsRequest"
                 },
                 "responses": {
                     "204": {
@@ -3510,31 +3254,7 @@
                     }
                 ],
                 "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "properties": {
-                                    "users": {
-                                        "type": "array",
-                                        "items": {
-                                            "properties": {
-                                                "uuid": {
-                                                    "type": "string",
-                                                    "format": "uuid"
-                                                },
-                                                "is_manager": {
-                                                    "type": "boolean"
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
+                    "$ref": "#/components/requestBodies/AssignUsersRequest"
                 },
                 "responses": {
                     "204": {
@@ -3573,35 +3293,7 @@
                     }
                 ],
                 "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "properties": {
-                                    "permissions": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string",
-                                            "format": "uuid"
-                                        }
-                                    },
-                                    "permission_groups": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string",
-                                            "format": "uuid"
-                                        }
-                                    },
-                                    "expires_at": {
-                                        "type": "string",
-                                        "format": "date-time",
-                                        "nullable": true
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
+                    "$ref": "#/components/requestBodies/AssignPermissionsRequest"
                 },
                 "responses": {
                     "204": {
@@ -3640,38 +3332,7 @@
                     }
                 ],
                 "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "user_uuid"
-                                ],
-                                "properties": {
-                                    "user_uuid": {
-                                        "type": "string",
-                                        "format": "uuid"
-                                    },
-                                    "permission_uuid": {
-                                        "type": "string",
-                                        "format": "uuid",
-                                        "nullable": true
-                                    },
-                                    "permission_group_uuid": {
-                                        "type": "string",
-                                        "format": "uuid",
-                                        "nullable": true
-                                    },
-                                    "expires_at": {
-                                        "type": "string",
-                                        "format": "date-time",
-                                        "nullable": true
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
+                    "$ref": "#/components/requestBodies/DelegatePermissionRequest"
                 },
                 "responses": {
                     "204": {
@@ -3713,36 +3374,7 @@
                     }
                 ],
                 "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "name"
-                                ],
-                                "properties": {
-                                    "name": {
-                                        "type": "string"
-                                    },
-                                    "permissions": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string",
-                                            "format": "uuid"
-                                        }
-                                    },
-                                    "permission_groups": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string",
-                                            "format": "uuid"
-                                        }
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
+                    "$ref": "#/components/requestBodies/ManagedRoleRequest"
                 },
                 "responses": {
                     "201": {
@@ -3821,53 +3453,7 @@
                 "summary": "Tworzy nowe wydarzenie w kalendarzu pracowników",
                 "operationId": "05408215af1017ee423e6c8cc2527ccc",
                 "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "type",
-                                    "date"
-                                ],
-                                "properties": {
-                                    "type": {
-                                        "type": "string"
-                                    },
-                                    "name": {
-                                        "type": "string",
-                                        "nullable": true
-                                    },
-                                    "description": {
-                                        "type": "string",
-                                        "nullable": true
-                                    },
-                                    "date": {
-                                        "type": "string",
-                                        "format": "date"
-                                    },
-                                    "end_date": {
-                                        "type": "string",
-                                        "format": "date",
-                                        "nullable": true
-                                    },
-                                    "start_time": {
-                                        "type": "string",
-                                        "example": "09:00",
-                                        "nullable": true
-                                    },
-                                    "end_time": {
-                                        "type": "string",
-                                        "example": "17:00",
-                                        "nullable": true
-                                    },
-                                    "is_active": {
-                                        "type": "boolean"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
+                    "$ref": "#/components/requestBodies/EmployeeScheduleRequest"
                 },
                 "responses": {
                     "201": {
@@ -3977,53 +3563,7 @@
                     }
                 ],
                 "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "type",
-                                    "date"
-                                ],
-                                "properties": {
-                                    "type": {
-                                        "type": "string"
-                                    },
-                                    "name": {
-                                        "type": "string",
-                                        "nullable": true
-                                    },
-                                    "description": {
-                                        "type": "string",
-                                        "nullable": true
-                                    },
-                                    "date": {
-                                        "type": "string",
-                                        "format": "date"
-                                    },
-                                    "end_date": {
-                                        "type": "string",
-                                        "format": "date",
-                                        "nullable": true
-                                    },
-                                    "start_time": {
-                                        "type": "string",
-                                        "example": "09:00",
-                                        "nullable": true
-                                    },
-                                    "end_time": {
-                                        "type": "string",
-                                        "example": "17:00",
-                                        "nullable": true
-                                    },
-                                    "is_active": {
-                                        "type": "boolean"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
+                    "$ref": "#/components/requestBodies/EmployeeScheduleRequest"
                 },
                 "responses": {
                     "204": {
@@ -4497,35 +4037,7 @@
                     }
                 ],
                 "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "properties": {
-                                    "permissions": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string",
-                                            "format": "uuid"
-                                        }
-                                    },
-                                    "permission_groups": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string",
-                                            "format": "uuid"
-                                        }
-                                    },
-                                    "expires_at": {
-                                        "type": "string",
-                                        "format": "date-time",
-                                        "nullable": true
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
+                    "$ref": "#/components/requestBodies/AssignPermissionsRequest"
                 },
                 "responses": {
                     "204": {
@@ -4614,26 +4126,7 @@
                     }
                 ],
                 "requestBody": {
-                    "required": true,
-                    "content": {
-                        "multipart/form-data": {
-                            "schema": {
-                                "required": [
-                                    "files[]"
-                                ],
-                                "properties": {
-                                    "files[]": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string",
-                                            "format": "binary"
-                                        }
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
+                    "$ref": "#/components/requestBodies/FileUploadRequest"
                 },
                 "responses": {
                     "200": {
@@ -4742,23 +4235,7 @@
                     }
                 ],
                 "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "filename"
-                                ],
-                                "properties": {
-                                    "filename": {
-                                        "type": "string",
-                                        "example": "nowa_nazwa"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
+                    "$ref": "#/components/requestBodies/FileRenameRequest"
                 },
                 "responses": {
                     "200": {
@@ -4900,26 +4377,7 @@
                     }
                 ],
                 "requestBody": {
-                    "required": true,
-                    "content": {
-                        "multipart/form-data": {
-                            "schema": {
-                                "required": [
-                                    "files[]"
-                                ],
-                                "properties": {
-                                    "files[]": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string",
-                                            "format": "binary"
-                                        }
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
+                    "$ref": "#/components/requestBodies/FileUploadRequest"
                 },
                 "responses": {
                     "200": {
@@ -5334,26 +4792,7 @@
                     }
                 ],
                 "requestBody": {
-                    "required": true,
-                    "content": {
-                        "multipart/form-data": {
-                            "schema": {
-                                "required": [
-                                    "files[]"
-                                ],
-                                "properties": {
-                                    "files[]": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string",
-                                            "format": "binary"
-                                        }
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
+                    "$ref": "#/components/requestBodies/FileUploadRequest"
                 },
                 "responses": {
                     "200": {
@@ -5462,23 +4901,7 @@
                     }
                 ],
                 "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "filename"
-                                ],
-                                "properties": {
-                                    "filename": {
-                                        "type": "string",
-                                        "example": "nowa_nazwa"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
+                    "$ref": "#/components/requestBodies/FileRenameRequest"
                 },
                 "responses": {
                     "200": {
@@ -5620,26 +5043,7 @@
                     }
                 ],
                 "requestBody": {
-                    "required": true,
-                    "content": {
-                        "multipart/form-data": {
-                            "schema": {
-                                "required": [
-                                    "files[]"
-                                ],
-                                "properties": {
-                                    "files[]": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string",
-                                            "format": "binary"
-                                        }
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
+                    "$ref": "#/components/requestBodies/FileUploadRequest"
                 },
                 "responses": {
                     "200": {
@@ -6225,26 +5629,7 @@
                     }
                 ],
                 "requestBody": {
-                    "required": true,
-                    "content": {
-                        "multipart/form-data": {
-                            "schema": {
-                                "required": [
-                                    "files[]"
-                                ],
-                                "properties": {
-                                    "files[]": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string",
-                                            "format": "binary"
-                                        }
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
+                    "$ref": "#/components/requestBodies/FileUploadRequest"
                 },
                 "responses": {
                     "200": {
@@ -6353,23 +5738,7 @@
                     }
                 ],
                 "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "filename"
-                                ],
-                                "properties": {
-                                    "filename": {
-                                        "type": "string",
-                                        "example": "nowa_nazwa"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
+                    "$ref": "#/components/requestBodies/FileRenameRequest"
                 },
                 "responses": {
                     "200": {
@@ -6646,22 +6015,7 @@
                     }
                 ],
                 "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "name"
-                                ],
-                                "properties": {
-                                    "name": {
-                                        "type": "string"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
+                    "$ref": "#/components/requestBodies/NameRequest"
                 },
                 "responses": {
                     "200": {
@@ -7533,6 +6887,46 @@
                 ]
             }
         },
+        "/api/patient/{uuid}/statistics": {
+            "get": {
+                "tags": [
+                    "Patient"
+                ],
+                "summary": "Statystyki pacjenta (ostatnia/następna wizyta, nieobecności, lekarz prowadzący)",
+                "operationId": "d441be85391809fc30cbae5cb9cdb646",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PatientStatisticsResource"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/patient/export": {
             "get": {
                 "tags": [
@@ -7639,26 +7033,7 @@
                     }
                 ],
                 "requestBody": {
-                    "required": true,
-                    "content": {
-                        "multipart/form-data": {
-                            "schema": {
-                                "required": [
-                                    "files[]"
-                                ],
-                                "properties": {
-                                    "files[]": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string",
-                                            "format": "binary"
-                                        }
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
+                    "$ref": "#/components/requestBodies/FileUploadRequest"
                 },
                 "responses": {
                     "200": {
@@ -7767,23 +7142,7 @@
                     }
                 ],
                 "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "filename"
-                                ],
-                                "properties": {
-                                    "filename": {
-                                        "type": "string",
-                                        "example": "nowa_nazwa"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
+                    "$ref": "#/components/requestBodies/FileRenameRequest"
                 },
                 "responses": {
                     "200": {
@@ -7925,26 +7284,7 @@
                     }
                 ],
                 "requestBody": {
-                    "required": true,
-                    "content": {
-                        "multipart/form-data": {
-                            "schema": {
-                                "required": [
-                                    "files[]"
-                                ],
-                                "properties": {
-                                    "files[]": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string",
-                                            "format": "binary"
-                                        }
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
+                    "$ref": "#/components/requestBodies/FileUploadRequest"
                 },
                 "responses": {
                     "200": {
@@ -8042,26 +7382,7 @@
                     }
                 ],
                 "requestBody": {
-                    "required": true,
-                    "content": {
-                        "multipart/form-data": {
-                            "schema": {
-                                "required": [
-                                    "files[]"
-                                ],
-                                "properties": {
-                                    "files[]": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string",
-                                            "format": "binary"
-                                        }
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
+                    "$ref": "#/components/requestBodies/FileUploadRequest"
                 },
                 "responses": {
                     "200": {
@@ -8170,23 +7491,7 @@
                     }
                 ],
                 "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "filename"
-                                ],
-                                "properties": {
-                                    "filename": {
-                                        "type": "string",
-                                        "example": "nowa_nazwa"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
+                    "$ref": "#/components/requestBodies/FileRenameRequest"
                 },
                 "responses": {
                     "200": {
@@ -8452,22 +7757,7 @@
                 "summary": "Tworzy nową grupę uprawnień",
                 "operationId": "bc7a30a9af1e79396c9139c013105be5",
                 "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "name"
-                                ],
-                                "properties": {
-                                    "name": {
-                                        "type": "string"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
+                    "$ref": "#/components/requestBodies/NameRequest"
                 },
                 "responses": {
                     "201": {
@@ -8577,22 +7867,7 @@
                     }
                 ],
                 "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "name"
-                                ],
-                                "properties": {
-                                    "name": {
-                                        "type": "string"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
+                    "$ref": "#/components/requestBodies/NameRequest"
                 },
                 "responses": {
                     "204": {
@@ -8745,72 +8020,7 @@
                 "summary": "Tworzy nową receptę",
                 "operationId": "e3c6ad550ecbb0acfe39c7cfd1801548",
                 "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "status",
-                                    "patient_uuid",
-                                    "doctor_uuid"
-                                ],
-                                "properties": {
-                                    "name": {
-                                        "type": "string",
-                                        "nullable": true
-                                    },
-                                    "code": {
-                                        "type": "string",
-                                        "nullable": true
-                                    },
-                                    "status": {
-                                        "type": "string",
-                                        "enum": [
-                                            "DRAFT",
-                                            "ISSUED",
-                                            "REALIZED",
-                                            "CANCELLED",
-                                            "EXPIRED"
-                                        ]
-                                    },
-                                    "patient_uuid": {
-                                        "type": "string",
-                                        "format": "uuid"
-                                    },
-                                    "doctor_uuid": {
-                                        "type": "string",
-                                        "format": "uuid"
-                                    },
-                                    "external_reference": {
-                                        "type": "string",
-                                        "nullable": true
-                                    },
-                                    "medicines": {
-                                        "type": "array",
-                                        "items": {
-                                            "properties": {
-                                                "medicine_uuid": {
-                                                    "type": "string",
-                                                    "format": "uuid"
-                                                },
-                                                "quantity": {
-                                                    "type": "integer",
-                                                    "example": 1
-                                                },
-                                                "dosage": {
-                                                    "type": "string",
-                                                    "example": "1 tabletka co 8 godzin"
-                                                }
-                                            },
-                                            "type": "object"
-                                        },
-                                        "nullable": true
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
+                    "$ref": "#/components/requestBodies/PrescriptionRequest"
                 },
                 "responses": {
                     "201": {
@@ -8956,72 +8166,7 @@
                     }
                 ],
                 "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "status",
-                                    "patient_uuid",
-                                    "doctor_uuid"
-                                ],
-                                "properties": {
-                                    "name": {
-                                        "type": "string",
-                                        "nullable": true
-                                    },
-                                    "code": {
-                                        "type": "string",
-                                        "nullable": true
-                                    },
-                                    "status": {
-                                        "type": "string",
-                                        "enum": [
-                                            "DRAFT",
-                                            "ISSUED",
-                                            "REALIZED",
-                                            "CANCELLED",
-                                            "EXPIRED"
-                                        ]
-                                    },
-                                    "patient_uuid": {
-                                        "type": "string",
-                                        "format": "uuid"
-                                    },
-                                    "doctor_uuid": {
-                                        "type": "string",
-                                        "format": "uuid"
-                                    },
-                                    "external_reference": {
-                                        "type": "string",
-                                        "nullable": true
-                                    },
-                                    "medicines": {
-                                        "type": "array",
-                                        "items": {
-                                            "properties": {
-                                                "medicine_uuid": {
-                                                    "type": "string",
-                                                    "format": "uuid"
-                                                },
-                                                "quantity": {
-                                                    "type": "integer",
-                                                    "example": 1
-                                                },
-                                                "dosage": {
-                                                    "type": "string",
-                                                    "example": "1 tabletka co 8 godzin"
-                                                }
-                                            },
-                                            "type": "object"
-                                        },
-                                        "nullable": true
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
+                    "$ref": "#/components/requestBodies/PrescriptionRequest"
                 },
                 "responses": {
                     "204": {
@@ -9167,22 +8312,7 @@
                 "summary": "Tworzy nową rolę",
                 "operationId": "9520944bc105c406a9d07398b2ea3a17",
                 "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "name"
-                                ],
-                                "properties": {
-                                    "name": {
-                                        "type": "string"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
+                    "$ref": "#/components/requestBodies/NameRequest"
                 },
                 "responses": {
                     "201": {
@@ -9292,22 +8422,7 @@
                     }
                 ],
                 "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "name"
-                                ],
-                                "properties": {
-                                    "name": {
-                                        "type": "string"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
+                    "$ref": "#/components/requestBodies/NameRequest"
                 },
                 "responses": {
                     "204": {
@@ -9377,31 +8492,7 @@
                     }
                 ],
                 "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "properties": {
-                                    "users": {
-                                        "type": "array",
-                                        "items": {
-                                            "properties": {
-                                                "uuid": {
-                                                    "type": "string",
-                                                    "format": "uuid"
-                                                },
-                                                "is_manager": {
-                                                    "type": "boolean"
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
+                    "$ref": "#/components/requestBodies/AssignUsersRequest"
                 },
                 "responses": {
                     "204": {
@@ -9440,35 +8531,7 @@
                     }
                 ],
                 "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "properties": {
-                                    "permissions": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string",
-                                            "format": "uuid"
-                                        }
-                                    },
-                                    "permission_groups": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string",
-                                            "format": "uuid"
-                                        }
-                                    },
-                                    "expires_at": {
-                                        "type": "string",
-                                        "format": "date-time",
-                                        "nullable": true
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
+                    "$ref": "#/components/requestBodies/AssignPermissionsRequest"
                 },
                 "responses": {
                     "204": {
@@ -9507,38 +8570,7 @@
                     }
                 ],
                 "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "user_uuid"
-                                ],
-                                "properties": {
-                                    "user_uuid": {
-                                        "type": "string",
-                                        "format": "uuid"
-                                    },
-                                    "permission_uuid": {
-                                        "type": "string",
-                                        "format": "uuid",
-                                        "nullable": true
-                                    },
-                                    "permission_group_uuid": {
-                                        "type": "string",
-                                        "format": "uuid",
-                                        "nullable": true
-                                    },
-                                    "expires_at": {
-                                        "type": "string",
-                                        "format": "date-time",
-                                        "nullable": true
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
+                    "$ref": "#/components/requestBodies/DelegatePermissionRequest"
                 },
                 "responses": {
                     "204": {
@@ -10070,35 +9102,7 @@
                     }
                 ],
                 "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "properties": {
-                                    "permissions": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string",
-                                            "format": "uuid"
-                                        }
-                                    },
-                                    "permission_groups": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string",
-                                            "format": "uuid"
-                                        }
-                                    },
-                                    "expires_at": {
-                                        "type": "string",
-                                        "format": "date-time",
-                                        "nullable": true
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
+                    "$ref": "#/components/requestBodies/AssignPermissionsRequest"
                 },
                 "responses": {
                     "204": {
@@ -10187,26 +9191,7 @@
                     }
                 ],
                 "requestBody": {
-                    "required": true,
-                    "content": {
-                        "multipart/form-data": {
-                            "schema": {
-                                "required": [
-                                    "files[]"
-                                ],
-                                "properties": {
-                                    "files[]": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string",
-                                            "format": "binary"
-                                        }
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
+                    "$ref": "#/components/requestBodies/FileUploadRequest"
                 },
                 "responses": {
                     "200": {
@@ -10315,23 +9300,7 @@
                     }
                 ],
                 "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "filename"
-                                ],
-                                "properties": {
-                                    "filename": {
-                                        "type": "string",
-                                        "example": "nowa_nazwa"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
+                    "$ref": "#/components/requestBodies/FileRenameRequest"
                 },
                 "responses": {
                     "200": {
@@ -10473,26 +9442,7 @@
                     }
                 ],
                 "requestBody": {
-                    "required": true,
-                    "content": {
-                        "multipart/form-data": {
-                            "schema": {
-                                "required": [
-                                    "files[]"
-                                ],
-                                "properties": {
-                                    "files[]": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string",
-                                            "format": "binary"
-                                        }
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
+                    "$ref": "#/components/requestBodies/FileUploadRequest"
                 },
                 "responses": {
                     "200": {
@@ -10540,23 +9490,7 @@
                     }
                 ],
                 "requestBody": {
-                    "required": true,
-                    "content": {
-                        "multipart/form-data": {
-                            "schema": {
-                                "required": [
-                                    "file"
-                                ],
-                                "properties": {
-                                    "file": {
-                                        "type": "string",
-                                        "format": "binary"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
+                    "$ref": "#/components/requestBodies/SingleFileUploadRequest"
                 },
                 "responses": {
                     "200": {
@@ -10635,23 +9569,7 @@
                     }
                 ],
                 "requestBody": {
-                    "required": true,
-                    "content": {
-                        "multipart/form-data": {
-                            "schema": {
-                                "required": [
-                                    "file"
-                                ],
-                                "properties": {
-                                    "file": {
-                                        "type": "string",
-                                        "format": "binary"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
+                    "$ref": "#/components/requestBodies/SingleFileUploadRequest"
                 },
                 "responses": {
                     "200": {
@@ -10772,22 +9690,7 @@
                 "summary": "Tworzy nową grupę użytkowników",
                 "operationId": "0cf1343662ca383d9d963127f017c676",
                 "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "name"
-                                ],
-                                "properties": {
-                                    "name": {
-                                        "type": "string"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
+                    "$ref": "#/components/requestBodies/NameRequest"
                 },
                 "responses": {
                     "201": {
@@ -10897,22 +9800,7 @@
                     }
                 ],
                 "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "name"
-                                ],
-                                "properties": {
-                                    "name": {
-                                        "type": "string"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
+                    "$ref": "#/components/requestBodies/NameRequest"
                 },
                 "responses": {
                     "204": {
@@ -10982,31 +9870,7 @@
                     }
                 ],
                 "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "properties": {
-                                    "users": {
-                                        "type": "array",
-                                        "items": {
-                                            "properties": {
-                                                "uuid": {
-                                                    "type": "string",
-                                                    "format": "uuid"
-                                                },
-                                                "is_manager": {
-                                                    "type": "boolean"
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
+                    "$ref": "#/components/requestBodies/AssignUsersRequest"
                 },
                 "responses": {
                     "204": {
@@ -11045,35 +9909,7 @@
                     }
                 ],
                 "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "properties": {
-                                    "permissions": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string",
-                                            "format": "uuid"
-                                        }
-                                    },
-                                    "permission_groups": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string",
-                                            "format": "uuid"
-                                        }
-                                    },
-                                    "expires_at": {
-                                        "type": "string",
-                                        "format": "date-time",
-                                        "nullable": true
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
+                    "$ref": "#/components/requestBodies/AssignPermissionsRequest"
                 },
                 "responses": {
                     "204": {
@@ -11112,36 +9948,7 @@
                     }
                 ],
                 "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "name"
-                                ],
-                                "properties": {
-                                    "name": {
-                                        "type": "string"
-                                    },
-                                    "permissions": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string",
-                                            "format": "uuid"
-                                        }
-                                    },
-                                    "permission_groups": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string",
-                                            "format": "uuid"
-                                        }
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
+                    "$ref": "#/components/requestBodies/ManagedRoleRequest"
                 },
                 "responses": {
                     "201": {
@@ -11192,23 +9999,7 @@
                     }
                 ],
                 "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "properties": {
-                                    "job_positions": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string",
-                                            "format": "uuid"
-                                        }
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
+                    "$ref": "#/components/requestBodies/AssignJobPositionsRequest"
                 },
                 "responses": {
                     "204": {
@@ -11867,6 +10658,97 @@
                 },
                 "type": "object"
             },
+            "PatientStatisticsDoctor": {
+                "properties": {
+                    "uuid": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "first_name": {
+                        "type": "string"
+                    },
+                    "last_name": {
+                        "type": "string"
+                    },
+                    "position": {
+                        "type": "string",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "PatientStatisticsVisit": {
+                "properties": {
+                    "uuid": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "starts_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "doctor": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/PatientStatisticsDoctor"
+                            }
+                        ],
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "PatientStatisticsResource": {
+                "properties": {
+                    "last_visit": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/PatientStatisticsVisit"
+                            }
+                        ],
+                        "nullable": true
+                    },
+                    "next_visit": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/PatientStatisticsVisit"
+                            }
+                        ],
+                        "nullable": true
+                    },
+                    "no_shows": {
+                        "properties": {
+                            "count": {
+                                "type": "integer"
+                            },
+                            "total_appointments": {
+                                "type": "integer"
+                            },
+                            "last_at": {
+                                "type": "string",
+                                "format": "date-time",
+                                "nullable": true
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "lead_doctor": {
+                        "properties": {
+                            "doctor": {
+                                "$ref": "#/components/schemas/PatientStatisticsDoctor"
+                            },
+                            "since": {
+                                "type": "string",
+                                "format": "date",
+                                "nullable": true
+                            }
+                        },
+                        "type": "object",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
             "PrescriptionResource": {
                 "properties": {
                     "uuid": {
@@ -12223,6 +11105,400 @@
                     }
                 },
                 "type": "object"
+            }
+        },
+        "requestBodies": {
+            "FileUploadRequest": {
+                "required": true,
+                "content": {
+                    "multipart/form-data": {
+                        "schema": {
+                            "required": [
+                                "files[]"
+                            ],
+                            "properties": {
+                                "files[]": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                }
+                            },
+                            "type": "object"
+                        }
+                    }
+                }
+            },
+            "SingleFileUploadRequest": {
+                "required": true,
+                "content": {
+                    "multipart/form-data": {
+                        "schema": {
+                            "required": [
+                                "file"
+                            ],
+                            "properties": {
+                                "file": {
+                                    "type": "string",
+                                    "format": "binary"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    }
+                }
+            },
+            "FileRenameRequest": {
+                "required": true,
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "required": [
+                                "filename"
+                            ],
+                            "properties": {
+                                "filename": {
+                                    "type": "string",
+                                    "example": "nowa_nazwa"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    }
+                }
+            },
+            "NameRequest": {
+                "required": true,
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "required": [
+                                "name"
+                            ],
+                            "properties": {
+                                "name": {
+                                    "type": "string"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    }
+                }
+            },
+            "AssignPermissionsRequest": {
+                "required": true,
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "properties": {
+                                "permissions": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    }
+                                },
+                                "permission_groups": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    }
+                                },
+                                "expires_at": {
+                                    "type": "string",
+                                    "format": "date-time",
+                                    "nullable": true
+                                }
+                            },
+                            "type": "object"
+                        }
+                    }
+                }
+            },
+            "AssignUsersRequest": {
+                "required": true,
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "properties": {
+                                "users": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "uuid": {
+                                                "type": "string",
+                                                "format": "uuid"
+                                            },
+                                            "is_manager": {
+                                                "type": "boolean"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            },
+                            "type": "object"
+                        }
+                    }
+                }
+            },
+            "AssignJobPositionsRequest": {
+                "required": true,
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "properties": {
+                                "job_positions": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    }
+                                }
+                            },
+                            "type": "object"
+                        }
+                    }
+                }
+            },
+            "DelegatePermissionRequest": {
+                "required": true,
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "required": [
+                                "user_uuid"
+                            ],
+                            "properties": {
+                                "user_uuid": {
+                                    "type": "string",
+                                    "format": "uuid"
+                                },
+                                "permission_uuid": {
+                                    "type": "string",
+                                    "format": "uuid",
+                                    "nullable": true
+                                },
+                                "permission_group_uuid": {
+                                    "type": "string",
+                                    "format": "uuid",
+                                    "nullable": true
+                                },
+                                "expires_at": {
+                                    "type": "string",
+                                    "format": "date-time",
+                                    "nullable": true
+                                }
+                            },
+                            "type": "object"
+                        }
+                    }
+                }
+            },
+            "ManagedRoleRequest": {
+                "required": true,
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "required": [
+                                "name"
+                            ],
+                            "properties": {
+                                "name": {
+                                    "type": "string"
+                                },
+                                "permissions": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    }
+                                },
+                                "permission_groups": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    }
+                                }
+                            },
+                            "type": "object"
+                        }
+                    }
+                }
+            },
+            "CompanyRequest": {
+                "required": true,
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "required": [
+                                "name",
+                                "regon",
+                                "nip",
+                                "address",
+                                "province",
+                                "district",
+                                "municipality"
+                            ],
+                            "properties": {
+                                "name": {
+                                    "type": "string"
+                                },
+                                "regon": {
+                                    "type": "string"
+                                },
+                                "nip": {
+                                    "type": "string"
+                                },
+                                "address": {
+                                    "type": "string"
+                                },
+                                "province": {
+                                    "type": "string"
+                                },
+                                "district": {
+                                    "type": "string"
+                                },
+                                "municipality": {
+                                    "type": "string"
+                                },
+                                "business_form": {
+                                    "type": "string",
+                                    "nullable": true
+                                },
+                                "type_of_business": {
+                                    "type": "string",
+                                    "nullable": true
+                                },
+                                "form_of_ownership": {
+                                    "type": "string",
+                                    "nullable": true
+                                }
+                            },
+                            "type": "object"
+                        }
+                    }
+                }
+            },
+            "EmployeeScheduleRequest": {
+                "required": true,
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "required": [
+                                "type",
+                                "date"
+                            ],
+                            "properties": {
+                                "type": {
+                                    "type": "string"
+                                },
+                                "name": {
+                                    "type": "string",
+                                    "nullable": true
+                                },
+                                "description": {
+                                    "type": "string",
+                                    "nullable": true
+                                },
+                                "date": {
+                                    "type": "string",
+                                    "format": "date"
+                                },
+                                "end_date": {
+                                    "type": "string",
+                                    "format": "date",
+                                    "nullable": true
+                                },
+                                "start_time": {
+                                    "type": "string",
+                                    "example": "09:00",
+                                    "nullable": true
+                                },
+                                "end_time": {
+                                    "type": "string",
+                                    "example": "17:00",
+                                    "nullable": true
+                                },
+                                "is_active": {
+                                    "type": "boolean"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    }
+                }
+            },
+            "PrescriptionRequest": {
+                "required": true,
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "required": [
+                                "status",
+                                "patient_uuid",
+                                "doctor_uuid"
+                            ],
+                            "properties": {
+                                "name": {
+                                    "type": "string",
+                                    "nullable": true
+                                },
+                                "code": {
+                                    "type": "string",
+                                    "nullable": true
+                                },
+                                "status": {
+                                    "type": "string",
+                                    "enum": [
+                                        "DRAFT",
+                                        "ISSUED",
+                                        "REALIZED",
+                                        "CANCELLED",
+                                        "EXPIRED"
+                                    ]
+                                },
+                                "patient_uuid": {
+                                    "type": "string",
+                                    "format": "uuid"
+                                },
+                                "doctor_uuid": {
+                                    "type": "string",
+                                    "format": "uuid"
+                                },
+                                "external_reference": {
+                                    "type": "string",
+                                    "nullable": true
+                                },
+                                "medicines": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "medicine_uuid": {
+                                                "type": "string",
+                                                "format": "uuid"
+                                            },
+                                            "quantity": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "dosage": {
+                                                "type": "string",
+                                                "example": "1 tabletka co 8 godzin"
+                                            }
+                                        },
+                                        "type": "object"
+                                    },
+                                    "nullable": true
+                                }
+                            },
+                            "type": "object"
+                        }
+                    }
+                }
             }
         },
         "securitySchemes": {

@@ -3,7 +3,13 @@
 namespace Tests\Unit\Repositories;
 
 use App\Models\Calendar;
+use App\Models\EmployeeSchedule;
+use App\Models\JobPosition;
+use App\Models\Patient;
+use App\Models\User;
 use App\Repositories\CalendarRepositoryInterface;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Tests\TestCase;
 
@@ -90,5 +96,171 @@ class CalendarRepositoryTest extends TestCase
 
         $this->assertTrue($this->repository->delete($calendar));
         $this->assertDatabaseMissing('calendars', ['uuid' => $calendar->uuid]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testFindLastVisitForPatientSkipsNoShowsAndFutureVisits(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2026-10-21 12:00:00', 'Europe/Warsaw'));
+        $patient = Patient::factory()->create();
+        $expected = $this->createVisitFor($patient, '2026-10-21', '11:00');
+        $this->createVisitFor($patient, '2026-10-20', '09:00');
+        $this->createVisitFor($patient, '2026-10-21', '11:30', true);
+        $this->createVisitFor($patient, '2026-10-21', '13:00');
+        $this->createVisitFor(Patient::factory()->create(), '2026-10-21', '11:45');
+
+        $this->assertTrue($this->repository->findLastVisitForPatient($patient)->is($expected));
+    }
+
+    /**
+     * @return void
+     */
+    public function testFindNextVisitForPatientReturnsNearestUpcomingVisit(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2026-10-21 12:00:00', 'Europe/Warsaw'));
+        $patient = Patient::factory()->create();
+        $this->createVisitFor($patient, '2026-10-21', '11:00');
+        $this->createVisitFor($patient, '2026-10-28', '10:30');
+        $expected = $this->createVisitFor($patient, '2026-10-21', '12:30');
+
+        $this->assertTrue($this->repository->findNextVisitForPatient($patient)->is($expected));
+    }
+
+    /**
+     * @return void
+     */
+    public function testPastAndUpcomingVisitsAreSplitInClinicTimezone(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2026-10-21 10:30:00', 'UTC'));
+        $patient = Patient::factory()->create();
+        $last = $this->createVisitFor($patient, '2026-10-21', '12:00');
+        $next = $this->createVisitFor($patient, '2026-10-21', '13:00');
+
+        $this->assertTrue($this->repository->findLastVisitForPatient($patient)->is($last));
+        $this->assertTrue($this->repository->findNextVisitForPatient($patient)->is($next));
+    }
+
+    /**
+     * @return void
+     */
+    public function testClinicDateIsUsedAroundMidnight(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2026-10-21 23:30:00', 'UTC'));
+        $patient = Patient::factory()->create();
+        $last = $this->createVisitFor($patient, '2026-10-22', '01:00');
+        $next = $this->createVisitFor($patient, '2026-10-22', '02:00');
+
+        $this->assertTrue($this->repository->findLastVisitForPatient($patient)->is($last));
+        $this->assertTrue($this->repository->findNextVisitForPatient($patient)->is($next));
+    }
+
+    /**
+     * @return void
+     */
+    public function testFindNextVisitForPatientReturnsNullWithoutUpcomingVisits(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2026-10-21 12:00:00', 'Europe/Warsaw'));
+        $patient = Patient::factory()->create();
+        $this->createVisitFor($patient, '2026-10-01', '10:00');
+
+        $this->assertNull($this->repository->findNextVisitForPatient($patient));
+    }
+
+    /**
+     * @return void
+     */
+    public function testFindLastNoShowForPatientReturnsLatestNoShow(): void
+    {
+        $patient = Patient::factory()->create();
+        $this->createVisitFor($patient, '2026-07-01', '09:00', true);
+        $expected = $this->createVisitFor($patient, '2026-08-14', '09:00', true);
+        $this->createVisitFor($patient, '2026-09-01', '09:00');
+
+        $this->assertTrue($this->repository->findLastNoShowForPatient($patient)->is($expected));
+    }
+
+    /**
+     * @return void
+     */
+    public function testCountForPatientCountsAllAndNoShowVisits(): void
+    {
+        $patient = Patient::factory()->create();
+        $this->createVisitFor($patient, '2026-07-01', '09:00', true);
+        $this->createVisitFor($patient, '2026-08-01', '09:00');
+        $this->createVisitFor($patient, '2026-09-01', '09:00');
+        $this->createVisitFor(Patient::factory()->create(), '2026-09-01', '09:00', true);
+
+        $this->assertSame(3, $this->repository->countForPatient($patient));
+        $this->assertSame(1, $this->repository->countForPatient($patient, true));
+    }
+
+    /**
+     * @return void
+     */
+    public function testVisitTodayWithoutStartTimeIsTreatedAsAlreadyStarted(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2026-10-21 12:00:00', 'Europe/Warsaw'));
+        $patient = Patient::factory()->create();
+        $visit = $this->createVisitFor($patient, '2026-10-21', '09:00');
+        $visit->update(['start_time' => null]);
+
+        $this->assertTrue($this->repository->findLastVisitForPatient($patient)->is($visit));
+        $this->assertNull($this->repository->findNextVisitForPatient($patient));
+    }
+
+    /**
+     * @return void
+     */
+    public function testCountForPatientIgnoresEmployeeScheduleRows(): void
+    {
+        $patient = Patient::factory()->create();
+        $this->createVisitFor($patient, '2026-09-01', '09:00');
+        $scheduleRow = EmployeeSchedule::factory()->create(['date' => '2026-09-02']);
+        DB::table('calendar_users')->insert([
+            'calendar_uuid' => $scheduleRow->uuid,
+            'userable_id' => $patient->uuid,
+            'userable_type' => $patient->getMorphClass(),
+        ]);
+
+        $this->assertSame(1, $this->repository->countForPatient($patient));
+    }
+
+    /**
+     * @return void
+     */
+    public function testPatientVisitsEagerLoadDoctorsWithJobPosition(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2026-10-21 12:00:00', 'Europe/Warsaw'));
+        $patient = Patient::factory()->create();
+        $doctor = User::factory()->create(['job_position_uuid' => JobPosition::factory()->create()->uuid]);
+        $visit = $this->createVisitFor($patient, '2026-10-28', '10:30');
+        $visit->users()->attach($doctor->uuid);
+
+        $found = $this->repository->findNextVisitForPatient($patient);
+
+        $this->assertTrue($found->relationLoaded('users'));
+        $this->assertTrue($found->users->first()->is($doctor));
+        $this->assertTrue($found->users->first()->relationLoaded('jobPosition'));
+    }
+
+    /**
+     * @param Patient $patient
+     * @param string $date
+     * @param string $startTime
+     * @param bool $noShow
+     * @return Calendar
+     */
+    private function createVisitFor(Patient $patient, string $date, string $startTime, bool $noShow = false): Calendar
+    {
+        $calendar = Calendar::factory()->create([
+            'date' => $date,
+            'start_time' => $startTime,
+            'no_show' => $noShow,
+        ]);
+        $calendar->patients()->attach($patient->uuid);
+
+        return $calendar;
     }
 }

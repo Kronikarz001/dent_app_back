@@ -108,15 +108,7 @@ class UserGroupController extends Controller
         path: '/api/user-group',
         summary: 'Tworzy nową grupę użytkowników',
         security: [['sanctum' => []]],
-        requestBody: new OA\RequestBody(
-            required: true,
-            content: new OA\JsonContent(
-                required: ['name'],
-                properties: [
-                    new OA\Property(property: 'name', type: 'string'),
-                ]
-            )
-        ),
+        requestBody: new OA\RequestBody(ref: '#/components/requestBodies/NameRequest'),
         tags: ['UserGroup'],
         responses: [
             new OA\Response(
@@ -143,15 +135,7 @@ class UserGroupController extends Controller
         path: '/api/user-group/{uuid}',
         summary: 'Aktualizuje grupę użytkowników',
         security: [['sanctum' => []]],
-        requestBody: new OA\RequestBody(
-            required: true,
-            content: new OA\JsonContent(
-                required: ['name'],
-                properties: [
-                    new OA\Property(property: 'name', type: 'string'),
-                ]
-            )
-        ),
+        requestBody: new OA\RequestBody(ref: '#/components/requestBodies/NameRequest'),
         tags: ['UserGroup'],
         parameters: [
             new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
@@ -202,19 +186,7 @@ class UserGroupController extends Controller
         path: '/api/user-group/{uuid}/users',
         summary: 'Przypisuje użytkowników do grupy (z flagą is_manager), zastępując poprzednią listę',
         security: [['sanctum' => []]],
-        requestBody: new OA\RequestBody(
-            required: true,
-            content: new OA\JsonContent(
-                properties: [
-                    new OA\Property(property: 'users', type: 'array', items: new OA\Items(
-                        properties: [
-                            new OA\Property(property: 'uuid', type: 'string', format: 'uuid'),
-                            new OA\Property(property: 'is_manager', type: 'boolean'),
-                        ]
-                    )),
-                ]
-            )
-        ),
+        requestBody: new OA\RequestBody(ref: '#/components/requestBodies/AssignUsersRequest'),
         tags: ['UserGroup'],
         parameters: [
             new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
@@ -241,16 +213,7 @@ class UserGroupController extends Controller
         path: '/api/user-group/{uuid}/permissions',
         summary: 'Nadaje grupie użytkowników uprawnienia lub grupy uprawnień (opcjonalnie czasowo)',
         security: [['sanctum' => []]],
-        requestBody: new OA\RequestBody(
-            required: true,
-            content: new OA\JsonContent(
-                properties: [
-                    new OA\Property(property: 'permissions', type: 'array', items: new OA\Items(type: 'string', format: 'uuid')),
-                    new OA\Property(property: 'permission_groups', type: 'array', items: new OA\Items(type: 'string', format: 'uuid')),
-                    new OA\Property(property: 'expires_at', type: 'string', format: 'date-time', nullable: true),
-                ]
-            )
-        ),
+        requestBody: new OA\RequestBody(ref: '#/components/requestBodies/AssignPermissionsRequest'),
         tags: ['UserGroup'],
         parameters: [
             new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
@@ -277,17 +240,7 @@ class UserGroupController extends Controller
         path: '/api/user-group/{uuid}/managed-roles',
         summary: 'Kierownik grupy użytkowników tworzy nową rolę w ramach grupy i nadaje jej uprawnienia (muszą być podzbiorem uprawnień grupy)',
         security: [['sanctum' => []]],
-        requestBody: new OA\RequestBody(
-            required: true,
-            content: new OA\JsonContent(
-                required: ['name'],
-                properties: [
-                    new OA\Property(property: 'name', type: 'string'),
-                    new OA\Property(property: 'permissions', type: 'array', items: new OA\Items(type: 'string', format: 'uuid')),
-                    new OA\Property(property: 'permission_groups', type: 'array', items: new OA\Items(type: 'string', format: 'uuid')),
-                ]
-            )
-        ),
+        requestBody: new OA\RequestBody(ref: '#/components/requestBodies/ManagedRoleRequest'),
         tags: ['UserGroup'],
         parameters: [
             new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
@@ -318,14 +271,7 @@ class UserGroupController extends Controller
         path: '/api/user-group/{uuid}/job-positions',
         summary: 'Przypisuje stanowiska do grupy użytkowników, zastępując poprzednią listę',
         security: [['sanctum' => []]],
-        requestBody: new OA\RequestBody(
-            required: true,
-            content: new OA\JsonContent(
-                properties: [
-                    new OA\Property(property: 'job_positions', type: 'array', items: new OA\Items(type: 'string', format: 'uuid')),
-                ]
-            )
-        ),
+        requestBody: new OA\RequestBody(ref: '#/components/requestBodies/AssignJobPositionsRequest'),
         tags: ['UserGroup'],
         parameters: [
             new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),

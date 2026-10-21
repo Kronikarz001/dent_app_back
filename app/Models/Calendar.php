@@ -8,6 +8,7 @@ use App\Traits\HasFile;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Support\Carbon;
 
 /**
  * Summary of Calendar
@@ -52,6 +53,14 @@ class Calendar extends UuidModel
                 CalendarEventType::appointmentTypes()
             ));
         });
+    }
+
+    /**
+     * @return Carbon
+     */
+    public function startsAt(): Carbon
+    {
+        return Carbon::parse($this->date->toDateString().' '.($this->start_time ?? '00:00:00'));
     }
 
     /**

@@ -36,7 +36,7 @@ class NotificationResource extends JsonResource
             'url' => $this->data['url'] ?? null,
             'type' => $this->data['type'] ?? null,
             'read' => ! is_null($this->read_at),
-            'created_at' => $this->created_at->toISOString(),
+            'created_at' => $this->created_at,
         ];
     }
 }

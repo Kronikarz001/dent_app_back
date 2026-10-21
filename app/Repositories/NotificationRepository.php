@@ -30,7 +30,7 @@ class NotificationRepository
         $query = $this->model->query()
             ->where('notifiable_type', User::class)
             ->where('notifiable_id', $userUuid)
-            ->orderBy('created_at', 'desc');
+            ->latest();
 
         return $usePagination
             ? $query->paginate($perPage)

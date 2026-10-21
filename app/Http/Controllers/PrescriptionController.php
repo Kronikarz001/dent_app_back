@@ -107,30 +107,7 @@ class PrescriptionController extends Controller
         path: '/api/prescription',
         summary: 'Tworzy nową receptę',
         security: [['sanctum' => []]],
-        requestBody: new OA\RequestBody(
-            required: true,
-            content: new OA\JsonContent(
-                required: ['status', 'patient_uuid', 'doctor_uuid'],
-                properties: [
-                    new OA\Property(property: 'name', type: 'string', nullable: true),
-                    new OA\Property(property: 'code', type: 'string', nullable: true),
-                    new OA\Property(property: 'status', type: 'string', enum: ['DRAFT', 'ISSUED', 'REALIZED', 'CANCELLED', 'EXPIRED']),
-                    new OA\Property(property: 'patient_uuid', type: 'string', format: 'uuid'),
-                    new OA\Property(property: 'doctor_uuid', type: 'string', format: 'uuid'),
-                    new OA\Property(property: 'external_reference', type: 'string', nullable: true),
-                    new OA\Property(
-                        property: 'medicines',
-                        type: 'array',
-                        nullable: true,
-                        items: new OA\Items(properties: [
-                            new OA\Property(property: 'medicine_uuid', type: 'string', format: 'uuid'),
-                            new OA\Property(property: 'quantity', type: 'integer', example: 1),
-                            new OA\Property(property: 'dosage', type: 'string', example: '1 tabletka co 8 godzin'),
-                        ])
-                    ),
-                ]
-            )
-        ),
+        requestBody: new OA\RequestBody(ref: '#/components/requestBodies/PrescriptionRequest'),
         tags: ['Prescription'],
         responses: [
             new OA\Response(
@@ -154,30 +131,7 @@ class PrescriptionController extends Controller
         path: '/api/prescription/{uuid}',
         summary: 'Aktualizuje receptę',
         security: [['sanctum' => []]],
-        requestBody: new OA\RequestBody(
-            required: true,
-            content: new OA\JsonContent(
-                required: ['status', 'patient_uuid', 'doctor_uuid'],
-                properties: [
-                    new OA\Property(property: 'name', type: 'string', nullable: true),
-                    new OA\Property(property: 'code', type: 'string', nullable: true),
-                    new OA\Property(property: 'status', type: 'string', enum: ['DRAFT', 'ISSUED', 'REALIZED', 'CANCELLED', 'EXPIRED']),
-                    new OA\Property(property: 'patient_uuid', type: 'string', format: 'uuid'),
-                    new OA\Property(property: 'doctor_uuid', type: 'string', format: 'uuid'),
-                    new OA\Property(property: 'external_reference', type: 'string', nullable: true),
-                    new OA\Property(
-                        property: 'medicines',
-                        type: 'array',
-                        nullable: true,
-                        items: new OA\Items(properties: [
-                            new OA\Property(property: 'medicine_uuid', type: 'string', format: 'uuid'),
-                            new OA\Property(property: 'quantity', type: 'integer', example: 1),
-                            new OA\Property(property: 'dosage', type: 'string', example: '1 tabletka co 8 godzin'),
-                        ])
-                    ),
-                ]
-            )
-        ),
+        requestBody: new OA\RequestBody(ref: '#/components/requestBodies/PrescriptionRequest'),
         tags: ['Prescription'],
         parameters: [
             new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),

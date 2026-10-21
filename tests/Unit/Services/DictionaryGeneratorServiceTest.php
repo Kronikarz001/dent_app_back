@@ -4,6 +4,7 @@ namespace Tests\Unit\Services;
 
 use App\Exceptions\DictionaryGenerationException;
 use App\Services\DictionaryGeneratorService;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Support\Facades\File;
 use Tests\Unit\UnitTestCase;
 
@@ -32,6 +33,8 @@ final class DictionaryGeneratorServiceTest extends UnitTestCase
 
     /**
      * @return void
+     *
+     * @throws FileNotFoundException
      */
     protected function setUp(): void
     {

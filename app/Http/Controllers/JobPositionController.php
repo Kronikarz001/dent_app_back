@@ -267,16 +267,7 @@ class JobPositionController extends Controller
         path: '/api/job-position/{uuid}/permissions',
         summary: 'Nadaje stanowisku uprawnienia lub grupy uprawnień (opcjonalnie czasowo)',
         security: [['sanctum' => []]],
-        requestBody: new OA\RequestBody(
-            required: true,
-            content: new OA\JsonContent(
-                properties: [
-                    new OA\Property(property: 'permissions', type: 'array', items: new OA\Items(type: 'string', format: 'uuid')),
-                    new OA\Property(property: 'permission_groups', type: 'array', items: new OA\Items(type: 'string', format: 'uuid')),
-                    new OA\Property(property: 'expires_at', type: 'string', format: 'date-time', nullable: true),
-                ]
-            )
-        ),
+        requestBody: new OA\RequestBody(ref: '#/components/requestBodies/AssignPermissionsRequest'),
         tags: ['JobPosition'],
         parameters: [
             new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),

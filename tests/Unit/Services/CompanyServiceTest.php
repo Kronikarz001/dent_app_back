@@ -21,6 +21,8 @@ class CompanyServiceTest extends TestCase
 
     /**
      * @return void
+     *
+     * @throws \Throwable
      */
     protected function setUp(): void
     {

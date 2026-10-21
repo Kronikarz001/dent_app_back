@@ -10,8 +10,11 @@ use App\Services\JobPositionService;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Mockery;
 use Mockery\MockInterface;
+use PhpOffice\PhpSpreadsheet\Exception as ExcelException;
+use PhpOffice\PhpSpreadsheet\Writer\Exception as ExcelWriterException;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Tests\TestCase;
+use Throwable;
 
 /**
  * Summary of JobPositionServiceTest
@@ -26,6 +29,8 @@ class JobPositionServiceTest extends TestCase
 
     /**
      * @return void
+     *
+     * @throws Throwable
      */
     protected function setUp(): void
     {
@@ -38,6 +43,8 @@ class JobPositionServiceTest extends TestCase
 
     /**
      * @return void
+     *
+     * @throws Throwable
      */
     protected function tearDown(): void
     {
@@ -143,6 +150,10 @@ class JobPositionServiceTest extends TestCase
 
     /**
      * @return void
+     *
+     * @throws ExcelException
+     * @throws ExcelWriterException
+     * @throws Throwable
      */
     public function testExportDelegatesToExportService(): void
     {
