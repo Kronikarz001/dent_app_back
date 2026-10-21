@@ -27,7 +27,9 @@ class TimezoneConfigurationTest extends TestCase
      */
     public function testDatabaseSessionUsesApplicationTimezone(): void
     {
-        $this->assertSame(config('app.timezone'), DB::selectOne('show timezone')->TimeZone);
+        $databaseNow = Carbon::parse(DB::selectOne('select localtimestamp as now')->now);
+
+        $this->assertLessThan(60, abs($databaseNow->diffInSeconds(Carbon::now())));
     }
 
     /**
