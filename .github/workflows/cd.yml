@@ -64,6 +64,8 @@ jobs:
           ssh -i ~/.ssh/dentapp_deploy -p ${{ secrets.SSH_PORT }} \
             ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
             "set -e && cd ${{ secrets.DEPLOY_PATH }} && \
+             mkdir -p bootstrap/cache storage/framework/cache/data storage/framework/sessions storage/framework/views storage/logs && \
+             chmod u+rwx bootstrap/cache storage/framework/cache/data storage/framework/sessions storage/framework/views storage/logs && \
              $PHP_BIN $COMPOSER_BIN install --no-dev --optimize-autoloader --no-interaction && \
              $PHP_BIN artisan storage:link --force && \
              $PHP_BIN artisan migrate --force && \
@@ -87,6 +89,8 @@ jobs:
             ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
             "cd ${{ secrets.DEPLOY_PATH }} && \
              tar xzf ../cd_rollback_backup.tar.gz && \
+             mkdir -p bootstrap/cache storage/framework/cache/data storage/framework/sessions storage/framework/views storage/logs && \
+             chmod u+rwx bootstrap/cache storage/framework/cache/data storage/framework/sessions storage/framework/views storage/logs && \
              $PHP_BIN $COMPOSER_BIN install --no-dev --optimize-autoloader --no-interaction && \
              $PHP_BIN artisan storage:link --force && \
              $PHP_BIN artisan migrate --force && \
