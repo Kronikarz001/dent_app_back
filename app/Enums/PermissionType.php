@@ -18,6 +18,6 @@ enum PermissionType: string
      */
     public static function fromRequest(Request $request): self
     {
-        return $request->isMethod('get') ? self::VIEW : self::EDIT;
+        return $request->isMethodSafe() ? self::VIEW : self::EDIT;
     }
 }
