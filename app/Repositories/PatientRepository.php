@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\Patient;
+use App\Models\User;
 use App\Search\PatientSearch;
 use App\Search\Search;
 use Illuminate\Database\Eloquent\Model;
@@ -60,6 +61,15 @@ class PatientRepository extends SearchableRepository implements PatientRepositor
             ->select(['uuid', 'romexis_patient_id'])
             ->whereNotNull('romexis_patient_id')
             ->paginate();
+    }
+
+    /**
+     * @param Patient $patient
+     * @return User|null
+     */
+    public function findDoctor(Patient $patient): ?User
+    {
+        return $patient->doctor()->with('jobPosition')->first();
     }
 
     /**

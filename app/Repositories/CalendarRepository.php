@@ -5,10 +5,11 @@ namespace App\Repositories;
 use App\Models\Calendar;
 use App\Models\Patient;
 use App\Search\CalendarSearch;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use App\Search\PatientVisitSearch;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
 
 /**
@@ -18,9 +19,11 @@ readonly class CalendarRepository implements CalendarRepositoryInterface
 {
     /**
      * @param CalendarSearch $search
+     * @param PatientVisitSearch $patientVisitSearch
      */
     public function __construct(
-        private CalendarSearch $search
+        private CalendarSearch $search,
+        private PatientVisitSearch $patientVisitSearch,
     ) {}
 
     /**
@@ -153,13 +156,25 @@ readonly class CalendarRepository implements CalendarRepositoryInterface
 
     /**
      * @param Patient $patient
+     * @return LengthAwarePaginator
+     */
+    public function findVisitsForPatient(Patient $patient): LengthAwarePaginator
+    {
+        return $this->patientVisitSearch->search(['patient_uuid' => $patient->uuid]);
+    }
+
+    /**
+     * @param Patient $patient
      * @return Builder
      */
     private function forPatient(Patient $patient): Builder
     {
         return Calendar::query()
             ->whereHas('patients', fn (Builder $query) => $query->where('patients.uuid', $patient->uuid))
-            ->with(['users' => fn ($query) => $query->orderBy('calendar_users.assigned_at')->with('jobPosition')]);
+            ->with([
+                'users' => fn ($query) => $query->orderBy('calendar_users.assigned_at')->with('jobPosition'),
+                'dentalExaminations' => fn ($query) => $query->orderBy('name'),
+            ]);
     }
 
     /**

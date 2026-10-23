@@ -5,6 +5,7 @@ namespace Tests\Feature\Controllers;
 use App\Enums\AuditableEventType;
 use App\Models\Audit;
 use App\Models\Calendar;
+use App\Models\DentalExamination;
 use App\Models\JobPosition;
 use App\Models\Patient;
 use App\Models\Permission;
@@ -482,6 +483,102 @@ class PatientControllerTest extends TestCase
         $this->callApiWithLoggedUser()
             ->getJson(route('patient.statistics', ['patient' => Str::uuid()->toString()]))
             ->assertNotFound();
+    }
+
+    /**
+     * @return void
+     */
+    public function testVisitsReturnsPaginatedArchiveNewestFirst(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2026-10-21 12:00:00', 'Europe/Warsaw'));
+        $doctor = User::factory()->create();
+        $patient = Patient::factory()->create();
+        $examination = DentalExamination::factory()->create(['name' => 'Przegląd stomatologiczny']);
+
+        $completed = $this->createVisitFor($patient, '2026-10-02', '12:00', false, $doctor);
+        $completed->dentalExaminations()->attach($examination->uuid);
+        $noShow = $this->createVisitFor($patient, '2026-08-14', '09:00', true);
+        $scheduled = $this->createVisitFor($patient, '2026-10-28', '10:30');
+        $this->createVisitFor(Patient::factory()->create(), '2026-10-10', '10:00');
+
+        $response = $this->callApiWithLoggedUser()
+            ->getJson(route('patient.visits', ['patient' => $patient->uuid]));
+
+        $response->assertOk()
+            ->assertJsonCount(3, 'data')
+            ->assertJsonPath('meta.total', 3)
+            ->assertJsonPath('data.0.uuid', $scheduled->uuid)
+            ->assertJsonPath('data.0.status', 'SCHEDULED')
+            ->assertJsonPath('data.0.treatments', [])
+            ->assertJsonPath('data.0.doctor', null)
+            ->assertJsonPath('data.1.uuid', $completed->uuid)
+            ->assertJsonPath('data.1.treatments.0.uuid', $examination->uuid)
+            ->assertJsonPath('data.1.treatments.0.name', 'Przegląd stomatologiczny')
+            ->assertJsonPath('data.1.date', '2026-10-02T12:00:00.000000')
+            ->assertJsonPath('data.1.doctor', [
+                'uuid' => $doctor->uuid,
+                'first_name' => $doctor->first_name,
+                'last_name' => $doctor->last_name,
+                'position' => $doctor->jobPosition?->name,
+            ])
+            ->assertJsonPath('data.1.status', 'COMPLETED')
+            ->assertJsonPath('data.2.uuid', $noShow->uuid)
+            ->assertJsonPath('data.2.date', '2026-08-14T09:00:00.000000')
+            ->assertJsonPath('data.2.status', 'NO_SHOW');
+    }
+
+    /**
+     * @return void
+     */
+    public function testVisitsRespectsSortAndPerPageParameters(): void
+    {
+        $patient = Patient::factory()->create();
+        $oldest = $this->createVisitFor($patient, '2026-01-10', '09:00');
+        $this->createVisitFor($patient, '2026-05-10', '09:00');
+        $this->createVisitFor($patient, '2026-10-02', '12:00');
+
+        $this->callApiWithLoggedUser()
+            ->getJson(route('patient.visits', ['patient' => $patient->uuid, 'sort' => 'date,asc', 'perPage' => 2]))
+            ->assertOk()
+            ->assertJsonCount(2, 'data')
+            ->assertJsonPath('data.0.uuid', $oldest->uuid)
+            ->assertJsonPath('meta.total', 3)
+            ->assertJsonPath('meta.per_page', 2);
+    }
+
+    /**
+     * @return void
+     */
+    public function testVisitsReturnsEmptyListForPatientWithoutVisits(): void
+    {
+        $patient = Patient::factory()->create();
+
+        $this->callApiWithLoggedUser()
+            ->getJson(route('patient.visits', ['patient' => $patient->uuid]))
+            ->assertOk()
+            ->assertJsonPath('data', [])
+            ->assertJsonPath('meta.total', 0);
+    }
+
+    /**
+     * @return void
+     */
+    public function testVisitsReturnsNotFoundForUnknownPatient(): void
+    {
+        $this->callApiWithLoggedUser()
+            ->getJson(route('patient.visits', ['patient' => Str::uuid()->toString()]))
+            ->assertNotFound();
+    }
+
+    /**
+     * @return void
+     */
+    public function testVisitsRequiresAuthentication(): void
+    {
+        $patient = Patient::factory()->create();
+
+        $this->getJson(route('patient.visits', ['patient' => $patient->uuid]))
+            ->assertUnauthorized();
     }
 
     /**

@@ -8,6 +8,7 @@ use App\Http\Requests\PatientUpdateRequest;
 use App\Http\Resources\PatientResource;
 use App\Http\Resources\PatientRomexisSyncResource;
 use App\Http\Resources\PatientStatisticsResource;
+use App\Http\Resources\PatientVisitResource;
 use App\Models\Patient;
 use App\Services\PatientServiceInterface;
 use Illuminate\Http\JsonResponse;
@@ -24,9 +25,9 @@ class PatientController extends Controller
 
     #[OA\Get(
         path: '/api/patient',
-        tags: ['Patient'],
         summary: 'Lista pacjentów (paginacja)',
         security: [['sanctum' => []]],
+        tags: ['Patient'],
         responses: [
             new OA\Response(
                 response: 200,
@@ -49,9 +50,9 @@ class PatientController extends Controller
 
     #[OA\Get(
         path: '/api/patient/selectlist',
-        tags: ['Patient'],
         summary: 'Lista pacjentów do selecta (uuid + name)',
         security: [['sanctum' => []]],
+        tags: ['Patient'],
         responses: [
             new OA\Response(response: 200, description: 'OK'),
         ]
@@ -63,9 +64,9 @@ class PatientController extends Controller
 
     #[OA\Get(
         path: '/api/patient/romexis-sync-list',
-        tags: ['Patient'],
         summary: 'Lista pacjentów z ustawionym romexis_patient_id (do synchronizacji zdjęć przez agenta Romexis)',
         security: [['sanctum' => []]],
+        tags: ['Patient'],
         responses: [
             new OA\Response(
                 response: 200,
@@ -88,9 +89,9 @@ class PatientController extends Controller
 
     #[OA\Get(
         path: '/api/patient/{uuid}',
-        tags: ['Patient'],
         summary: 'Pobiera jednego pacjenta',
         security: [['sanctum' => []]],
+        tags: ['Patient'],
         parameters: [
             new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
         ],
@@ -112,9 +113,9 @@ class PatientController extends Controller
 
     #[OA\Get(
         path: '/api/patient/{uuid}/statistics',
-        tags: ['Patient'],
         summary: 'Statystyki pacjenta (ostatnia/następna wizyta, nieobecności, lekarz prowadzący)',
         security: [['sanctum' => []]],
+        tags: ['Patient'],
         parameters: [
             new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
         ],
@@ -132,9 +133,37 @@ class PatientController extends Controller
         return new PatientStatisticsResource($this->patientService->getStatistics($patient));
     }
 
+    #[OA\Get(
+        path: '/api/patient/{uuid}/visits',
+        summary: 'Archiwum wizyt pacjenta (paginacja, od najnowszej)',
+        security: [['sanctum' => []]],
+        tags: ['Patient'],
+        parameters: [
+            new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'OK',
+                content: new OA\JsonContent(
+                    allOf: [
+                        new OA\Schema(ref: '#/components/schemas/PaginatedResponse'),
+                        new OA\Schema(properties: [
+                            new OA\Property(property: 'data', type: 'array', items: new OA\Items(ref: '#/components/schemas/PatientVisitResource')),
+                        ]),
+                    ]
+                )
+            ),
+            new OA\Response(response: 404, description: 'Nie znaleziono'),
+        ]
+    )]
+    public function visits(Patient $patient): AnonymousResourceCollection
+    {
+        return PatientVisitResource::collection($this->patientService->getVisits($patient));
+    }
+
     #[OA\Post(
         path: '/api/patient',
-        tags: ['Patient'],
         summary: 'Tworzy nowego pacjenta',
         security: [['sanctum' => []]],
         requestBody: new OA\RequestBody(
@@ -156,6 +185,7 @@ class PatientController extends Controller
                 ]
             )
         ),
+        tags: ['Patient'],
         responses: [
             new OA\Response(
                 response: 201,
@@ -174,12 +204,8 @@ class PatientController extends Controller
 
     #[OA\Put(
         path: '/api/patient/{uuid}',
-        tags: ['Patient'],
         summary: 'Aktualizuje pacjenta',
         security: [['sanctum' => []]],
-        parameters: [
-            new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
-        ],
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
@@ -191,11 +217,11 @@ class PatientController extends Controller
                     new OA\Property(
                         property: 'phone_numbers',
                         type: 'array',
-                        nullable: true,
                         items: new OA\Items(properties: [
                             new OA\Property(property: 'number', type: 'string', example: '48500100200'),
                             new OA\Property(property: 'type', type: 'string', enum: ['PRIVATE', 'WORK']),
-                        ])
+                        ]),
+                        nullable: true
                     ),
                     new OA\Property(property: 'street', type: 'string', nullable: true),
                     new OA\Property(property: 'house_number', type: 'string', nullable: true),
@@ -208,6 +234,10 @@ class PatientController extends Controller
                 ]
             )
         ),
+        tags: ['Patient'],
+        parameters: [
+            new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
+        ],
         responses: [
             new OA\Response(response: 204, description: 'Zaktualizowano'),
             new OA\Response(response: 404, description: 'Nie znaleziono'),
@@ -223,9 +253,9 @@ class PatientController extends Controller
 
     #[OA\Delete(
         path: '/api/patient/{uuid}',
-        tags: ['Patient'],
         summary: 'Usuwa pacjenta',
         security: [['sanctum' => []]],
+        tags: ['Patient'],
         parameters: [
             new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
         ],
@@ -243,9 +273,9 @@ class PatientController extends Controller
 
     #[OA\Get(
         path: '/api/patient/export',
-        tags: ['Patient'],
         summary: 'Eksport pacjentów do pliku',
         security: [['sanctum' => []]],
+        tags: ['Patient'],
         parameters: [
             new OA\QueryParameter(name: 'type', required: true, schema: new OA\Schema(type: 'string', enum: ['xlsx', 'csv', 'ods'])),
         ],

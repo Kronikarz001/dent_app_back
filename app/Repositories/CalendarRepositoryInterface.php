@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Models\Calendar;
 use App\Models\Patient;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 /**
  * Summary of CalendarRepositoryInterface
@@ -60,4 +61,10 @@ interface CalendarRepositoryInterface extends BasicRepositoryInterface
      * @return int
      */
     public function countForPatient(Patient $patient, ?bool $noShow = null): int;
+
+    /**
+     * @param Patient $patient
+     * @return LengthAwarePaginator
+     */
+    public function findVisitsForPatient(Patient $patient): LengthAwarePaginator;
 }

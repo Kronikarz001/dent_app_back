@@ -75,6 +75,14 @@ abstract class Search implements SearchInterface
     }
 
     /**
+     * @return array<string, string>
+     */
+    protected function defaultSort(): array
+    {
+        return [];
+    }
+
+    /**
      * @return array
      */
     protected function relationsCount(): array
@@ -187,6 +195,10 @@ abstract class Search implements SearchInterface
     {
         $sortParam = $this->request->get(config('search.sort_keyword'));
         if ($sortParam === null) {
+            foreach ($this->defaultSort() as $column => $direction) {
+                $this->searchRepository->orderBy($query, $query->getModel()->getTable().'.'.$column, $direction);
+            }
+
             return;
         }
 

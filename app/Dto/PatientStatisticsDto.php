@@ -2,7 +2,6 @@
 
 namespace App\Dto;
 
-use App\Models\Calendar;
 use App\Models\User;
 use Illuminate\Support\Carbon;
 
@@ -12,36 +11,36 @@ use Illuminate\Support\Carbon;
 class PatientStatisticsDto extends Dto
 {
     /**
-     * @param Calendar|null $lastVisit
-     * @param Calendar|null $nextVisit
+     * @param PatientVisitDto|null $lastVisit
+     * @param PatientVisitDto|null $nextVisit
      * @param int $noShowCount
      * @param int $totalAppointments
-     * @param Calendar|null $lastNoShow
+     * @param Carbon|null $lastNoShowAt
      * @param User|null $leadDoctor
-     * @param Carbon|null $leadDoctorSince
+     * @param string|null $leadDoctorSince
      */
     public function __construct(
-        private readonly ?Calendar $lastVisit,
-        private readonly ?Calendar $nextVisit,
+        private readonly ?PatientVisitDto $lastVisit,
+        private readonly ?PatientVisitDto $nextVisit,
         private readonly int $noShowCount,
         private readonly int $totalAppointments,
-        private readonly ?Calendar $lastNoShow,
+        private readonly ?Carbon $lastNoShowAt,
         private readonly ?User $leadDoctor,
-        private readonly ?Carbon $leadDoctorSince,
+        private readonly ?string $leadDoctorSince,
     ) {}
 
     /**
-     * @return Calendar|null
+     * @return PatientVisitDto|null
      */
-    public function getLastVisit(): ?Calendar
+    public function getLastVisit(): ?PatientVisitDto
     {
         return $this->lastVisit;
     }
 
     /**
-     * @return Calendar|null
+     * @return PatientVisitDto|null
      */
-    public function getNextVisit(): ?Calendar
+    public function getNextVisit(): ?PatientVisitDto
     {
         return $this->nextVisit;
     }
@@ -63,11 +62,11 @@ class PatientStatisticsDto extends Dto
     }
 
     /**
-     * @return Calendar|null
+     * @return Carbon|null
      */
-    public function getLastNoShow(): ?Calendar
+    public function getLastNoShowAt(): ?Carbon
     {
-        return $this->lastNoShow;
+        return $this->lastNoShowAt;
     }
 
     /**
@@ -79,9 +78,9 @@ class PatientStatisticsDto extends Dto
     }
 
     /**
-     * @return Carbon|null
+     * @return string|null
      */
-    public function getLeadDoctorSince(): ?Carbon
+    public function getLeadDoctorSince(): ?string
     {
         return $this->leadDoctorSince;
     }

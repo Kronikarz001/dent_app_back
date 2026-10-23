@@ -3,6 +3,7 @@
 namespace Tests\Unit\Repositories;
 
 use App\Models\Calendar;
+use App\Models\DentalExamination;
 use App\Models\EmployeeSchedule;
 use App\Models\JobPosition;
 use App\Models\Patient;
@@ -243,6 +244,38 @@ class CalendarRepositoryTest extends TestCase
         $this->assertTrue($found->relationLoaded('users'));
         $this->assertTrue($found->users->first()->is($doctor));
         $this->assertTrue($found->users->first()->relationLoaded('jobPosition'));
+    }
+
+    /**
+     * @return void
+     */
+    public function testFindVisitsForPatientReturnsOnlyPatientVisitsNewestFirstWithRelations(): void
+    {
+        $patient = Patient::factory()->create();
+        $doctor = User::factory()->create();
+        $examination = DentalExamination::factory()->create(['name' => 'Przegląd stomatologiczny']);
+
+        $oldest = $this->createVisitFor($patient, '2026-01-10', '09:00');
+        $newest = $this->createVisitFor($patient, '2026-10-02', '12:00');
+        $sameDayEarlier = $this->createVisitFor($patient, '2026-10-02', '08:00', true);
+        $newest->users()->attach($doctor->uuid);
+        $newest->dentalExaminations()->attach($examination->uuid);
+        $this->createVisitFor(Patient::factory()->create(), '2026-10-05', '10:00');
+        $schedule = EmployeeSchedule::factory()->create(['date' => '2026-10-03']);
+        DB::table('calendar_users')->insert([
+            'calendar_uuid' => $schedule->uuid,
+            'userable_id' => $patient->uuid,
+            'userable_type' => $patient->getMorphClass(),
+        ]);
+
+        $result = $this->repository->findVisitsForPatient($patient);
+
+        $this->assertSame([$newest->uuid, $sameDayEarlier->uuid, $oldest->uuid], $result->getCollection()->pluck('uuid')->all());
+        $this->assertSame(3, $result->total());
+        $this->assertTrue($result->getCollection()->first()->relationLoaded('users'));
+        $this->assertTrue($result->getCollection()->first()->relationLoaded('dentalExaminations'));
+        $this->assertSame('Przegląd stomatologiczny', $result->getCollection()->first()->dentalExaminations->first()->name);
+        $this->assertTrue($result->getCollection()->first()->users->first()->is($doctor));
     }
 
     /**

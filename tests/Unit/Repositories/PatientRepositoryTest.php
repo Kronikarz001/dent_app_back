@@ -2,7 +2,9 @@
 
 namespace Tests\Unit\Repositories;
 
+use App\Models\JobPosition;
 use App\Models\Patient;
+use App\Models\User;
 use App\Repositories\PatientRepositoryInterface;
 use Illuminate\Support\Str;
 use Tests\TestCase;
@@ -90,5 +92,30 @@ class PatientRepositoryTest extends TestCase
 
         $this->assertTrue($this->repository->delete($patient));
         $this->assertDatabaseMissing('patients', ['uuid' => $patient->uuid]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testFindDoctorReturnsLeadDoctorWithJobPosition(): void
+    {
+        $jobPosition = JobPosition::factory()->create();
+        $doctor = User::factory()->create(['job_position_uuid' => $jobPosition->uuid]);
+        $patient = Patient::factory()->create(['doctor_uuid' => $doctor->uuid]);
+
+        $found = $this->repository->findDoctor($patient);
+
+        $this->assertTrue($found->is($doctor));
+        $this->assertTrue($found->relationLoaded('jobPosition'));
+    }
+
+    /**
+     * @return void
+     */
+    public function testFindDoctorReturnsNullWhenPatientHasNoDoctor(): void
+    {
+        $patient = Patient::factory()->create(['doctor_uuid' => null]);
+
+        $this->assertNull($this->repository->findDoctor($patient));
     }
 }

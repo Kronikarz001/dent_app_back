@@ -56,6 +56,12 @@ interface PatientServiceInterface
     public function getStatistics(Patient $patient): PatientStatisticsDto;
 
     /**
+     * @param Patient $patient
+     * @return LengthAwarePaginator
+     */
+    public function getVisits(Patient $patient): LengthAwarePaginator;
+
+    /**
      * @param ExportRequest $request
      * @return BinaryFileResponse
      *

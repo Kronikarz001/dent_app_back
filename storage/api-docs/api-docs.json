@@ -6927,6 +6927,61 @@
                 ]
             }
         },
+        "/api/patient/{uuid}/visits": {
+            "get": {
+                "tags": [
+                    "Patient"
+                ],
+                "summary": "Archiwum wizyt pacjenta (paginacja, od najnowszej)",
+                "operationId": "e5a5f6eca7f3299444c036f65d18673a",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/PaginatedResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/PatientVisitResource"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Nie znaleziono"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/patient/export": {
             "get": {
                 "tags": [
@@ -11039,6 +11094,26 @@
                 },
                 "type": "object"
             },
+            "DoctorResource": {
+                "properties": {
+                    "uuid": {
+                        "description": "Summary of DoctorResource",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "first_name": {
+                        "type": "string"
+                    },
+                    "last_name": {
+                        "type": "string"
+                    },
+                    "position": {
+                        "type": "string",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
             "MessageGroupResource": {
                 "properties": {
                     "uuid": {
@@ -11102,6 +11177,42 @@
                     "created_at": {
                         "type": "string",
                         "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "PatientVisitResource": {
+                "properties": {
+                    "uuid": {
+                        "description": "Summary of PatientVisitResource",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "treatments": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/DentalExaminationResource"
+                        }
+                    },
+                    "date": {
+                        "type": "string",
+                        "example": "2026-10-02T12:00:00.000000"
+                    },
+                    "doctor": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/DoctorResource"
+                            }
+                        ],
+                        "nullable": true
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "COMPLETED",
+                            "NO_SHOW",
+                            "SCHEDULED"
+                        ]
                     }
                 },
                 "type": "object"
