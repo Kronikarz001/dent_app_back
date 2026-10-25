@@ -6,7 +6,6 @@ use App\Events\MessageSent;
 use App\Exceptions\MessageAccessDeniedException;
 use App\Exceptions\MessageGroupAccessDeniedException;
 use App\Models\Message;
-use App\Models\MessageGroup;
 use App\Repositories\MessageGroupRepositoryInterface;
 use App\Repositories\MessageRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -49,7 +48,7 @@ readonly class MessageService implements MessageServiceInterface
                 'message' => $data['message'],
             ]);
         } else {
-            $defaultGroup = MessageGroup::where('is_default', true)->first();
+            $defaultGroup = $this->messageGroupRepository->findDefault();
 
             $message = $this->messageRepository->create([
                 'user_uuid' => $sender->uuid,
@@ -83,11 +82,10 @@ readonly class MessageService implements MessageServiceInterface
     public function getInbox(): LengthAwarePaginator
     {
         $user = Auth::user();
-        $userGroupUuids = $user->messageGroups()->pluck('message_groups.uuid')->toArray();
 
         return $this->messageRepository->findAllWithPagination([
             'for_user' => $user->uuid,
-            'user_group_uuids' => $userGroupUuids,
+            'user_group_uuids' => $this->messageGroupRepository->findUuidsForUser($user->uuid),
         ]);
     }
 

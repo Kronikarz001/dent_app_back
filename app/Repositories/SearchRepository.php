@@ -3,8 +3,8 @@
 namespace App\Repositories;
 
 use Closure;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 /**
  * Summary of SearchRepository

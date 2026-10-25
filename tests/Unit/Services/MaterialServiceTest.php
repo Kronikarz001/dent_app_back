@@ -68,12 +68,12 @@ class MaterialServiceTest extends TestCase
     /**
      * @return void
      */
-    public function testGetMaterialsListPassesOnlyUuidAndNameColumns(): void
+    public function testGetMaterialsListSelectsOnlyUuidAndNameColumns(): void
     {
         $paginator = new LengthAwarePaginator([], 0, 100, 1);
 
         $this->materialRepository
-            ->shouldReceive('findAllWithPagination')
+            ->shouldReceive('findSelectAllWithPagination')
             ->once()
             ->with(['uuid', 'name'])
             ->andReturn($paginator);
@@ -154,7 +154,7 @@ class MaterialServiceTest extends TestCase
         $this->materialRepository
             ->shouldReceive('findAllWithPagination')
             ->once()
-            ->withNoArgs()
+            ->with([], -1)
             ->andReturn($paginator);
 
         $this->exportService

@@ -2,8 +2,6 @@
 
 namespace App\Services;
 
-use App\Models\NotificationChannel;
-use App\Models\NotificationType;
 use App\Models\User;
 use App\Repositories\NotificationPreferenceRepository;
 use App\Repositories\NotificationRepository;
@@ -122,13 +120,12 @@ readonly class NotificationService implements NotificationServiceInterface
             $channelUuid = $preference['channel_id'];
             $enabled = $preference['enabled'];
 
-            $channel = NotificationChannel::find($channelUuid);
+            $channel = $this->preferenceRepository->findChannel($channelUuid);
             if (! $channel || ! $channel->is_configurable) {
                 continue;
             }
 
-            $type = NotificationType::find($typeUuid);
-            if (! $type) {
+            if (! $this->preferenceRepository->typeExists($typeUuid)) {
                 continue;
             }
 

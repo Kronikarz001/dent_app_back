@@ -2,33 +2,45 @@
 
 namespace App\Repositories;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
  * Summary of BasicRepository
+ *
+ * @template TModel of Model
+ *
+ * @implements BasicRepositoryInterface<TModel>
  */
 abstract class BasicRepository implements BasicRepositoryInterface
 {
     /**
-     * @var string
+     * @var class-string<TModel>
      */
     protected string $modelClass;
 
     /**
-     * @param array $data
-     * @return Model
+     * @return Builder<TModel>
      */
-    public function create(array $data): Model
+    protected function query(): Builder
     {
-        return $this->modelClass::create($data);
+        return $this->modelClass::query();
     }
 
     /**
-     * @param Model $model
      * @param array $data
-     * @return Model
+     * @return TModel
+     */
+    public function create(array $data): Model
+    {
+        return $this->query()->create($data);
+    }
+
+    /**
+     * @param TModel $model
+     * @param array $data
+     * @return TModel
      */
     public function update(Model $model, array $data): Model
     {
@@ -38,7 +50,7 @@ abstract class BasicRepository implements BasicRepositoryInterface
     }
 
     /**
-     * @param Model $model
+     * @param TModel $model
      * @return bool
      */
     public function delete(Model $model): bool
@@ -48,72 +60,63 @@ abstract class BasicRepository implements BasicRepositoryInterface
 
     /**
      * @param string $uuid
-     * @return Model|null
+     * @return TModel|null
      */
     public function findByUuid(string $uuid): ?Model
     {
-        return $this->modelClass::where('uuid', $uuid)->first();
+        return $this->query()->where('uuid', $uuid)->first();
     }
 
     /**
-     * @param array $uuids
-     * @return Collection
+     * @param string $uuid
+     * @return TModel
+     */
+    public function findByUuidOrFail(string $uuid): Model
+    {
+        return $this->query()->where('uuid', $uuid)->firstOrFail();
+    }
+
+    /**
+     * @param TModel $model
+     * @param string[] $relations
+     * @return TModel
+     */
+    public function loadRelations(Model $model, array $relations): Model
+    {
+        return $model->load($relations);
+    }
+
+    /**
+     * @param TModel $model
+     * @param string $relation
+     * @param array $ids
+     * @return array{attached: array, detached: array, updated: array}
+     */
+    public function syncRelation(Model $model, string $relation, array $ids): array
+    {
+        return $model->{$relation}()->sync($ids);
+    }
+
+    /**
+     * @param string[] $uuids
+     * @return Collection<int, TModel>
      */
     public function findAllByUuids(array $uuids): Collection
     {
-        return $this->modelClass::whereIn('uuid', $uuids)->get();
+        return $this->query()->whereIn('uuid', $uuids)->get();
     }
 
     /**
-     * @param string $modelClass
-     * @param array $uniqueAttributes
-     * @param array $values
-     * @return Model
+     * @param string $column
+     * @param mixed $value
+     * @param string|null $ignoreUuid
+     * @return bool
      */
-    public function createOrUpdate(string $modelClass, array $uniqueAttributes, array $values): Model
+    public function existsBy(string $column, mixed $value, ?string $ignoreUuid = null): bool
     {
-        return $modelClass::updateOrCreate($uniqueAttributes, $values);
-    }
-
-    /**
-     * @param Model $model
-     * @param string $relationMethod
-     * @param array|null $desiredIds
-     * @param callable|null $pivotCallback
-     * @return void
-     */
-    protected function syncPivotRelation(Model $model, string $relationMethod, ?array $desiredIds, ?callable $pivotCallback = null): void
-    {
-        if ($desiredIds === null) {
-            return;
-        }
-
-        /** @var BelongsToMany $relation */
-        $relation = $model->{$relationMethod}();
-        $pivotKey = $relation->getQualifiedRelatedPivotKeyName();
-        $currentIds = $relation->pluck($pivotKey)->all();
-
-        $toAttach = array_diff($desiredIds, $currentIds);
-        $toDetach = array_diff($currentIds, $desiredIds);
-
-        if (! empty($toDetach)) {
-            $relation->detach($toDetach);
-        }
-
-        if (is_null($pivotCallback)) {
-            if (! empty($toAttach)) {
-                $relation->attach($toAttach);
-            }
-
-            return;
-        }
-
-        if (! empty($toAttach)) {
-            $payload = [];
-            foreach ($toAttach as $id) {
-                $payload[$id] = $pivotCallback($id);
-            }
-            $relation->attach($payload);
-        }
+        return $this->query()
+            ->where($column, $value)
+            ->when($ignoreUuid, fn (Builder $query) => $query->where('uuid', '!=', $ignoreUuid))
+            ->exists();
     }
 }

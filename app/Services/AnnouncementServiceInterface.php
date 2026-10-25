@@ -16,6 +16,12 @@ interface AnnouncementServiceInterface
     public function getAll(): LengthAwarePaginator;
 
     /**
+     * @param Announcement $announcement
+     * @return Announcement
+     */
+    public function getAnnouncement(Announcement $announcement): Announcement;
+
+    /**
      * @param array $data
      * @return Announcement
      */

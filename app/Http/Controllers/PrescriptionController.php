@@ -100,7 +100,7 @@ class PrescriptionController extends Controller
     )]
     public function show(Prescription $prescription): PrescriptionResource
     {
-        return new PrescriptionResource($prescription->load(['patient', 'doctor', 'medicines']));
+        return new PrescriptionResource($this->prescriptionService->getPrescription($prescription));
     }
 
     #[OA\Post(
@@ -124,7 +124,7 @@ class PrescriptionController extends Controller
     {
         $prescription = $this->prescriptionService->createPrescription($request->validated());
 
-        return new PrescriptionResource($prescription->load(['patient', 'doctor', 'medicines']));
+        return new PrescriptionResource($this->prescriptionService->getPrescription($prescription));
     }
 
     #[OA\Put(
@@ -193,6 +193,6 @@ class PrescriptionController extends Controller
     {
         $prescription = $this->prescriptionService->issuePrescription($prescription);
 
-        return new PrescriptionResource($prescription->load(['patient', 'doctor', 'medicines']));
+        return new PrescriptionResource($this->prescriptionService->getPrescription($prescription));
     }
 }

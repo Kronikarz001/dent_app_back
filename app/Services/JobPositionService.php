@@ -5,11 +5,9 @@ namespace App\Services;
 use App\Exports\JobPositionExport;
 use App\Http\Requests\ExportRequest;
 use App\Models\JobPosition;
-use App\Models\Permission;
-use App\Models\PermissionAssignment;
-use App\Models\PermissionGroup;
 use App\Models\User;
 use App\Repositories\JobPositionRepositoryInterface;
+use App\Repositories\UserRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 use PhpOffice\PhpSpreadsheet\Exception;
@@ -24,10 +22,14 @@ readonly class JobPositionService implements JobPositionServiceInterface
     /**
      * @param JobPositionRepositoryInterface $jobPositionRepository
      * @param ExportServiceInterface $exportService
+     * @param UserRepositoryInterface $userRepository
+     * @param PermissionGrantServiceInterface $permissionGrantService
      */
     public function __construct(
         private JobPositionRepositoryInterface $jobPositionRepository,
         private ExportServiceInterface $exportService,
+        private UserRepositoryInterface $userRepository,
+        private PermissionGrantServiceInterface $permissionGrantService,
     ) {}
 
     /**
@@ -43,7 +45,7 @@ readonly class JobPositionService implements JobPositionServiceInterface
      */
     public function getJobPositionsList(): LengthAwarePaginator
     {
-        return $this->jobPositionRepository->findAllWithPagination(['uuid', 'name']);
+        return $this->jobPositionRepository->findSelectAllWithPagination(['uuid', 'name']);
     }
 
     /**
@@ -81,7 +83,7 @@ readonly class JobPositionService implements JobPositionServiceInterface
      */
     public function assignJobPosition(User $user, array $data): void
     {
-        $user->update(['job_position_uuid' => $data['job_position_uuid']]);
+        $this->userRepository->update($user, ['job_position_uuid' => $data['job_position_uuid']]);
     }
 
     /**
@@ -93,7 +95,7 @@ readonly class JobPositionService implements JobPositionServiceInterface
      */
     public function export(ExportRequest $request): BinaryFileResponse
     {
-        return $this->exportService->export($request, new JobPositionExport($this->getJobPositions()->getCollection()), JobPosition::getModel());
+        return $this->exportService->export($request, new JobPositionExport($this->jobPositionRepository->findAllWithPagination(perPage: -1)->getCollection()), JobPosition::getModel());
     }
 
     /**
@@ -103,32 +105,6 @@ readonly class JobPositionService implements JobPositionServiceInterface
      */
     public function assignPermissions(JobPosition $jobPosition, array $data): void
     {
-        foreach ($data['permissions'] ?? [] as $permissionUuid) {
-            $this->grant(Permission::class, $permissionUuid, $jobPosition, $data['expires_at'] ?? null);
-        }
-
-        foreach ($data['permission_groups'] ?? [] as $permissionGroupUuid) {
-            $this->grant(PermissionGroup::class, $permissionGroupUuid, $jobPosition, $data['expires_at'] ?? null);
-        }
-    }
-
-    /**
-     * @param string $grantableType
-     * @param string $grantableUuid
-     * @param JobPosition $jobPosition
-     * @param string|null $expiresAt
-     * @return void
-     */
-    private function grant(string $grantableType, string $grantableUuid, JobPosition $jobPosition, ?string $expiresAt): void
-    {
-        PermissionAssignment::firstOrCreate([
-            'grantable_type' => $grantableType,
-            'grantable_id' => $grantableUuid,
-            'assignable_type' => JobPosition::class,
-            'assignable_id' => $jobPosition->uuid,
-        ], [
-            'expires_at' => $expiresAt,
-            'granted_by' => Auth::id(),
-        ]);
+        $this->permissionGrantService->assign($jobPosition, $data, Auth::user());
     }
 }

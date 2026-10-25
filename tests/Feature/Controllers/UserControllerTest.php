@@ -201,6 +201,94 @@ class UserControllerTest extends TestCase
     /**
      * @return void
      */
+    public function testNonAdminWithUserEditPermissionCannotGrantAdminFlags(): void
+    {
+        $editor = $this->createUserWithUserEditPermission();
+
+        $this->callApiWithLoggedUser($editor)
+            ->putJson(route('user.update', ['user' => $editor->uuid]), [
+                'first_name' => 'Ewa',
+                'is_admin' => true,
+                'is_superuser' => true,
+            ])
+            ->assertForbidden();
+
+        $this->assertFalse($editor->fresh()->is_admin);
+        $this->assertFalse($editor->fresh()->is_superuser);
+    }
+
+    /**
+     * @return void
+     */
+    public function testNonAdminCannotCreateAdminUser(): void
+    {
+        $editor = $this->createUserWithUserEditPermission();
+
+        $this->callApiWithLoggedUser($editor)
+            ->postJson(route('user.store'), [
+                'first_name' => 'Jan',
+                'last_name' => 'Kowalski',
+                'pesel' => '90010112345',
+                'private_email' => 'jan@example.com',
+                'is_admin' => true,
+            ])
+            ->assertForbidden();
+
+        $this->assertDatabaseMissing('users', ['private_email' => 'jan@example.com']);
+    }
+
+    /**
+     * @return void
+     */
+    public function testNonAdminCanSendUnchangedAdminFlags(): void
+    {
+        $editor = $this->createUserWithUserEditPermission();
+        $user = User::factory()->create(['is_admin' => false]);
+
+        $this->callApiWithLoggedUser($editor)
+            ->putJson(route('user.update', ['user' => $user->uuid]), [
+                'first_name' => 'Ewa',
+                'is_admin' => false,
+            ])
+            ->assertNoContent();
+
+        $this->assertSame('Ewa', $user->fresh()->first_name);
+    }
+
+    /**
+     * @return void
+     */
+    public function testAdminCanGrantAdminFlag(): void
+    {
+        $user = User::factory()->create(['is_admin' => false]);
+
+        $this->callApiWithLoggedUser()
+            ->putJson(route('user.update', ['user' => $user->uuid]), ['is_admin' => true])
+            ->assertNoContent();
+
+        $this->assertTrue($user->fresh()->is_admin);
+    }
+
+    /**
+     * @return User
+     */
+    private function createUserWithUserEditPermission(): User
+    {
+        $user = User::factory()->create(['is_admin' => false, 'is_superuser' => false]);
+        $permission = Permission::where('resource', 'user')->where('type', 'edit')->firstOrFail();
+        PermissionAssignment::create([
+            'grantable_type' => Permission::class,
+            'grantable_id' => $permission->uuid,
+            'assignable_type' => User::class,
+            'assignable_id' => $user->uuid,
+        ]);
+
+        return $user;
+    }
+
+    /**
+     * @return void
+     */
     public function testUpdateUserReturnsConflictWhenPeselAlreadyTaken(): void
     {
         User::factory()->create(['pesel' => '12345678901']);
@@ -441,6 +529,26 @@ class UserControllerTest extends TestCase
             'grantable_id' => $permission->uuid,
             'assignable_type' => User::class,
             'assignable_id' => $target->uuid,
+        ]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testAssignPermissionsForbiddenWhenActingUserDoesNotHoldPermission(): void
+    {
+        $editor = $this->createUserWithUserEditPermission();
+        $permission = Permission::where('resource', 'patient')->where('type', 'edit')->firstOrFail();
+
+        $this->callApiWithLoggedUser($editor)
+            ->patchJson(route('user.assignPermissions', ['user' => $editor->uuid]), [
+                'permissions' => [$permission->uuid],
+            ])
+            ->assertForbidden();
+
+        $this->assertDatabaseMissing('permission_assignments', [
+            'grantable_id' => $permission->uuid,
+            'assignable_id' => $editor->uuid,
         ]);
     }
 }

@@ -147,11 +147,13 @@ class MessageServiceTest extends TestCase
     {
         $sender = User::factory()->make(['uuid' => 'sender-uuid']);
         Auth::setUser($sender);
-        $defaultGroup = MessageGroup::where('is_default', true)->firstOrFail();
+        $defaultGroup = MessageGroup::factory()->make(['uuid' => 'default-group-uuid', 'is_default' => true]);
         $message = Message::factory()->make([
             'user_uuid' => 'sender-uuid',
             'message_group_uuid' => $defaultGroup->uuid,
         ]);
+
+        $this->messageGroupRepository->shouldReceive('findDefault')->once()->andReturn($defaultGroup);
 
         $this->messageRepository
             ->shouldReceive('create')
@@ -175,8 +177,10 @@ class MessageServiceTest extends TestCase
     {
         $user = User::factory()->create();
         Auth::setUser($user);
-        $userGroupUuids = $user->messageGroups()->pluck('message_groups.uuid')->toArray();
+        $userGroupUuids = ['group-a', 'group-b'];
         $paginator = new LengthAwarePaginator([], 0, 15, 1);
+
+        $this->messageGroupRepository->shouldReceive('findUuidsForUser')->once()->with($user->uuid)->andReturn($userGroupUuids);
 
         $this->messageRepository
             ->shouldReceive('findAllWithPagination')

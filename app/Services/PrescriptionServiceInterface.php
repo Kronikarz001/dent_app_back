@@ -23,6 +23,12 @@ interface PrescriptionServiceInterface
     public function getPrescriptionsForPatient(Patient $patient): LengthAwarePaginator;
 
     /**
+     * @param Prescription $prescription
+     * @return Prescription
+     */
+    public function getPrescription(Prescription $prescription): Prescription;
+
+    /**
      * @param array $data
      * @return Prescription
      */

@@ -6,18 +6,19 @@ use App\Exceptions\InvalidAuditableIdentifierException;
 use App\Models\Audit;
 use App\Search\AuditSearch;
 use App\Search\Search;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 
 /**
  * Summary of AuditRepository
+ *
+ * @extends SearchableRepository<Audit>
  */
 class AuditRepository extends SearchableRepository implements AuditRepositoryInterface
 {
     /**
-     * @var string
+     * @var class-string<Audit>
      */
     protected string $modelClass = Audit::class;
 
@@ -25,17 +26,8 @@ class AuditRepository extends SearchableRepository implements AuditRepositoryInt
      * @param AuditSearch $search
      */
     public function __construct(
-        private AuditSearch $search
+        private readonly AuditSearch $search
     ) {}
-
-    /**
-     * @param array $params
-     * @return LengthAwarePaginator
-     */
-    public function findAllWithPagination(array $params = []): LengthAwarePaginator
-    {
-        return $this->search->search($params);
-    }
 
     /**
      * @return Search
@@ -43,15 +35,6 @@ class AuditRepository extends SearchableRepository implements AuditRepositoryInt
     protected function getSearchModel(): Search
     {
         return $this->search;
-    }
-
-    /**
-     * @param array $data
-     * @return Audit
-     */
-    public function create(array $data): Audit
-    {
-        return Audit::create($data);
     }
 
     /**
@@ -78,7 +61,7 @@ class AuditRepository extends SearchableRepository implements AuditRepositoryInt
      */
     public function findLatestChangeTo(Model $model, string $attribute, string $value): ?Audit
     {
-        return Audit::query()
+        return $this->query()
             ->where('auditable_type', $model->getMorphClass())
             ->where('auditable_id', $model->getKey())
             ->where("change_to->{$attribute}", $value)

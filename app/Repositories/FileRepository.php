@@ -6,15 +6,16 @@ use App\Models\File;
 use App\Search\FileSearch;
 use App\Search\Search;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Model;
 
 /**
  * Summary of FileRepository
+ *
+ * @extends SearchableRepository<File>
  */
 class FileRepository extends SearchableRepository implements FileRepositoryInterface
 {
     /**
-     * @var string
+     * @var class-string<File>
      */
     protected string $modelClass = File::class;
 
@@ -31,45 +32,6 @@ class FileRepository extends SearchableRepository implements FileRepositoryInter
     protected function getSearchModel(): Search
     {
         return $this->search;
-    }
-
-    /**
-     * @param string $uuid
-     * @return File
-     */
-    public function findByUuid(string $uuid): File
-    {
-        return File::whereUuid($uuid)->first();
-    }
-
-    /**
-     * @param array $data
-     * @return File
-     */
-    public function create(array $data): File
-    {
-        return File::create($data);
-    }
-
-    /**
-     * @param Model|File $model
-     * @param array $data
-     * @return File
-     */
-    public function update(Model|File $model, array $data): File
-    {
-        $model->update($data);
-
-        return $model;
-    }
-
-    /**
-     * @param Model|File $model
-     * @return bool
-     */
-    public function delete(Model|File $model): bool
-    {
-        return $model->delete();
     }
 
     /**

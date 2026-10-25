@@ -4,6 +4,7 @@ namespace Tests\Unit\Services;
 
 use App\Models\Patient;
 use App\Models\PhoneNumber;
+use App\Repositories\PhoneNumberRepository;
 use App\Services\PhoneNumberService;
 use Tests\TestCase;
 
@@ -18,7 +19,7 @@ class PhoneNumberServiceTest extends TestCase
     {
         parent::setUp();
 
-        $this->phoneNumberService = new PhoneNumberService;
+        $this->phoneNumberService = new PhoneNumberService(new PhoneNumberRepository);
     }
 
     /**

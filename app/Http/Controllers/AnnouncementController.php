@@ -111,7 +111,7 @@ class AnnouncementController extends Controller
     )]
     public function show(Announcement $announcement): AnnouncementResource
     {
-        return new AnnouncementResource($announcement->load('author'));
+        return new AnnouncementResource($this->announcementService->getAnnouncement($announcement));
     }
 
     /**

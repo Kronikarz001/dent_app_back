@@ -4,7 +4,6 @@ namespace App\Http\Middlewares;
 
 use App\Enums\PermissionType;
 use App\Exceptions\PermissionDeniedException;
-use App\Models\PermissionRoute;
 use App\Models\User;
 use App\Services\PermissionServiceInterface;
 use Closure;
@@ -67,9 +66,7 @@ class PermissionMiddleware
             return $next($request);
         }
 
-        $resource = PermissionRoute::query()
-            ->where('route_name', $routeName)
-            ->value('resource');
+        $resource = $this->permissionService->findResourceForRoute($routeName);
 
         if ($resource === null) {
             throw new PermissionDeniedException;

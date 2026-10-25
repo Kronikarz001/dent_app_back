@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -54,6 +55,8 @@ use Laravel\Sanctum\PersonalAccessToken;
  */
 abstract class BasicUser extends Authenticatable
 {
+    public const RESOURCE_RELATIONS = ['phoneNumbers', 'jobPosition', 'latestAvatar', 'latestBackground', 'validTokens'];
+
     /** @use HasFactory<UserFactory> */
     use Auditable, HasApiTokens, HasFactory, HasFile, HasPhoneNumber, HasUuids, Notifiable, SerializesLocalDates;
 
@@ -98,6 +101,15 @@ abstract class BasicUser extends Authenticatable
     ];
 
     /**
+     * @param BasicUser $user
+     * @return static
+     */
+    public static function fromUser(BasicUser $user): static
+    {
+        return (new static)->newFromBuilder($user->getAttributes());
+    }
+
+    /**
      * @param string $token
      * @return static|null
      */
@@ -117,13 +129,46 @@ abstract class BasicUser extends Authenticatable
      */
     public function isOnline(): UserStatusType
     {
+        return $this->validTokens->isNotEmpty() ? UserStatusType::ACTIVE : UserStatusType::NON_ACTIVE;
+    }
+
+    /**
+     * @return MorphMany
+     */
+    public function validTokens(): MorphMany
+    {
         $expiration = config('sanctum.expiration');
 
-        $hasValidToken = $this->tokens()
-            ->when($expiration, fn ($query) => $query->where('created_at', '>', now()->subMinutes($expiration)))
-            ->exists();
+        return $this->tokens()
+            ->when($expiration, fn ($query) => $query->where('created_at', '>', now()->subMinutes($expiration)));
+    }
 
-        return $hasValidToken ? UserStatusType::ACTIVE : UserStatusType::NON_ACTIVE;
+    /**
+     * @return HasOne
+     */
+    public function latestAvatar(): HasOne
+    {
+        return $this->latestFileOf(UserAvatar::class);
+    }
+
+    /**
+     * @return HasOne
+     */
+    public function latestBackground(): HasOne
+    {
+        return $this->latestFileOf(UserBackground::class);
+    }
+
+    /**
+     * @param string $fileableType
+     * @return HasOne
+     */
+    private function latestFileOf(string $fileableType): HasOne
+    {
+        return $this->hasOne(File::class, 'fileable_id', 'uuid')
+            ->where('fileable_type', $fileableType)
+            ->where('is_latest', true)
+            ->latest();
     }
 
     /**
@@ -161,17 +206,9 @@ abstract class BasicUser extends Authenticatable
      */
     public function getAvatarPathAttribute(): ?string
     {
-        $file = File::where('fileable_type', UserAvatar::class)
-            ->where('fileable_id', $this->uuid)
-            ->where('is_latest', true)
-            ->latest()
-            ->first();
+        $file = $this->latestAvatar;
 
-        if (! $file) {
-            return null;
-        }
-
-        return Storage::disk('public')->url($file->path);
+        return $file ? Storage::disk('public')->url($file->path) : null;
     }
 
     /**
@@ -179,17 +216,9 @@ abstract class BasicUser extends Authenticatable
      */
     public function getBackgroundPathAttribute(): ?string
     {
-        $file = File::where('fileable_type', UserBackground::class)
-            ->where('fileable_id', $this->uuid)
-            ->where('is_latest', true)
-            ->latest()
-            ->first();
+        $file = $this->latestBackground;
 
-        if (! $file) {
-            return null;
-        }
-
-        return route('userfile.background-download', ['user' => $this->uuid, 'file' => $file->uuid]);
+        return $file ? route('userfile.background-download', ['user' => $this->uuid, 'file' => $file->uuid]) : null;
     }
 
     /**

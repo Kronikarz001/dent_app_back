@@ -5,9 +5,9 @@ namespace App\Services;
 use App\Exceptions\AuthenticationException;
 use App\Http\Requests\LoginRequest;
 use App\Models\User;
+use App\Repositories\UserRepositoryInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 
 /**
@@ -15,6 +15,13 @@ use Illuminate\Support\Facades\Password;
  */
 readonly class AuthService implements AuthServiceInterface
 {
+    /**
+     * @param UserRepositoryInterface $userRepository
+     */
+    public function __construct(
+        private UserRepositoryInterface $userRepository,
+    ) {}
+
     /**
      * @param LoginRequest $request
      * @return JsonResponse
@@ -44,7 +51,7 @@ readonly class AuthService implements AuthServiceInterface
             return;
         }
 
-        $user->currentAccessToken()->delete();
+        $this->userRepository->revokeCurrentToken($user);
     }
 
     /**
@@ -70,11 +77,7 @@ readonly class AuthService implements AuthServiceInterface
     {
         $status = Password::reset(
             $data,
-            function ($user, $password) {
-                $user->forceFill([
-                    'password' => Hash::make($password),
-                ])->save();
-            }
+            fn (User $user, string $password) => $this->userRepository->update($user, ['password' => $password])
         );
 
         if ($status === Password::PASSWORD_RESET) {
@@ -97,10 +100,8 @@ readonly class AuthService implements AuthServiceInterface
             ];
         }
 
-        $plainText = $user->createToken('token')->plainTextToken;
-
         return [
-            'token' => $plainText,
+            'token' => $this->userRepository->createToken($user, 'token'),
             'type' => 'BEARER',
         ];
     }

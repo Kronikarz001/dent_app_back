@@ -11,6 +11,7 @@ use App\Models\Role;
 use App\Services\RoleServiceInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Gate;
 use OpenApi\Attributes as OA;
 
 /**
@@ -252,6 +253,7 @@ class RoleController extends Controller
     )]
     public function delegate(Role $role, DelegatePermissionRequest $request): JsonResponse
     {
+        Gate::authorize('delegate', [$role, $request->input('user_uuid')]);
         $this->roleService->delegate($role, $request->all());
 
         return new JsonResponse(null, 204);

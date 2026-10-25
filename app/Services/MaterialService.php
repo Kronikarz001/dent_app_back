@@ -40,7 +40,7 @@ readonly class MaterialService implements MaterialServiceInterface
      */
     public function getMaterialsList(): LengthAwarePaginator
     {
-        return $this->materialRepository->findAllWithPagination(['uuid', 'name']);
+        return $this->materialRepository->findSelectAllWithPagination(['uuid', 'name']);
     }
 
     /**
@@ -52,7 +52,7 @@ readonly class MaterialService implements MaterialServiceInterface
         $material = $this->materialRepository->create($data);
 
         if (array_key_exists('dental_examinations', $data)) {
-            $this->auditService->recordSync($material, 'dental_examinations', $material->dentalExaminations()->sync($data['dental_examinations']));
+            $this->auditService->recordSync($material, 'dental_examinations', $this->materialRepository->syncRelation($material, 'dentalExaminations', $data['dental_examinations']));
         }
 
         return $material;
@@ -68,7 +68,7 @@ readonly class MaterialService implements MaterialServiceInterface
         $material = $this->materialRepository->update($material, $data);
 
         if (array_key_exists('dental_examinations', $data)) {
-            $this->auditService->recordSync($material, 'dental_examinations', $material->dentalExaminations()->sync($data['dental_examinations']));
+            $this->auditService->recordSync($material, 'dental_examinations', $this->materialRepository->syncRelation($material, 'dentalExaminations', $data['dental_examinations']));
         }
 
         return $material;
@@ -92,6 +92,6 @@ readonly class MaterialService implements MaterialServiceInterface
      */
     public function export(ExportRequest $request): BinaryFileResponse
     {
-        return $this->exportService->export($request, new MaterialExport($this->getMaterials()->getCollection()), Material::getModel());
+        return $this->exportService->export($request, new MaterialExport($this->materialRepository->findAllWithPagination(perPage: -1)->getCollection()), Material::getModel());
     }
 }

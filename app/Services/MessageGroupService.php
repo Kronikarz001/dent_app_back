@@ -47,7 +47,7 @@ readonly class MessageGroupService implements MessageGroupServiceInterface
     {
         $this->assertMember($group);
 
-        return $group->load(['creator', 'users']);
+        return $this->messageGroupRepository->loadDetails($group);
     }
 
     /**
@@ -74,10 +74,9 @@ readonly class MessageGroupService implements MessageGroupServiceInterface
             'creator_uuid' => $creator->uuid,
         ]);
 
-        $userUuids = array_unique(array_merge([$creator->uuid], $data['user_uuids']));
-        $group->users()->attach($userUuids);
+        $this->messageGroupRepository->addUsers($group, array_unique(array_merge([$creator->uuid], $data['user_uuids'])));
 
-        return $group->load(['creator', 'users']);
+        return $this->messageGroupRepository->loadDetails($group);
     }
 
     /**
@@ -133,7 +132,7 @@ readonly class MessageGroupService implements MessageGroupServiceInterface
         $this->assertMember($group);
         $this->assertNotDefault($group, 'Nie można ręcznie edytować grupy domyślnej.');
 
-        if (! $group->users()->where('users.uuid', $user->uuid)->exists()) {
+        if (! $this->messageGroupRepository->hasMember($group, $user->uuid)) {
             throw new MessageGroupMemberNotFoundException;
         }
 

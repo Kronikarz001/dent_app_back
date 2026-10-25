@@ -21,6 +21,12 @@ interface PermissionGroupServiceInterface
     public function getPermissionGroupsList(): LengthAwarePaginator;
 
     /**
+     * @param PermissionGroup $group
+     * @return PermissionGroup
+     */
+    public function getPermissionGroup(PermissionGroup $group): PermissionGroup;
+
+    /**
      * @param array $data
      * @return PermissionGroup
      */

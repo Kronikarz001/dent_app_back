@@ -32,7 +32,7 @@ readonly class MedicineService implements MedicineServiceInterface
      */
     public function getMedicinesList(): LengthAwarePaginator
     {
-        return $this->medicineRepository->findAllWithPagination(['uuid', 'name']);
+        return $this->medicineRepository->findSelectAllWithPagination(['uuid', 'name']);
     }
 
     /**

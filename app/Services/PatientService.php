@@ -51,7 +51,7 @@ readonly class PatientService implements PatientServiceInterface
      */
     public function getPatientsList(): LengthAwarePaginator
     {
-        return $this->patientRepository->findAllWithPagination(['uuid', 'name']);
+        return $this->patientRepository->findSelectAllWithPagination(['uuid', 'first_name', 'last_name']);
     }
 
     /**
@@ -136,6 +136,6 @@ readonly class PatientService implements PatientServiceInterface
      */
     public function export(ExportRequest $request): BinaryFileResponse
     {
-        return $this->exportService->export($request, new PatientExport($this->getPatients()->getCollection()), Patient::getModel());
+        return $this->exportService->export($request, new PatientExport($this->patientRepository->findAllWithPagination(perPage: -1)->getCollection()), Patient::getModel());
     }
 }

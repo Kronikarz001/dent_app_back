@@ -68,11 +68,11 @@ readonly class CompanyService implements CompanyServiceInterface
      */
     private function assertUniqueRegonAndNip(array $data, ?Company $ignore = null): void
     {
-        if (array_key_exists('regon', $data) && $this->companyRepository->existsByRegon($data['regon'], $ignore?->uuid)) {
+        if (array_key_exists('regon', $data) && $this->companyRepository->existsBy('regon', $data['regon'], $ignore?->uuid)) {
             throw new DuplicateCompanyDataException('Firma o podanym numerze REGON już istnieje.');
         }
 
-        if (array_key_exists('nip', $data) && $this->companyRepository->existsByNip($data['nip'], $ignore?->uuid)) {
+        if (array_key_exists('nip', $data) && $this->companyRepository->existsBy('nip', $data['nip'], $ignore?->uuid)) {
             throw new DuplicateCompanyDataException('Firma o podanym numerze NIP już istnieje.');
         }
     }

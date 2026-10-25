@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Exceptions\ScheduleConflictException;
 use App\Models\EmployeeSchedule;
 use App\Repositories\EmployeeScheduleRepositoryInterface;
+use App\Repositories\ScheduleOverlapRepositoryInterface;
 use App\Services\Concerns\DetectsScheduleConflicts;
 use Illuminate\Pagination\LengthAwarePaginator;
 
@@ -25,6 +26,14 @@ readonly class EmployeeScheduleService implements EmployeeScheduleServiceInterfa
     ) {}
 
     /**
+     * @return ScheduleOverlapRepositoryInterface
+     */
+    protected function scheduleRepository(): ScheduleOverlapRepositoryInterface
+    {
+        return $this->employeeScheduleRepository;
+    }
+
+    /**
      * @return LengthAwarePaginator
      */
     public function getSchedules(): LengthAwarePaginator
@@ -37,7 +46,7 @@ readonly class EmployeeScheduleService implements EmployeeScheduleServiceInterfa
      */
     public function getSchedulesList(): LengthAwarePaginator
     {
-        return $this->employeeScheduleRepository->findAllWithPagination(['uuid', 'name']);
+        return $this->employeeScheduleRepository->findSelectAllWithPagination(['uuid', 'name']);
     }
 
     /**
@@ -79,6 +88,6 @@ readonly class EmployeeScheduleService implements EmployeeScheduleServiceInterfa
     {
         $this->assertNoScheduleConflicts($schedule, $data['users'] ?? []);
 
-        $this->auditService->recordSync($schedule, 'users', $schedule->users()->sync($data['users'] ?? []));
+        $this->auditService->recordSync($schedule, 'users', $this->employeeScheduleRepository->syncRelation($schedule, 'users', $data['users'] ?? []));
     }
 }

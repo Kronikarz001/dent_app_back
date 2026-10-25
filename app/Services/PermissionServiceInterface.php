@@ -32,6 +32,12 @@ interface PermissionServiceInterface
     public function hasPermission(User $user, string $resource, PermissionType $type): bool;
 
     /**
+     * @param string|null $routeName
+     * @return string|null
+     */
+    public function findResourceForRoute(?string $routeName): ?string;
+
+    /**
      * @param User $user
      * @param Permission $permission
      * @return bool

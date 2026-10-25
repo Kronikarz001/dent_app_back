@@ -3,43 +3,32 @@
 namespace App\Repositories;
 
 use App\Models\User;
-use Illuminate\Database\Eloquent\Model;
 
 /**
  * Summary of UserRepositoryInterface
+ *
+ * @extends SearchableRepositoryInterface<User>
  */
-interface UserRepositoryInterface extends BasicRepositoryInterface
+interface UserRepositoryInterface extends SearchableRepositoryInterface
 {
-    /**
-     * @param string $uuid
-     * @return User|null
-     */
-    public function findByUuid(string $uuid): ?User;
-
-    /**
-     * @param array $data
-     * @return User
-     */
-    public function create(array $data): User;
-
-    /**
-     * @param User|Model $user
-     * @param array $data
-     * @return User
-     */
-    public function update(User|Model $user, array $data): User;
-
-    /**
-     * @param Model|User $model
-     * @return bool
-     */
-    public function delete(Model|User $model): bool;
-
     /**
      * @param string $token
      * @return User|null
      */
     public function getUserByToken(string $token): ?User;
+
+    /**
+     * @param User $user
+     * @param string $name
+     * @return string
+     */
+    public function createToken(User $user, string $name): string;
+
+    /**
+     * @param User $user
+     * @return void
+     */
+    public function revokeCurrentToken(User $user): void;
 
     /**
      * @return User
@@ -51,25 +40,4 @@ interface UserRepositoryInterface extends BasicRepositoryInterface
      * @return User
      */
     public function getUserInformation(string $userUuid): User;
-
-    /**
-     * @param string $email
-     * @param string|null $ignoreUuid
-     * @return bool
-     */
-    public function existsByEmail(string $email, ?string $ignoreUuid = null): bool;
-
-    /**
-     * @param string $privateEmail
-     * @param string|null $ignoreUuid
-     * @return bool
-     */
-    public function existsByPrivateEmail(string $privateEmail, ?string $ignoreUuid = null): bool;
-
-    /**
-     * @param string $pesel
-     * @param string|null $ignoreUuid
-     * @return bool
-     */
-    public function existsByPesel(string $pesel, ?string $ignoreUuid = null): bool;
 }

@@ -8,11 +8,13 @@ use App\Search\Search;
 
 /**
  * Summary of DentistRepository
+ *
+ * @extends SearchableRepository<Dentist>
  */
 class DentistRepository extends SearchableRepository implements DentistRepositoryInterface
 {
     /**
-     * @var string
+     * @var class-string<Dentist>
      */
     protected string $modelClass = Dentist::class;
 

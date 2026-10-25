@@ -13,6 +13,7 @@ use App\Models\UserGroup;
 use App\Services\UserGroupServiceInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Gate;
 use OpenApi\Attributes as OA;
 
 /**
@@ -259,6 +260,8 @@ class UserGroupController extends Controller
     )]
     public function createRole(UserGroup $userGroup, CreateManagedRoleRequest $request): RoleResource
     {
+        Gate::authorize('manage', $userGroup);
+
         return new RoleResource($this->userGroupService->createManagedRole($userGroup, $request->all()));
     }
 

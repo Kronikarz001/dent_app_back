@@ -93,7 +93,7 @@ class PermissionGroupController extends Controller
     )]
     public function show(PermissionGroup $permissionGroup): PermissionGroupResource
     {
-        return new PermissionGroupResource($permissionGroup->load('permissions'));
+        return new PermissionGroupResource($this->permissionGroupService->getPermissionGroup($permissionGroup));
     }
 
     /**

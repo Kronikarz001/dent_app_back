@@ -3,98 +3,36 @@
 namespace App\Repositories;
 
 use App\Models\EmployeeSchedule;
+use App\Repositories\Concerns\FindsScheduleOverlaps;
 use App\Search\EmployeeScheduleSearch;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Model;
+use App\Search\Search;
 
 /**
  * Summary of EmployeeScheduleRepository
+ *
+ * @extends SearchableRepository<EmployeeSchedule>
  */
-readonly class EmployeeScheduleRepository implements EmployeeScheduleRepositoryInterface
+class EmployeeScheduleRepository extends SearchableRepository implements EmployeeScheduleRepositoryInterface
 {
+    use FindsScheduleOverlaps;
+
+    /**
+     * @var class-string<EmployeeSchedule>
+     */
+    protected string $modelClass = EmployeeSchedule::class;
+
     /**
      * @param EmployeeScheduleSearch $search
      */
     public function __construct(
-        private EmployeeScheduleSearch $search
+        private readonly EmployeeScheduleSearch $search
     ) {}
 
     /**
-     * @param array $params
-     * @return LengthAwarePaginator
+     * @return Search
      */
-    public function findAllWithPagination(array $params = []): LengthAwarePaginator
+    protected function getSearchModel(): Search
     {
-        return $this->search->search($params);
-    }
-
-    /**
-     * @param array $columns
-     * @param array $params
-     * @return LengthAwarePaginator
-     */
-    public function findSelectAllWithPagination(array $columns = ['*'], array $params = []): LengthAwarePaginator
-    {
-        return $this->search->search($params);
-    }
-
-    /**
-     * @param string $uuid
-     * @return EmployeeSchedule|null
-     */
-    public function findByUuid(string $uuid): ?EmployeeSchedule
-    {
-        return EmployeeSchedule::where('uuid', $uuid)->first();
-    }
-
-    /**
-     * @param array $data
-     * @return EmployeeSchedule
-     */
-    public function create(array $data): EmployeeSchedule
-    {
-        return EmployeeSchedule::create($data);
-    }
-
-    /**
-     * @param EmployeeSchedule|Model $model
-     * @param array $data
-     * @return EmployeeSchedule
-     */
-    public function update(EmployeeSchedule|Model $model, array $data): EmployeeSchedule
-    {
-        $model->update($data);
-
-        return $model->fresh();
-    }
-
-    /**
-     * @param array $uuids
-     * @return Collection
-     */
-    public function findAllByUuids(array $uuids): Collection
-    {
-        return EmployeeSchedule::whereIn('uuid', $uuids)->get();
-    }
-
-    /**
-     * @param string $modelClass
-     * @param array $uniqueAttributes
-     * @param array $values
-     * @return EmployeeSchedule
-     */
-    public function createOrUpdate(string $modelClass, array $uniqueAttributes, array $values): EmployeeSchedule
-    {
-        return $modelClass::updateOrCreate($uniqueAttributes, $values);
-    }
-
-    /**
-     * @param EmployeeSchedule|Model $model
-     * @return bool
-     */
-    public function delete(EmployeeSchedule|Model $model): bool
-    {
-        return $model->delete();
+        return $this->search;
     }
 }

@@ -3,45 +3,45 @@
 namespace App\Repositories;
 
 use App\Models\MessageGroup;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 
 /**
  * Summary of MessageGroupRepositoryInterface
+ *
+ * @extends SearchableRepositoryInterface<MessageGroup>
  */
-interface MessageGroupRepositoryInterface extends BasicRepositoryInterface
+interface MessageGroupRepositoryInterface extends SearchableRepositoryInterface
 {
-    /**
-     * @param string $uuid
-     * @return MessageGroup|null
-     */
-    public function findByUuid(string $uuid): ?MessageGroup;
-
-    /**
-     * @param array $data
-     * @return MessageGroup
-     */
-    public function create(array $data): MessageGroup;
-
-    /**
-     * @param MessageGroup|Model $model
-     * @param array $data
-     * @return MessageGroup
-     */
-    public function update(MessageGroup|Model $model, array $data): MessageGroup;
-
-    /**
-     * @param Model|MessageGroup $model
-     * @return bool
-     */
-    public function delete(Model|MessageGroup $model): bool;
-
     /**
      * @param MessageGroup $group
      * @param string $userUuid
      * @return void
      */
     public function addUser(MessageGroup $group, string $userUuid): void;
+
+    /**
+     * @param MessageGroup $group
+     * @param string[] $userUuids
+     * @return void
+     */
+    public function addUsers(MessageGroup $group, array $userUuids): void;
+
+    /**
+     * @param MessageGroup $group
+     * @return MessageGroup
+     */
+    public function loadDetails(MessageGroup $group): MessageGroup;
+
+    /**
+     * @return MessageGroup|null
+     */
+    public function findDefault(): ?MessageGroup;
+
+    /**
+     * @param string $userUuid
+     * @return string[]
+     */
+    public function findUuidsForUser(string $userUuid): array;
 
     /**
      * @param MessageGroup $group

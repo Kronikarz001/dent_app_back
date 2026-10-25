@@ -40,7 +40,7 @@ readonly class DentalExaminationService implements DentalExaminationServiceInter
      */
     public function getDentalExaminationsList(): LengthAwarePaginator
     {
-        return $this->dentalExaminationRepository->findAllWithPagination(['uuid', 'name']);
+        return $this->dentalExaminationRepository->findSelectAllWithPagination(['uuid', 'name']);
     }
 
     /**
@@ -50,14 +50,7 @@ readonly class DentalExaminationService implements DentalExaminationServiceInter
     public function createDentalExamination(array $data): DentalExamination
     {
         $dentalExamination = $this->dentalExaminationRepository->create($data);
-
-        if (array_key_exists('materials', $data)) {
-            $this->auditService->recordSync($dentalExamination, 'materials', $dentalExamination->materials()->sync($data['materials']));
-        }
-
-        if (array_key_exists('calendars', $data)) {
-            $this->auditService->recordSync($dentalExamination, 'calendars', $dentalExamination->calendars()->sync($data['calendars']));
-        }
+        $this->syncRelations($dentalExamination, $data);
 
         return $dentalExamination;
     }
@@ -70,16 +63,23 @@ readonly class DentalExaminationService implements DentalExaminationServiceInter
     public function updateDentalExamination(DentalExamination $dentalExamination, array $data): DentalExamination
     {
         $dentalExamination = $this->dentalExaminationRepository->update($dentalExamination, $data);
-
-        if (array_key_exists('materials', $data)) {
-            $this->auditService->recordSync($dentalExamination, 'materials', $dentalExamination->materials()->sync($data['materials']));
-        }
-
-        if (array_key_exists('calendars', $data)) {
-            $this->auditService->recordSync($dentalExamination, 'calendars', $dentalExamination->calendars()->sync($data['calendars']));
-        }
+        $this->syncRelations($dentalExamination, $data);
 
         return $dentalExamination;
+    }
+
+    /**
+     * @param DentalExamination $dentalExamination
+     * @param array $data
+     * @return void
+     */
+    private function syncRelations(DentalExamination $dentalExamination, array $data): void
+    {
+        foreach (['materials', 'calendars'] as $relation) {
+            if (array_key_exists($relation, $data)) {
+                $this->auditService->recordSync($dentalExamination, $relation, $this->dentalExaminationRepository->syncRelation($dentalExamination, $relation, $data[$relation]));
+            }
+        }
     }
 
     /**
@@ -100,6 +100,6 @@ readonly class DentalExaminationService implements DentalExaminationServiceInter
      */
     public function export(ExportRequest $request): BinaryFileResponse
     {
-        return $this->exportService->export($request, new DentalExaminationExport($this->getDentalExaminations()->getCollection()), DentalExamination::getModel());
+        return $this->exportService->export($request, new DentalExaminationExport($this->dentalExaminationRepository->findAllWithPagination(perPage: -1)->getCollection()), DentalExamination::getModel());
     }
 }

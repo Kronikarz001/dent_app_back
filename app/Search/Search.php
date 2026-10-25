@@ -4,9 +4,9 @@ namespace App\Search;
 
 use App\Repositories\SearchRepositoryInterface;
 use App\Services\SearchServiceInterface;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 /**
  * Summary of Search
@@ -99,31 +99,38 @@ abstract class Search implements SearchInterface
     }
 
     /**
+     * @param string[] $columns
      * @return string[]
      */
-    protected function selectColumns(): array
+    protected function selectColumns(array $columns = []): array
     {
-        $query = $this->searchRepository->createQuery($this->modelClass());
+        $table = $this->searchRepository->createQuery($this->modelClass())->getModel()->getTable();
 
-        return [$query->getModel()->getTable().'.*'];
+        if ($columns === []) {
+            return [$table.'.*'];
+        }
+
+        return array_map(fn (string $column) => $table.'.'.$column, $columns);
     }
 
     /**
      * @param array $params
+     * @param string[] $columns
+     * @param int|null $perPage
      * @return LengthAwarePaginator
      */
-    final public function search(array $params = []): LengthAwarePaginator
+    final public function search(array $params = [], array $columns = [], ?int $perPage = null): LengthAwarePaginator
     {
         $query = $this->searchRepository->createQuery($this->modelClass());
 
-        $this->searchRepository->applySelect($query, $this->selectColumns());
+        $this->searchRepository->applySelect($query, $this->selectColumns($columns));
 
         $this->searchService->applyRelations(
             $query,
-            array_merge(
+            $columns === [] ? array_merge(
                 $this->relationsShipLoad(),
                 $this->searchService->buildRecursiveRelationPaths($this->recursiveRelations())
-            ),
+            ) : [],
             $this->relationsCount()
         );
 
@@ -132,7 +139,15 @@ abstract class Search implements SearchInterface
         $this->applySearchString($query);
         $this->applySort($query);
 
-        return $this->searchRepository->paginate($query, (int) $this->request->get('perPage', -1));
+        return $this->searchRepository->paginate($query, $perPage ?? $this->resolvePerPage());
+    }
+
+    /**
+     * @return int
+     */
+    protected function resolvePerPage(): int
+    {
+        return (int) $this->request->get('perPage', config('search.default_per_page'));
     }
 
     /**

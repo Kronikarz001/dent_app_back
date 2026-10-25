@@ -3,35 +3,13 @@
 namespace App\Providers;
 
 use App\Models\User;
+use App\Notifications\Channels\DatabaseChannel;
 use App\Observers\UserObserver;
-use App\Providers\AppServiceProviders\AnnouncementServiceProvider;
-use App\Providers\AppServiceProviders\AuditServiceProvider;
-use App\Providers\AppServiceProviders\AuthServiceProvider;
-use App\Providers\AppServiceProviders\CalendarServiceProvider;
-use App\Providers\AppServiceProviders\CompanyServiceProvider;
-use App\Providers\AppServiceProviders\DentalExaminationServiceProvider;
-use App\Providers\AppServiceProviders\DentistServiceProvider;
-use App\Providers\AppServiceProviders\DepartmentServiceProvider;
-use App\Providers\AppServiceProviders\DictionaryServiceProvider;
-use App\Providers\AppServiceProviders\EmployeeScheduleServiceProvider;
-use App\Providers\AppServiceProviders\FileServiceProvider;
-use App\Providers\AppServiceProviders\JobPositionServiceProvider;
-use App\Providers\AppServiceProviders\MaterialServiceProvider;
-use App\Providers\AppServiceProviders\MedicineServiceProvider;
-use App\Providers\AppServiceProviders\MessageServiceProvider;
-use App\Providers\AppServiceProviders\NotificationServiceProvider;
-use App\Providers\AppServiceProviders\P1ServiceProvider;
-use App\Providers\AppServiceProviders\PatientServiceProvider;
-use App\Providers\AppServiceProviders\PermissionGroupServiceProvider;
-use App\Providers\AppServiceProviders\PermissionServiceProvider;
-use App\Providers\AppServiceProviders\PhotoServiceProvider;
-use App\Providers\AppServiceProviders\PrescriptionServiceProvider;
-use App\Providers\AppServiceProviders\RoleServiceProvider;
-use App\Providers\AppServiceProviders\SearchServiceProvider;
-use App\Providers\AppServiceProviders\UserGroupServiceProvider;
-use App\Providers\AppServiceProviders\UserServiceProvider;
+use App\Repositories;
+use App\Services;
 use Carbon\CarbonInterface;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Notifications\ChannelManager;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\ServiceProvider;
 use PhpOffice\PhpSpreadsheet\Shared\File as SpreadsheetFile;
@@ -42,37 +20,65 @@ use PhpOffice\PhpSpreadsheet\Shared\File as SpreadsheetFile;
 class AppServiceProvider extends ServiceProvider
 {
     /**
-     * @return void
+     * @var array<class-string, class-string>
      */
-    public function register(): void
-    {
-        $this->app->register(AuditServiceProvider::class);
-        $this->app->register(AuthServiceProvider::class);
-        $this->app->register(SearchServiceProvider::class);
-        $this->app->register(UserServiceProvider::class);
-        $this->app->register(UserGroupServiceProvider::class);
-        $this->app->register(PatientServiceProvider::class);
-        $this->app->register(JobPositionServiceProvider::class);
-        $this->app->register(DentistServiceProvider::class);
-        $this->app->register(CalendarServiceProvider::class);
-        $this->app->register(EmployeeScheduleServiceProvider::class);
-        $this->app->register(CompanyServiceProvider::class);
-        $this->app->register(FileServiceProvider::class);
-        $this->app->register(PhotoServiceProvider::class);
-        $this->app->register(DentalExaminationServiceProvider::class);
-        $this->app->register(MaterialServiceProvider::class);
-        $this->app->register(MedicineServiceProvider::class);
-        $this->app->register(PrescriptionServiceProvider::class);
-        $this->app->register(P1ServiceProvider::class);
-        $this->app->register(MessageServiceProvider::class);
-        $this->app->register(AnnouncementServiceProvider::class);
-        $this->app->register(DictionaryServiceProvider::class);
-        $this->app->register(NotificationServiceProvider::class);
-        $this->app->register(PermissionServiceProvider::class);
-        $this->app->register(PermissionGroupServiceProvider::class);
-        $this->app->register(RoleServiceProvider::class);
-        $this->app->register(DepartmentServiceProvider::class);
-    }
+    public array $bindings = [
+        Repositories\AnnouncementRepositoryInterface::class => Repositories\AnnouncementRepository::class,
+        Repositories\AuditRepositoryInterface::class => Repositories\AuditRepository::class,
+        Repositories\CalendarRepositoryInterface::class => Repositories\CalendarRepository::class,
+        Repositories\CompanyRepositoryInterface::class => Repositories\CompanyRepository::class,
+        Repositories\DentalExaminationRepositoryInterface::class => Repositories\DentalExaminationRepository::class,
+        Repositories\DentistRepositoryInterface::class => Repositories\DentistRepository::class,
+        Repositories\DepartmentRepositoryInterface::class => Repositories\DepartmentRepository::class,
+        Repositories\EmployeeScheduleRepositoryInterface::class => Repositories\EmployeeScheduleRepository::class,
+        Repositories\FileRepositoryInterface::class => Repositories\FileRepository::class,
+        Repositories\JobPositionRepositoryInterface::class => Repositories\JobPositionRepository::class,
+        Repositories\MaterialRepositoryInterface::class => Repositories\MaterialRepository::class,
+        Repositories\MedicineRepositoryInterface::class => Repositories\MedicineRepository::class,
+        Repositories\MessageGroupRepositoryInterface::class => Repositories\MessageGroupRepository::class,
+        Repositories\MessageRepositoryInterface::class => Repositories\MessageRepository::class,
+        Repositories\PatientRepositoryInterface::class => Repositories\PatientRepository::class,
+        Repositories\PermissionGroupRepositoryInterface::class => Repositories\PermissionGroupRepository::class,
+        Repositories\PermissionRepositoryInterface::class => Repositories\PermissionRepository::class,
+        Repositories\PhoneNumberRepositoryInterface::class => Repositories\PhoneNumberRepository::class,
+        Repositories\PhotoRepositoryInterface::class => Repositories\PhotoRepository::class,
+        Repositories\PrescriptionRepositoryInterface::class => Repositories\PrescriptionRepository::class,
+        Repositories\RoleRepositoryInterface::class => Repositories\RoleRepository::class,
+        Repositories\SearchRepositoryInterface::class => Repositories\SearchRepository::class,
+        Repositories\UserGroupRepositoryInterface::class => Repositories\UserGroupRepository::class,
+        Repositories\UserRepositoryInterface::class => Repositories\UserRepository::class,
+
+        Services\AnnouncementServiceInterface::class => Services\AnnouncementService::class,
+        Services\AuditServiceInterface::class => Services\AuditService::class,
+        Services\AuthServiceInterface::class => Services\AuthService::class,
+        Services\CalendarServiceInterface::class => Services\CalendarService::class,
+        Services\CompanyServiceInterface::class => Services\CompanyService::class,
+        Services\DentalExaminationServiceInterface::class => Services\DentalExaminationService::class,
+        Services\DentistServiceInterface::class => Services\DentistService::class,
+        Services\DepartmentServiceInterface::class => Services\DepartmentService::class,
+        Services\DictionaryServiceInterface::class => Services\DictionaryService::class,
+        Services\EmployeeScheduleServiceInterface::class => Services\EmployeeScheduleService::class,
+        Services\ExportServiceInterface::class => Services\ExportService::class,
+        Services\FileServiceInterface::class => Services\FileService::class,
+        Services\JobPositionServiceInterface::class => Services\JobPositionService::class,
+        Services\MaterialServiceInterface::class => Services\MaterialService::class,
+        Services\MedicineServiceInterface::class => Services\MedicineService::class,
+        Services\MessageGroupServiceInterface::class => Services\MessageGroupService::class,
+        Services\MessageServiceInterface::class => Services\MessageService::class,
+        Services\NotificationServiceInterface::class => Services\NotificationService::class,
+        Services\P1ServiceInterface::class => Services\P1Service::class,
+        Services\PatientServiceInterface::class => Services\PatientService::class,
+        Services\PermissionGrantServiceInterface::class => Services\PermissionGrantService::class,
+        Services\PermissionGroupServiceInterface::class => Services\PermissionGroupService::class,
+        Services\PermissionServiceInterface::class => Services\PermissionService::class,
+        Services\PhoneNumberServiceInterface::class => Services\PhoneNumberService::class,
+        Services\PhotoServiceInterface::class => Services\PhotoService::class,
+        Services\PrescriptionServiceInterface::class => Services\PrescriptionService::class,
+        Services\RoleServiceInterface::class => Services\RoleService::class,
+        Services\SearchServiceInterface::class => Services\SearchService::class,
+        Services\UserGroupServiceInterface::class => Services\UserGroupService::class,
+        Services\UserServiceInterface::class => Services\UserService::class,
+    ];
 
     /**
      * @return void
@@ -84,6 +90,10 @@ class AppServiceProvider extends ServiceProvider
         $this->loadJsonTranslationsFrom(__DIR__.'/../lang');
         ini_set('upload_tmp_dir', storage_path('temp'));
         SpreadsheetFile::setUseUploadTempDirectory(true);
+
+        $this->callAfterResolving(ChannelManager::class, function (ChannelManager $manager) {
+            $manager->extend('database', fn () => new DatabaseChannel);
+        });
 
         User::observe(UserObserver::class);
     }

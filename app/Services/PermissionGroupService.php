@@ -33,7 +33,16 @@ readonly class PermissionGroupService implements PermissionGroupServiceInterface
      */
     public function getPermissionGroupsList(): LengthAwarePaginator
     {
-        return $this->permissionGroupRepository->findAllWithPagination(['uuid', 'name']);
+        return $this->permissionGroupRepository->findSelectAllWithPagination(['uuid', 'name']);
+    }
+
+    /**
+     * @param PermissionGroup $group
+     * @return PermissionGroup
+     */
+    public function getPermissionGroup(PermissionGroup $group): PermissionGroup
+    {
+        return $this->permissionGroupRepository->loadRelations($group, ['permissions']);
     }
 
     /**
@@ -71,6 +80,6 @@ readonly class PermissionGroupService implements PermissionGroupServiceInterface
      */
     public function assignPermissions(PermissionGroup $group, array $data): void
     {
-        $this->auditService->recordSync($group, 'permissions', $group->permissions()->sync($data['permissions'] ?? []));
+        $this->auditService->recordSync($group, 'permissions', $this->permissionGroupRepository->syncRelation($group, 'permissions', $data['permissions'] ?? []));
     }
 }

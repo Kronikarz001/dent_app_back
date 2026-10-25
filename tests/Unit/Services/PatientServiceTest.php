@@ -90,14 +90,14 @@ class PatientServiceTest extends TestCase
     /**
      * @return void
      */
-    public function testGetPatientsListPassesOnlyUuidAndNameColumns(): void
+    public function testGetPatientsListSelectsOnlyUuidAndNameColumns(): void
     {
         $paginator = new LengthAwarePaginator([], 0, 100, 1);
 
         $this->patientRepository
-            ->shouldReceive('findAllWithPagination')
+            ->shouldReceive('findSelectAllWithPagination')
             ->once()
-            ->with(['uuid', 'name'])
+            ->with(['uuid', 'first_name', 'last_name'])
             ->andReturn($paginator);
 
         $result = $this->patientService->getPatientsList();
@@ -176,7 +176,7 @@ class PatientServiceTest extends TestCase
         $this->patientRepository
             ->shouldReceive('findAllWithPagination')
             ->once()
-            ->withNoArgs()
+            ->with([], -1)
             ->andReturn($paginator);
 
         $this->exportService

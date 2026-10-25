@@ -2,18 +2,22 @@
 
 namespace App\Repositories;
 
+use App\Models\Department;
 use App\Models\Role;
+use App\Models\User;
+use App\Models\UserGroup;
 use App\Search\RoleSearch;
 use App\Search\Search;
-use Illuminate\Database\Eloquent\Model;
 
 /**
  * Summary of RoleRepository
+ *
+ * @extends SearchableRepository<Role>
  */
 class RoleRepository extends SearchableRepository implements RoleRepositoryInterface
 {
     /**
-     * @var string
+     * @var class-string<Role>
      */
     protected string $modelClass = Role::class;
 
@@ -33,41 +37,38 @@ class RoleRepository extends SearchableRepository implements RoleRepositoryInter
     }
 
     /**
-     * @param string $uuid
-     * @return Role|null
-     */
-    public function findByUuid(string $uuid): ?Role
-    {
-        return Role::where('uuid', $uuid)->first();
-    }
-
-    /**
-     * @param array $data
-     * @return Role
-     */
-    public function create(array $data): Role
-    {
-        return Role::create($data);
-    }
-
-    /**
-     * @param Role|Model $model
-     * @param array $data
-     * @return Role
-     */
-    public function update(Role|Model $model, array $data): Role
-    {
-        $model->update($data);
-
-        return $model->fresh();
-    }
-
-    /**
-     * @param Role|Model $model
+     * @param Role $role
+     * @param User $user
      * @return bool
      */
-    public function delete(Role|Model $model): bool
+    public function isManager(Role $role, User $user): bool
     {
-        return $model->delete();
+        return $role->users()
+            ->where('users.uuid', $user->uuid)
+            ->wherePivot('is_manager', true)
+            ->exists();
+    }
+
+    /**
+     * @param Role $role
+     * @param string $userUuid
+     * @return bool
+     */
+    public function hasMember(Role $role, string $userUuid): bool
+    {
+        return $role->users()->where('users.uuid', $userUuid)->exists();
+    }
+
+    /**
+     * @param Department|UserGroup $container
+     * @param string $name
+     * @return Role
+     */
+    public function createInContainer(Department|UserGroup $container, string $name): Role
+    {
+        $role = $this->create(['name' => $name]);
+        $container->roles()->attach($role->uuid);
+
+        return $role;
     }
 }

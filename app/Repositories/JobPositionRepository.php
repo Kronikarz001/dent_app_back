@@ -5,16 +5,16 @@ namespace App\Repositories;
 use App\Models\JobPosition;
 use App\Search\JobPositionSearch;
 use App\Search\Search;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Model;
 
 /**
  * Summary of JobPositionRepository
+ *
+ * @extends SearchableRepository<JobPosition>
  */
 class JobPositionRepository extends SearchableRepository implements JobPositionRepositoryInterface
 {
     /**
-     * @var string
+     * @var class-string<JobPosition>
      */
     protected string $modelClass = JobPosition::class;
 
@@ -22,17 +22,8 @@ class JobPositionRepository extends SearchableRepository implements JobPositionR
      * @param JobPositionSearch $search
      */
     public function __construct(
-        private JobPositionSearch $search
+        private readonly JobPositionSearch $search
     ) {}
-
-    /**
-     * @param array $params
-     * @return LengthAwarePaginator
-     */
-    public function findAllWithPagination(array $params = []): LengthAwarePaginator
-    {
-        return $this->search->search($params);
-    }
 
     /**
      * @return Search
@@ -40,44 +31,5 @@ class JobPositionRepository extends SearchableRepository implements JobPositionR
     protected function getSearchModel(): Search
     {
         return $this->search;
-    }
-
-    /**
-     * @param string $uuid
-     * @return JobPosition|null
-     */
-    public function findByUuid(string $uuid): ?JobPosition
-    {
-        return JobPosition::where('uuid', $uuid)->first();
-    }
-
-    /**
-     * @param array $data
-     * @return JobPosition
-     */
-    public function create(array $data): JobPosition
-    {
-        return JobPosition::create($data);
-    }
-
-    /**
-     * @param JobPosition|Model $model
-     * @param array $data
-     * @return JobPosition
-     */
-    public function update(JobPosition|Model $model, array $data): JobPosition
-    {
-        $model->update($data);
-
-        return $model->fresh();
-    }
-
-    /**
-     * @param JobPosition|Model $model
-     * @return bool
-     */
-    public function delete(JobPosition|Model $model): bool
-    {
-        return $model->delete();
     }
 }

@@ -7,6 +7,7 @@ use App\Exports\CalendarExport;
 use App\Http\Requests\ExportRequest;
 use App\Models\Calendar;
 use App\Repositories\CalendarRepositoryInterface;
+use App\Repositories\ScheduleOverlapRepositoryInterface;
 use App\Services\Concerns\DetectsScheduleConflicts;
 use Illuminate\Pagination\LengthAwarePaginator;
 use PhpOffice\PhpSpreadsheet\Exception;
@@ -32,6 +33,14 @@ readonly class CalendarService implements CalendarServiceInterface
     ) {}
 
     /**
+     * @return ScheduleOverlapRepositoryInterface
+     */
+    protected function scheduleRepository(): ScheduleOverlapRepositoryInterface
+    {
+        return $this->calendarRepository;
+    }
+
+    /**
      * @return LengthAwarePaginator
      */
     public function getCalendars(): LengthAwarePaginator
@@ -44,7 +53,7 @@ readonly class CalendarService implements CalendarServiceInterface
      */
     public function getCalendarsList(): LengthAwarePaginator
     {
-        return $this->calendarRepository->findAllWithPagination(['uuid', 'name']);
+        return $this->calendarRepository->findSelectAllWithPagination(['uuid', 'name']);
     }
 
     /**
@@ -60,7 +69,7 @@ readonly class CalendarService implements CalendarServiceInterface
         $calendar = $this->calendarRepository->create($data);
 
         if (array_key_exists('dental_examinations', $data)) {
-            $this->auditService->recordSync($calendar, 'dental_examinations', $calendar->dentalExaminations()->sync($data['dental_examinations']));
+            $this->auditService->recordSync($calendar, 'dental_examinations', $this->calendarRepository->syncRelation($calendar, 'dentalExaminations', $data['dental_examinations']));
         }
 
         return $calendar;
@@ -80,7 +89,7 @@ readonly class CalendarService implements CalendarServiceInterface
         $calendar = $this->calendarRepository->update($calendar, $data);
 
         if (array_key_exists('dental_examinations', $data)) {
-            $this->auditService->recordSync($calendar, 'dental_examinations', $calendar->dentalExaminations()->sync($data['dental_examinations']));
+            $this->auditService->recordSync($calendar, 'dental_examinations', $this->calendarRepository->syncRelation($calendar, 'dentalExaminations', $data['dental_examinations']));
         }
 
         return $calendar;
@@ -106,8 +115,8 @@ readonly class CalendarService implements CalendarServiceInterface
     {
         $this->assertNoScheduleConflicts($calendar, $data['users'] ?? [], $data['patients'] ?? []);
 
-        $this->auditService->recordSync($calendar, 'users', $calendar->users()->sync($data['users'] ?? []));
-        $this->auditService->recordSync($calendar, 'patients', $calendar->patients()->sync($data['patients'] ?? []));
+        $this->auditService->recordSync($calendar, 'users', $this->calendarRepository->syncRelation($calendar, 'users', $data['users'] ?? []));
+        $this->auditService->recordSync($calendar, 'patients', $this->calendarRepository->syncRelation($calendar, 'patients', $data['patients'] ?? []));
     }
 
     /**
@@ -119,6 +128,6 @@ readonly class CalendarService implements CalendarServiceInterface
      */
     public function export(ExportRequest $request): BinaryFileResponse
     {
-        return $this->exportService->export($request, new CalendarExport($this->getCalendars()->getCollection()), Calendar::getModel());
+        return $this->exportService->export($request, new CalendarExport($this->calendarRepository->findAllWithPagination(perPage: -1)->getCollection()), Calendar::getModel());
     }
 }

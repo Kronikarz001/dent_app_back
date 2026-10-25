@@ -75,12 +75,12 @@ class DentalExaminationServiceTest extends TestCase
     /**
      * @return void
      */
-    public function testGetDentalExaminationsListPassesOnlyUuidAndNameColumns(): void
+    public function testGetDentalExaminationsListSelectsOnlyUuidAndNameColumns(): void
     {
         $paginator = new LengthAwarePaginator([], 0, 100, 1);
 
         $this->dentalExaminationRepository
-            ->shouldReceive('findAllWithPagination')
+            ->shouldReceive('findSelectAllWithPagination')
             ->once()
             ->with(['uuid', 'name'])
             ->andReturn($paginator);
@@ -165,7 +165,7 @@ class DentalExaminationServiceTest extends TestCase
         $this->dentalExaminationRepository
             ->shouldReceive('findAllWithPagination')
             ->once()
-            ->withNoArgs()
+            ->with([], -1)
             ->andReturn($paginator);
 
         $this->exportService

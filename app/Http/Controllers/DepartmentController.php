@@ -15,6 +15,7 @@ use App\Models\Department;
 use App\Services\DepartmentServiceInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Gate;
 use OpenApi\Attributes as OA;
 
 /**
@@ -317,6 +318,7 @@ class DepartmentController extends Controller
     )]
     public function delegate(Department $department, DelegatePermissionRequest $request): JsonResponse
     {
+        Gate::authorize('delegate', [$department, $request->input('user_uuid')]);
         $this->departmentService->delegate($department, $request->all());
 
         return new JsonResponse(null, 204);
@@ -350,6 +352,8 @@ class DepartmentController extends Controller
     )]
     public function createRole(Department $department, CreateManagedRoleRequest $request): RoleResource
     {
+        Gate::authorize('manage', $department);
+
         return new RoleResource($this->departmentService->createManagedRole($department, $request->all()));
     }
 }

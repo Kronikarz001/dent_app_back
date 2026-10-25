@@ -137,7 +137,12 @@ readonly class AuditService implements AuditServiceInterface
      */
     public function exportHistory(Model $model, ExportRequest $request): BinaryFileResponse
     {
-        return $this->exportService->export($request, new AuditExport($this->getHistory($model)->getCollection()), Audit::getModel());
+        $history = $this->auditRepository->findAllWithPagination([
+            'auditable_type' => $model->getMorphClass(),
+            'auditable_id' => $model->getKey(),
+        ], -1);
+
+        return $this->exportService->export($request, new AuditExport($history->getCollection()), Audit::getModel());
     }
 
     /**

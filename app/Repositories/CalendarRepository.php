@@ -4,104 +4,43 @@ namespace App\Repositories;
 
 use App\Models\Calendar;
 use App\Models\Patient;
+use App\Repositories\Concerns\FindsScheduleOverlaps;
 use App\Search\CalendarSearch;
 use App\Search\PatientVisitSearch;
+use App\Search\Search;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
 
 /**
  * Summary of CalendarRepository
+ *
+ * @extends SearchableRepository<Calendar>
  */
-readonly class CalendarRepository implements CalendarRepositoryInterface
+class CalendarRepository extends SearchableRepository implements CalendarRepositoryInterface
 {
+    use FindsScheduleOverlaps;
+
+    /**
+     * @var class-string<Calendar>
+     */
+    protected string $modelClass = Calendar::class;
+
     /**
      * @param CalendarSearch $search
      * @param PatientVisitSearch $patientVisitSearch
      */
     public function __construct(
-        private CalendarSearch $search,
-        private PatientVisitSearch $patientVisitSearch,
+        private readonly CalendarSearch $search,
+        private readonly PatientVisitSearch $patientVisitSearch,
     ) {}
 
     /**
-     * @param array $params
-     * @return LengthAwarePaginator
+     * @return Search
      */
-    public function findAllWithPagination(array $params = []): LengthAwarePaginator
+    protected function getSearchModel(): Search
     {
-        return $this->search->search($params);
-    }
-
-    /**
-     * @param array $columns
-     * @param array $params
-     * @return LengthAwarePaginator
-     */
-    public function findSelectAllWithPagination(array $columns = ['*'], array $params = []): LengthAwarePaginator
-    {
-        return $this->search->search($params);
-    }
-
-    /**
-     * @param string $uuid
-     * @return Calendar|null
-     */
-    public function findByUuid(string $uuid): ?Calendar
-    {
-        return Calendar::where('uuid', $uuid)->first();
-    }
-
-    /**
-     * @param array $data
-     * @return Calendar
-     */
-    public function create(array $data): Calendar
-    {
-        return Calendar::create($data);
-    }
-
-    /**
-     * @param Calendar|Model $model
-     * @param array $data
-     * @return Calendar
-     */
-    public function update(Calendar|Model $model, array $data): Calendar
-    {
-        $model->update($data);
-
-        return $model->fresh();
-    }
-
-    /**
-     * @param array $uuids
-     * @return Collection
-     */
-    public function findAllByUuids(array $uuids): Collection
-    {
-        return Calendar::whereIn('uuid', $uuids)->get();
-    }
-
-    /**
-     * @param string $modelClass
-     * @param array $uniqueAttributes
-     * @param array $values
-     * @return Calendar
-     */
-    public function createOrUpdate(string $modelClass, array $uniqueAttributes, array $values): Calendar
-    {
-        return $modelClass::updateOrCreate($uniqueAttributes, $values);
-    }
-
-    /**
-     * @param Calendar|Model $model
-     * @return bool
-     */
-    public function delete(Calendar|Model $model): bool
-    {
-        return $model->delete();
+        return $this->search;
     }
 
     /**
@@ -169,7 +108,7 @@ readonly class CalendarRepository implements CalendarRepositoryInterface
      */
     private function forPatient(Patient $patient): Builder
     {
-        return Calendar::query()
+        return $this->query()
             ->whereHas('patients', fn (Builder $query) => $query->where('patients.uuid', $patient->uuid))
             ->with([
                 'users' => fn ($query) => $query->orderBy('calendar_users.assigned_at')->with('jobPosition'),

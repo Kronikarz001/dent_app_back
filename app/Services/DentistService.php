@@ -30,6 +30,6 @@ readonly class DentistService implements DentistServiceInterface
      */
     public function getDentistsList(): LengthAwarePaginator
     {
-        return $this->dentistRepository->findAllWithPagination(['uuid', 'name']);
+        return $this->dentistRepository->findSelectAllWithPagination(['uuid', 'first_name', 'last_name']);
     }
 }

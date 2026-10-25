@@ -75,8 +75,8 @@ class UserRepositoryTest extends TestCase
     {
         $user = User::factory()->create(['email' => 'taken@example.com']);
 
-        $this->assertTrue($this->repository->existsByEmail('taken@example.com'));
-        $this->assertFalse($this->repository->existsByEmail('taken@example.com', $user->uuid));
+        $this->assertTrue($this->repository->existsBy('email', 'taken@example.com'));
+        $this->assertFalse($this->repository->existsBy('email', 'taken@example.com', $user->uuid));
     }
 
     /**
@@ -86,8 +86,8 @@ class UserRepositoryTest extends TestCase
     {
         $user = User::factory()->create(['private_email' => 'private@example.com']);
 
-        $this->assertTrue($this->repository->existsByPrivateEmail('private@example.com'));
-        $this->assertFalse($this->repository->existsByPrivateEmail('private@example.com', $user->uuid));
+        $this->assertTrue($this->repository->existsBy('private_email', 'private@example.com'));
+        $this->assertFalse($this->repository->existsBy('private_email', 'private@example.com', $user->uuid));
     }
 
     /**
@@ -97,7 +97,7 @@ class UserRepositoryTest extends TestCase
     {
         $user = User::factory()->create(['pesel' => '90010112345']);
 
-        $this->assertTrue($this->repository->existsByPesel('90010112345'));
-        $this->assertFalse($this->repository->existsByPesel('90010112345', $user->uuid));
+        $this->assertTrue($this->repository->existsBy('pesel', '90010112345'));
+        $this->assertFalse($this->repository->existsBy('pesel', '90010112345', $user->uuid));
     }
 }
