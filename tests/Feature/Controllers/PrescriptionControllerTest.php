@@ -7,6 +7,7 @@ use App\Models\Medicine;
 use App\Models\Patient;
 use App\Models\Prescription;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 /**
@@ -42,6 +43,32 @@ class PrescriptionControllerTest extends TestCase
         $response->assertOk();
         $response->assertJsonCount(1, 'data');
         $response->assertJsonPath('data.0.uuid', $ownPrescription->uuid);
+    }
+
+    /**
+     * @return void
+     */
+    public function testByPatientQueryCountDoesNotGrowWithNumberOfPrescriptions(): void
+    {
+        $patient = Patient::factory()->create(['doctor_uuid' => User::factory()]);
+        Prescription::factory()->count(2)->create(['patient_uuid' => $patient->uuid, 'doctor_uuid' => User::factory()]);
+
+        $api = $this->callApiWithLoggedUser();
+        $countQueries = function () use ($api, $patient): int {
+            DB::flushQueryLog();
+            DB::enableQueryLog();
+            $api->getJson(route('patient.prescriptions', ['patient' => $patient->uuid]))->assertOk();
+            DB::disableQueryLog();
+
+            return count(DB::getQueryLog());
+        };
+
+        $countQueries();
+        $withTwo = $countQueries();
+        Prescription::factory()->count(4)->create(['patient_uuid' => $patient->uuid, 'doctor_uuid' => User::factory()]);
+        $withSix = $countQueries();
+
+        $this->assertSame($withTwo, $withSix);
     }
 
     /**
