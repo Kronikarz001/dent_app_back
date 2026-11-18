@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\AssignEmployeeScheduleUsersRequest;
+use App\Http\Requests\EmployeeScheduleIndexRequest;
 use App\Http\Requests\EmployeeScheduleRequest;
 use App\Http\Resources\EmployeeScheduleResource;
 use App\Models\EmployeeSchedule;
 use App\Services\EmployeeScheduleServiceInterface;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Pagination\LengthAwarePaginator;
 use OpenApi\Attributes as OA;
@@ -24,13 +26,19 @@ class EmployeeScheduleController extends Controller
     ) {}
 
     /**
+     * @param EmployeeScheduleIndexRequest $request
      * @return LengthAwarePaginator
      */
     #[OA\Get(
         path: '/api/employee-schedule',
-        summary: 'Lista wydarzeń w kalendarzu pracowników',
+        summary: 'Lista wydarzeń w kalendarzu pracowników (z przypisanymi pracownikami)',
         security: [['sanctum' => []]],
         tags: ['EmployeeSchedule'],
+        parameters: [
+            new OA\QueryParameter(name: 'employeeSchedule[user_uuids][]', description: 'Filtr po pracownikach', required: false, schema: new OA\Schema(type: 'array', items: new OA\Items(type: 'string', format: 'uuid'))),
+            new OA\QueryParameter(name: 'employeeSchedule[date_from]', description: 'Wpisy kończące się nie wcześniej niż ta data', required: false, schema: new OA\Schema(type: 'string', format: 'date')),
+            new OA\QueryParameter(name: 'employeeSchedule[date_to]', description: 'Wpisy zaczynające się nie później niż ta data', required: false, schema: new OA\Schema(type: 'string', format: 'date')),
+        ],
         responses: [
             new OA\Response(
                 response: 200,
@@ -46,13 +54,46 @@ class EmployeeScheduleController extends Controller
             ),
         ]
     )]
-    public function index(): LengthAwarePaginator
+    public function index(EmployeeScheduleIndexRequest $request): LengthAwarePaginator
     {
-        return $this->employeeScheduleService->getSchedules();
+        return $this->employeeScheduleService->getSchedules($request->filters());
     }
 
     /**
+     * @param EmployeeScheduleIndexRequest $request
      * @return LengthAwarePaginator
+     */
+    #[OA\Get(
+        path: '/api/employee-schedule/my',
+        summary: 'Grafik zalogowanego pracownika',
+        security: [['sanctum' => []]],
+        tags: ['EmployeeSchedule'],
+        parameters: [
+            new OA\QueryParameter(name: 'employeeSchedule[date_from]', description: 'Wpisy kończące się nie wcześniej niż ta data', required: false, schema: new OA\Schema(type: 'string', format: 'date')),
+            new OA\QueryParameter(name: 'employeeSchedule[date_to]', description: 'Wpisy zaczynające się nie później niż ta data', required: false, schema: new OA\Schema(type: 'string', format: 'date')),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'OK',
+                content: new OA\JsonContent(
+                    allOf: [
+                        new OA\Schema(ref: '#/components/schemas/PaginatedResponse'),
+                        new OA\Schema(properties: [
+                            new OA\Property(property: 'data', type: 'array', items: new OA\Items(ref: '#/components/schemas/EmployeeScheduleResource')),
+                        ]),
+                    ]
+                )
+            ),
+        ]
+    )]
+    public function my(EmployeeScheduleIndexRequest $request): LengthAwarePaginator
+    {
+        return $this->employeeScheduleService->getMySchedules($request->filters());
+    }
+
+    /**
+     * @return Collection
      */
     #[OA\Get(
         path: '/api/employee-schedule/selectlist',
@@ -60,10 +101,14 @@ class EmployeeScheduleController extends Controller
         security: [['sanctum' => []]],
         tags: ['EmployeeSchedule'],
         responses: [
-            new OA\Response(response: 200, description: 'OK'),
+            new OA\Response(
+                response: 200,
+                description: 'OK',
+                content: new OA\JsonContent(type: 'array', items: new OA\Items(ref: '#/components/schemas/SelectListItem'))
+            ),
         ]
     )]
-    public function selectList(): LengthAwarePaginator
+    public function selectList(): Collection
     {
         return $this->employeeScheduleService->getSchedulesList();
     }
@@ -93,7 +138,7 @@ class EmployeeScheduleController extends Controller
     )]
     public function show(EmployeeSchedule $employeeSchedule): EmployeeScheduleResource
     {
-        return new EmployeeScheduleResource($employeeSchedule);
+        return new EmployeeScheduleResource($this->employeeScheduleService->getScheduleDetails($employeeSchedule));
     }
 
     /**

@@ -72,6 +72,7 @@ class PermissionGroupSearch extends Search
     {
         return [
             'permissions',
+            'users:uuid,first_name,last_name',
         ];
     }
 }

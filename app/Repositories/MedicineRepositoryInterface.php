@@ -3,38 +3,14 @@
 namespace App\Repositories;
 
 use App\Models\Medicine;
-use Illuminate\Database\Eloquent\Model;
 
 /**
  * Summary of MedicineRepositoryInterface
+ *
+ * @extends SearchableRepositoryInterface<Medicine>
  */
-interface MedicineRepositoryInterface extends BasicRepositoryInterface
+interface MedicineRepositoryInterface extends SearchableRepositoryInterface
 {
-    /**
-     * @param string $uuid
-     * @return Medicine|null
-     */
-    public function findByUuid(string $uuid): ?Medicine;
-
-    /**
-     * @param array $data
-     * @return Medicine
-     */
-    public function create(array $data): Medicine;
-
-    /**
-     * @param Medicine|Model $model
-     * @param array $data
-     * @return Medicine
-     */
-    public function update(Medicine|Model $model, array $data): Medicine;
-
-    /**
-     * @param Model|Medicine $model
-     * @return bool
-     */
-    public function delete(Model|Medicine $model): bool;
-
     /**
      * @param string $eanGtin
      * @param array $data

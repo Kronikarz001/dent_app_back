@@ -7,15 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * Summary of AuditRepositoryInterface
+ *
+ * @extends SearchableRepositoryInterface<Audit>
  */
-interface AuditRepositoryInterface extends BasicRepositoryInterface
+interface AuditRepositoryInterface extends SearchableRepositoryInterface
 {
-    /**
-     * @param array $data
-     * @return Audit
-     */
-    public function create(array $data): Audit;
-
     /**
      * @param string $modelClass
      * @param string $uuid

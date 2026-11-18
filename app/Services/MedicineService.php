@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Enums\ReimbursementLevel;
 use App\Models\Medicine;
 use App\Repositories\MedicineRepositoryInterface;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 /**
@@ -28,11 +29,11 @@ readonly class MedicineService implements MedicineServiceInterface
     }
 
     /**
-     * @return LengthAwarePaginator
+     * @return Collection
      */
-    public function getMedicinesList(): LengthAwarePaginator
+    public function getMedicinesList(): Collection
     {
-        return $this->medicineRepository->findAllWithPagination(['uuid', 'name']);
+        return $this->medicineRepository->findSelectAll(['uuid', 'name']);
     }
 
     /**

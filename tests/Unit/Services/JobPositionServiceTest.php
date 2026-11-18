@@ -5,8 +5,11 @@ namespace Tests\Unit\Services;
 use App\Http\Requests\ExportRequest;
 use App\Models\JobPosition;
 use App\Repositories\JobPositionRepositoryInterface;
+use App\Repositories\UserRepositoryInterface;
 use App\Services\ExportServiceInterface;
 use App\Services\JobPositionService;
+use App\Services\PermissionGrantServiceInterface;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Mockery;
 use Mockery\MockInterface;
@@ -38,7 +41,12 @@ class JobPositionServiceTest extends TestCase
 
         $this->jobPositionRepository = Mockery::mock(JobPositionRepositoryInterface::class);
         $this->exportService = Mockery::mock(ExportServiceInterface::class);
-        $this->jobPositionService = new JobPositionService($this->jobPositionRepository, $this->exportService);
+        $this->jobPositionService = new JobPositionService(
+            $this->jobPositionRepository,
+            $this->exportService,
+            Mockery::mock(UserRepositoryInterface::class),
+            Mockery::mock(PermissionGrantServiceInterface::class)
+        );
     }
 
     /**
@@ -74,20 +82,19 @@ class JobPositionServiceTest extends TestCase
     /**
      * @return void
      */
-    public function testGetJobPositionsListPassesOnlyUuidAndNameColumns(): void
+    public function testGetJobPositionsListSelectsOnlyUuidAndNameColumns(): void
     {
-        $paginator = new LengthAwarePaginator([], 0, 100, 1);
+        $collection = new Collection;
 
         $this->jobPositionRepository
-            ->shouldReceive('findAllWithPagination')
+            ->shouldReceive('findSelectAll')
             ->once()
             ->with(['uuid', 'name'])
-            ->andReturn($paginator);
+            ->andReturn($collection);
 
         $result = $this->jobPositionService->getJobPositionsList();
 
-        $this->assertInstanceOf(LengthAwarePaginator::class, $result);
-        $this->assertSame($paginator, $result);
+        $this->assertSame($collection, $result);
     }
 
     /**
@@ -164,7 +171,7 @@ class JobPositionServiceTest extends TestCase
         $this->jobPositionRepository
             ->shouldReceive('findAllWithPagination')
             ->once()
-            ->withNoArgs()
+            ->with([], -1)
             ->andReturn($paginator);
 
         $this->exportService

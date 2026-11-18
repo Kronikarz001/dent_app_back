@@ -5,16 +5,17 @@ namespace App\Repositories;
 use App\Models\Prescription;
 use App\Search\PrescriptionSearch;
 use App\Search\Search;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 /**
  * Summary of PrescriptionRepository
+ *
+ * @extends SearchableRepository<Prescription>
  */
 class PrescriptionRepository extends SearchableRepository implements PrescriptionRepositoryInterface
 {
     /**
-     * @var string
+     * @var class-string<Prescription>
      */
     protected string $modelClass = Prescription::class;
 
@@ -22,17 +23,8 @@ class PrescriptionRepository extends SearchableRepository implements Prescriptio
      * @param PrescriptionSearch $search
      */
     public function __construct(
-        private PrescriptionSearch $search
+        private readonly PrescriptionSearch $search
     ) {}
-
-    /**
-     * @param array $params
-     * @return LengthAwarePaginator
-     */
-    public function findAllWithPagination(array $params = []): LengthAwarePaginator
-    {
-        return $this->search->search($params);
-    }
 
     /**
      * @return Search
@@ -43,54 +35,11 @@ class PrescriptionRepository extends SearchableRepository implements Prescriptio
     }
 
     /**
-     * @param string $uuid
-     * @return Prescription|null
-     */
-    public function findByUuid(string $uuid): ?Prescription
-    {
-        return Prescription::where('uuid', $uuid)->first();
-    }
-
-    /**
      * @param string $patientUuid
-     * @return LengthAwarePaginator
+     * @return LengthAwarePaginator<int, Prescription>
      */
     public function findAllByPatient(string $patientUuid): LengthAwarePaginator
     {
-        return Prescription::query()
-            ->where('patient_uuid', $patientUuid)
-            ->with(['patient', 'doctor', 'medicines'])
-            ->latest()
-            ->paginate();
-    }
-
-    /**
-     * @param array $data
-     * @return Prescription
-     */
-    public function create(array $data): Prescription
-    {
-        return Prescription::create($data);
-    }
-
-    /**
-     * @param Prescription|Model $model
-     * @param array $data
-     * @return Prescription
-     */
-    public function update(Prescription|Model $model, array $data): Prescription
-    {
-        $model->update($data);
-
-        return $model->fresh();
-    }
-
-    /**
-     * @param Prescription|Model $model
-     * @return bool
-     */
-    public function delete(Prescription|Model $model): bool
-    {
-        return $model->delete();
+        return $this->search->search(['patient_uuid' => $patientUuid]);
     }
 }

@@ -8,6 +8,7 @@ use App\Repositories\UserRepositoryInterface;
 use App\Services\ExportServiceInterface;
 use App\Services\PhoneNumberServiceInterface;
 use App\Services\UserService;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Mockery;
 use Mockery\MockInterface;
@@ -32,7 +33,11 @@ class UserServiceTest extends TestCase
         $this->userRepository = Mockery::mock(UserRepositoryInterface::class);
         $exportService = Mockery::mock(ExportServiceInterface::class);
         $phoneNumberService = Mockery::mock(PhoneNumberServiceInterface::class);
-        $this->userService = new UserService($this->userRepository, $exportService, $phoneNumberService);
+        $this->userService = new UserService(
+            $this->userRepository,
+            $exportService,
+            $phoneNumberService
+        );
     }
 
     /**
@@ -66,38 +71,19 @@ class UserServiceTest extends TestCase
     /**
      * @return void
      */
-    public function testGetUsersListPassesOnlyUuidAndNameColumns(): void
+    public function testGetUsersListSelectsOnlyUuidAndNameColumns(): void
     {
-        $paginator = new LengthAwarePaginator([], 0, 100, 1);
+        $collection = new Collection;
 
         $this->userRepository
-            ->shouldReceive('findAllWithPagination')
+            ->shouldReceive('findSelectAll')
             ->once()
-            ->with(['uuid', 'name'])
-            ->andReturn($paginator);
+            ->with(['uuid', 'first_name', 'last_name', 'job_position_uuid'])
+            ->andReturn($collection);
 
         $result = $this->userService->getUsersList();
 
-        $this->assertInstanceOf(LengthAwarePaginator::class, $result);
-        $this->assertSame($paginator, $result);
-    }
-
-    /**
-     * @return void
-     */
-    public function testGetUsersListDoesNotPassEmptyColumns(): void
-    {
-        $paginator = new LengthAwarePaginator([], 0, 100, 1);
-
-        $this->userRepository
-            ->shouldReceive('findAllWithPagination')
-            ->once()
-            ->with(Mockery::not([]))
-            ->andReturn($paginator);
-
-        $result = $this->userService->getUsersList();
-
-        $this->assertSame($paginator, $result);
+        $this->assertSame($collection, $result);
     }
 
     /**
@@ -159,9 +145,9 @@ class UserServiceTest extends TestCase
         $user = User::factory()->make(['uuid' => 'user-uuid']);
 
         $this->userRepository
-            ->shouldReceive('existsByEmail')
+            ->shouldReceive('existsBy')
             ->once()
-            ->with('taken@example.com', 'user-uuid')
+            ->with('email', 'taken@example.com', 'user-uuid')
             ->andReturnTrue();
 
         $this->userRepository->shouldNotReceive('update');
@@ -179,9 +165,9 @@ class UserServiceTest extends TestCase
         $user = User::factory()->make(['uuid' => 'user-uuid']);
 
         $this->userRepository
-            ->shouldReceive('existsByPesel')
+            ->shouldReceive('existsBy')
             ->once()
-            ->with('12345678901', 'user-uuid')
+            ->with('pesel', '12345678901', 'user-uuid')
             ->andReturnTrue();
 
         $this->userRepository->shouldNotReceive('update');

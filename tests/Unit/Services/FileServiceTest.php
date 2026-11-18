@@ -18,7 +18,6 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
 use Mockery;
-use Tests\Mocks\Repositories\FileMockRepository;
 use Tests\Unit\UnitTestCase;
 
 class FileServiceTest extends UnitTestCase
@@ -77,7 +76,7 @@ class FileServiceTest extends UnitTestCase
             ->with($path)
             ->andReturn($mimetype);
 
-        $service = new FileService(new FileMockRepository);
+        $service = new FileService(Mockery::mock(FileRepositoryInterface::class));
 
         $result = $service->getFile($fileModel);
 
@@ -132,7 +131,7 @@ class FileServiceTest extends UnitTestCase
             ->with($path)
             ->andReturnFalse();
 
-        $service = new FileService(new FileMockRepository);
+        $service = new FileService(Mockery::mock(FileRepositoryInterface::class));
 
         $this->expectException(FileNotFoundException::class);
 
@@ -193,7 +192,8 @@ class FileServiceTest extends UnitTestCase
     public function testDeleteFile(): void
     {
         $repoMock = Mockery::mock(FileRepositoryInterface::class);
-        $file = new File(['path' => 'some/path.pdf']);
+        $file = new File(['uuid' => 'file-uuid', 'path' => 'some/path.pdf']);
+        $repoMock->shouldReceive('findAllByFileUuid')->once()->with('file-uuid')->andReturn(new Collection);
         $repoMock
             ->shouldReceive('delete')
             ->once()
@@ -225,7 +225,8 @@ class FileServiceTest extends UnitTestCase
     public function testDeleteFileThrowsWhenFileDoesNotExist(): void
     {
         $repoMock = Mockery::mock(FileRepositoryInterface::class);
-        $file = new File(['path' => 'some/path.pdf']);
+        $file = new File(['uuid' => 'file-uuid', 'path' => 'some/path.pdf']);
+        $repoMock->shouldReceive('findAllByFileUuid')->once()->with('file-uuid')->andReturn(new Collection);
         $repoMock
             ->shouldReceive('delete')
             ->never()
@@ -306,7 +307,7 @@ class FileServiceTest extends UnitTestCase
             ->shouldReceive('put')->once()
             ->andReturnFalse();
 
-        $service = new FileService(new FileMockRepository);
+        $service = new FileService(Mockery::mock(FileRepositoryInterface::class));
         $service->saveFile(
             new FileDto([$dtoFile], FileableType::USER),
             $model
@@ -342,8 +343,7 @@ class FileServiceTest extends UnitTestCase
     {
         $child1 = new File(['path' => 'c1.txt']);
         $child2 = new File(['path' => 'c2.txt']);
-        $parent = new File(['path' => 'p.txt']);
-        $parent->setRelation('files', new Collection([$child1, $child2]));
+        $parent = new File(['uuid' => 'parent-uuid', 'path' => 'p.txt']);
 
         foreach (['c1.txt', 'c2.txt', 'p.txt'] as $path) {
             $this->diskMock
@@ -355,6 +355,9 @@ class FileServiceTest extends UnitTestCase
         }
 
         $repoMock = Mockery::mock(FileRepositoryInterface::class);
+        $repoMock
+            ->shouldReceive('findAllByFileUuid')->once()
+            ->with('parent-uuid')->andReturn(new Collection([$child1, $child2]));
         $repoMock
             ->shouldReceive('delete')->once()
             ->with($parent)->andReturnTrue();

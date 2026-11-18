@@ -4,41 +4,17 @@ namespace App\Repositories;
 
 use App\Models\File;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Model;
 
 /**
  * Summary of FileRepositoryInterface
+ *
+ * @extends SearchableRepositoryInterface<File>
  */
 interface FileRepositoryInterface extends SearchableRepositoryInterface
 {
     /**
-     * @param array $data
-     * @return File
-     */
-    public function create(array $data): File;
-
-    /**
-     * @param string $uuid
-     * @return File
-     */
-    public function findByUuid(string $uuid): File;
-
-    /**
-     * @param Model|File $model
-     * @param array $data
-     * @return File
-     */
-    public function update(Model|File $model, array $data): File;
-
-    /**
-     * @param File|Model $model
-     * @return bool
-     */
-    public function delete(File|Model $model): bool;
-
-    /**
      * @param string $parentParentUuid
-     * @return Collection
+     * @return Collection<int, File>
      */
     public function findAllByFileUuid(string $parentParentUuid): Collection;
 
@@ -47,7 +23,7 @@ interface FileRepositoryInterface extends SearchableRepositoryInterface
      * @param string $fileableId
      * @param string $excludeUuid
      * @param string|null $oldFileUuid
-     * @return Collection
+     * @return Collection<int, File>
      */
     public function findAllByFileableExceptUuid(string $fileableType, string $fileableId, string $excludeUuid, ?string $oldFileUuid): Collection;
 
@@ -60,7 +36,7 @@ interface FileRepositoryInterface extends SearchableRepositoryInterface
 
     /**
      * @param array $params
-     * @return Collection
+     * @return Collection<int, File>
      */
     public function findAllWithParams(array $params): Collection;
 }

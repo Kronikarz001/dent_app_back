@@ -6,6 +6,7 @@ use App\Enums\Gender;
 use App\Enums\PhoneNumberType;
 use App\Models\Patient;
 use App\Services\PatientServiceInterface;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Application;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Tests\TestCase;
@@ -44,13 +45,13 @@ class PatientServiceTest extends TestCase
     /**
      * @return void
      */
-    public function testGetPatientsListReturnsPaginator(): void
+    public function testGetPatientsListReturnsCollection(): void
     {
         Patient::factory()->count(2)->create();
 
         $result = $this->service->getPatientsList();
 
-        $this->assertInstanceOf(LengthAwarePaginator::class, $result);
+        $this->assertInstanceOf(Collection::class, $result);
     }
 
     /**

@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Models\NotificationChannel;
 use App\Models\NotificationGroup;
 use App\Models\NotificationPreference;
+use App\Models\NotificationType;
 use Illuminate\Support\Collection;
 
 /**
@@ -51,6 +52,24 @@ class NotificationPreferenceRepository
             ->where('is_configurable', true)
             ->where('is_internal', false)
             ->get();
+    }
+
+    /**
+     * @param string $uuid
+     * @return NotificationChannel|null
+     */
+    public function findChannel(string $uuid): ?NotificationChannel
+    {
+        return NotificationChannel::query()->find($uuid);
+    }
+
+    /**
+     * @param string $uuid
+     * @return bool
+     */
+    public function typeExists(string $uuid): bool
+    {
+        return NotificationType::query()->whereKey($uuid)->exists();
     }
 
     /**

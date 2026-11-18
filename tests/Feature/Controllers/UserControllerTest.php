@@ -2,11 +2,13 @@
 
 namespace Tests\Feature\Controllers;
 
+use App\Models\EmployeeSchedule;
 use App\Models\JobPosition;
 use App\Models\Permission;
 use App\Models\PermissionAssignment;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Route;
 use Tests\TestCase;
 
 /**
@@ -196,6 +198,94 @@ class UserControllerTest extends TestCase
         $this->assertDatabaseHas('users', [
             'email' => 'example_updated@mail',
         ]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testNonAdminWithUserEditPermissionCannotGrantAdminFlags(): void
+    {
+        $editor = $this->createUserWithUserEditPermission();
+
+        $this->callApiWithLoggedUser($editor)
+            ->putJson(route('user.update', ['user' => $editor->uuid]), [
+                'first_name' => 'Ewa',
+                'is_admin' => true,
+                'is_superuser' => true,
+            ])
+            ->assertForbidden();
+
+        $this->assertFalse($editor->fresh()->is_admin);
+        $this->assertFalse($editor->fresh()->is_superuser);
+    }
+
+    /**
+     * @return void
+     */
+    public function testNonAdminCannotCreateAdminUser(): void
+    {
+        $editor = $this->createUserWithUserEditPermission();
+
+        $this->callApiWithLoggedUser($editor)
+            ->postJson(route('user.store'), [
+                'first_name' => 'Jan',
+                'last_name' => 'Kowalski',
+                'pesel' => '90010112345',
+                'private_email' => 'jan@example.com',
+                'is_admin' => true,
+            ])
+            ->assertForbidden();
+
+        $this->assertDatabaseMissing('users', ['private_email' => 'jan@example.com']);
+    }
+
+    /**
+     * @return void
+     */
+    public function testNonAdminCanSendUnchangedAdminFlags(): void
+    {
+        $editor = $this->createUserWithUserEditPermission();
+        $user = User::factory()->create(['is_admin' => false]);
+
+        $this->callApiWithLoggedUser($editor)
+            ->putJson(route('user.update', ['user' => $user->uuid]), [
+                'first_name' => 'Ewa',
+                'is_admin' => false,
+            ])
+            ->assertNoContent();
+
+        $this->assertSame('Ewa', $user->fresh()->first_name);
+    }
+
+    /**
+     * @return void
+     */
+    public function testAdminCanGrantAdminFlag(): void
+    {
+        $user = User::factory()->create(['is_admin' => false]);
+
+        $this->callApiWithLoggedUser()
+            ->putJson(route('user.update', ['user' => $user->uuid]), ['is_admin' => true])
+            ->assertNoContent();
+
+        $this->assertTrue($user->fresh()->is_admin);
+    }
+
+    /**
+     * @return User
+     */
+    private function createUserWithUserEditPermission(): User
+    {
+        $user = User::factory()->create(['is_admin' => false, 'is_superuser' => false]);
+        $permission = Permission::where('resource', 'user')->where('type', 'edit')->firstOrFail();
+        PermissionAssignment::create([
+            'grantable_type' => Permission::class,
+            'grantable_id' => $permission->uuid,
+            'assignable_type' => User::class,
+            'assignable_id' => $user->uuid,
+        ]);
+
+        return $user;
     }
 
     /**
@@ -425,22 +515,58 @@ class UserControllerTest extends TestCase
     /**
      * @return void
      */
-    public function testAssignPermissionsCreatesDirectGrant(): void
+    public function testSelectListReturnsPlainArrayOfUserSummaries(): void
     {
-        $target = User::factory()->create();
-        $permission = Permission::factory()->create();
+        $position = JobPosition::factory()->create(['name' => 'Higienistka']);
+        $user = User::factory()->create(['job_position_uuid' => $position->uuid]);
+
+        $response = $this->callApiWithLoggedUser($user)
+            ->getJson(route('user.selectList'));
+
+        $response->assertOk();
+        $this->assertTrue(array_is_list($response->json()));
+        $this->assertSame(
+            ['uuid', 'first_name', 'last_name', 'avatar_path', 'job_position'],
+            array_keys($response->json('0'))
+        );
+        $response->assertJsonPath('0.job_position.name', 'Higienistka');
+    }
+
+    /**
+     * @return void
+     */
+    public function testWorkingTodayReturnsOnlyUsersWithActiveWorkEntryToday(): void
+    {
+        $working = User::factory()->create();
+        $onVacation = User::factory()->create();
+        $workingTomorrow = User::factory()->create();
+        $inactiveEntry = User::factory()->create();
+
+        $work = EmployeeSchedule::factory()->create(['type' => 'WORK', 'date' => now()->toDateString(), 'is_active' => true]);
+        $work->users()->attach($working->uuid);
+        $vacation = EmployeeSchedule::factory()->create(['type' => 'VACATION', 'date' => now()->toDateString(), 'is_active' => true]);
+        $vacation->users()->attach($onVacation->uuid);
+        $tomorrow = EmployeeSchedule::factory()->create(['type' => 'WORK', 'date' => now()->addDay()->toDateString(), 'is_active' => true]);
+        $tomorrow->users()->attach($workingTomorrow->uuid);
+        $inactive = EmployeeSchedule::factory()->create(['type' => 'WORK', 'date' => now()->toDateString(), 'is_active' => false]);
+        $inactive->users()->attach($inactiveEntry->uuid);
+
+        $response = $this->callApiWithLoggedUser()
+            ->getJson(route('user.workingToday'));
+
+        $response->assertOk();
+        $this->assertSame([$working->uuid], collect($response->json())->pluck('uuid')->all());
+    }
+
+    /**
+     * @return void
+     */
+    public function testAssignPermissionsEndpointNoLongerExists(): void
+    {
+        $this->assertFalse(Route::has('user.assignPermissions'));
 
         $this->callApiWithLoggedUser()
-            ->patchJson(route('user.assignPermissions', ['user' => $target->uuid]), [
-                'permissions' => [$permission->uuid],
-            ])
-            ->assertNoContent();
-
-        $this->assertDatabaseHas('permission_assignments', [
-            'grantable_type' => Permission::class,
-            'grantable_id' => $permission->uuid,
-            'assignable_type' => User::class,
-            'assignable_id' => $target->uuid,
-        ]);
+            ->patchJson('/api/user/'.User::factory()->create()->uuid.'/permissions', ['permissions' => []])
+            ->assertNotFound();
     }
 }

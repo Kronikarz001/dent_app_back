@@ -5,19 +5,19 @@ namespace App\Repositories;
 use App\Models\MessageGroup;
 use App\Search\MessageGroupSearch;
 use App\Search\Search;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 /**
  * Summary of MessageGroupRepository
+ *
+ * @extends SearchableRepository<MessageGroup>
  */
 class MessageGroupRepository extends SearchableRepository implements MessageGroupRepositoryInterface
 {
     /**
-     * @var string
+     * @var class-string<MessageGroup>
      */
     protected string $modelClass = MessageGroup::class;
 
@@ -25,17 +25,8 @@ class MessageGroupRepository extends SearchableRepository implements MessageGrou
      * @param MessageGroupSearch $search
      */
     public function __construct(
-        private MessageGroupSearch $search
+        private readonly MessageGroupSearch $search
     ) {}
-
-    /**
-     * @param array $params
-     * @return LengthAwarePaginator
-     */
-    public function findAllWithPagination(array $params = []): LengthAwarePaginator
-    {
-        return $this->search->search($params);
-    }
 
     /**
      * @return Search
@@ -46,45 +37,6 @@ class MessageGroupRepository extends SearchableRepository implements MessageGrou
     }
 
     /**
-     * @param string $uuid
-     * @return MessageGroup|null
-     */
-    public function findByUuid(string $uuid): ?MessageGroup
-    {
-        return MessageGroup::where('uuid', $uuid)->first();
-    }
-
-    /**
-     * @param array $data
-     * @return MessageGroup
-     */
-    public function create(array $data): MessageGroup
-    {
-        return MessageGroup::create($data);
-    }
-
-    /**
-     * @param MessageGroup|Model $model
-     * @param array $data
-     * @return MessageGroup
-     */
-    public function update(MessageGroup|Model $model, array $data): MessageGroup
-    {
-        $model->update($data);
-
-        return $model->fresh();
-    }
-
-    /**
-     * @param Model|MessageGroup $model
-     * @return bool
-     */
-    public function delete(Model|MessageGroup $model): bool
-    {
-        return $model->delete();
-    }
-
-    /**
      * @param MessageGroup $group
      * @param string $userUuid
      * @return void
@@ -92,6 +44,45 @@ class MessageGroupRepository extends SearchableRepository implements MessageGrou
     public function addUser(MessageGroup $group, string $userUuid): void
     {
         $group->users()->attach($userUuid);
+    }
+
+    /**
+     * @param MessageGroup $group
+     * @param string[] $userUuids
+     * @return void
+     */
+    public function addUsers(MessageGroup $group, array $userUuids): void
+    {
+        $group->users()->attach($userUuids);
+    }
+
+    /**
+     * @param MessageGroup $group
+     * @return MessageGroup
+     */
+    public function loadDetails(MessageGroup $group): MessageGroup
+    {
+        return $group->load(['creator', 'users']);
+    }
+
+    /**
+     * @return MessageGroup|null
+     */
+    public function findDefault(): ?MessageGroup
+    {
+        return $this->query()->where('is_default', true)->first();
+    }
+
+    /**
+     * @param string $userUuid
+     * @return string[]
+     */
+    public function findUuidsForUser(string $userUuid): array
+    {
+        return $this->query()
+            ->whereHas('users', fn (Builder $query) => $query->where('users.uuid', $userUuid))
+            ->pluck('uuid')
+            ->all();
     }
 
     /**

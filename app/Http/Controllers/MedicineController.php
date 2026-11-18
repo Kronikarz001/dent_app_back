@@ -7,6 +7,7 @@ use App\Http\Requests\MedicineUpdateRequest;
 use App\Http\Resources\MedicineResource;
 use App\Models\Medicine;
 use App\Services\MedicineServiceInterface;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Pagination\LengthAwarePaginator;
 use OpenApi\Attributes as OA;
@@ -54,10 +55,14 @@ class MedicineController extends Controller
         security: [['sanctum' => []]],
         tags: ['Medicine'],
         responses: [
-            new OA\Response(response: 200, description: 'OK'),
+            new OA\Response(
+                response: 200,
+                description: 'OK',
+                content: new OA\JsonContent(type: 'array', items: new OA\Items(ref: '#/components/schemas/SelectListItem'))
+            ),
         ]
     )]
-    public function selectList(): LengthAwarePaginator
+    public function selectList(): Collection
     {
         return $this->medicineService->getMedicinesList();
     }

@@ -3,6 +3,7 @@
 namespace App\Search;
 
 use App\Models\Calendar;
+use App\Search\Concerns\FiltersCalendarEntries;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
@@ -10,6 +11,8 @@ use Illuminate\Database\Eloquent\Builder;
  */
 class CalendarSearch extends Search
 {
+    use FiltersCalendarEntries;
+
     /**
      * @return string
      */
@@ -84,7 +87,11 @@ class CalendarSearch extends Search
      * @param array $params
      * @return void
      */
-    protected function preFilter(Builder $query, array $params): void {}
+    protected function preFilter(Builder $query, array $params): void
+    {
+        $this->applyUserUuids($query, $params['user_uuids'] ?? []);
+        $this->applyDateRange($query, $params['date_from'] ?? null, $params['date_to'] ?? null);
+    }
 
     /**
      * @return array
@@ -93,6 +100,19 @@ class CalendarSearch extends Search
     {
         return [
             'dentalExaminations',
+            'users:uuid,first_name,last_name',
+            'patients:uuid,first_name,last_name',
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    protected function defaultSort(): array
+    {
+        return [
+            'date' => 'asc',
+            'start_time' => 'asc',
         ];
     }
 }

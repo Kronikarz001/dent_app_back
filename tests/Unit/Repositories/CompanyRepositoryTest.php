@@ -33,8 +33,8 @@ class CompanyRepositoryTest extends TestCase
     {
         Company::factory()->create(['regon' => '123456789']);
 
-        $this->assertTrue($this->repository->existsByRegon('123456789'));
-        $this->assertFalse($this->repository->existsByRegon('000000000'));
+        $this->assertTrue($this->repository->existsBy('regon', '123456789'));
+        $this->assertFalse($this->repository->existsBy('regon', '000000000'));
     }
 
     /**
@@ -44,7 +44,7 @@ class CompanyRepositoryTest extends TestCase
     {
         $company = Company::factory()->create(['regon' => '123456789']);
 
-        $this->assertFalse($this->repository->existsByRegon('123456789', $company->uuid));
+        $this->assertFalse($this->repository->existsBy('regon', '123456789', $company->uuid));
     }
 
     /**
@@ -54,8 +54,8 @@ class CompanyRepositoryTest extends TestCase
     {
         Company::factory()->create(['nip' => '9876543210']);
 
-        $this->assertTrue($this->repository->existsByNip('9876543210'));
-        $this->assertFalse($this->repository->existsByNip('0000000000'));
+        $this->assertTrue($this->repository->existsBy('nip', '9876543210'));
+        $this->assertFalse($this->repository->existsBy('nip', '0000000000'));
     }
 
     /**
@@ -65,7 +65,7 @@ class CompanyRepositoryTest extends TestCase
     {
         $company = Company::factory()->create(['nip' => '9876543210']);
 
-        $this->assertFalse($this->repository->existsByNip('9876543210', $company->uuid));
+        $this->assertFalse($this->repository->existsBy('nip', '9876543210', $company->uuid));
     }
 
     /**

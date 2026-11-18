@@ -8,6 +8,7 @@ use App\Repositories\DentalExaminationRepositoryInterface;
 use App\Services\AuditServiceInterface;
 use App\Services\DentalExaminationService;
 use App\Services\ExportServiceInterface;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Mockery;
 use Mockery\MockInterface;
@@ -75,20 +76,19 @@ class DentalExaminationServiceTest extends TestCase
     /**
      * @return void
      */
-    public function testGetDentalExaminationsListPassesOnlyUuidAndNameColumns(): void
+    public function testGetDentalExaminationsListSelectsOnlyUuidAndNameColumns(): void
     {
-        $paginator = new LengthAwarePaginator([], 0, 100, 1);
+        $collection = new Collection;
 
         $this->dentalExaminationRepository
-            ->shouldReceive('findAllWithPagination')
+            ->shouldReceive('findSelectAll')
             ->once()
             ->with(['uuid', 'name'])
-            ->andReturn($paginator);
+            ->andReturn($collection);
 
         $result = $this->dentalExaminationService->getDentalExaminationsList();
 
-        $this->assertInstanceOf(LengthAwarePaginator::class, $result);
-        $this->assertSame($paginator, $result);
+        $this->assertSame($collection, $result);
     }
 
     /**
@@ -165,7 +165,7 @@ class DentalExaminationServiceTest extends TestCase
         $this->dentalExaminationRepository
             ->shouldReceive('findAllWithPagination')
             ->once()
-            ->withNoArgs()
+            ->with([], -1)
             ->andReturn($paginator);
 
         $this->exportService

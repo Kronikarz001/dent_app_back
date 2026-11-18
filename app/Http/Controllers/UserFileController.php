@@ -286,7 +286,7 @@ class UserFileController extends Controller
         return FileResource::collection(
             $this->fileService->saveFile(
                 new FileDto([$request->file('file')], FileableType::USER_BACKGROUND),
-                UserBackground::find($user->uuid)
+                UserBackground::fromUser($user)
             )
         );
     }
@@ -307,7 +307,7 @@ class UserFileController extends Controller
     )]
     public function backgroundDownload(User $user, File $file): Response
     {
-        $this->fileService->assertFileOwnedBy($file, UserBackground::find($user->uuid));
+        $this->fileService->assertFileOwnedBy($file, UserBackground::fromUser($user));
 
         return response($this->fileService->getPhotoFile($file), 200, ['Content-Type' => $file->mimetype]);
     }

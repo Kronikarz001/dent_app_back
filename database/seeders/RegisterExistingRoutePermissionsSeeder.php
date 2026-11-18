@@ -184,7 +184,6 @@ class RegisterExistingRoutePermissionsSeeder extends Seeder
                 'user.update',
                 'user.destroy',
                 'user.jobPosition.assignJobPosition',
-                'user.assignPermissions',
                 'user.history',
                 'user.history.export',
             ],

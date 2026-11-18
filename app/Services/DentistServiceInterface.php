@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 /**
@@ -15,7 +16,7 @@ interface DentistServiceInterface
     public function getDentists(): LengthAwarePaginator;
 
     /**
-     * @return LengthAwarePaginator
+     * @return Collection
      */
-    public function getDentistsList(): LengthAwarePaginator;
+    public function getDentistsList(): Collection;
 }

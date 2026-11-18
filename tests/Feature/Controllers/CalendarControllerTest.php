@@ -408,4 +408,106 @@ class CalendarControllerTest extends TestCase
             'userable_type' => User::class,
         ]);
     }
+
+    /**
+     * @return void
+     */
+    public function testIndexIncludesUsersAndPatients(): void
+    {
+        $dentist = User::factory()->create(['first_name' => 'Anna', 'last_name' => 'Kowalska']);
+        $patient = Patient::factory()->create(['first_name' => 'Jan', 'last_name' => 'Kowalski']);
+        $calendar = Calendar::factory()->create();
+        $calendar->users()->attach($dentist->uuid);
+        $calendar->patients()->attach($patient->uuid);
+
+        $response = $this->callApiWithLoggedUser()
+            ->getJson(route('calendar.index'));
+
+        $response->assertOk();
+        $response->assertJsonPath('data.0.users.0.uuid', $dentist->uuid);
+        $response->assertJsonPath('data.0.users.0.first_name', 'Anna');
+        $response->assertJsonPath('data.0.patients.0.uuid', $patient->uuid);
+        $response->assertJsonPath('data.0.patients.0.last_name', 'Kowalski');
+        $this->assertArrayNotHasKey('email', $response->json('data.0.users.0'));
+        $this->assertArrayNotHasKey('pesel', $response->json('data.0.patients.0'));
+    }
+
+    /**
+     * @return void
+     */
+    public function testIndexFiltersByUserUuidsAndDateRange(): void
+    {
+        $dentist = User::factory()->create();
+        $otherDentist = User::factory()->create();
+
+        $matching = Calendar::factory()->create(['date' => '2026-11-13']);
+        $matching->users()->attach($dentist->uuid);
+        $otherDay = Calendar::factory()->create(['date' => '2026-11-14']);
+        $otherDay->users()->attach($dentist->uuid);
+        $otherDoctor = Calendar::factory()->create(['date' => '2026-11-13']);
+        $otherDoctor->users()->attach($otherDentist->uuid);
+
+        $response = $this->callApiWithLoggedUser()
+            ->getJson(route('calendar.index', [
+                'calendar' => [
+                    'user_uuids' => [$dentist->uuid],
+                    'date_from' => '2026-11-13',
+                    'date_to' => '2026-11-13',
+                ],
+            ]));
+
+        $response->assertOk();
+        $this->assertSame([$matching->uuid], collect($response->json('data'))->pluck('uuid')->all());
+    }
+
+    /**
+     * @return void
+     */
+    public function testIndexRejectsInvalidUserUuid(): void
+    {
+        $this->callApiWithLoggedUser()
+            ->getJson(route('calendar.index', ['calendar' => ['user_uuids' => ['not-a-uuid']]]))
+            ->assertStatus(422);
+    }
+
+    /**
+     * @return void
+     */
+    public function testTodayReturnsOnlyTodayAppointmentsSortedByStartTime(): void
+    {
+        $later = Calendar::factory()->create(['date' => now()->toDateString(), 'start_time' => '12:00', 'end_time' => '13:00']);
+        $earlier = Calendar::factory()->create(['date' => now()->toDateString(), 'start_time' => '08:00', 'end_time' => '09:00']);
+        Calendar::factory()->create(['date' => now()->addDay()->toDateString()]);
+        EmployeeSchedule::factory()->create(['date' => now()->toDateString()]);
+
+        $response = $this->callApiWithLoggedUser()
+            ->getJson(route('calendar.today'));
+
+        $response->assertOk();
+        $this->assertTrue(array_is_list($response->json()));
+        $this->assertSame([$earlier->uuid, $later->uuid], collect($response->json())->pluck('uuid')->all());
+        $this->assertArrayHasKey('users', $response->json('0'));
+        $this->assertArrayHasKey('patients', $response->json('0'));
+    }
+
+    /**
+     * @return void
+     */
+    public function testShowIncludesUsersPatientsAndDentalExaminations(): void
+    {
+        $dentist = User::factory()->create();
+        $patient = Patient::factory()->create();
+        $examination = DentalExamination::factory()->create();
+        $calendar = Calendar::factory()->create();
+        $calendar->users()->attach($dentist->uuid);
+        $calendar->patients()->attach($patient->uuid);
+        $calendar->dentalExaminations()->attach($examination->uuid);
+
+        $this->callApiWithLoggedUser()
+            ->getJson(route('calendar.show', ['calendar' => $calendar->uuid]))
+            ->assertOk()
+            ->assertJsonPath('users.0.uuid', $dentist->uuid)
+            ->assertJsonPath('patients.0.uuid', $patient->uuid)
+            ->assertJsonPath('dental_examinations.0.uuid', $examination->uuid);
+    }
 }

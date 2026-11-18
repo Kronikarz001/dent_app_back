@@ -2,36 +2,36 @@
 
 namespace App\Repositories;
 
+use App\Models\Department;
 use App\Models\Role;
-use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
+use App\Models\UserGroup;
 
 /**
  * Summary of RoleRepositoryInterface
+ *
+ * @extends SearchableRepositoryInterface<Role>
  */
-interface RoleRepositoryInterface extends BasicRepositoryInterface
+interface RoleRepositoryInterface extends SearchableRepositoryInterface
 {
     /**
-     * @param string $uuid
-     * @return Role|null
-     */
-    public function findByUuid(string $uuid): ?Role;
-
-    /**
-     * @param array $data
-     * @return Role
-     */
-    public function create(array $data): Role;
-
-    /**
-     * @param Role|Model $model
-     * @param array $data
-     * @return Role
-     */
-    public function update(Role|Model $model, array $data): Role;
-
-    /**
-     * @param Model|Role $model
+     * @param Role $role
+     * @param User $user
      * @return bool
      */
-    public function delete(Model|Role $model): bool;
+    public function isManager(Role $role, User $user): bool;
+
+    /**
+     * @param Role $role
+     * @param string $userUuid
+     * @return bool
+     */
+    public function hasMember(Role $role, string $userUuid): bool;
+
+    /**
+     * @param Department|UserGroup $container
+     * @param string $name
+     * @return Role
+     */
+    public function createInContainer(Department|UserGroup $container, string $name): Role;
 }

@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'default_per_page' => (int) env('SEARCH_DEFAULT_PER_PAGE', 50),
     'sort_keyword' => 'sort',
     'search_keywords' => [
         'sort',

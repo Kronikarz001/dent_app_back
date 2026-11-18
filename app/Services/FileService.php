@@ -95,7 +95,7 @@ readonly class FileService implements FileServiceInterface
      */
     public function saveAvatar(User $user, UploadedFile $file): array
     {
-        return $this->processFiles(new FileDto([$file], FileableType::USER_AVATAR), UserAvatar::find($user->uuid));
+        return $this->processFiles(new FileDto([$file], FileableType::USER_AVATAR), UserAvatar::fromUser($user));
     }
 
     /**
@@ -118,7 +118,7 @@ readonly class FileService implements FileServiceInterface
      */
     public function deleteFile(File $file): bool
     {
-        $file->files->each(fn (File $child) => $this->deletePhysicalFile($child));
+        $this->fileRepository->findAllByFileUuid($file->uuid)->each(fn (File $child) => $this->deletePhysicalFile($child));
         $this->deletePhysicalFile($file);
 
         return $this->fileRepository->delete($file);
@@ -377,6 +377,6 @@ readonly class FileService implements FileServiceInterface
      */
     public function deleteAvatar(User $user): void
     {
-        $this->getAllFilesWithoutPagination(UserAvatar::find($user->uuid))->each(fn (File $file) => $this->deleteFile($file));
+        $this->getAllFilesWithoutPagination(UserAvatar::fromUser($user))->each(fn (File $file) => $this->deleteFile($file));
     }
 }

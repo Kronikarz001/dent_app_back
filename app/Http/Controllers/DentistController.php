@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\UserResource;
+use App\Http\Resources\UserSelectResource;
 use App\Models\Dentist;
 use App\Services\DentistServiceInterface;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use OpenApi\Attributes as OA;
 
@@ -49,20 +51,24 @@ class DentistController extends Controller
     }
 
     /**
-     * @return LengthAwarePaginator
+     * @return AnonymousResourceCollection
      */
     #[OA\Get(
         path: '/api/dentist/selectlist',
-        summary: 'Lista lekarzy stomatologów do selecta (uuid + name)',
+        summary: 'Lista lekarzy stomatologów do selecta',
         security: [['sanctum' => []]],
         tags: ['Dentist'],
         responses: [
-            new OA\Response(response: 200, description: 'OK'),
+            new OA\Response(
+                response: 200,
+                description: 'OK',
+                content: new OA\JsonContent(type: 'array', items: new OA\Items(ref: '#/components/schemas/UserSelectResource'))
+            ),
         ]
     )]
-    public function selectList(): LengthAwarePaginator
+    public function selectList(): AnonymousResourceCollection
     {
-        return $this->dentistService->getDentistsList();
+        return UserSelectResource::collection($this->dentistService->getDentistsList());
     }
 
     /**

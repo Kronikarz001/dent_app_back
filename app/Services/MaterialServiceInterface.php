@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Http\Requests\ExportRequest;
 use App\Models\Material;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\Writer\Exception as WriterException;
@@ -20,9 +21,9 @@ interface MaterialServiceInterface
     public function getMaterials(): LengthAwarePaginator;
 
     /**
-     * @return LengthAwarePaginator
+     * @return Collection
      */
-    public function getMaterialsList(): LengthAwarePaginator;
+    public function getMaterialsList(): Collection;
 
     /**
      * @param array $data

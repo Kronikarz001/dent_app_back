@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Http\Requests\ExportRequest;
 use App\Models\JobPosition;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\Writer\Exception as WriterException;
@@ -21,9 +22,9 @@ interface JobPositionServiceInterface
     public function getJobPositions(): LengthAwarePaginator;
 
     /**
-     * @return LengthAwarePaginator
+     * @return Collection
      */
-    public function getJobPositionsList(): LengthAwarePaginator;
+    public function getJobPositionsList(): Collection;
 
     /**
      * @param array $data

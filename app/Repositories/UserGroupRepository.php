@@ -2,18 +2,20 @@
 
 namespace App\Repositories;
 
+use App\Models\User;
 use App\Models\UserGroup;
 use App\Search\Search;
 use App\Search\UserGroupSearch;
-use Illuminate\Database\Eloquent\Model;
 
 /**
  * Summary of UserGroupRepository
+ *
+ * @extends SearchableRepository<UserGroup>
  */
 class UserGroupRepository extends SearchableRepository implements UserGroupRepositoryInterface
 {
     /**
-     * @var string
+     * @var class-string<UserGroup>
      */
     protected string $modelClass = UserGroup::class;
 
@@ -33,41 +35,15 @@ class UserGroupRepository extends SearchableRepository implements UserGroupRepos
     }
 
     /**
-     * @param string $uuid
-     * @return UserGroup|null
-     */
-    public function findByUuid(string $uuid): ?UserGroup
-    {
-        return UserGroup::where('uuid', $uuid)->first();
-    }
-
-    /**
-     * @param array $data
-     * @return UserGroup
-     */
-    public function create(array $data): UserGroup
-    {
-        return UserGroup::create($data);
-    }
-
-    /**
-     * @param UserGroup|Model $model
-     * @param array $data
-     * @return UserGroup
-     */
-    public function update(UserGroup|Model $model, array $data): UserGroup
-    {
-        $model->update($data);
-
-        return $model->fresh();
-    }
-
-    /**
-     * @param UserGroup|Model $model
+     * @param UserGroup $group
+     * @param User $user
      * @return bool
      */
-    public function delete(UserGroup|Model $model): bool
+    public function isManager(UserGroup $group, User $user): bool
     {
-        return $model->delete();
+        return $group->users()
+            ->where('users.uuid', $user->uuid)
+            ->wherePivot('is_manager', true)
+            ->exists();
     }
 }

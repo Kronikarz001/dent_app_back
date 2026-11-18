@@ -5,8 +5,11 @@ namespace App\Services;
 use App\Exceptions\ScheduleConflictException;
 use App\Models\EmployeeSchedule;
 use App\Repositories\EmployeeScheduleRepositoryInterface;
+use App\Repositories\ScheduleOverlapRepositoryInterface;
 use App\Services\Concerns\DetectsScheduleConflicts;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * Summary of EmployeeScheduleService
@@ -25,19 +28,48 @@ readonly class EmployeeScheduleService implements EmployeeScheduleServiceInterfa
     ) {}
 
     /**
-     * @return LengthAwarePaginator
+     * @return ScheduleOverlapRepositoryInterface
      */
-    public function getSchedules(): LengthAwarePaginator
+    protected function scheduleRepository(): ScheduleOverlapRepositoryInterface
     {
-        return $this->employeeScheduleRepository->findAllWithPagination();
+        return $this->employeeScheduleRepository;
     }
 
     /**
+     * @param array{user_uuids?: string[], date_from?: string, date_to?: string} $filters
      * @return LengthAwarePaginator
      */
-    public function getSchedulesList(): LengthAwarePaginator
+    public function getSchedules(array $filters = []): LengthAwarePaginator
     {
-        return $this->employeeScheduleRepository->findAllWithPagination(['uuid', 'name']);
+        return $this->employeeScheduleRepository->findAllWithPagination($filters);
+    }
+
+    /**
+     * @param array{date_from?: string, date_to?: string} $filters
+     * @return LengthAwarePaginator
+     */
+    public function getMySchedules(array $filters = []): LengthAwarePaginator
+    {
+        return $this->employeeScheduleRepository->findAllWithPagination(array_merge($filters, [
+            'user_uuids' => [Auth::user()->uuid],
+        ]));
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getSchedulesList(): Collection
+    {
+        return $this->employeeScheduleRepository->findSelectAll(['uuid', 'name']);
+    }
+
+    /**
+     * @param EmployeeSchedule $schedule
+     * @return EmployeeSchedule
+     */
+    public function getScheduleDetails(EmployeeSchedule $schedule): EmployeeSchedule
+    {
+        return $this->employeeScheduleRepository->loadRelations($schedule, ['users:uuid,first_name,last_name']);
     }
 
     /**
@@ -79,6 +111,6 @@ readonly class EmployeeScheduleService implements EmployeeScheduleServiceInterfa
     {
         $this->assertNoScheduleConflicts($schedule, $data['users'] ?? []);
 
-        $this->auditService->recordSync($schedule, 'users', $schedule->users()->sync($data['users'] ?? []));
+        $this->auditService->recordSync($schedule, 'users', $this->employeeScheduleRepository->syncRelation($schedule, 'users', $data['users'] ?? []));
     }
 }

@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 use Mockery;
 use Mockery\MockInterface;
 use Tests\TestCase;
+use Throwable;
 
 class SearchServiceTest extends TestCase
 {
@@ -30,6 +31,8 @@ class SearchServiceTest extends TestCase
 
     /**
      * @return void
+     *
+     * @throws Throwable
      */
     protected function tearDown(): void
     {

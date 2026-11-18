@@ -25,6 +25,13 @@ use OpenApi\Attributes as OA;
     ]
 )]
 #[OA\Schema(
+    schema: 'SelectListItem',
+    properties: [
+        new OA\Property(property: 'uuid', type: 'string', format: 'uuid'),
+        new OA\Property(property: 'name', type: 'string'),
+    ]
+)]
+#[OA\Schema(
     schema: 'FileResource',
     properties: [
         new OA\Property(property: 'uuid', type: 'string', format: 'uuid'),
@@ -156,6 +163,9 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: 'end_time', type: 'string', nullable: true),
         new OA\Property(property: 'no_show', type: 'boolean'),
         new OA\Property(property: 'is_active', type: 'boolean'),
+        new OA\Property(property: 'users', type: 'array', items: new OA\Items(ref: '#/components/schemas/PersonSummaryResource')),
+        new OA\Property(property: 'patients', type: 'array', items: new OA\Items(ref: '#/components/schemas/PersonSummaryResource')),
+        new OA\Property(property: 'dental_examinations', type: 'array', items: new OA\Items(ref: '#/components/schemas/DentalExaminationResource')),
         new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
         new OA\Property(property: 'updated_at', type: 'string', format: 'date-time'),
     ]
@@ -172,6 +182,7 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: 'start_time', type: 'string', nullable: true),
         new OA\Property(property: 'end_time', type: 'string', nullable: true),
         new OA\Property(property: 'is_active', type: 'boolean'),
+        new OA\Property(property: 'users', type: 'array', items: new OA\Items(ref: '#/components/schemas/PersonSummaryResource')),
         new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
         new OA\Property(property: 'updated_at', type: 'string', format: 'date-time'),
     ]
@@ -318,7 +329,9 @@ use OpenApi\Attributes as OA;
     properties: [
         new OA\Property(property: 'uuid', type: 'string', format: 'uuid'),
         new OA\Property(property: 'name', type: 'string'),
+        new OA\Property(property: 'description', type: 'string', nullable: true),
         new OA\Property(property: 'permissions', type: 'array', items: new OA\Items(ref: '#/components/schemas/PermissionResource')),
+        new OA\Property(property: 'users', type: 'array', items: new OA\Items(ref: '#/components/schemas/PersonSummaryResource')),
         new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
         new OA\Property(property: 'updated_at', type: 'string', format: 'date-time'),
     ]
@@ -393,6 +406,17 @@ use OpenApi\Attributes as OA;
         required: ['name'],
         properties: [
             new OA\Property(property: 'name', type: 'string'),
+        ]
+    )
+)]
+#[OA\RequestBody(
+    request: 'PermissionGroupRequest',
+    required: true,
+    content: new OA\JsonContent(
+        required: ['name'],
+        properties: [
+            new OA\Property(property: 'name', type: 'string', maxLength: 255),
+            new OA\Property(property: 'description', type: 'string', maxLength: 1000, nullable: true),
         ]
     )
 )]
@@ -492,6 +516,30 @@ use OpenApi\Attributes as OA;
     )
 )]
 #[OA\RequestBody(
+    request: 'RoomRequest',
+    required: true,
+    content: new OA\JsonContent(
+        required: ['name'],
+        properties: [
+            new OA\Property(property: 'name', type: 'string', example: 'Gabinet 1'),
+            new OA\Property(property: 'description', type: 'string', nullable: true),
+            new OA\Property(property: 'is_active', type: 'boolean'),
+        ]
+    )
+)]
+#[OA\RequestBody(
+    request: 'ScheduleRuleRequest',
+    required: true,
+    content: new OA\JsonContent(
+        required: ['day', 'start_time', 'end_time'],
+        properties: [
+            new OA\Property(property: 'day', type: 'string', enum: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']),
+            new OA\Property(property: 'start_time', type: 'string', example: '08:00'),
+            new OA\Property(property: 'end_time', type: 'string', example: '16:00'),
+        ]
+    )
+)]
+#[OA\RequestBody(
     request: 'PrescriptionRequest',
     required: true,
     content: new OA\JsonContent(
@@ -506,12 +554,12 @@ use OpenApi\Attributes as OA;
             new OA\Property(
                 property: 'medicines',
                 type: 'array',
-                nullable: true,
                 items: new OA\Items(properties: [
                     new OA\Property(property: 'medicine_uuid', type: 'string', format: 'uuid'),
                     new OA\Property(property: 'quantity', type: 'integer', example: 1),
                     new OA\Property(property: 'dosage', type: 'string', example: '1 tabletka co 8 godzin'),
-                ])
+                ]),
+                nullable: true
             ),
         ]
     )

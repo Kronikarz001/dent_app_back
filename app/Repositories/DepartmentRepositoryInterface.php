@@ -3,35 +3,26 @@
 namespace App\Repositories;
 
 use App\Models\Department;
-use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
 
 /**
  * Summary of DepartmentRepositoryInterface
+ *
+ * @extends SearchableRepositoryInterface<Department>
  */
-interface DepartmentRepositoryInterface extends BasicRepositoryInterface
+interface DepartmentRepositoryInterface extends SearchableRepositoryInterface
 {
     /**
-     * @param string $uuid
-     * @return Department|null
-     */
-    public function findByUuid(string $uuid): ?Department;
-
-    /**
-     * @param array $data
-     * @return Department
-     */
-    public function create(array $data): Department;
-
-    /**
-     * @param Department|Model $model
-     * @param array $data
-     * @return Department
-     */
-    public function update(Department|Model $model, array $data): Department;
-
-    /**
-     * @param Model|Department $model
+     * @param Department $department
+     * @param User $user
      * @return bool
      */
-    public function delete(Model|Department $model): bool;
+    public function isManager(Department $department, User $user): bool;
+
+    /**
+     * @param Department $department
+     * @param string $userUuid
+     * @return bool
+     */
+    public function hasMember(Department $department, string $userUuid): bool;
 }

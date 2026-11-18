@@ -8,22 +8,27 @@ use App\Models\JobPosition;
 use App\Models\Permission;
 use App\Models\PermissionAssignment;
 use App\Models\PermissionGroup;
+use App\Models\PermissionRoute;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\UserGroup;
 use App\Search\PermissionSearch;
 use App\Search\Search;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * Summary of PermissionRepository
+ *
+ * @extends SearchableRepository<Permission>
  */
 class PermissionRepository extends SearchableRepository implements PermissionRepositoryInterface
 {
     /**
-     * @var string
+     * @var class-string<Permission>
      */
     protected string $modelClass = Permission::class;
 
@@ -40,15 +45,6 @@ class PermissionRepository extends SearchableRepository implements PermissionRep
     protected function getSearchModel(): Search
     {
         return $this->search;
-    }
-
-    /**
-     * @param string $uuid
-     * @return Permission|null
-     */
-    public function findByUuid(string $uuid): ?Permission
-    {
-        return Permission::where('uuid', $uuid)->first();
     }
 
     /**
@@ -163,6 +159,93 @@ class PermissionRepository extends SearchableRepository implements PermissionRep
         $allUuids = $directPermissionUuids->merge($viaGroupsPermissionUuids)->unique();
 
         return Permission::whereIn('uuid', $allUuids)->get()->map(fn (Permission $permission) => $permission->name)->values()->all();
+    }
+
+    /**
+     * @param string|null $routeName
+     * @return string|null
+     */
+    public function findResourceForRoute(?string $routeName): ?string
+    {
+        $resources = Cache::rememberForever(
+            PermissionRoute::CACHE_KEY,
+            fn () => PermissionRoute::query()->pluck('resource', 'route_name')->all()
+        );
+
+        return $resources[$routeName] ?? null;
+    }
+
+    /**
+     * @param Permission|PermissionGroup $grantable
+     * @param Model $assignable
+     * @param string|null $expiresAt
+     * @param string|null $grantedBy
+     * @return PermissionAssignment
+     */
+    public function grant(Permission|PermissionGroup $grantable, Model $assignable, ?string $expiresAt, ?string $grantedBy): PermissionAssignment
+    {
+        return PermissionAssignment::query()->firstOrCreate([
+            'grantable_type' => $grantable::class,
+            'grantable_id' => $grantable->uuid,
+            'assignable_type' => $assignable::class,
+            'assignable_id' => $assignable->uuid,
+        ], [
+            'expires_at' => $expiresAt,
+            'granted_by' => $grantedBy,
+        ]);
+    }
+
+    /**
+     * @param Permission|PermissionGroup $grantable
+     * @param Model $assignable
+     * @param string|null $expiresAt
+     * @param string $grantedBy
+     * @return PermissionAssignment
+     */
+    public function createGrant(Permission|PermissionGroup $grantable, Model $assignable, ?string $expiresAt, string $grantedBy): PermissionAssignment
+    {
+        return PermissionAssignment::query()->create([
+            'grantable_type' => $grantable::class,
+            'grantable_id' => $grantable->uuid,
+            'assignable_type' => $assignable::class,
+            'assignable_id' => $assignable->uuid,
+            'granted_by' => $grantedBy,
+            'expires_at' => $expiresAt,
+        ]);
+    }
+
+    /**
+     * @param PermissionGroup $group
+     * @param string[] $userUuids
+     * @param string|null $grantedBy
+     * @return array{attached: string[], detached: string[]}
+     */
+    public function syncGroupUsers(PermissionGroup $group, array $userUuids, ?string $grantedBy): array
+    {
+        $assignments = PermissionAssignment::query()
+            ->where('grantable_type', PermissionGroup::class)
+            ->where('grantable_id', $group->uuid)
+            ->where('assignable_type', User::class);
+
+        $current = (clone $assignments)->notExpired()->pluck('assignable_id')->all();
+        $attached = array_values(array_diff($userUuids, $current));
+        $detached = array_values(array_diff($current, $userUuids));
+
+        (clone $assignments)->whereNotIn('assignable_id', $userUuids)->delete();
+
+        foreach ($attached as $userUuid) {
+            PermissionAssignment::query()->updateOrCreate([
+                'grantable_type' => PermissionGroup::class,
+                'grantable_id' => $group->uuid,
+                'assignable_type' => User::class,
+                'assignable_id' => $userUuid,
+            ], [
+                'expires_at' => null,
+                'granted_by' => $grantedBy,
+            ]);
+        }
+
+        return ['attached' => $attached, 'detached' => $detached];
     }
 
     /**

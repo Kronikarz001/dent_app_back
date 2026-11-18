@@ -54,6 +54,44 @@ class PermissionMiddlewareTest extends TestCase
     /**
      * @return void
      */
+    public function testHeadRequestNeedsOnlyViewGrant(): void
+    {
+        $user = User::factory()->create(['is_admin' => false]);
+        $permission = Permission::where('resource', 'patient')->where('type', PermissionType::VIEW->value)->firstOrFail();
+        PermissionAssignment::create([
+            'grantable_type' => Permission::class,
+            'grantable_id' => $permission->uuid,
+            'assignable_type' => User::class,
+            'assignable_id' => $user->uuid,
+        ]);
+
+        $this->callApiWithLoggedUser($user)
+            ->head(route('patient.index'))
+            ->assertOk();
+    }
+
+    /**
+     * @return void
+     */
+    public function testViewGrantDoesNotAllowWriteRequest(): void
+    {
+        $user = User::factory()->create(['is_admin' => false]);
+        $permission = Permission::where('resource', 'patient')->where('type', PermissionType::VIEW->value)->firstOrFail();
+        PermissionAssignment::create([
+            'grantable_type' => Permission::class,
+            'grantable_id' => $permission->uuid,
+            'assignable_type' => User::class,
+            'assignable_id' => $user->uuid,
+        ]);
+
+        $this->callApiWithLoggedUser($user)
+            ->deleteJson(route('patient.destroy', ['patient' => Patient::factory()->create()->uuid]))
+            ->assertForbidden();
+    }
+
+    /**
+     * @return void
+     */
     public function testAdminBypassesResourcePermissionCheck(): void
     {
         $admin = User::factory()->create(['is_admin' => true]);

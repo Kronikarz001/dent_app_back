@@ -5,46 +5,31 @@ namespace App\Repositories;
 use App\Models\Announcement;
 use App\Search\AnnouncementSearch;
 use App\Search\Search;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Summary of AnnouncementRepository
+ *
+ * @extends SearchableRepository<Announcement>
+ */
 class AnnouncementRepository extends SearchableRepository implements AnnouncementRepositoryInterface
 {
+    /**
+     * @var class-string<Announcement>
+     */
     protected string $modelClass = Announcement::class;
 
+    /**
+     * @param AnnouncementSearch $search
+     */
     public function __construct(
-        private AnnouncementSearch $search
+        private readonly AnnouncementSearch $search
     ) {}
 
-    public function findAllWithPagination(array $params = []): LengthAwarePaginator
-    {
-        return $this->search->search($params);
-    }
-
+    /**
+     * @return Search
+     */
     protected function getSearchModel(): Search
     {
         return $this->search;
-    }
-
-    public function findByUuid(string $uuid): ?Announcement
-    {
-        return Announcement::where('uuid', $uuid)->first();
-    }
-
-    public function create(array $data): Announcement
-    {
-        return Announcement::create($data);
-    }
-
-    public function update(Announcement|Model $model, array $data): Announcement
-    {
-        $model->update($data);
-
-        return $model->fresh();
-    }
-
-    public function delete(Model|Announcement $model): bool
-    {
-        return $model->delete();
     }
 }

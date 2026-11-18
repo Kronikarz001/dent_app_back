@@ -2,36 +2,20 @@
 
 namespace App\Repositories;
 
+use App\Models\User;
 use App\Models\UserGroup;
-use Illuminate\Database\Eloquent\Model;
 
 /**
  * Summary of UserGroupRepositoryInterface
+ *
+ * @extends SearchableRepositoryInterface<UserGroup>
  */
-interface UserGroupRepositoryInterface extends BasicRepositoryInterface
+interface UserGroupRepositoryInterface extends SearchableRepositoryInterface
 {
     /**
-     * @param string $uuid
-     * @return UserGroup|null
-     */
-    public function findByUuid(string $uuid): ?UserGroup;
-
-    /**
-     * @param array $data
-     * @return UserGroup
-     */
-    public function create(array $data): UserGroup;
-
-    /**
-     * @param UserGroup|Model $model
-     * @param array $data
-     * @return UserGroup
-     */
-    public function update(UserGroup|Model $model, array $data): UserGroup;
-
-    /**
-     * @param Model|UserGroup $model
+     * @param UserGroup $group
+     * @param User $user
      * @return bool
      */
-    public function delete(Model|UserGroup $model): bool;
+    public function isManager(UserGroup $group, User $user): bool;
 }

@@ -3,12 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\AssignCalendarUsersRequest;
+use App\Http\Requests\CalendarIndexRequest;
 use App\Http\Requests\CalendarRequest;
 use App\Http\Requests\ExportRequest;
 use App\Http\Resources\CalendarResource;
 use App\Models\Calendar;
 use App\Services\CalendarServiceInterface;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use OpenApi\Attributes as OA;
 use PhpOffice\PhpSpreadsheet\Exception;
@@ -28,35 +31,55 @@ class CalendarController extends Controller
     ) {}
 
     /**
+     * @param CalendarIndexRequest $request
      * @return LengthAwarePaginator
      */
     #[OA\Get(
         path: '/api/calendar',
-        summary: 'Lista wydarzeń w kalendarzu',
+        summary: 'Lista wydarzeń w kalendarzu (z przypisanymi lekarzami i pacjentami)',
+        security: [['sanctum' => []]],
+        tags: ['Calendar'],
+        parameters: [
+            new OA\QueryParameter(name: 'calendar[user_uuids][]', description: 'Filtr po przypisanych lekarzach', required: false, schema: new OA\Schema(type: 'array', items: new OA\Items(type: 'string', format: 'uuid'))),
+            new OA\QueryParameter(name: 'calendar[date_from]', description: 'Wizyty kończące się nie wcześniej niż ta data', required: false, schema: new OA\Schema(type: 'string', format: 'date')),
+            new OA\QueryParameter(name: 'calendar[date_to]', description: 'Wizyty zaczynające się nie później niż ta data', required: false, schema: new OA\Schema(type: 'string', format: 'date')),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'OK',
+                content: new OA\JsonContent(type: 'array', items: new OA\Items(ref: '#/components/schemas/CalendarResource'))
+            ),
+        ]
+    )]
+    public function index(CalendarIndexRequest $request): LengthAwarePaginator
+    {
+        return $this->calendarService->getCalendars($request->filters());
+    }
+
+    /**
+     * @return AnonymousResourceCollection
+     */
+    #[OA\Get(
+        path: '/api/calendar/today',
+        summary: 'Dzisiejsze wizyty (posortowane po godzinie)',
         security: [['sanctum' => []]],
         tags: ['Calendar'],
         responses: [
             new OA\Response(
                 response: 200,
                 description: 'OK',
-                content: new OA\JsonContent(
-                    allOf: [
-                        new OA\Schema(ref: '#/components/schemas/PaginatedResponse'),
-                        new OA\Schema(properties: [
-                            new OA\Property(property: 'data', type: 'array', items: new OA\Items(ref: '#/components/schemas/CalendarResource')),
-                        ]),
-                    ]
-                )
+                content: new OA\JsonContent(type: 'array', items: new OA\Items(ref: '#/components/schemas/CalendarResource'))
             ),
         ]
     )]
-    public function index(): LengthAwarePaginator
+    public function today(): AnonymousResourceCollection
     {
-        return $this->calendarService->getCalendars();
+        return CalendarResource::collection($this->calendarService->getTodayCalendars());
     }
 
     /**
-     * @return LengthAwarePaginator
+     * @return Collection
      */
     #[OA\Get(
         path: '/api/calendar/selectlist',
@@ -64,10 +87,14 @@ class CalendarController extends Controller
         security: [['sanctum' => []]],
         tags: ['Calendar'],
         responses: [
-            new OA\Response(response: 200, description: 'OK'),
+            new OA\Response(
+                response: 200,
+                description: 'OK',
+                content: new OA\JsonContent(type: 'array', items: new OA\Items(ref: '#/components/schemas/SelectListItem'))
+            ),
         ]
     )]
-    public function selectList(): LengthAwarePaginator
+    public function selectList(): Collection
     {
         return $this->calendarService->getCalendarsList();
     }
@@ -97,7 +124,7 @@ class CalendarController extends Controller
     )]
     public function show(Calendar $calendar): CalendarResource
     {
-        return new CalendarResource($calendar);
+        return new CalendarResource($this->calendarService->getCalendarDetails($calendar));
     }
 
     /**

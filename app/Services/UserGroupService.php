@@ -3,13 +3,10 @@
 namespace App\Services;
 
 use App\Exceptions\PermissionDeniedException;
-use App\Models\Permission;
-use App\Models\PermissionAssignment;
-use App\Models\PermissionGroup;
 use App\Models\Role;
-use App\Models\User;
 use App\Models\UserGroup;
 use App\Repositories\UserGroupRepositoryInterface;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 
@@ -21,12 +18,12 @@ readonly class UserGroupService implements UserGroupServiceInterface
     /**
      * @param UserGroupRepositoryInterface $userGroupRepository
      * @param AuditServiceInterface $auditService
-     * @param PermissionServiceInterface $permissionService
+     * @param PermissionGrantServiceInterface $permissionGrantService
      */
     public function __construct(
         private UserGroupRepositoryInterface $userGroupRepository,
         private AuditServiceInterface $auditService,
-        private PermissionServiceInterface $permissionService,
+        private PermissionGrantServiceInterface $permissionGrantService,
     ) {}
 
     /**
@@ -38,11 +35,11 @@ readonly class UserGroupService implements UserGroupServiceInterface
     }
 
     /**
-     * @return LengthAwarePaginator
+     * @return Collection
      */
-    public function getUserGroupsList(): LengthAwarePaginator
+    public function getUserGroupsList(): Collection
     {
-        return $this->userGroupRepository->findAllWithPagination(['uuid', 'name']);
+        return $this->userGroupRepository->findSelectAll(['uuid', 'name']);
     }
 
     /**
@@ -84,7 +81,7 @@ readonly class UserGroupService implements UserGroupServiceInterface
             ->mapWithKeys(fn (array $entry) => [$entry['uuid'] => ['is_manager' => $entry['is_manager'] ?? false]])
             ->all();
 
-        $this->auditService->recordSync($group, 'users', $group->users()->sync($syncData));
+        $this->auditService->recordSync($group, 'users', $this->userGroupRepository->syncRelation($group, 'users', $syncData));
     }
 
     /**
@@ -96,28 +93,7 @@ readonly class UserGroupService implements UserGroupServiceInterface
      */
     public function assignPermissions(UserGroup $group, array $data): void
     {
-        /** @var User $actingUser */
-        $actingUser = Auth::user();
-
-        foreach ($data['permissions'] ?? [] as $permissionUuid) {
-            $permission = Permission::where('uuid', $permissionUuid)->firstOrFail();
-
-            if (! $actingUser->is_admin && ! $this->permissionService->hasPermissionGrant($actingUser, $permission)) {
-                throw new PermissionDeniedException('Nie posiadasz tego uprawnienia, nie możesz go nadać.');
-            }
-
-            $this->grant(Permission::class, $permission->uuid, $group, $data['expires_at'] ?? null);
-        }
-
-        foreach ($data['permission_groups'] ?? [] as $permissionGroupUuid) {
-            $permissionGroup = PermissionGroup::where('uuid', $permissionGroupUuid)->firstOrFail();
-
-            if (! $actingUser->is_admin && ! $this->permissionService->hasGroupGrant($actingUser, $permissionGroup)) {
-                throw new PermissionDeniedException('Nie posiadasz tej grupy uprawnień, nie możesz jej nadać.');
-            }
-
-            $this->grant(PermissionGroup::class, $permissionGroup->uuid, $group, $data['expires_at'] ?? null);
-        }
+        $this->permissionGrantService->assign($group, $data, Auth::user());
     }
 
     /**
@@ -127,7 +103,7 @@ readonly class UserGroupService implements UserGroupServiceInterface
      */
     public function assignJobPositions(UserGroup $group, array $data): void
     {
-        $this->auditService->recordSync($group, 'jobPositions', $group->jobPositions()->sync($data['job_positions'] ?? []));
+        $this->auditService->recordSync($group, 'jobPositions', $this->userGroupRepository->syncRelation($group, 'jobPositions', $data['job_positions'] ?? []));
     }
 
     /**
@@ -139,78 +115,6 @@ readonly class UserGroupService implements UserGroupServiceInterface
      */
     public function createManagedRole(UserGroup $group, array $data): Role
     {
-        /** @var User $actingUser */
-        $actingUser = Auth::user();
-
-        if (! $group->users()->where('users.uuid', $actingUser->uuid)->wherePivot('is_manager', true)->exists()) {
-            throw new PermissionDeniedException('Nie jesteś kierownikiem tej grupy użytkowników.');
-        }
-
-        foreach ($data['permissions'] ?? [] as $permissionUuid) {
-            $permission = Permission::where('uuid', $permissionUuid)->firstOrFail();
-
-            if (! $this->permissionService->hasContainerPermissionGrant(UserGroup::class, $group->uuid, $permission)) {
-                throw new PermissionDeniedException('Uprawnienie wykracza poza uprawnienia tej grupy użytkowników.');
-            }
-        }
-
-        foreach ($data['permission_groups'] ?? [] as $permissionGroupUuid) {
-            $permissionGroup = PermissionGroup::where('uuid', $permissionGroupUuid)->firstOrFail();
-
-            if (! $this->permissionService->hasContainerGroupGrant(UserGroup::class, $group->uuid, $permissionGroup)) {
-                throw new PermissionDeniedException('Grupa uprawnień wykracza poza uprawnienia tej grupy użytkowników.');
-            }
-        }
-
-        $role = Role::create(['name' => $data['name']]);
-        $group->roles()->attach($role->uuid);
-
-        foreach ($data['permissions'] ?? [] as $permissionUuid) {
-            $this->createGrantForRole($permissionUuid, Permission::class, $role, $actingUser);
-        }
-
-        foreach ($data['permission_groups'] ?? [] as $permissionGroupUuid) {
-            $this->createGrantForRole($permissionGroupUuid, PermissionGroup::class, $role, $actingUser);
-        }
-
-        return $role;
-    }
-
-    /**
-     * @param string $grantableType
-     * @param string $grantableUuid
-     * @param UserGroup $group
-     * @param string|null $expiresAt
-     * @return void
-     */
-    private function grant(string $grantableType, string $grantableUuid, UserGroup $group, ?string $expiresAt): void
-    {
-        PermissionAssignment::firstOrCreate([
-            'grantable_type' => $grantableType,
-            'grantable_id' => $grantableUuid,
-            'assignable_type' => UserGroup::class,
-            'assignable_id' => $group->uuid,
-        ], [
-            'expires_at' => $expiresAt,
-            'granted_by' => Auth::id(),
-        ]);
-    }
-
-    /**
-     * @param string $grantableUuid
-     * @param string $grantableType
-     * @param Role $role
-     * @param User $grantedBy
-     * @return void
-     */
-    private function createGrantForRole(string $grantableUuid, string $grantableType, Role $role, User $grantedBy): void
-    {
-        PermissionAssignment::create([
-            'grantable_type' => $grantableType,
-            'grantable_id' => $grantableUuid,
-            'assignable_type' => Role::class,
-            'assignable_id' => $role->uuid,
-            'granted_by' => $grantedBy->uuid,
-        ]);
+        return $this->permissionGrantService->createManagedRole($group, $data, Auth::user());
     }
 }

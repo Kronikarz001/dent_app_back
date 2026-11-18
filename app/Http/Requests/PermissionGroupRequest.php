@@ -23,7 +23,8 @@ class PermissionGroupRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string'],
+            'name' => ['required', 'string', 'max:255'],
+            'description' => ['nullable', 'string', 'max:1000'],
         ];
     }
 
@@ -34,6 +35,7 @@ class PermissionGroupRequest extends FormRequest
     {
         return [
             'name.required' => 'Nazwa jest wymagana.',
+            'description.max' => 'Opis może mieć maksymalnie 1000 znaków.',
         ];
     }
 }

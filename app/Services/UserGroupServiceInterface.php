@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Role;
 use App\Models\UserGroup;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 /**
@@ -17,9 +18,9 @@ interface UserGroupServiceInterface
     public function getUserGroups(): LengthAwarePaginator;
 
     /**
-     * @return LengthAwarePaginator
+     * @return Collection
      */
-    public function getUserGroupsList(): LengthAwarePaginator;
+    public function getUserGroupsList(): Collection;
 
     /**
      * @param array $data

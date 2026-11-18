@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Department;
 use App\Models\Role;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 /**
@@ -17,9 +18,9 @@ interface DepartmentServiceInterface
     public function getDepartments(): LengthAwarePaginator;
 
     /**
-     * @return LengthAwarePaginator
+     * @return Collection
      */
-    public function getDepartmentsList(): LengthAwarePaginator;
+    public function getDepartmentsList(): Collection;
 
     /**
      * @param array $data

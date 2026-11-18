@@ -28,6 +28,15 @@ readonly class AnnouncementService implements AnnouncementServiceInterface
     }
 
     /**
+     * @param Announcement $announcement
+     * @return Announcement
+     */
+    public function getAnnouncement(Announcement $announcement): Announcement
+    {
+        return $this->announcementRepository->loadRelations($announcement, ['author']);
+    }
+
+    /**
      * @param array $data
      * @return Announcement
      */

@@ -4,9 +4,10 @@ namespace App\Search;
 
 use App\Repositories\SearchRepositoryInterface;
 use App\Services\SearchServiceInterface;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 /**
  * Summary of Search
@@ -75,6 +76,14 @@ abstract class Search implements SearchInterface
     }
 
     /**
+     * @return array<string, string>
+     */
+    protected function defaultSort(): array
+    {
+        return [];
+    }
+
+    /**
      * @return array
      */
     protected function relationsCount(): array
@@ -91,31 +100,66 @@ abstract class Search implements SearchInterface
     }
 
     /**
+     * @param string[] $columns
      * @return string[]
      */
-    protected function selectColumns(): array
+    protected function selectColumns(array $columns = []): array
     {
-        $query = $this->searchRepository->createQuery($this->modelClass());
+        $table = $this->searchRepository->createQuery($this->modelClass())->getModel()->getTable();
 
-        return [$query->getModel()->getTable().'.*'];
+        if ($columns === []) {
+            return [$table.'.*'];
+        }
+
+        return array_map(fn (string $column) => $table.'.'.$column, $columns);
+    }
+
+    /**
+     * @return string[]
+     */
+    protected function selectRelations(): array
+    {
+        return [];
     }
 
     /**
      * @param array $params
+     * @param string[] $columns
+     * @param int|null $perPage
      * @return LengthAwarePaginator
      */
-    final public function search(array $params = []): LengthAwarePaginator
+    final public function search(array $params = [], array $columns = [], ?int $perPage = null): LengthAwarePaginator
+    {
+        return $this->searchRepository->paginate($this->buildQuery($params, $columns), $perPage ?? $this->resolvePerPage());
+    }
+
+    /**
+     * @param array $params
+     * @param string[] $columns
+     * @return Collection
+     */
+    final public function searchAll(array $params = [], array $columns = []): Collection
+    {
+        return $this->searchRepository->get($this->buildQuery($params, $columns));
+    }
+
+    /**
+     * @param array $params
+     * @param string[] $columns
+     * @return Builder
+     */
+    private function buildQuery(array $params, array $columns): Builder
     {
         $query = $this->searchRepository->createQuery($this->modelClass());
 
-        $this->searchRepository->applySelect($query, $this->selectColumns());
+        $this->searchRepository->applySelect($query, $this->selectColumns($columns));
 
         $this->searchService->applyRelations(
             $query,
-            array_merge(
+            $columns === [] ? array_merge(
                 $this->relationsShipLoad(),
                 $this->searchService->buildRecursiveRelationPaths($this->recursiveRelations())
-            ),
+            ) : $this->selectRelations(),
             $this->relationsCount()
         );
 
@@ -124,7 +168,15 @@ abstract class Search implements SearchInterface
         $this->applySearchString($query);
         $this->applySort($query);
 
-        return $this->searchRepository->paginate($query, (int) $this->request->get('perPage', -1));
+        return $query;
+    }
+
+    /**
+     * @return int
+     */
+    protected function resolvePerPage(): int
+    {
+        return (int) $this->request->get('perPage', config('search.default_per_page'));
     }
 
     /**
@@ -187,6 +239,10 @@ abstract class Search implements SearchInterface
     {
         $sortParam = $this->request->get(config('search.sort_keyword'));
         if ($sortParam === null) {
+            foreach ($this->defaultSort() as $column => $direction) {
+                $this->searchRepository->orderBy($query, $query->getModel()->getTable().'.'.$column, $direction);
+            }
+
             return;
         }
 

@@ -23,9 +23,9 @@ class JobPositionFileController extends Controller
 
     #[OA\Get(
         path: '/api/job-position/{jobPosition}/file',
-        tags: ['JobPositionFile'],
         summary: 'Lista plików stanowiska (paginacja)',
         security: [['sanctum' => []]],
+        tags: ['JobPositionFile'],
         parameters: [
             new OA\PathParameter(name: 'jobPosition', schema: new OA\Schema(type: 'string', format: 'uuid')),
         ],

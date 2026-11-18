@@ -42,6 +42,15 @@ readonly class PrescriptionService implements PrescriptionServiceInterface
     }
 
     /**
+     * @param Prescription $prescription
+     * @return Prescription
+     */
+    public function getPrescription(Prescription $prescription): Prescription
+    {
+        return $this->prescriptionRepository->loadRelations($prescription, ['patient', 'doctor', 'medicines']);
+    }
+
+    /**
      * @param array $data
      * @return Prescription
      */
@@ -116,6 +125,6 @@ readonly class PrescriptionService implements PrescriptionServiceInterface
             ],
         ])->all();
 
-        $this->auditService->recordSync($prescription, 'medicines', $prescription->medicines()->sync($syncPayload));
+        $this->auditService->recordSync($prescription, 'medicines', $this->prescriptionRepository->syncRelation($prescription, 'medicines', $syncPayload));
     }
 }

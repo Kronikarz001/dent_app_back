@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Dto\PatientStatisticsDto;
 use App\Http\Requests\ExportRequest;
 use App\Models\Patient;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\Writer\Exception as WriterException;
@@ -21,9 +22,9 @@ interface PatientServiceInterface
     public function getPatients(): LengthAwarePaginator;
 
     /**
-     * @return LengthAwarePaginator
+     * @return Collection
      */
-    public function getPatientsList(): LengthAwarePaginator;
+    public function getPatientsList(): Collection;
 
     /**
      * @return LengthAwarePaginator
@@ -54,6 +55,12 @@ interface PatientServiceInterface
      * @return PatientStatisticsDto
      */
     public function getStatistics(Patient $patient): PatientStatisticsDto;
+
+    /**
+     * @param Patient $patient
+     * @return LengthAwarePaginator
+     */
+    public function getVisits(Patient $patient): LengthAwarePaginator;
 
     /**
      * @param ExportRequest $request

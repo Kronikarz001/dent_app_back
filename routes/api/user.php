@@ -17,10 +17,10 @@ Route::middleware('auth:sanctum')->group(function () {
         ->name('user.export');
     Route::get('/user/selectlist', [UserController::class, 'selectList'])
         ->name('user.selectList');
+    Route::get('/user/working-today', [UserController::class, 'workingToday'])
+        ->name('user.workingToday');
     Route::patch('/user/edit-password', [UserController::class, 'editPassword'])
         ->name('user.edit_password');
-    Route::patch('/user/{user}/permissions', [UserController::class, 'assignPermissions'])
-        ->name('user.assignPermissions');
     Route::apiResource('/user', UserController::class)
         ->names('user');
 

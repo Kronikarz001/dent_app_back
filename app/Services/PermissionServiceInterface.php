@@ -6,6 +6,7 @@ use App\Enums\PermissionType;
 use App\Models\Permission;
 use App\Models\PermissionGroup;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 /**
@@ -19,9 +20,9 @@ interface PermissionServiceInterface
     public function getPermissions(): LengthAwarePaginator;
 
     /**
-     * @return LengthAwarePaginator
+     * @return Collection
      */
-    public function getPermissionsList(): LengthAwarePaginator;
+    public function getPermissionsList(): Collection;
 
     /**
      * @param User $user
@@ -30,6 +31,12 @@ interface PermissionServiceInterface
      * @return bool
      */
     public function hasPermission(User $user, string $resource, PermissionType $type): bool;
+
+    /**
+     * @param string|null $routeName
+     * @return string|null
+     */
+    public function findResourceForRoute(?string $routeName): ?string;
 
     /**
      * @param User $user

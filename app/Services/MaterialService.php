@@ -6,6 +6,7 @@ use App\Exports\MaterialExport;
 use App\Http\Requests\ExportRequest;
 use App\Models\Material;
 use App\Repositories\MaterialRepositoryInterface;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\Writer\Exception as WriterException;
@@ -36,11 +37,11 @@ readonly class MaterialService implements MaterialServiceInterface
     }
 
     /**
-     * @return LengthAwarePaginator
+     * @return Collection
      */
-    public function getMaterialsList(): LengthAwarePaginator
+    public function getMaterialsList(): Collection
     {
-        return $this->materialRepository->findAllWithPagination(['uuid', 'name']);
+        return $this->materialRepository->findSelectAll(['uuid', 'name']);
     }
 
     /**
@@ -52,7 +53,7 @@ readonly class MaterialService implements MaterialServiceInterface
         $material = $this->materialRepository->create($data);
 
         if (array_key_exists('dental_examinations', $data)) {
-            $this->auditService->recordSync($material, 'dental_examinations', $material->dentalExaminations()->sync($data['dental_examinations']));
+            $this->auditService->recordSync($material, 'dental_examinations', $this->materialRepository->syncRelation($material, 'dentalExaminations', $data['dental_examinations']));
         }
 
         return $material;
@@ -68,7 +69,7 @@ readonly class MaterialService implements MaterialServiceInterface
         $material = $this->materialRepository->update($material, $data);
 
         if (array_key_exists('dental_examinations', $data)) {
-            $this->auditService->recordSync($material, 'dental_examinations', $material->dentalExaminations()->sync($data['dental_examinations']));
+            $this->auditService->recordSync($material, 'dental_examinations', $this->materialRepository->syncRelation($material, 'dentalExaminations', $data['dental_examinations']));
         }
 
         return $material;
@@ -92,6 +93,6 @@ readonly class MaterialService implements MaterialServiceInterface
      */
     public function export(ExportRequest $request): BinaryFileResponse
     {
-        return $this->exportService->export($request, new MaterialExport($this->getMaterials()->getCollection()), Material::getModel());
+        return $this->exportService->export($request, new MaterialExport($this->materialRepository->findAllWithPagination(perPage: -1)->getCollection()), Material::getModel());
     }
 }

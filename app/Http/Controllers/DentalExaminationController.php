@@ -7,6 +7,7 @@ use App\Http\Requests\ExportRequest;
 use App\Http\Resources\DentalExaminationResource;
 use App\Models\DentalExamination;
 use App\Services\DentalExaminationServiceInterface;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Pagination\LengthAwarePaginator;
 use OpenApi\Attributes as OA;
@@ -55,7 +56,7 @@ class DentalExaminationController extends Controller
     }
 
     /**
-     * @return LengthAwarePaginator
+     * @return Collection
      */
     #[OA\Get(
         path: '/api/dental-examination/selectlist',
@@ -63,10 +64,14 @@ class DentalExaminationController extends Controller
         security: [['sanctum' => []]],
         tags: ['DentalExamination'],
         responses: [
-            new OA\Response(response: 200, description: 'OK'),
+            new OA\Response(
+                response: 200,
+                description: 'OK',
+                content: new OA\JsonContent(type: 'array', items: new OA\Items(ref: '#/components/schemas/SelectListItem'))
+            ),
         ]
     )]
-    public function selectList(): LengthAwarePaginator
+    public function selectList(): Collection
     {
         return $this->dentalExaminationService->getDentalExaminationsList();
     }

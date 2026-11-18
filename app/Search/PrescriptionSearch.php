@@ -3,6 +3,7 @@
 namespace App\Search;
 
 use App\Models\Prescription;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
@@ -69,7 +70,20 @@ class PrescriptionSearch extends Search
      * @param array $params
      * @return void
      */
-    protected function preFilter(Builder $query, array $params): void {}
+    protected function preFilter(Builder $query, array $params): void
+    {
+        $query->where($params);
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    protected function defaultSort(): array
+    {
+        return [
+            'created_at' => 'desc',
+        ];
+    }
 
     /**
      * @return array
@@ -77,8 +91,9 @@ class PrescriptionSearch extends Search
     protected function relationsShipLoad(): array
     {
         return [
-            'patient',
-            'doctor',
+            'patient.phoneNumbers',
+            ...array_map(fn (string $relation) => 'patient.doctor.'.$relation, User::RESOURCE_RELATIONS),
+            ...array_map(fn (string $relation) => 'doctor.'.$relation, User::RESOURCE_RELATIONS),
             'medicines',
         ];
     }

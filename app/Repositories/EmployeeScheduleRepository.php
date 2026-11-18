@@ -3,98 +3,60 @@
 namespace App\Repositories;
 
 use App\Models\EmployeeSchedule;
+use App\Repositories\Concerns\FindsScheduleOverlaps;
 use App\Search\EmployeeScheduleSearch;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use App\Search\Search;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 /**
  * Summary of EmployeeScheduleRepository
+ *
+ * @extends SearchableRepository<EmployeeSchedule>
  */
-readonly class EmployeeScheduleRepository implements EmployeeScheduleRepositoryInterface
+class EmployeeScheduleRepository extends SearchableRepository implements EmployeeScheduleRepositoryInterface
 {
+    use FindsScheduleOverlaps;
+
+    /**
+     * @var class-string<EmployeeSchedule>
+     */
+    protected string $modelClass = EmployeeSchedule::class;
+
     /**
      * @param EmployeeScheduleSearch $search
      */
     public function __construct(
-        private EmployeeScheduleSearch $search
+        private readonly EmployeeScheduleSearch $search
     ) {}
 
     /**
-     * @param array $params
-     * @return LengthAwarePaginator
+     * @return Search
      */
-    public function findAllWithPagination(array $params = []): LengthAwarePaginator
+    protected function getSearchModel(): Search
     {
-        return $this->search->search($params);
+        return $this->search;
     }
 
     /**
-     * @param array $columns
-     * @param array $params
-     * @return LengthAwarePaginator
+     * @param string[] $userUuids
+     * @param string $dateFrom
+     * @param string $dateTo
+     * @return Collection<int, EmployeeSchedule>
      */
-    public function findSelectAllWithPagination(array $columns = ['*'], array $params = []): LengthAwarePaginator
+    public function findActiveForUsersBetween(array $userUuids, string $dateFrom, string $dateTo): Collection
     {
-        return $this->search->search($params);
-    }
+        $forUsers = fn (Builder|MorphToMany $users) => $users->whereIn('users.uuid', $userUuids);
 
-    /**
-     * @param string $uuid
-     * @return EmployeeSchedule|null
-     */
-    public function findByUuid(string $uuid): ?EmployeeSchedule
-    {
-        return EmployeeSchedule::where('uuid', $uuid)->first();
-    }
-
-    /**
-     * @param array $data
-     * @return EmployeeSchedule
-     */
-    public function create(array $data): EmployeeSchedule
-    {
-        return EmployeeSchedule::create($data);
-    }
-
-    /**
-     * @param EmployeeSchedule|Model $model
-     * @param array $data
-     * @return EmployeeSchedule
-     */
-    public function update(EmployeeSchedule|Model $model, array $data): EmployeeSchedule
-    {
-        $model->update($data);
-
-        return $model->fresh();
-    }
-
-    /**
-     * @param array $uuids
-     * @return Collection
-     */
-    public function findAllByUuids(array $uuids): Collection
-    {
-        return EmployeeSchedule::whereIn('uuid', $uuids)->get();
-    }
-
-    /**
-     * @param string $modelClass
-     * @param array $uniqueAttributes
-     * @param array $values
-     * @return EmployeeSchedule
-     */
-    public function createOrUpdate(string $modelClass, array $uniqueAttributes, array $values): EmployeeSchedule
-    {
-        return $modelClass::updateOrCreate($uniqueAttributes, $values);
-    }
-
-    /**
-     * @param EmployeeSchedule|Model $model
-     * @return bool
-     */
-    public function delete(EmployeeSchedule|Model $model): bool
-    {
-        return $model->delete();
+        return $this->query()
+            ->where('is_active', true)
+            ->whereDate('date', '<=', $dateTo)
+            ->whereRaw('COALESCE(end_date, date) >= ?', [$dateFrom])
+            ->whereHas('users', $forUsers)
+            ->with(['users' => fn (MorphToMany $users) => $forUsers($users)->select('users.uuid')])
+            ->orderBy('date')
+            ->orderBy('start_time')
+            ->get();
     }
 }

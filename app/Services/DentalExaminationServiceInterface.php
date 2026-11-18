@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Http\Requests\ExportRequest;
 use App\Models\DentalExamination;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\Writer\Exception as WriterException;
@@ -20,9 +21,9 @@ interface DentalExaminationServiceInterface
     public function getDentalExaminations(): LengthAwarePaginator;
 
     /**
-     * @return LengthAwarePaginator
+     * @return Collection
      */
-    public function getDentalExaminationsList(): LengthAwarePaginator;
+    public function getDentalExaminationsList(): Collection;
 
     /**
      * @param array $data

@@ -9,6 +9,7 @@ use App\Models\DentalExamination;
 use App\Models\Material;
 use App\Models\User;
 use App\Services\DentalExaminationServiceInterface;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Application;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
@@ -51,13 +52,13 @@ class DentalExaminationServiceTest extends TestCase
     /**
      * @return void
      */
-    public function testGetDentalExaminationsListReturnsPaginator(): void
+    public function testGetDentalExaminationsListReturnsCollection(): void
     {
         DentalExamination::factory()->count(2)->create();
 
         $result = $this->service->getDentalExaminationsList();
 
-        $this->assertInstanceOf(LengthAwarePaginator::class, $result);
+        $this->assertInstanceOf(Collection::class, $result);
     }
 
     /**

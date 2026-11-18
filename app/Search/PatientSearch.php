@@ -37,6 +37,7 @@ class PatientSearch extends Search
             'email',
             'pesel',
             'is_active',
+            'romexis_patient_id',
         ];
     }
 

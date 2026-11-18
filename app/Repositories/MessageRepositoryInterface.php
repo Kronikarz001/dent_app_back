@@ -4,38 +4,14 @@ namespace App\Repositories;
 
 use App\Models\Message;
 use App\Models\User;
-use Illuminate\Database\Eloquent\Model;
 
 /**
  * Summary of MessageRepositoryInterface
+ *
+ * @extends SearchableRepositoryInterface<Message>
  */
-interface MessageRepositoryInterface extends BasicRepositoryInterface
+interface MessageRepositoryInterface extends SearchableRepositoryInterface
 {
-    /**
-     * @param string $uuid
-     * @return Message|null
-     */
-    public function findByUuid(string $uuid): ?Message;
-
-    /**
-     * @param array $data
-     * @return Message
-     */
-    public function create(array $data): Message;
-
-    /**
-     * @param Message|Model $model
-     * @param array $data
-     * @return Message
-     */
-    public function update(Message|Model $model, array $data): Message;
-
-    /**
-     * @param Model|Message $model
-     * @return bool
-     */
-    public function delete(Model|Message $model): bool;
-
     /**
      * @param Message $message
      * @param string $groupUuid

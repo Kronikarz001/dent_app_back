@@ -5,16 +5,16 @@ namespace App\Repositories;
 use App\Models\Material;
 use App\Search\MaterialSearch;
 use App\Search\Search;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Model;
 
 /**
  * Summary of MaterialRepository
+ *
+ * @extends SearchableRepository<Material>
  */
 class MaterialRepository extends SearchableRepository implements MaterialRepositoryInterface
 {
     /**
-     * @var string
+     * @var class-string<Material>
      */
     protected string $modelClass = Material::class;
 
@@ -22,17 +22,8 @@ class MaterialRepository extends SearchableRepository implements MaterialReposit
      * @param MaterialSearch $search
      */
     public function __construct(
-        private MaterialSearch $search
+        private readonly MaterialSearch $search
     ) {}
-
-    /**
-     * @param array $params
-     * @return LengthAwarePaginator
-     */
-    public function findAllWithPagination(array $params = []): LengthAwarePaginator
-    {
-        return $this->search->search($params);
-    }
 
     /**
      * @return Search
@@ -40,44 +31,5 @@ class MaterialRepository extends SearchableRepository implements MaterialReposit
     protected function getSearchModel(): Search
     {
         return $this->search;
-    }
-
-    /**
-     * @param string $uuid
-     * @return Material|null
-     */
-    public function findByUuid(string $uuid): ?Material
-    {
-        return Material::where('uuid', $uuid)->first();
-    }
-
-    /**
-     * @param array $data
-     * @return Material
-     */
-    public function create(array $data): Material
-    {
-        return Material::create($data);
-    }
-
-    /**
-     * @param Material|Model $model
-     * @param array $data
-     * @return Material
-     */
-    public function update(Material|Model $model, array $data): Material
-    {
-        $model->update($data);
-
-        return $model->fresh();
-    }
-
-    /**
-     * @param Material|Model $model
-     * @return bool
-     */
-    public function delete(Material|Model $model): bool
-    {
-        return $model->delete();
     }
 }

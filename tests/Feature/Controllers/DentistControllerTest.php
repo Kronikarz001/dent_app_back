@@ -111,4 +111,28 @@ class DentistControllerTest extends TestCase
 
         $response->assertUnauthorized();
     }
+
+    /**
+     * @return void
+     */
+    public function testSelectListReturnsPlainArrayWithJobPositionAndAvatar(): void
+    {
+        $dentistPosition = $this->dentistJobPosition();
+        $dentist = User::factory()->create(['first_name' => 'Dominika', 'last_name' => 'Zalewska']);
+        $dentist->update(['job_position_uuid' => $dentistPosition->uuid]);
+        User::factory()->create();
+
+        $response = $this->callApiWithLoggedUser()
+            ->getJson(route('dentist.selectList'));
+
+        $response->assertOk();
+        $this->assertTrue(array_is_list($response->json()));
+        $response->assertExactJson([[
+            'uuid' => $dentist->uuid,
+            'first_name' => 'Dominika',
+            'last_name' => 'Zalewska',
+            'avatar_path' => null,
+            'job_position' => ['uuid' => $dentistPosition->uuid, 'name' => JobPosition::DENTIST_NAME],
+        ]]);
+    }
 }

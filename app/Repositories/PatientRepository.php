@@ -3,18 +3,20 @@
 namespace App\Repositories;
 
 use App\Models\Patient;
+use App\Models\User;
 use App\Search\PatientSearch;
 use App\Search\Search;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 /**
  * Summary of PatientRepository
+ *
+ * @extends SearchableRepository<Patient>
  */
 class PatientRepository extends SearchableRepository implements PatientRepositoryInterface
 {
     /**
-     * @var string
+     * @var class-string<Patient>
      */
     protected string $modelClass = Patient::class;
 
@@ -26,15 +28,6 @@ class PatientRepository extends SearchableRepository implements PatientRepositor
     ) {}
 
     /**
-     * @param array $params
-     * @return LengthAwarePaginator
-     */
-    public function findAllWithPagination(array $params = []): LengthAwarePaginator
-    {
-        return $this->search->search($params);
-    }
-
-    /**
      * @return Search
      */
     protected function getSearchModel(): Search
@@ -43,52 +36,19 @@ class PatientRepository extends SearchableRepository implements PatientRepositor
     }
 
     /**
-     * @param string $uuid
-     * @return Patient|null
-     */
-    public function findByUuid(string $uuid): ?Patient
-    {
-        return Patient::where('uuid', $uuid)->first();
-    }
-
-    /**
-     * @return LengthAwarePaginator
+     * @return LengthAwarePaginator<int, Patient>
      */
     public function findAllWithRomexisId(): LengthAwarePaginator
     {
-        return Patient::query()
-            ->select(['uuid', 'romexis_patient_id'])
-            ->whereNotNull('romexis_patient_id')
-            ->paginate();
+        return $this->search->search(['romexis_patient_id' => 'not_null'], ['uuid', 'romexis_patient_id']);
     }
 
     /**
-     * @param array $data
-     * @return Patient
+     * @param Patient $patient
+     * @return User|null
      */
-    public function create(array $data): Patient
+    public function findDoctor(Patient $patient): ?User
     {
-        return Patient::create($data);
-    }
-
-    /**
-     * @param Patient|Model $model
-     * @param array $data
-     * @return Patient
-     */
-    public function update(Patient|Model $model, array $data): Patient
-    {
-        $model->update($data);
-
-        return $model->fresh();
-    }
-
-    /**
-     * @param Patient|Model $model
-     * @return bool
-     */
-    public function delete(Patient|Model $model): bool
-    {
-        return $model->delete();
+        return $patient->doctor()->with('jobPosition')->first();
     }
 }

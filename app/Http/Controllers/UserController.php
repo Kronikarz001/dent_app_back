@@ -2,17 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\AssignPermissionsRequest;
 use App\Http\Requests\EditPasswordRequest;
 use App\Http\Requests\ExportRequest;
 use App\Http\Requests\UserStoreRequest;
 use App\Http\Requests\UserUpdateRequest;
 use App\Http\Resources\LoggedUserResource;
 use App\Http\Resources\UserResource;
+use App\Http\Resources\UserSelectResource;
 use App\Models\User;
 use App\Services\PermissionServiceInterface;
 use App\Services\UserServiceInterface;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use OpenApi\Attributes as OA;
 use PhpOffice\PhpSpreadsheet\Exception;
@@ -62,20 +63,45 @@ class UserController extends Controller
     }
 
     /**
-     * @return LengthAwarePaginator
+     * @return AnonymousResourceCollection
      */
     #[OA\Get(
         path: '/api/user/selectlist',
-        summary: 'Lista użytkowników do selecta (uuid + name)',
+        summary: 'Lista użytkowników do selecta',
         security: [['sanctum' => []]],
         tags: ['User'],
         responses: [
-            new OA\Response(response: 200, description: 'OK'),
+            new OA\Response(
+                response: 200,
+                description: 'OK',
+                content: new OA\JsonContent(type: 'array', items: new OA\Items(ref: '#/components/schemas/UserSelectResource'))
+            ),
         ]
     )]
-    public function selectList(): LengthAwarePaginator
+    public function selectList(): AnonymousResourceCollection
     {
-        return $this->userService->getUsersList();
+        return UserSelectResource::collection($this->userService->getUsersList());
+    }
+
+    /**
+     * @return AnonymousResourceCollection
+     */
+    #[OA\Get(
+        path: '/api/user/working-today',
+        summary: 'Pracownicy, którzy mają dziś zaplanowaną pracę w grafiku',
+        security: [['sanctum' => []]],
+        tags: ['User'],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'OK',
+                content: new OA\JsonContent(type: 'array', items: new OA\Items(ref: '#/components/schemas/UserSelectResource'))
+            ),
+        ]
+    )]
+    public function workingToday(): AnonymousResourceCollection
+    {
+        return UserSelectResource::collection($this->userService->getUsersWorkingToday());
     }
 
     /**
@@ -310,33 +336,6 @@ class UserController extends Controller
     public function editPassword(EditPasswordRequest $request): JsonResponse
     {
         $this->userService->editPassword($this->userService->getLoggedUser(), $request->all());
-
-        return new JsonResponse(null, 204);
-    }
-
-    /**
-     * @param User $user
-     * @param AssignPermissionsRequest $request
-     * @return JsonResponse
-     */
-    #[OA\Patch(
-        path: '/api/user/{uuid}/permissions',
-        summary: 'Nadaje użytkownikowi uprawnienia lub grupy uprawnień bezpośrednio (opcjonalnie czasowo)',
-        security: [['sanctum' => []]],
-        requestBody: new OA\RequestBody(ref: '#/components/requestBodies/AssignPermissionsRequest'),
-        tags: ['User'],
-        parameters: [
-            new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
-        ],
-        responses: [
-            new OA\Response(response: 204, description: 'Nadano'),
-            new OA\Response(response: 404, description: 'Nie znaleziono'),
-            new OA\Response(response: 422, description: 'Błąd walidacji'),
-        ]
-    )]
-    public function assignPermissions(User $user, AssignPermissionsRequest $request): JsonResponse
-    {
-        $this->userService->assignPermissions($user, $request->all());
 
         return new JsonResponse(null, 204);
     }

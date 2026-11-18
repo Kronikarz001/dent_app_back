@@ -5,10 +5,13 @@ namespace App\Services;
 use App\Dto\PatientStatisticsDto;
 use App\Exports\PatientExport;
 use App\Http\Requests\ExportRequest;
+use App\Mappers\PatientVisitMapper;
+use App\Models\Calendar;
 use App\Models\Patient;
 use App\Repositories\AuditRepositoryInterface;
 use App\Repositories\CalendarRepositoryInterface;
 use App\Repositories\PatientRepositoryInterface;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\Writer\Exception as WriterException;
@@ -25,6 +28,7 @@ readonly class PatientService implements PatientServiceInterface
      * @param PhoneNumberServiceInterface $phoneNumberService
      * @param CalendarRepositoryInterface $calendarRepository
      * @param AuditRepositoryInterface $auditRepository
+     * @param PatientVisitMapper $patientVisitMapper
      */
     public function __construct(
         private PatientRepositoryInterface $patientRepository,
@@ -32,6 +36,7 @@ readonly class PatientService implements PatientServiceInterface
         private PhoneNumberServiceInterface $phoneNumberService,
         private CalendarRepositoryInterface $calendarRepository,
         private AuditRepositoryInterface $auditRepository,
+        private PatientVisitMapper $patientVisitMapper,
     ) {}
 
     /**
@@ -43,11 +48,11 @@ readonly class PatientService implements PatientServiceInterface
     }
 
     /**
-     * @return LengthAwarePaginator
+     * @return Collection
      */
-    public function getPatientsList(): LengthAwarePaginator
+    public function getPatientsList(): Collection
     {
-        return $this->patientRepository->findAllWithPagination(['uuid', 'name']);
+        return $this->patientRepository->findSelectAll(['uuid', 'first_name', 'last_name']);
     }
 
     /**
@@ -96,19 +101,31 @@ readonly class PatientService implements PatientServiceInterface
      */
     public function getStatistics(Patient $patient): PatientStatisticsDto
     {
-        $leadDoctor = $patient->doctor()->with('jobPosition')->first();
+        $leadDoctor = $this->patientRepository->findDoctor($patient);
+        $lastVisit = $this->calendarRepository->findLastVisitForPatient($patient);
+        $nextVisit = $this->calendarRepository->findNextVisitForPatient($patient);
 
         return new PatientStatisticsDto(
-            $this->calendarRepository->findLastVisitForPatient($patient),
-            $this->calendarRepository->findNextVisitForPatient($patient),
+            $lastVisit === null ? null : $this->patientVisitMapper->map($lastVisit),
+            $nextVisit === null ? null : $this->patientVisitMapper->map($nextVisit),
             $this->calendarRepository->countForPatient($patient, true),
             $this->calendarRepository->countForPatient($patient),
-            $this->calendarRepository->findLastNoShowForPatient($patient),
+            $this->calendarRepository->findLastNoShowForPatient($patient)?->startsAt(),
             $leadDoctor,
             $leadDoctor === null
                 ? null
-                : $this->auditRepository->findLatestChangeTo($patient, 'doctor_uuid', $leadDoctor->uuid)?->created_at,
+                : $this->auditRepository->findLatestChangeTo($patient, 'doctor_uuid', $leadDoctor->uuid)?->created_at?->toDateString(),
         );
+    }
+
+    /**
+     * @param Patient $patient
+     * @return LengthAwarePaginator
+     */
+    public function getVisits(Patient $patient): LengthAwarePaginator
+    {
+        return $this->calendarRepository->findVisitsForPatient($patient)
+            ->through(fn (Calendar $calendar) => $this->patientVisitMapper->map($calendar));
     }
 
     /**
@@ -120,6 +137,6 @@ readonly class PatientService implements PatientServiceInterface
      */
     public function export(ExportRequest $request): BinaryFileResponse
     {
-        return $this->exportService->export($request, new PatientExport($this->getPatients()->getCollection()), Patient::getModel());
+        return $this->exportService->export($request, new PatientExport($this->patientRepository->findAllWithPagination(perPage: -1)->getCollection()), Patient::getModel());
     }
 }

@@ -13,8 +13,10 @@ use App\Http\Resources\DepartmentResource;
 use App\Http\Resources\RoleResource;
 use App\Models\Department;
 use App\Services\DepartmentServiceInterface;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Gate;
 use OpenApi\Attributes as OA;
 
 /**
@@ -58,7 +60,7 @@ class DepartmentController extends Controller
     }
 
     /**
-     * @return LengthAwarePaginator
+     * @return Collection
      */
     #[OA\Get(
         path: '/api/department/selectlist',
@@ -66,10 +68,14 @@ class DepartmentController extends Controller
         security: [['sanctum' => []]],
         tags: ['Department'],
         responses: [
-            new OA\Response(response: 200, description: 'OK'),
+            new OA\Response(
+                response: 200,
+                description: 'OK',
+                content: new OA\JsonContent(type: 'array', items: new OA\Items(ref: '#/components/schemas/SelectListItem'))
+            ),
         ]
     )]
-    public function selectList(): LengthAwarePaginator
+    public function selectList(): Collection
     {
         return $this->departmentService->getDepartmentsList();
     }
@@ -317,6 +323,7 @@ class DepartmentController extends Controller
     )]
     public function delegate(Department $department, DelegatePermissionRequest $request): JsonResponse
     {
+        Gate::authorize('delegate', [$department, $request->input('user_uuid')]);
         $this->departmentService->delegate($department, $request->all());
 
         return new JsonResponse(null, 204);
@@ -350,6 +357,8 @@ class DepartmentController extends Controller
     )]
     public function createRole(Department $department, CreateManagedRoleRequest $request): RoleResource
     {
+        Gate::authorize('manage', $department);
+
         return new RoleResource($this->departmentService->createManagedRole($department, $request->all()));
     }
 }

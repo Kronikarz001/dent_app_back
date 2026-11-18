@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Repositories\DentistRepositoryInterface;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 /**
@@ -26,10 +27,10 @@ readonly class DentistService implements DentistServiceInterface
     }
 
     /**
-     * @return LengthAwarePaginator
+     * @return Collection
      */
-    public function getDentistsList(): LengthAwarePaginator
+    public function getDentistsList(): Collection
     {
-        return $this->dentistRepository->findAllWithPagination(['uuid', 'name']);
+        return $this->dentistRepository->findSelectAll(['uuid', 'first_name', 'last_name', 'job_position_uuid']);
     }
 }

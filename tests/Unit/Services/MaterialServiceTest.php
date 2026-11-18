@@ -8,6 +8,7 @@ use App\Repositories\MaterialRepositoryInterface;
 use App\Services\AuditServiceInterface;
 use App\Services\ExportServiceInterface;
 use App\Services\MaterialService;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Mockery;
 use Mockery\MockInterface;
@@ -68,20 +69,19 @@ class MaterialServiceTest extends TestCase
     /**
      * @return void
      */
-    public function testGetMaterialsListPassesOnlyUuidAndNameColumns(): void
+    public function testGetMaterialsListSelectsOnlyUuidAndNameColumns(): void
     {
-        $paginator = new LengthAwarePaginator([], 0, 100, 1);
+        $collection = new Collection;
 
         $this->materialRepository
-            ->shouldReceive('findAllWithPagination')
+            ->shouldReceive('findSelectAll')
             ->once()
             ->with(['uuid', 'name'])
-            ->andReturn($paginator);
+            ->andReturn($collection);
 
         $result = $this->materialService->getMaterialsList();
 
-        $this->assertInstanceOf(LengthAwarePaginator::class, $result);
-        $this->assertSame($paginator, $result);
+        $this->assertSame($collection, $result);
     }
 
     /**
@@ -154,7 +154,7 @@ class MaterialServiceTest extends TestCase
         $this->materialRepository
             ->shouldReceive('findAllWithPagination')
             ->once()
-            ->withNoArgs()
+            ->with([], -1)
             ->andReturn($paginator);
 
         $this->exportService

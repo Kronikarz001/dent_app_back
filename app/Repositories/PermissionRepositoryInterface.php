@@ -4,20 +4,18 @@ namespace App\Repositories;
 
 use App\Enums\PermissionType;
 use App\Models\Permission;
+use App\Models\PermissionAssignment;
 use App\Models\PermissionGroup;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * Summary of PermissionRepositoryInterface
+ *
+ * @extends SearchableRepositoryInterface<Permission>
  */
-interface PermissionRepositoryInterface extends BasicRepositoryInterface
+interface PermissionRepositoryInterface extends SearchableRepositoryInterface
 {
-    /**
-     * @param string $uuid
-     * @return Permission|null
-     */
-    public function findByUuid(string $uuid): ?Permission;
-
     /**
      * @param User $user
      * @param string $resource
@@ -61,4 +59,36 @@ interface PermissionRepositoryInterface extends BasicRepositoryInterface
      * @return bool
      */
     public function hasContainerGroupGrant(string $assignableType, string $assignableUuid, PermissionGroup $group): bool;
+
+    /**
+     * @param string|null $routeName
+     * @return string|null
+     */
+    public function findResourceForRoute(?string $routeName): ?string;
+
+    /**
+     * @param PermissionGroup $group
+     * @param string[] $userUuids
+     * @param string|null $grantedBy
+     * @return array{attached: string[], detached: string[]}
+     */
+    public function syncGroupUsers(PermissionGroup $group, array $userUuids, ?string $grantedBy): array;
+
+    /**
+     * @param Permission|PermissionGroup $grantable
+     * @param Model $assignable
+     * @param string|null $expiresAt
+     * @param string|null $grantedBy
+     * @return PermissionAssignment
+     */
+    public function grant(Permission|PermissionGroup $grantable, Model $assignable, ?string $expiresAt, ?string $grantedBy): PermissionAssignment;
+
+    /**
+     * @param Permission|PermissionGroup $grantable
+     * @param Model $assignable
+     * @param string|null $expiresAt
+     * @param string $grantedBy
+     * @return PermissionAssignment
+     */
+    public function createGrant(Permission|PermissionGroup $grantable, Model $assignable, ?string $expiresAt, string $grantedBy): PermissionAssignment;
 }

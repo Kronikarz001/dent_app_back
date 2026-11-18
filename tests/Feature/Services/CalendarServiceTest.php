@@ -9,6 +9,7 @@ use App\Models\DentalExamination;
 use App\Models\Patient;
 use App\Models\User;
 use App\Services\CalendarServiceInterface;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Application;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
@@ -51,13 +52,13 @@ class CalendarServiceTest extends TestCase
     /**
      * @return void
      */
-    public function testGetCalendarsListReturnsPaginator(): void
+    public function testGetCalendarsListReturnsCollection(): void
     {
         Calendar::factory()->count(2)->create();
 
         $result = $this->service->getCalendarsList();
 
-        $this->assertInstanceOf(LengthAwarePaginator::class, $result);
+        $this->assertInstanceOf(Collection::class, $result);
     }
 
     /**

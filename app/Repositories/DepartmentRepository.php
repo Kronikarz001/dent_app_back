@@ -3,17 +3,20 @@
 namespace App\Repositories;
 
 use App\Models\Department;
+use App\Models\User;
 use App\Search\DepartmentSearch;
 use App\Search\Search;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 
 /**
  * Summary of DepartmentRepository
+ *
+ * @extends SearchableRepository<Department>
  */
 class DepartmentRepository extends SearchableRepository implements DepartmentRepositoryInterface
 {
     /**
-     * @var string
+     * @var class-string<Department>
      */
     protected string $modelClass = Department::class;
 
@@ -33,41 +36,30 @@ class DepartmentRepository extends SearchableRepository implements DepartmentRep
     }
 
     /**
-     * @param string $uuid
-     * @return Department|null
-     */
-    public function findByUuid(string $uuid): ?Department
-    {
-        return Department::where('uuid', $uuid)->first();
-    }
-
-    /**
-     * @param array $data
-     * @return Department
-     */
-    public function create(array $data): Department
-    {
-        return Department::create($data);
-    }
-
-    /**
-     * @param Department|Model $model
-     * @param array $data
-     * @return Department
-     */
-    public function update(Department|Model $model, array $data): Department
-    {
-        $model->update($data);
-
-        return $model->fresh();
-    }
-
-    /**
-     * @param Department|Model $model
+     * @param Department $department
+     * @param User $user
      * @return bool
      */
-    public function delete(Department|Model $model): bool
+    public function isManager(Department $department, User $user): bool
     {
-        return $model->delete();
+        $isDirectManager = $department->users()
+            ->where('users.uuid', $user->uuid)
+            ->wherePivot('is_manager', true)
+            ->exists();
+
+        return $isDirectManager || $department->roles()
+            ->whereHas('users', fn (Builder $query) => $query->where('users.uuid', $user->uuid)->where('role_user.is_manager', true))
+            ->exists();
+    }
+
+    /**
+     * @param Department $department
+     * @param string $userUuid
+     * @return bool
+     */
+    public function hasMember(Department $department, string $userUuid): bool
+    {
+        return $department->users()->where('users.uuid', $userUuid)->exists()
+            || $department->roles()->whereHas('users', fn (Builder $query) => $query->where('users.uuid', $userUuid))->exists();
     }
 }
