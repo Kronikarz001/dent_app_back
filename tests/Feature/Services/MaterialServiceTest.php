@@ -8,6 +8,7 @@ use App\Models\DentalExamination;
 use App\Models\Material;
 use App\Models\User;
 use App\Services\MaterialServiceInterface;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Application;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
@@ -50,13 +51,13 @@ class MaterialServiceTest extends TestCase
     /**
      * @return void
      */
-    public function testGetMaterialsListReturnsPaginator(): void
+    public function testGetMaterialsListReturnsCollection(): void
     {
         Material::factory()->count(2)->create();
 
         $result = $this->service->getMaterialsList();
 
-        $this->assertInstanceOf(LengthAwarePaginator::class, $result);
+        $this->assertInstanceOf(Collection::class, $result);
     }
 
     /**

@@ -13,6 +13,7 @@ use App\Http\Resources\DepartmentResource;
 use App\Http\Resources\RoleResource;
 use App\Models\Department;
 use App\Services\DepartmentServiceInterface;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Gate;
@@ -59,7 +60,7 @@ class DepartmentController extends Controller
     }
 
     /**
-     * @return LengthAwarePaginator
+     * @return Collection
      */
     #[OA\Get(
         path: '/api/department/selectlist',
@@ -67,10 +68,14 @@ class DepartmentController extends Controller
         security: [['sanctum' => []]],
         tags: ['Department'],
         responses: [
-            new OA\Response(response: 200, description: 'OK'),
+            new OA\Response(
+                response: 200,
+                description: 'OK',
+                content: new OA\JsonContent(type: 'array', items: new OA\Items(ref: '#/components/schemas/SelectListItem'))
+            ),
         ]
     )]
-    public function selectList(): LengthAwarePaginator
+    public function selectList(): Collection
     {
         return $this->departmentService->getDepartmentsList();
     }

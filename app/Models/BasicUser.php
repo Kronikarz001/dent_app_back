@@ -238,6 +238,14 @@ abstract class BasicUser extends Authenticatable
     }
 
     /**
+     * @return MorphToMany
+     */
+    public function employeeSchedules(): MorphToMany
+    {
+        return $this->morphToMany(EmployeeSchedule::class, 'userable', 'calendar_users', 'userable_id', 'calendar_uuid', 'uuid', 'uuid');
+    }
+
+    /**
      * @return MorphMany
      */
     public function notifications(): MorphMany

@@ -21,3 +21,6 @@ require __DIR__.'/api/user-group.php';
 require __DIR__.'/api/role.php';
 require __DIR__.'/api/department.php';
 require __DIR__.'/api/dictionaries.php';
+require __DIR__.'/api/room.php';
+require __DIR__.'/api/schedule-rule.php';
+require __DIR__.'/api/statistics.php';

@@ -80,6 +80,17 @@ class DentistSearch extends Search
     protected function preFilter(Builder $query, array $params): void {}
 
     /**
+     * @return string[]
+     */
+    protected function selectRelations(): array
+    {
+        return [
+            'jobPosition:uuid,name',
+            'latestAvatar',
+        ];
+    }
+
+    /**
      * @return array
      */
     protected function relationsShipLoad(): array

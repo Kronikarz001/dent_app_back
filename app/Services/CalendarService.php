@@ -9,7 +9,9 @@ use App\Models\Calendar;
 use App\Repositories\CalendarRepositoryInterface;
 use App\Repositories\ScheduleOverlapRepositoryInterface;
 use App\Services\Concerns\DetectsScheduleConflicts;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Carbon;
 use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\Writer\Exception as WriterException;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -41,19 +43,46 @@ readonly class CalendarService implements CalendarServiceInterface
     }
 
     /**
+     * @param array{user_uuids?: string[], date_from?: string, date_to?: string} $filters
      * @return LengthAwarePaginator
      */
-    public function getCalendars(): LengthAwarePaginator
+    public function getCalendars(array $filters = []): LengthAwarePaginator
     {
-        return $this->calendarRepository->findAllWithPagination();
+        return $this->calendarRepository->findAllWithPagination($filters);
     }
 
     /**
-     * @return LengthAwarePaginator
+     * @return Collection
      */
-    public function getCalendarsList(): LengthAwarePaginator
+    public function getTodayCalendars(): Collection
     {
-        return $this->calendarRepository->findSelectAllWithPagination(['uuid', 'name']);
+        $today = Carbon::today()->toDateString();
+
+        return $this->calendarRepository->findAllWithoutPagination([
+            'date_from' => $today,
+            'date_to' => $today,
+        ]);
+    }
+
+    /**
+     * @param Calendar $calendar
+     * @return Calendar
+     */
+    public function getCalendarDetails(Calendar $calendar): Calendar
+    {
+        return $this->calendarRepository->loadRelations($calendar, [
+            'dentalExaminations',
+            'users:uuid,first_name,last_name',
+            'patients:uuid,first_name,last_name',
+        ]);
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getCalendarsList(): Collection
+    {
+        return $this->calendarRepository->findSelectAll(['uuid', 'name']);
     }
 
     /**

@@ -15,6 +15,7 @@ use App\Repositories\PatientRepositoryInterface;
 use App\Services\ExportServiceInterface;
 use App\Services\PatientService;
 use App\Services\PhoneNumberServiceInterface;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
 use Mockery;
@@ -92,18 +93,17 @@ class PatientServiceTest extends TestCase
      */
     public function testGetPatientsListSelectsOnlyUuidAndNameColumns(): void
     {
-        $paginator = new LengthAwarePaginator([], 0, 100, 1);
+        $collection = new Collection;
 
         $this->patientRepository
-            ->shouldReceive('findSelectAllWithPagination')
+            ->shouldReceive('findSelectAll')
             ->once()
             ->with(['uuid', 'first_name', 'last_name'])
-            ->andReturn($paginator);
+            ->andReturn($collection);
 
         $result = $this->patientService->getPatientsList();
 
-        $this->assertInstanceOf(LengthAwarePaginator::class, $result);
-        $this->assertSame($paginator, $result);
+        $this->assertSame($collection, $result);
     }
 
     /**

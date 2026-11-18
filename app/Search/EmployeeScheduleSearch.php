@@ -3,6 +3,7 @@
 namespace App\Search;
 
 use App\Models\EmployeeSchedule;
+use App\Search\Concerns\FiltersCalendarEntries;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
@@ -10,6 +11,8 @@ use Illuminate\Database\Eloquent\Builder;
  */
 class EmployeeScheduleSearch extends Search
 {
+    use FiltersCalendarEntries;
+
     /**
      * @return string
      */
@@ -83,13 +86,19 @@ class EmployeeScheduleSearch extends Search
      * @param array $params
      * @return void
      */
-    protected function preFilter(Builder $query, array $params): void {}
+    protected function preFilter(Builder $query, array $params): void
+    {
+        $this->applyUserUuids($query, $params['user_uuids'] ?? []);
+        $this->applyDateRange($query, $params['date_from'] ?? null, $params['date_to'] ?? null);
+    }
 
     /**
      * @return array
      */
     protected function relationsShipLoad(): array
     {
-        return [];
+        return [
+            'users:uuid,first_name,last_name',
+        ];
     }
 }

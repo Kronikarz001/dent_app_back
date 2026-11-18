@@ -204,4 +204,137 @@ class EmployeeScheduleControllerTest extends TestCase
             'userable_type' => User::class,
         ]);
     }
+
+    /**
+     * @return void
+     */
+    public function testIndexIncludesAssignedUsersSummary(): void
+    {
+        $employee = User::factory()->create(['first_name' => 'Anna', 'last_name' => 'Kowalska']);
+        $schedule = EmployeeSchedule::factory()->create();
+        $schedule->users()->attach($employee->uuid);
+
+        $response = $this->callApiWithLoggedUser()
+            ->getJson(route('employee-schedule.index'));
+
+        $response->assertOk();
+        $response->assertJsonPath('data.0.users.0.uuid', $employee->uuid);
+        $response->assertJsonPath('data.0.users.0.first_name', 'Anna');
+        $response->assertJsonPath('data.0.users.0.last_name', 'Kowalska');
+        $this->assertArrayNotHasKey('email', $response->json('data.0.users.0'));
+    }
+
+    /**
+     * @return void
+     */
+    public function testIndexFiltersByUserUuids(): void
+    {
+        $first = User::factory()->create();
+        $second = User::factory()->create();
+        $other = User::factory()->create();
+
+        $firstSchedule = EmployeeSchedule::factory()->create();
+        $firstSchedule->users()->attach($first->uuid);
+        $secondSchedule = EmployeeSchedule::factory()->create();
+        $secondSchedule->users()->attach($second->uuid);
+        $otherSchedule = EmployeeSchedule::factory()->create();
+        $otherSchedule->users()->attach($other->uuid);
+
+        $response = $this->callApiWithLoggedUser()
+            ->getJson(route('employee-schedule.index', [
+                'employeeSchedule' => ['user_uuids' => [$first->uuid, $second->uuid]],
+            ]));
+
+        $response->assertOk();
+        $uuids = collect($response->json('data'))->pluck('uuid')->all();
+        $this->assertEqualsCanonicalizing([$firstSchedule->uuid, $secondSchedule->uuid], $uuids);
+    }
+
+    /**
+     * @return void
+     */
+    public function testIndexFiltersByDateRangeIncludingMultiDayEntries(): void
+    {
+        $vacation = EmployeeSchedule::factory()->create([
+            'type' => 'VACATION',
+            'date' => '2026-11-10',
+            'end_date' => '2026-11-20',
+        ]);
+        $inRange = EmployeeSchedule::factory()->create(['date' => '2026-11-13']);
+        EmployeeSchedule::factory()->create(['date' => '2026-11-12']);
+        EmployeeSchedule::factory()->create(['date' => '2026-11-21']);
+
+        $response = $this->callApiWithLoggedUser()
+            ->getJson(route('employee-schedule.index', [
+                'employeeSchedule' => ['date_from' => '2026-11-13', 'date_to' => '2026-11-13'],
+            ]));
+
+        $response->assertOk();
+        $uuids = collect($response->json('data'))->pluck('uuid')->all();
+        $this->assertEqualsCanonicalizing([$vacation->uuid, $inRange->uuid], $uuids);
+    }
+
+    /**
+     * @return void
+     */
+    public function testIndexRejectsDateToBeforeDateFrom(): void
+    {
+        $this->callApiWithLoggedUser()
+            ->getJson(route('employee-schedule.index', [
+                'employeeSchedule' => ['date_from' => '2026-11-13', 'date_to' => '2026-11-12'],
+            ]))
+            ->assertStatus(422);
+    }
+
+    /**
+     * @return void
+     */
+    public function testMyReturnsOnlyEntriesOfLoggedUser(): void
+    {
+        $me = User::factory()->create(['is_admin' => true]);
+        $colleague = User::factory()->create();
+
+        $mine = EmployeeSchedule::factory()->create();
+        $mine->users()->attach($me->uuid);
+        $theirs = EmployeeSchedule::factory()->create();
+        $theirs->users()->attach($colleague->uuid);
+
+        $response = $this->callApiWithLoggedUser($me)
+            ->getJson(route('employee-schedule.my', [
+                'employeeSchedule' => ['user_uuids' => [$colleague->uuid]],
+            ]));
+
+        $response->assertOk();
+        $this->assertSame([$mine->uuid], collect($response->json('data'))->pluck('uuid')->all());
+    }
+
+    /**
+     * @return void
+     */
+    public function testShowIncludesAssignedUsers(): void
+    {
+        $employee = User::factory()->create();
+        $schedule = EmployeeSchedule::factory()->create();
+        $schedule->users()->attach($employee->uuid);
+
+        $this->callApiWithLoggedUser()
+            ->getJson(route('employee-schedule.show', ['employeeSchedule' => $schedule->uuid]))
+            ->assertOk()
+            ->assertJsonPath('users.0.uuid', $employee->uuid);
+    }
+
+    /**
+     * @return void
+     */
+    public function testSelectListReturnsPlainArray(): void
+    {
+        EmployeeSchedule::factory()->count(2)->create();
+
+        $response = $this->callApiWithLoggedUser()
+            ->getJson(route('employee-schedule.selectList'));
+
+        $response->assertOk();
+        $this->assertTrue(array_is_list($response->json()));
+        $this->assertSame(['uuid', 'name'], array_keys($response->json('0')));
+    }
 }

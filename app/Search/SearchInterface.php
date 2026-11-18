@@ -2,6 +2,7 @@
 
 namespace App\Search;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 /**
@@ -16,4 +17,11 @@ interface SearchInterface
      * @return LengthAwarePaginator
      */
     public function search(array $params = [], array $columns = [], ?int $perPage = null): LengthAwarePaginator;
+
+    /**
+     * @param array $params
+     * @param string[] $columns
+     * @return Collection
+     */
+    public function searchAll(array $params = [], array $columns = []): Collection;
 }

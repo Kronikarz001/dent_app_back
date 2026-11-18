@@ -9,6 +9,7 @@ use App\Repositories\UserRepositoryInterface;
 use App\Services\ExportServiceInterface;
 use App\Services\JobPositionService;
 use App\Services\PermissionGrantServiceInterface;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Mockery;
 use Mockery\MockInterface;
@@ -83,18 +84,17 @@ class JobPositionServiceTest extends TestCase
      */
     public function testGetJobPositionsListSelectsOnlyUuidAndNameColumns(): void
     {
-        $paginator = new LengthAwarePaginator([], 0, 100, 1);
+        $collection = new Collection;
 
         $this->jobPositionRepository
-            ->shouldReceive('findSelectAllWithPagination')
+            ->shouldReceive('findSelectAll')
             ->once()
             ->with(['uuid', 'name'])
-            ->andReturn($paginator);
+            ->andReturn($collection);
 
         $result = $this->jobPositionService->getJobPositionsList();
 
-        $this->assertInstanceOf(LengthAwarePaginator::class, $result);
-        $this->assertSame($paginator, $result);
+        $this->assertSame($collection, $result);
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Search\Search;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 /**
@@ -34,10 +35,19 @@ abstract class SearchableRepository extends BasicRepository implements Searchabl
     /**
      * @param string[] $columns
      * @param array $params
-     * @return LengthAwarePaginator<int, TModel>
+     * @return Collection<int, TModel>
      */
-    public function findSelectAllWithPagination(array $columns, array $params = []): LengthAwarePaginator
+    public function findSelectAll(array $columns, array $params = []): Collection
     {
-        return $this->getSearchModel()->search($params, $columns);
+        return $this->getSearchModel()->searchAll($params, $columns);
+    }
+
+    /**
+     * @param array $params
+     * @return Collection<int, TModel>
+     */
+    public function findAllWithoutPagination(array $params = []): Collection
+    {
+        return $this->getSearchModel()->searchAll($params);
     }
 }

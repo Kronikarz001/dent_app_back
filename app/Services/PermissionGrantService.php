@@ -89,6 +89,23 @@ readonly class PermissionGrantService implements PermissionGrantServiceInterface
     }
 
     /**
+     * @param PermissionGroup $group
+     * @param string[] $userUuids
+     * @param User $actor
+     * @return array{attached: string[], detached: string[]}
+     *
+     * @throws PermissionDeniedException
+     */
+    public function syncGroupUsers(PermissionGroup $group, array $userUuids, User $actor): array
+    {
+        if (! $actor->is_admin && ! $this->permissionRepository->hasGroupGrant($actor, $group)) {
+            throw new PermissionDeniedException('Nie posiadasz tej grupy uprawnień, nie możesz jej nadać.');
+        }
+
+        return $this->permissionRepository->syncGroupUsers($group, array_values(array_unique($userUuids)), $actor->uuid);
+    }
+
+    /**
      * @param Department|UserGroup $container
      * @param array $data
      * @param User $actor

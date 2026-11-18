@@ -5,6 +5,7 @@ namespace Tests\Feature\Services;
 use App\Models\JobPosition;
 use App\Models\User;
 use App\Services\DentistServiceInterface;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Application;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Tests\TestCase;
@@ -53,7 +54,7 @@ class DentistServiceTest extends TestCase
     /**
      * @return void
      */
-    public function testGetDentistsListReturnsPaginator(): void
+    public function testGetDentistsListReturnsCollectionWithJobPosition(): void
     {
         $dentistPosition = JobPosition::factory()->create(['name' => JobPosition::DENTIST_NAME]);
         $dentist = User::factory()->create();
@@ -61,6 +62,8 @@ class DentistServiceTest extends TestCase
 
         $result = $this->service->getDentistsList();
 
-        $this->assertInstanceOf(LengthAwarePaginator::class, $result);
+        $this->assertInstanceOf(Collection::class, $result);
+        $this->assertSame([$dentist->uuid], $result->pluck('uuid')->all());
+        $this->assertTrue($result->first()->relationLoaded('jobPosition'));
     }
 }

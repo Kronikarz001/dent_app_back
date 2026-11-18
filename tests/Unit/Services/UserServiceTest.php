@@ -6,9 +6,9 @@ use App\Exceptions\DuplicateUserDataException;
 use App\Models\User;
 use App\Repositories\UserRepositoryInterface;
 use App\Services\ExportServiceInterface;
-use App\Services\PermissionGrantServiceInterface;
 use App\Services\PhoneNumberServiceInterface;
 use App\Services\UserService;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Mockery;
 use Mockery\MockInterface;
@@ -36,8 +36,7 @@ class UserServiceTest extends TestCase
         $this->userService = new UserService(
             $this->userRepository,
             $exportService,
-            $phoneNumberService,
-            Mockery::mock(PermissionGrantServiceInterface::class)
+            $phoneNumberService
         );
     }
 
@@ -74,18 +73,17 @@ class UserServiceTest extends TestCase
      */
     public function testGetUsersListSelectsOnlyUuidAndNameColumns(): void
     {
-        $paginator = new LengthAwarePaginator([], 0, 100, 1);
+        $collection = new Collection;
 
         $this->userRepository
-            ->shouldReceive('findSelectAllWithPagination')
+            ->shouldReceive('findSelectAll')
             ->once()
-            ->with(['uuid', 'first_name', 'last_name'])
-            ->andReturn($paginator);
+            ->with(['uuid', 'first_name', 'last_name', 'job_position_uuid'])
+            ->andReturn($collection);
 
         $result = $this->userService->getUsersList();
 
-        $this->assertInstanceOf(LengthAwarePaginator::class, $result);
-        $this->assertSame($paginator, $result);
+        $this->assertSame($collection, $result);
     }
 
     /**

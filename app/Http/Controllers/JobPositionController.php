@@ -10,6 +10,7 @@ use App\Http\Resources\JobPositionResource;
 use App\Models\JobPosition;
 use App\Models\User;
 use App\Services\JobPositionServiceInterface;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Pagination\LengthAwarePaginator;
 use OpenApi\Attributes as OA;
@@ -58,7 +59,7 @@ class JobPositionController extends Controller
     }
 
     /**
-     * @return LengthAwarePaginator
+     * @return Collection
      */
     #[OA\Get(
         path: '/api/job-position/selectlist',
@@ -66,10 +67,14 @@ class JobPositionController extends Controller
         security: [['sanctum' => []]],
         tags: ['JobPosition'],
         responses: [
-            new OA\Response(response: 200, description: 'OK'),
+            new OA\Response(
+                response: 200,
+                description: 'OK',
+                content: new OA\JsonContent(type: 'array', items: new OA\Items(ref: '#/components/schemas/SelectListItem'))
+            ),
         ]
     )]
-    public function selectList(): LengthAwarePaginator
+    public function selectList(): Collection
     {
         return $this->jobPositionService->getJobPositionsList();
     }

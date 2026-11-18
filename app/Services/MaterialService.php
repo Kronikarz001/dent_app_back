@@ -6,6 +6,7 @@ use App\Exports\MaterialExport;
 use App\Http\Requests\ExportRequest;
 use App\Models\Material;
 use App\Repositories\MaterialRepositoryInterface;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\Writer\Exception as WriterException;
@@ -36,11 +37,11 @@ readonly class MaterialService implements MaterialServiceInterface
     }
 
     /**
-     * @return LengthAwarePaginator
+     * @return Collection
      */
-    public function getMaterialsList(): LengthAwarePaginator
+    public function getMaterialsList(): Collection
     {
-        return $this->materialRepository->findSelectAllWithPagination(['uuid', 'name']);
+        return $this->materialRepository->findSelectAll(['uuid', 'name']);
     }
 
     /**

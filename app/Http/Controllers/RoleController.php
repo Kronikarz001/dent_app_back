@@ -9,6 +9,7 @@ use App\Http\Requests\RoleRequest;
 use App\Http\Resources\RoleResource;
 use App\Models\Role;
 use App\Services\RoleServiceInterface;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Gate;
@@ -55,7 +56,7 @@ class RoleController extends Controller
     }
 
     /**
-     * @return LengthAwarePaginator
+     * @return Collection
      */
     #[OA\Get(
         path: '/api/role/selectlist',
@@ -63,10 +64,14 @@ class RoleController extends Controller
         security: [['sanctum' => []]],
         tags: ['Role'],
         responses: [
-            new OA\Response(response: 200, description: 'OK'),
+            new OA\Response(
+                response: 200,
+                description: 'OK',
+                content: new OA\JsonContent(type: 'array', items: new OA\Items(ref: '#/components/schemas/SelectListItem'))
+            ),
         ]
     )]
-    public function selectList(): LengthAwarePaginator
+    public function selectList(): Collection
     {
         return $this->roleService->getRolesList();
     }

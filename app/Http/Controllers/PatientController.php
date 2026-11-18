@@ -11,6 +11,7 @@ use App\Http\Resources\PatientStatisticsResource;
 use App\Http\Resources\PatientVisitResource;
 use App\Models\Patient;
 use App\Services\PatientServiceInterface;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -50,14 +51,22 @@ class PatientController extends Controller
 
     #[OA\Get(
         path: '/api/patient/selectlist',
-        summary: 'Lista pacjentów do selecta (uuid + name)',
+        summary: 'Lista pacjentów do selecta (uuid + imię i nazwisko)',
         security: [['sanctum' => []]],
         tags: ['Patient'],
         responses: [
-            new OA\Response(response: 200, description: 'OK'),
+            new OA\Response(
+                response: 200,
+                description: 'OK',
+                content: new OA\JsonContent(type: 'array', items: new OA\Items(properties: [
+                    new OA\Property(property: 'uuid', type: 'string', format: 'uuid'),
+                    new OA\Property(property: 'first_name', type: 'string'),
+                    new OA\Property(property: 'last_name', type: 'string'),
+                ]))
+            ),
         ]
     )]
-    public function selectList(): LengthAwarePaginator
+    public function selectList(): Collection
     {
         return $this->patientService->getPatientsList();
     }

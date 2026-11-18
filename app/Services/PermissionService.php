@@ -7,6 +7,7 @@ use App\Models\Permission;
 use App\Models\PermissionGroup;
 use App\Models\User;
 use App\Repositories\PermissionRepositoryInterface;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 /**
@@ -30,11 +31,11 @@ readonly class PermissionService implements PermissionServiceInterface
     }
 
     /**
-     * @return LengthAwarePaginator
+     * @return Collection
      */
-    public function getPermissionsList(): LengthAwarePaginator
+    public function getPermissionsList(): Collection
     {
-        return $this->permissionRepository->findSelectAllWithPagination(['uuid', 'resource', 'type']);
+        return $this->permissionRepository->findSelectAll(['uuid', 'resource', 'type']);
     }
 
     /**

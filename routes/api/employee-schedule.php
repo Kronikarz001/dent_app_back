@@ -14,6 +14,8 @@ Route::middleware('auth:sanctum')->group(function () {
         ->name('employee-schedule.assignUsers');
     Route::get('/employee-schedule/selectlist', [EmployeeScheduleController::class, 'selectList'])
         ->name('employee-schedule.selectList');
+    Route::get('/employee-schedule/my', [EmployeeScheduleController::class, 'my'])
+        ->name('employee-schedule.my');
     Route::apiResource('/employee-schedule', EmployeeScheduleController::class)
         ->names('employee-schedule')
         ->parameters(['employee-schedule' => 'employeeSchedule']);

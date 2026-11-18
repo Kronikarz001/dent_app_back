@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Role;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 /**
@@ -16,9 +17,9 @@ interface RoleServiceInterface
     public function getRoles(): LengthAwarePaginator;
 
     /**
-     * @return LengthAwarePaginator
+     * @return Collection
      */
-    public function getRolesList(): LengthAwarePaginator;
+    public function getRolesList(): Collection;
 
     /**
      * @param array $data

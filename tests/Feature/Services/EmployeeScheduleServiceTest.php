@@ -7,6 +7,7 @@ use App\Models\Audit;
 use App\Models\EmployeeSchedule;
 use App\Models\User;
 use App\Services\EmployeeScheduleServiceInterface;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Application;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
@@ -49,13 +50,13 @@ class EmployeeScheduleServiceTest extends TestCase
     /**
      * @return void
      */
-    public function testGetSchedulesListReturnsPaginator(): void
+    public function testGetSchedulesListReturnsCollection(): void
     {
         EmployeeSchedule::factory()->count(2)->create();
 
         $result = $this->service->getSchedulesList();
 
-        $this->assertInstanceOf(LengthAwarePaginator::class, $result);
+        $this->assertInstanceOf(Collection::class, $result);
     }
 
     /**

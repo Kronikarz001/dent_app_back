@@ -7,6 +7,7 @@ use App\Http\Requests\MaterialRequest;
 use App\Http\Resources\MaterialResource;
 use App\Models\Material;
 use App\Services\MaterialServiceInterface;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Pagination\LengthAwarePaginator;
 use OpenApi\Attributes as OA;
@@ -55,7 +56,7 @@ class MaterialController extends Controller
     }
 
     /**
-     * @return LengthAwarePaginator
+     * @return Collection
      */
     #[OA\Get(
         path: '/api/material/selectlist',
@@ -63,10 +64,14 @@ class MaterialController extends Controller
         security: [['sanctum' => []]],
         tags: ['Material'],
         responses: [
-            new OA\Response(response: 200, description: 'OK'),
+            new OA\Response(
+                response: 200,
+                description: 'OK',
+                content: new OA\JsonContent(type: 'array', items: new OA\Items(ref: '#/components/schemas/SelectListItem'))
+            ),
         ]
     )]
-    public function selectList(): LengthAwarePaginator
+    public function selectList(): Collection
     {
         return $this->materialService->getMaterialsList();
     }

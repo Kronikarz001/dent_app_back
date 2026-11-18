@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\PermissionResource;
 use App\Models\Permission;
 use App\Services\PermissionServiceInterface;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use OpenApi\Attributes as OA;
 
@@ -49,18 +50,26 @@ class PermissionController extends Controller
     }
 
     /**
-     * @return LengthAwarePaginator
+     * @return Collection
      */
     #[OA\Get(
         path: '/api/permission/selectlist',
-        summary: 'Lista uprawnień do selecta (uuid + name)',
+        summary: 'Lista uprawnień do selecta (uuid + resource + type)',
         security: [['sanctum' => []]],
         tags: ['Permission'],
         responses: [
-            new OA\Response(response: 200, description: 'OK'),
+            new OA\Response(
+                response: 200,
+                description: 'OK',
+                content: new OA\JsonContent(type: 'array', items: new OA\Items(properties: [
+                    new OA\Property(property: 'uuid', type: 'string', format: 'uuid'),
+                    new OA\Property(property: 'resource', type: 'string'),
+                    new OA\Property(property: 'type', type: 'string'),
+                ]))
+            ),
         ]
     )]
-    public function selectList(): LengthAwarePaginator
+    public function selectList(): Collection
     {
         return $this->permissionService->getPermissionsList();
     }

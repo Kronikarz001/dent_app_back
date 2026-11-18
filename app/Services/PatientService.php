@@ -11,6 +11,7 @@ use App\Models\Patient;
 use App\Repositories\AuditRepositoryInterface;
 use App\Repositories\CalendarRepositoryInterface;
 use App\Repositories\PatientRepositoryInterface;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\Writer\Exception as WriterException;
@@ -47,11 +48,11 @@ readonly class PatientService implements PatientServiceInterface
     }
 
     /**
-     * @return LengthAwarePaginator
+     * @return Collection
      */
-    public function getPatientsList(): LengthAwarePaginator
+    public function getPatientsList(): Collection
     {
-        return $this->patientRepository->findSelectAllWithPagination(['uuid', 'first_name', 'last_name']);
+        return $this->patientRepository->findSelectAll(['uuid', 'first_name', 'last_name']);
     }
 
     /**

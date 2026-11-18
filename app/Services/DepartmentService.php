@@ -7,6 +7,7 @@ use App\Models\Department;
 use App\Models\Role;
 use App\Repositories\DepartmentRepositoryInterface;
 use App\Repositories\UserRepositoryInterface;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 
@@ -37,11 +38,11 @@ readonly class DepartmentService implements DepartmentServiceInterface
     }
 
     /**
-     * @return LengthAwarePaginator
+     * @return Collection
      */
-    public function getDepartmentsList(): LengthAwarePaginator
+    public function getDepartmentsList(): Collection
     {
-        return $this->departmentRepository->findSelectAllWithPagination(['uuid', 'name']);
+        return $this->departmentRepository->findSelectAll(['uuid', 'name']);
     }
 
     /**

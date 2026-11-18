@@ -11,6 +11,7 @@ use App\Http\Resources\RoleResource;
 use App\Http\Resources\UserGroupResource;
 use App\Models\UserGroup;
 use App\Services\UserGroupServiceInterface;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Gate;
@@ -57,7 +58,7 @@ class UserGroupController extends Controller
     }
 
     /**
-     * @return LengthAwarePaginator
+     * @return Collection
      */
     #[OA\Get(
         path: '/api/user-group/selectlist',
@@ -65,10 +66,14 @@ class UserGroupController extends Controller
         security: [['sanctum' => []]],
         tags: ['UserGroup'],
         responses: [
-            new OA\Response(response: 200, description: 'OK'),
+            new OA\Response(
+                response: 200,
+                description: 'OK',
+                content: new OA\JsonContent(type: 'array', items: new OA\Items(ref: '#/components/schemas/SelectListItem'))
+            ),
         ]
     )]
-    public function selectList(): LengthAwarePaginator
+    public function selectList(): Collection
     {
         return $this->userGroupService->getUserGroupsList();
     }

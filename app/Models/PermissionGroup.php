@@ -3,7 +3,9 @@
 namespace App\Models;
 
 use App\Traits\Auditable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 /**
  * Summary of PermissionGroup
@@ -14,6 +16,7 @@ class PermissionGroup extends UuidModel
 
     protected $fillable = [
         'name',
+        'description',
     ];
 
     /**
@@ -29,5 +32,25 @@ class PermissionGroup extends UuidModel
             'uuid',
             'uuid'
         );
+    }
+
+    /**
+     * @return MorphToMany
+     */
+    public function users(): MorphToMany
+    {
+        return $this->morphedByMany(
+            User::class,
+            'assignable',
+            'permission_assignments',
+            'grantable_id',
+            'assignable_id',
+            'uuid',
+            'uuid'
+        )
+            ->wherePivot('grantable_type', self::class)
+            ->where(fn (Builder $query) => $query
+                ->whereNull('permission_assignments.expires_at')
+                ->orWhere('permission_assignments.expires_at', '>', now()));
     }
 }

@@ -5,6 +5,7 @@ namespace App\Search;
 use App\Repositories\SearchRepositoryInterface;
 use App\Services\SearchServiceInterface;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 
@@ -114,12 +115,40 @@ abstract class Search implements SearchInterface
     }
 
     /**
+     * @return string[]
+     */
+    protected function selectRelations(): array
+    {
+        return [];
+    }
+
+    /**
      * @param array $params
      * @param string[] $columns
      * @param int|null $perPage
      * @return LengthAwarePaginator
      */
     final public function search(array $params = [], array $columns = [], ?int $perPage = null): LengthAwarePaginator
+    {
+        return $this->searchRepository->paginate($this->buildQuery($params, $columns), $perPage ?? $this->resolvePerPage());
+    }
+
+    /**
+     * @param array $params
+     * @param string[] $columns
+     * @return Collection
+     */
+    final public function searchAll(array $params = [], array $columns = []): Collection
+    {
+        return $this->searchRepository->get($this->buildQuery($params, $columns));
+    }
+
+    /**
+     * @param array $params
+     * @param string[] $columns
+     * @return Builder
+     */
+    private function buildQuery(array $params, array $columns): Builder
     {
         $query = $this->searchRepository->createQuery($this->modelClass());
 
@@ -130,7 +159,7 @@ abstract class Search implements SearchInterface
             $columns === [] ? array_merge(
                 $this->relationsShipLoad(),
                 $this->searchService->buildRecursiveRelationPaths($this->recursiveRelations())
-            ) : [],
+            ) : $this->selectRelations(),
             $this->relationsCount()
         );
 
@@ -139,7 +168,7 @@ abstract class Search implements SearchInterface
         $this->applySearchString($query);
         $this->applySort($query);
 
-        return $this->searchRepository->paginate($query, $perPage ?? $this->resolvePerPage());
+        return $query;
     }
 
     /**

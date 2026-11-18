@@ -2,7 +2,9 @@
 
 namespace App\Services;
 
+use App\Exceptions\PermissionDeniedException;
 use App\Models\PermissionGroup;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 /**
@@ -16,9 +18,9 @@ interface PermissionGroupServiceInterface
     public function getPermissionGroups(): LengthAwarePaginator;
 
     /**
-     * @return LengthAwarePaginator
+     * @return Collection
      */
-    public function getPermissionGroupsList(): LengthAwarePaginator;
+    public function getPermissionGroupsList(): Collection;
 
     /**
      * @param PermissionGroup $group
@@ -51,4 +53,13 @@ interface PermissionGroupServiceInterface
      * @return void
      */
     public function assignPermissions(PermissionGroup $group, array $data): void;
+
+    /**
+     * @param PermissionGroup $group
+     * @param array $data
+     * @return void
+     *
+     * @throws PermissionDeniedException
+     */
+    public function assignUsers(PermissionGroup $group, array $data): void;
 }

@@ -8,6 +8,7 @@ use App\Models\JobPosition;
 use App\Models\User;
 use App\Repositories\JobPositionRepositoryInterface;
 use App\Repositories\UserRepositoryInterface;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 use PhpOffice\PhpSpreadsheet\Exception;
@@ -41,11 +42,11 @@ readonly class JobPositionService implements JobPositionServiceInterface
     }
 
     /**
-     * @return LengthAwarePaginator
+     * @return Collection
      */
-    public function getJobPositionsList(): LengthAwarePaginator
+    public function getJobPositionsList(): Collection
     {
-        return $this->jobPositionRepository->findSelectAllWithPagination(['uuid', 'name']);
+        return $this->jobPositionRepository->findSelectAll(['uuid', 'name']);
     }
 
     /**

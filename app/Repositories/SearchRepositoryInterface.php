@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use Closure;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 /**
@@ -176,4 +177,10 @@ interface SearchRepositoryInterface
      * @return LengthAwarePaginator
      */
     public function paginate(Builder $query, int $perPage): LengthAwarePaginator;
+
+    /**
+     * @param Builder $query
+     * @return Collection
+     */
+    public function get(Builder $query): Collection;
 }

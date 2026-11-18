@@ -7,6 +7,7 @@ use App\Models\Audit;
 use App\Models\JobPosition;
 use App\Models\User;
 use App\Services\JobPositionServiceInterface;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Application;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
@@ -48,13 +49,13 @@ class JobPositionServiceTest extends TestCase
     /**
      * @return void
      */
-    public function testGetJobPositionsListReturnsPaginator(): void
+    public function testGetJobPositionsListReturnsCollection(): void
     {
         JobPosition::factory()->count(2)->create();
 
         $result = $this->service->getJobPositionsList();
 
-        $this->assertInstanceOf(LengthAwarePaginator::class, $result);
+        $this->assertInstanceOf(Collection::class, $result);
     }
 
     /**

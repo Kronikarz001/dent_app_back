@@ -9,7 +9,9 @@ use App\Exports\UserExport;
 use App\Http\Requests\ExportRequest;
 use App\Models\User;
 use App\Repositories\UserRepositoryInterface;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use PhpOffice\PhpSpreadsheet\Exception;
@@ -27,13 +29,11 @@ readonly class UserService implements UserServiceInterface
      * @param UserRepositoryInterface $userRepository
      * @param ExportServiceInterface $exportService
      * @param PhoneNumberServiceInterface $phoneNumberService
-     * @param PermissionGrantServiceInterface $permissionGrantService
      */
     public function __construct(
         private UserRepositoryInterface $userRepository,
         private ExportServiceInterface $exportService,
         private PhoneNumberServiceInterface $phoneNumberService,
-        private PermissionGrantServiceInterface $permissionGrantService,
     ) {}
 
     /**
@@ -45,11 +45,22 @@ readonly class UserService implements UserServiceInterface
     }
 
     /**
-     * @return LengthAwarePaginator
+     * @return Collection
      */
-    public function getUsersList(): LengthAwarePaginator
+    public function getUsersList(): Collection
     {
-        return $this->userRepository->findSelectAllWithPagination(['uuid', 'first_name', 'last_name']);
+        return $this->userRepository->findSelectAll(['uuid', 'first_name', 'last_name', 'job_position_uuid']);
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getUsersWorkingToday(): Collection
+    {
+        return $this->userRepository->findSelectAll(
+            ['uuid', 'first_name', 'last_name', 'job_position_uuid'],
+            ['working_on' => Carbon::today()->toDateString()]
+        );
     }
 
     /**
@@ -155,16 +166,6 @@ readonly class UserService implements UserServiceInterface
     public function export(ExportRequest $request): BinaryFileResponse
     {
         return $this->exportService->export($request, new UserExport($this->userRepository->findAllWithPagination(perPage: -1)->getCollection()), User::getModel());
-    }
-
-    /**
-     * @param User $user
-     * @param array $data
-     * @return void
-     */
-    public function assignPermissions(User $user, array $data): void
-    {
-        $this->permissionGrantService->assign($user, $data, Auth::user());
     }
 
     /**

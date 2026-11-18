@@ -2,8 +2,11 @@
 
 namespace Tests\Feature\Services;
 
+use App\Exceptions\PermissionDeniedException;
 use App\Models\Permission;
+use App\Models\PermissionAssignment;
 use App\Models\PermissionGroup;
+use App\Models\User;
 use App\Services\PermissionGroupServiceInterface;
 use Illuminate\Foundation\Application;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -95,6 +98,49 @@ class PermissionGroupServiceTest extends TestCase
         $this->assertDatabaseHas('permission_group_permission', [
             'permission_group_uuid' => $group->uuid,
             'permission_uuid' => $newPermission->uuid,
+        ]);
+    }
+
+    /**
+     * @return void
+     */
+    public function testAssignUsersByNonAdminWithoutGroupThrows(): void
+    {
+        $group = PermissionGroup::factory()->create();
+        $target = User::factory()->create();
+        $this->actingAs(User::factory()->create(['is_admin' => false]));
+
+        $this->expectException(PermissionDeniedException::class);
+
+        try {
+            $this->service->assignUsers($group, ['users' => [$target->uuid]]);
+        } finally {
+            $this->assertDatabaseMissing('permission_assignments', ['assignable_id' => $target->uuid]);
+        }
+    }
+
+    /**
+     * @return void
+     */
+    public function testAssignUsersByNonAdminHoldingGroupGrantsIt(): void
+    {
+        $group = PermissionGroup::factory()->create();
+        $actor = User::factory()->create(['is_admin' => false]);
+        $target = User::factory()->create();
+        PermissionAssignment::query()->create([
+            'grantable_type' => PermissionGroup::class,
+            'grantable_id' => $group->uuid,
+            'assignable_type' => User::class,
+            'assignable_id' => $actor->uuid,
+        ]);
+        $this->actingAs($actor);
+
+        $this->service->assignUsers($group, ['users' => [$actor->uuid, $target->uuid]]);
+
+        $this->assertDatabaseHas('permission_assignments', [
+            'grantable_id' => $group->uuid,
+            'assignable_id' => $target->uuid,
+            'granted_by' => $actor->uuid,
         ]);
     }
 }

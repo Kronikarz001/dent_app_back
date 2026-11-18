@@ -22,7 +22,24 @@ class SearchPaginationTest extends TestCase
             ->getJson(route('material.selectList'))
             ->assertOk();
 
-        $this->assertSame(['uuid', 'name'], array_keys($response->json('data.0')));
+        $this->assertCount(2, $response->json());
+        $this->assertSame(['uuid', 'name'], array_keys($response->json('0')));
+    }
+
+    /**
+     * @return void
+     */
+    public function testSelectListIsNotPaginated(): void
+    {
+        config(['search.default_per_page' => 2]);
+        Material::factory()->count(3)->create();
+
+        $response = $this->callApiWithLoggedUser()
+            ->getJson(route('material.selectList'))
+            ->assertOk();
+
+        $this->assertTrue(array_is_list($response->json()));
+        $this->assertCount(3, $response->json());
     }
 
     /**
@@ -36,7 +53,7 @@ class SearchPaginationTest extends TestCase
             ->getJson(route('patient.selectList'))
             ->assertOk();
 
-        $this->assertSame(['uuid', 'first_name', 'last_name'], array_keys($response->json('data.0')));
+        $this->assertSame(['uuid', 'first_name', 'last_name'], array_keys($response->json('0')));
     }
 
     /**

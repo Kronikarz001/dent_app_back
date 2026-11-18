@@ -87,6 +87,16 @@ abstract class BasicRepository implements BasicRepositoryInterface
     }
 
     /**
+     * @param Collection<int, TModel> $models
+     * @param string[] $relations
+     * @return Collection<int, TModel>
+     */
+    public function loadRelationsForMany(Collection $models, array $relations): Collection
+    {
+        return $models->load($relations);
+    }
+
+    /**
      * @param TModel $model
      * @param string $relation
      * @param array $ids

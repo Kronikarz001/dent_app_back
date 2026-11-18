@@ -2,9 +2,12 @@
 
 namespace App\Services;
 
+use App\Exceptions\PermissionDeniedException;
 use App\Models\PermissionGroup;
 use App\Repositories\PermissionGroupRepositoryInterface;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * Summary of PermissionGroupService
@@ -14,10 +17,12 @@ readonly class PermissionGroupService implements PermissionGroupServiceInterface
     /**
      * @param PermissionGroupRepositoryInterface $permissionGroupRepository
      * @param AuditServiceInterface $auditService
+     * @param PermissionGrantServiceInterface $permissionGrantService
      */
     public function __construct(
         private PermissionGroupRepositoryInterface $permissionGroupRepository,
         private AuditServiceInterface $auditService,
+        private PermissionGrantServiceInterface $permissionGrantService,
     ) {}
 
     /**
@@ -29,11 +34,11 @@ readonly class PermissionGroupService implements PermissionGroupServiceInterface
     }
 
     /**
-     * @return LengthAwarePaginator
+     * @return Collection
      */
-    public function getPermissionGroupsList(): LengthAwarePaginator
+    public function getPermissionGroupsList(): Collection
     {
-        return $this->permissionGroupRepository->findSelectAllWithPagination(['uuid', 'name']);
+        return $this->permissionGroupRepository->findSelectAll(['uuid', 'name']);
     }
 
     /**
@@ -42,7 +47,7 @@ readonly class PermissionGroupService implements PermissionGroupServiceInterface
      */
     public function getPermissionGroup(PermissionGroup $group): PermissionGroup
     {
-        return $this->permissionGroupRepository->loadRelations($group, ['permissions']);
+        return $this->permissionGroupRepository->loadRelations($group, ['permissions', 'users:uuid,first_name,last_name']);
     }
 
     /**
@@ -81,5 +86,17 @@ readonly class PermissionGroupService implements PermissionGroupServiceInterface
     public function assignPermissions(PermissionGroup $group, array $data): void
     {
         $this->auditService->recordSync($group, 'permissions', $this->permissionGroupRepository->syncRelation($group, 'permissions', $data['permissions'] ?? []));
+    }
+
+    /**
+     * @param PermissionGroup $group
+     * @param array $data
+     * @return void
+     *
+     * @throws PermissionDeniedException
+     */
+    public function assignUsers(PermissionGroup $group, array $data): void
+    {
+        $this->auditService->recordSync($group, 'users', $this->permissionGrantService->syncGroupUsers($group, $data['users'] ?? [], Auth::user()));
     }
 }

@@ -22,6 +22,9 @@ class CalendarResource extends JsonResource
             'end_time' => $this->end_time,
             'no_show' => $this->no_show,
             'is_active' => $this->is_active,
+            'users' => PersonSummaryResource::collection($this->whenLoaded('users')),
+            'patients' => PersonSummaryResource::collection($this->whenLoaded('patients')),
+            'dental_examinations' => DentalExaminationResource::collection($this->whenLoaded('dentalExaminations')),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

@@ -6,6 +6,7 @@ use App\Enums\PhoneNumberType;
 use App\Exceptions\DuplicateUserDataException;
 use App\Models\User;
 use App\Services\UserServiceInterface;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Application;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
@@ -48,13 +49,13 @@ class UserServiceTest extends TestCase
     /**
      * @return void
      */
-    public function testGetUsersListReturnsPaginator(): void
+    public function testGetUsersListReturnsCollection(): void
     {
         User::factory()->count(2)->create();
 
         $result = $this->service->getUsersList();
 
-        $this->assertInstanceOf(LengthAwarePaginator::class, $result);
+        $this->assertInstanceOf(Collection::class, $result);
     }
 
     /**

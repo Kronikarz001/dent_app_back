@@ -6,6 +6,7 @@ use App\Exceptions\PermissionDeniedException;
 use App\Models\Role;
 use App\Repositories\RoleRepositoryInterface;
 use App\Repositories\UserRepositoryInterface;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 
@@ -36,11 +37,11 @@ readonly class RoleService implements RoleServiceInterface
     }
 
     /**
-     * @return LengthAwarePaginator
+     * @return Collection
      */
-    public function getRolesList(): LengthAwarePaginator
+    public function getRolesList(): Collection
     {
-        return $this->roleRepository->findSelectAllWithPagination(['uuid', 'name']);
+        return $this->roleRepository->findSelectAll(['uuid', 'name']);
     }
 
     /**

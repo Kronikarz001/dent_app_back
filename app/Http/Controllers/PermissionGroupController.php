@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\PermissionDeniedException;
 use App\Http\Requests\AssignPermissionGroupPermissionsRequest;
+use App\Http\Requests\AssignPermissionGroupUsersRequest;
 use App\Http\Requests\PermissionGroupRequest;
 use App\Http\Resources\PermissionGroupResource;
 use App\Models\PermissionGroup;
 use App\Services\PermissionGroupServiceInterface;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Pagination\LengthAwarePaginator;
 use OpenApi\Attributes as OA;
@@ -52,7 +55,7 @@ class PermissionGroupController extends Controller
     }
 
     /**
-     * @return LengthAwarePaginator
+     * @return Collection
      */
     #[OA\Get(
         path: '/api/permission-group/selectlist',
@@ -60,10 +63,14 @@ class PermissionGroupController extends Controller
         security: [['sanctum' => []]],
         tags: ['PermissionGroup'],
         responses: [
-            new OA\Response(response: 200, description: 'OK'),
+            new OA\Response(
+                response: 200,
+                description: 'OK',
+                content: new OA\JsonContent(type: 'array', items: new OA\Items(ref: '#/components/schemas/SelectListItem'))
+            ),
         ]
     )]
-    public function selectList(): LengthAwarePaginator
+    public function selectList(): Collection
     {
         return $this->permissionGroupService->getPermissionGroupsList();
     }
@@ -104,7 +111,7 @@ class PermissionGroupController extends Controller
         path: '/api/permission-group',
         summary: 'Tworzy nową grupę uprawnień',
         security: [['sanctum' => []]],
-        requestBody: new OA\RequestBody(ref: '#/components/requestBodies/NameRequest'),
+        requestBody: new OA\RequestBody(ref: '#/components/requestBodies/PermissionGroupRequest'),
         tags: ['PermissionGroup'],
         responses: [
             new OA\Response(
@@ -131,7 +138,7 @@ class PermissionGroupController extends Controller
         path: '/api/permission-group/{uuid}',
         summary: 'Aktualizuje grupę uprawnień',
         security: [['sanctum' => []]],
-        requestBody: new OA\RequestBody(ref: '#/components/requestBodies/NameRequest'),
+        requestBody: new OA\RequestBody(ref: '#/components/requestBodies/PermissionGroupRequest'),
         tags: ['PermissionGroup'],
         parameters: [
             new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
@@ -203,6 +210,44 @@ class PermissionGroupController extends Controller
     public function assignPermissions(PermissionGroup $permissionGroup, AssignPermissionGroupPermissionsRequest $request): JsonResponse
     {
         $this->permissionGroupService->assignPermissions($permissionGroup, $request->all());
+
+        return new JsonResponse(null, 204);
+    }
+
+    /**
+     * @param PermissionGroup $permissionGroup
+     * @param AssignPermissionGroupUsersRequest $request
+     * @return JsonResponse
+     *
+     * @throws PermissionDeniedException
+     */
+    #[OA\Patch(
+        path: '/api/permission-group/{uuid}/users',
+        summary: 'Przypisuje użytkowników do grupy uprawnień, zastępując poprzednią listę',
+        security: [['sanctum' => []]],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ['users'],
+                properties: [
+                    new OA\Property(property: 'users', type: 'array', items: new OA\Items(type: 'string', format: 'uuid')),
+                ]
+            )
+        ),
+        tags: ['PermissionGroup'],
+        parameters: [
+            new OA\PathParameter(name: 'uuid', schema: new OA\Schema(type: 'string', format: 'uuid')),
+        ],
+        responses: [
+            new OA\Response(response: 204, description: 'Przypisano'),
+            new OA\Response(response: 403, description: 'Brak tej grupy uprawnień u przypisującego'),
+            new OA\Response(response: 404, description: 'Nie znaleziono'),
+            new OA\Response(response: 422, description: 'Błąd walidacji'),
+        ]
+    )]
+    public function assignUsers(PermissionGroup $permissionGroup, AssignPermissionGroupUsersRequest $request): JsonResponse
+    {
+        $this->permissionGroupService->assignUsers($permissionGroup, $request->validated());
 
         return new JsonResponse(null, 204);
     }

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Exceptions\PermissionDeniedException;
 use App\Models\Department;
+use App\Models\PermissionGroup;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\UserGroup;
@@ -33,6 +34,16 @@ interface PermissionGrantServiceInterface
      * @throws PermissionDeniedException
      */
     public function delegate(User $target, array $data, User $actor): void;
+
+    /**
+     * @param PermissionGroup $group
+     * @param string[] $userUuids
+     * @param User $actor
+     * @return array{attached: string[], detached: string[]}
+     *
+     * @throws PermissionDeniedException
+     */
+    public function syncGroupUsers(PermissionGroup $group, array $userUuids, User $actor): array;
 
     /**
      * @param Department|UserGroup $container

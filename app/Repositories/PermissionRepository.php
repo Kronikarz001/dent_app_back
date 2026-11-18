@@ -215,6 +215,40 @@ class PermissionRepository extends SearchableRepository implements PermissionRep
     }
 
     /**
+     * @param PermissionGroup $group
+     * @param string[] $userUuids
+     * @param string|null $grantedBy
+     * @return array{attached: string[], detached: string[]}
+     */
+    public function syncGroupUsers(PermissionGroup $group, array $userUuids, ?string $grantedBy): array
+    {
+        $assignments = PermissionAssignment::query()
+            ->where('grantable_type', PermissionGroup::class)
+            ->where('grantable_id', $group->uuid)
+            ->where('assignable_type', User::class);
+
+        $current = (clone $assignments)->notExpired()->pluck('assignable_id')->all();
+        $attached = array_values(array_diff($userUuids, $current));
+        $detached = array_values(array_diff($current, $userUuids));
+
+        (clone $assignments)->whereNotIn('assignable_id', $userUuids)->delete();
+
+        foreach ($attached as $userUuid) {
+            PermissionAssignment::query()->updateOrCreate([
+                'grantable_type' => PermissionGroup::class,
+                'grantable_id' => $group->uuid,
+                'assignable_type' => User::class,
+                'assignable_id' => $userUuid,
+            ], [
+                'expires_at' => null,
+                'granted_by' => $grantedBy,
+            ]);
+        }
+
+        return ['attached' => $attached, 'detached' => $detached];
+    }
+
+    /**
      * @param User $user
      * @return Builder
      */

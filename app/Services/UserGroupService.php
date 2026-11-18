@@ -6,6 +6,7 @@ use App\Exceptions\PermissionDeniedException;
 use App\Models\Role;
 use App\Models\UserGroup;
 use App\Repositories\UserGroupRepositoryInterface;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 
@@ -34,11 +35,11 @@ readonly class UserGroupService implements UserGroupServiceInterface
     }
 
     /**
-     * @return LengthAwarePaginator
+     * @return Collection
      */
-    public function getUserGroupsList(): LengthAwarePaginator
+    public function getUserGroupsList(): Collection
     {
-        return $this->userGroupRepository->findSelectAllWithPagination(['uuid', 'name']);
+        return $this->userGroupRepository->findSelectAll(['uuid', 'name']);
     }
 
     /**

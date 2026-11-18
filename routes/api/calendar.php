@@ -17,6 +17,8 @@ Route::middleware('auth:sanctum')->group(function () {
         ->name('calendar.assignUsers');
     Route::get('/calendar/selectlist', [CalendarController::class, 'selectList'])
         ->name('calendar.selectList');
+    Route::get('/calendar/today', [CalendarController::class, 'today'])
+        ->name('calendar.today');
     Route::apiResource('/calendar', CalendarController::class)
         ->names('calendar');
 

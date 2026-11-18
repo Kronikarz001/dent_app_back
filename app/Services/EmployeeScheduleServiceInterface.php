@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\EmployeeSchedule;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 /**
@@ -11,14 +12,27 @@ use Illuminate\Pagination\LengthAwarePaginator;
 interface EmployeeScheduleServiceInterface
 {
     /**
+     * @param array{user_uuids?: string[], date_from?: string, date_to?: string} $filters
      * @return LengthAwarePaginator
      */
-    public function getSchedules(): LengthAwarePaginator;
+    public function getSchedules(array $filters = []): LengthAwarePaginator;
 
     /**
+     * @param array{date_from?: string, date_to?: string} $filters
      * @return LengthAwarePaginator
      */
-    public function getSchedulesList(): LengthAwarePaginator;
+    public function getMySchedules(array $filters = []): LengthAwarePaginator;
+
+    /**
+     * @return Collection
+     */
+    public function getSchedulesList(): Collection;
+
+    /**
+     * @param EmployeeSchedule $schedule
+     * @return EmployeeSchedule
+     */
+    public function getScheduleDetails(EmployeeSchedule $schedule): EmployeeSchedule;
 
     /**
      * @param array $data

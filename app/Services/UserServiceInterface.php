@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Http\Requests\ExportRequest;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\Writer\Exception as WriterException;
@@ -20,9 +21,14 @@ interface UserServiceInterface
     public function getUsers(): LengthAwarePaginator;
 
     /**
-     * @return LengthAwarePaginator
+     * @return Collection
      */
-    public function getUsersList(): LengthAwarePaginator;
+    public function getUsersList(): Collection;
+
+    /**
+     * @return Collection
+     */
+    public function getUsersWorkingToday(): Collection;
 
     /**
      * @param array $data
@@ -63,11 +69,4 @@ interface UserServiceInterface
      * @throws WriterException
      */
     public function export(ExportRequest $request): BinaryFileResponse;
-
-    /**
-     * @param User $user
-     * @param array $data
-     * @return void
-     */
-    public function assignPermissions(User $user, array $data): void;
 }

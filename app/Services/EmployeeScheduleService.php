@@ -7,7 +7,9 @@ use App\Models\EmployeeSchedule;
 use App\Repositories\EmployeeScheduleRepositoryInterface;
 use App\Repositories\ScheduleOverlapRepositoryInterface;
 use App\Services\Concerns\DetectsScheduleConflicts;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * Summary of EmployeeScheduleService
@@ -34,19 +36,40 @@ readonly class EmployeeScheduleService implements EmployeeScheduleServiceInterfa
     }
 
     /**
+     * @param array{user_uuids?: string[], date_from?: string, date_to?: string} $filters
      * @return LengthAwarePaginator
      */
-    public function getSchedules(): LengthAwarePaginator
+    public function getSchedules(array $filters = []): LengthAwarePaginator
     {
-        return $this->employeeScheduleRepository->findAllWithPagination();
+        return $this->employeeScheduleRepository->findAllWithPagination($filters);
     }
 
     /**
+     * @param array{date_from?: string, date_to?: string} $filters
      * @return LengthAwarePaginator
      */
-    public function getSchedulesList(): LengthAwarePaginator
+    public function getMySchedules(array $filters = []): LengthAwarePaginator
     {
-        return $this->employeeScheduleRepository->findSelectAllWithPagination(['uuid', 'name']);
+        return $this->employeeScheduleRepository->findAllWithPagination(array_merge($filters, [
+            'user_uuids' => [Auth::user()->uuid],
+        ]));
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getSchedulesList(): Collection
+    {
+        return $this->employeeScheduleRepository->findSelectAll(['uuid', 'name']);
+    }
+
+    /**
+     * @param EmployeeSchedule $schedule
+     * @return EmployeeSchedule
+     */
+    public function getScheduleDetails(EmployeeSchedule $schedule): EmployeeSchedule
+    {
+        return $this->employeeScheduleRepository->loadRelations($schedule, ['users:uuid,first_name,last_name']);
     }
 
     /**

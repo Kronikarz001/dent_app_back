@@ -6,6 +6,7 @@ use App\Exports\DentalExaminationExport;
 use App\Http\Requests\ExportRequest;
 use App\Models\DentalExamination;
 use App\Repositories\DentalExaminationRepositoryInterface;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\Writer\Exception as WriterException;
@@ -36,11 +37,11 @@ readonly class DentalExaminationService implements DentalExaminationServiceInter
     }
 
     /**
-     * @return LengthAwarePaginator
+     * @return Collection
      */
-    public function getDentalExaminationsList(): LengthAwarePaginator
+    public function getDentalExaminationsList(): Collection
     {
-        return $this->dentalExaminationRepository->findSelectAllWithPagination(['uuid', 'name']);
+        return $this->dentalExaminationRepository->findSelectAll(['uuid', 'name']);
     }
 
     /**

@@ -67,6 +67,14 @@ interface PermissionRepositoryInterface extends SearchableRepositoryInterface
     public function findResourceForRoute(?string $routeName): ?string;
 
     /**
+     * @param PermissionGroup $group
+     * @param string[] $userUuids
+     * @param string|null $grantedBy
+     * @return array{attached: string[], detached: string[]}
+     */
+    public function syncGroupUsers(PermissionGroup $group, array $userUuids, ?string $grantedBy): array;
+
+    /**
      * @param Permission|PermissionGroup $grantable
      * @param Model $assignable
      * @param string|null $expiresAt

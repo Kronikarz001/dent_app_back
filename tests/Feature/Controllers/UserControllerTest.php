@@ -2,11 +2,13 @@
 
 namespace Tests\Feature\Controllers;
 
+use App\Models\EmployeeSchedule;
 use App\Models\JobPosition;
 use App\Models\Permission;
 use App\Models\PermissionAssignment;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Route;
 use Tests\TestCase;
 
 /**
@@ -513,42 +515,58 @@ class UserControllerTest extends TestCase
     /**
      * @return void
      */
-    public function testAssignPermissionsCreatesDirectGrant(): void
+    public function testSelectListReturnsPlainArrayOfUserSummaries(): void
     {
-        $target = User::factory()->create();
-        $permission = Permission::factory()->create();
+        $position = JobPosition::factory()->create(['name' => 'Higienistka']);
+        $user = User::factory()->create(['job_position_uuid' => $position->uuid]);
 
-        $this->callApiWithLoggedUser()
-            ->patchJson(route('user.assignPermissions', ['user' => $target->uuid]), [
-                'permissions' => [$permission->uuid],
-            ])
-            ->assertNoContent();
+        $response = $this->callApiWithLoggedUser($user)
+            ->getJson(route('user.selectList'));
 
-        $this->assertDatabaseHas('permission_assignments', [
-            'grantable_type' => Permission::class,
-            'grantable_id' => $permission->uuid,
-            'assignable_type' => User::class,
-            'assignable_id' => $target->uuid,
-        ]);
+        $response->assertOk();
+        $this->assertTrue(array_is_list($response->json()));
+        $this->assertSame(
+            ['uuid', 'first_name', 'last_name', 'avatar_path', 'job_position'],
+            array_keys($response->json('0'))
+        );
+        $response->assertJsonPath('0.job_position.name', 'Higienistka');
     }
 
     /**
      * @return void
      */
-    public function testAssignPermissionsForbiddenWhenActingUserDoesNotHoldPermission(): void
+    public function testWorkingTodayReturnsOnlyUsersWithActiveWorkEntryToday(): void
     {
-        $editor = $this->createUserWithUserEditPermission();
-        $permission = Permission::where('resource', 'patient')->where('type', 'edit')->firstOrFail();
+        $working = User::factory()->create();
+        $onVacation = User::factory()->create();
+        $workingTomorrow = User::factory()->create();
+        $inactiveEntry = User::factory()->create();
 
-        $this->callApiWithLoggedUser($editor)
-            ->patchJson(route('user.assignPermissions', ['user' => $editor->uuid]), [
-                'permissions' => [$permission->uuid],
-            ])
-            ->assertForbidden();
+        $work = EmployeeSchedule::factory()->create(['type' => 'WORK', 'date' => now()->toDateString(), 'is_active' => true]);
+        $work->users()->attach($working->uuid);
+        $vacation = EmployeeSchedule::factory()->create(['type' => 'VACATION', 'date' => now()->toDateString(), 'is_active' => true]);
+        $vacation->users()->attach($onVacation->uuid);
+        $tomorrow = EmployeeSchedule::factory()->create(['type' => 'WORK', 'date' => now()->addDay()->toDateString(), 'is_active' => true]);
+        $tomorrow->users()->attach($workingTomorrow->uuid);
+        $inactive = EmployeeSchedule::factory()->create(['type' => 'WORK', 'date' => now()->toDateString(), 'is_active' => false]);
+        $inactive->users()->attach($inactiveEntry->uuid);
 
-        $this->assertDatabaseMissing('permission_assignments', [
-            'grantable_id' => $permission->uuid,
-            'assignable_id' => $editor->uuid,
-        ]);
+        $response = $this->callApiWithLoggedUser()
+            ->getJson(route('user.workingToday'));
+
+        $response->assertOk();
+        $this->assertSame([$working->uuid], collect($response->json())->pluck('uuid')->all());
+    }
+
+    /**
+     * @return void
+     */
+    public function testAssignPermissionsEndpointNoLongerExists(): void
+    {
+        $this->assertFalse(Route::has('user.assignPermissions'));
+
+        $this->callApiWithLoggedUser()
+            ->patchJson('/api/user/'.User::factory()->create()->uuid.'/permissions', ['permissions' => []])
+            ->assertNotFound();
     }
 }

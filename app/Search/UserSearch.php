@@ -2,6 +2,7 @@
 
 namespace App\Search;
 
+use App\Enums\CalendarEventType;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -77,7 +78,29 @@ class UserSearch extends Search
      * @param array $params
      * @return void
      */
-    protected function preFilter(Builder $query, array $params): void {}
+    protected function preFilter(Builder $query, array $params): void
+    {
+        $workingOn = $params['working_on'] ?? null;
+
+        if ($workingOn !== null) {
+            $query->whereHas('employeeSchedules', fn (Builder $schedules) => $schedules
+                ->where('calendars.type', CalendarEventType::WORK->value)
+                ->where('calendars.is_active', true)
+                ->whereDate('calendars.date', '<=', $workingOn)
+                ->whereRaw('COALESCE(calendars.end_date, calendars.date) >= ?', [$workingOn]));
+        }
+    }
+
+    /**
+     * @return string[]
+     */
+    protected function selectRelations(): array
+    {
+        return [
+            'jobPosition:uuid,name',
+            'latestAvatar',
+        ];
+    }
 
     /**
      * @return array

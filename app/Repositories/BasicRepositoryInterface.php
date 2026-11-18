@@ -23,9 +23,15 @@ interface BasicRepositoryInterface
     /**
      * @param string[] $columns
      * @param array $params
-     * @return LengthAwarePaginator<int, TModel>
+     * @return Collection<int, TModel>
      */
-    public function findSelectAllWithPagination(array $columns, array $params = []): LengthAwarePaginator;
+    public function findSelectAll(array $columns, array $params = []): Collection;
+
+    /**
+     * @param array $params
+     * @return Collection<int, TModel>
+     */
+    public function findAllWithoutPagination(array $params = []): Collection;
 
     /**
      * @param string $uuid
@@ -45,6 +51,13 @@ interface BasicRepositoryInterface
      * @return TModel
      */
     public function loadRelations(Model $model, array $relations): Model;
+
+    /**
+     * @param Collection<int, TModel> $models
+     * @param string[] $relations
+     * @return Collection<int, TModel>
+     */
+    public function loadRelationsForMany(Collection $models, array $relations): Collection;
 
     /**
      * @param TModel $model
